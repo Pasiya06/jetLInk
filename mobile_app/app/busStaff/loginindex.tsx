@@ -155,15 +155,7 @@ const login = async () => {
   }
 };
 
-useEffect(() => {
 
-  const interval = setInterval(() => {
-    login();
-  }, 5000);
-
-  return () => clearInterval(interval);
-
-}, []);
 
 
   

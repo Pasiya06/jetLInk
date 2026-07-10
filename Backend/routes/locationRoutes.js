@@ -12,6 +12,8 @@ router.post("/update", updateLocation);
 
 router.get("/", getAllLocations);
 
-router.get("/:busNumber", getBusLocation);
-
+router.get(
+ "/location/:busNumber",
+ getBusLocation
+);
 export default router;

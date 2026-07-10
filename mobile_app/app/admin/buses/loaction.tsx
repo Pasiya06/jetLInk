@@ -23,30 +23,38 @@ const BusScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState('');
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const busNum = params.busNumber as string;
-  const [locations, setLocations] = useState([]);
+  const [location, setLocation] = useState<any>(null);
   const [loading, setLoading] = useState(true);
     
 
-    useEffect(() => {
-  getLocations();
+useEffect(() => {
 
-  const interval = setInterval(() => {
+ if(busNum){
     getLocations();
-  }, 5000); // refresh every 5 seconds
 
-  return () => clearInterval(interval);
-}, []);
+    const interval = setInterval(()=>{
+      getLocations();
+    },5000);
+
+    return ()=>clearInterval(interval);
+ }
+
+},[busNum]);
 
 const getLocations = async () => {
   try {
-    const response = await fetch(`${API_URL}/location/${busNum}`)
+
+    const response = await fetch(
+      `${API_URL}/location/${busNum}`
+    );
 
     const result = await response.json();
 
-    if (result.success) {
-      setLocations(result.data);
+    if(result.success){
+      setLocation(result.data);
     }
-  } catch (error) {
+
+  } catch(error){
     console.log(error);
   } finally {
     setLoading(false);
@@ -78,17 +86,18 @@ const getLocations = async () => {
               longitudeDelta: 0.05,
             }}
           >
-            {locations.map((bus: any) => (
+           {
+              location && (
               <Marker
-                key={bus.busNumber}
-                coordinate={{
-                  latitude: Number(bus.latitude),
-                  longitude: Number(bus.longitude),
-                }}
-                title={bus.busNumber}
-                description={`Speed : ${bus.speed ?? 0} km/h`}
+              coordinate={{
+                latitude:Number(location.latitude),
+                longitude:Number(location.longitude)
+              }}
+              title={location.busNumber}
+              description={`Speed : ${location.speed ?? 0} km/h`}
               />
-            ))}
+              )
+              }
           </MapView>
                     
 
