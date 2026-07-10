@@ -22,7 +22,7 @@ const BusScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState('');
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
-
+  const busNum = params.busNumber as string;
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
     
@@ -39,7 +39,7 @@ const BusScreen: React.FC = () => {
 
 const getLocations = async () => {
   try {
-    const response = await fetch(`${API_URL}/location/${busNumber}`)
+    const response = await fetch(`${API_URL}/location/${busNum}`)
 
     const result = await response.json();
 
