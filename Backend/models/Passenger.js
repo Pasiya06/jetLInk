@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Counter from "./Counter.js";
+
 const passengerSchema = new mongoose.Schema(
   {
     passengerId: {
@@ -7,7 +7,6 @@ const passengerSchema = new mongoose.Schema(
       unique: true,
     },
 
-    
     firstName: {
       type: String,
       required: true,
@@ -37,13 +36,6 @@ const passengerSchema = new mongoose.Schema(
       unique: true,
     },
 
-
-    gender: {
-      type: String,
-      enum: ["Male", "Female", "Other"],
-      required: true,
-    },
-
     email: {
       type: String,
       required: true,
@@ -61,41 +53,20 @@ const passengerSchema = new mongoose.Schema(
   }
 );
 
-export const deletePassenger = async (req, res) => {
-  try {
-    const passenger = await Passenger.findById(req.params.id);
+// Auto Increment passengerId
+passengerSchema.pre("save", async function () {
+  if (!this.isNew || this.passengerId) return;
 
-    if (!passenger) {
-      return res.status(404).json({
-        success: false,
-        message: "Passenger not found",
-      });
-    }
+  const lastPassenger = await mongoose
+    .model("Passenger")
+    .findOne()
+    .sort({ passengerId: -1 });
 
-    const deletedPassengerId = passenger.passengerId;
-
-    await Passenger.findByIdAndDelete(req.params.id);
-
-    // Shift remaining IDs down by 1
-    await Passenger.updateMany(
-      { passengerId: { $gt: deletedPassengerId } },
-      { $inc: { passengerId: -1 } }
-    );
-
-    res.json({
-      success: true,
-      message: "Passenger deleted successfully",
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-};
+  this.passengerId = lastPassenger
+    ? lastPassenger.passengerId + 1
+    : 1;
+});
 
 const Passenger = mongoose.model("Passenger", passengerSchema);
-
-
 
 export default Passenger;

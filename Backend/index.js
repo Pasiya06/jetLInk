@@ -6,6 +6,9 @@ import adminRoutes from "./routes/adminRoutes.js";
 import busRoutes from "./routes/busRoutes.js";
 import passengerRoutes from "./routes/passengerRoutes.js";
 import scheduleRoutes from "./routes/scheduleRoutes.js";
+import driverRoutes from "./routes/driverRoutes.js";
+import conductorRoutes from "./routes/conductorRoutes.js";
+import locationRoutes from "./routes/locationRoutes.js";
 
 dotenv.config();
 
@@ -56,6 +59,10 @@ app.use("/api/passengers", passengerRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/buses", busRoutes);
 app.use("/api/schedules", scheduleRoutes);
+app.use("/api/drivers", driverRoutes);
+app.use("/api/conductors", conductorRoutes);
+app.use("/api/location", locationRoutes);
+
 
 // Invalid Route Handler
 app.use((req, res) => {

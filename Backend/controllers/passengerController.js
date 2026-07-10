@@ -58,3 +58,35 @@ export const getPassengers = async (req, res) => {
     });
   }
 };
+
+export const deletePassenger = async (req, res) => {
+  try {
+    const passenger = await Passenger.findById(req.params.id);
+
+    if (!passenger) {
+      return res.status(404).json({
+        success: false,
+        message: "Passenger not found",
+      });
+    }
+
+    const deletedPassengerId = passenger.passengerId;
+
+    await Passenger.findByIdAndDelete(req.params.id);
+
+    await Passenger.updateMany(
+      { passengerId: { $gt: deletedPassengerId } },
+      { $inc: { passengerId: -1 } }
+    );
+
+    res.json({
+      success: true,
+      message: "Passenger deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

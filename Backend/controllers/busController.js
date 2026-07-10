@@ -95,3 +95,37 @@ export const updateBus = async (req, res) => {
     });
   }
 };
+
+export const checkBusNumber = async (req, res) => {
+  try {
+    const bus = await Bus.findOne({
+      busNumber: req.params.busNumber,
+    });
+
+    if (!bus) {
+      return res.status(404).json({
+        success: false,
+        exists: false,
+        message: "bus not found",
+      });
+    }
+
+    res.status(200).json({
+      
+      success: true,
+      exists: true,
+      data: {
+        _id: bus._id,
+        busId: bus.busId,
+        busNumber: bus.busNumber,
+        
+      },
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
