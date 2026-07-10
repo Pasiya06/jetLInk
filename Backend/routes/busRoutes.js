@@ -5,9 +5,12 @@ import {
   deleteBus,
   updateBus,
   checkBusNumber,
+  logoutBus,
 } from "../controllers/busController.js";
 
 const router = express.Router();
+
+router.post("/offline", logoutBus);
 
 // Check bus number
 router.get("/check/:busNumber", checkBusNumber);

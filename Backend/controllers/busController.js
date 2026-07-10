@@ -129,3 +129,21 @@ export const checkBusNumber = async (req, res) => {
     });
   }
 };
+
+export const logoutBus = async (req, res) => {
+  try {
+    await Location.deleteOne({
+      busNumber: req.body.busNumber,
+    });
+
+    res.json({
+      success: true,
+      message: "Bus is offline",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

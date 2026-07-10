@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as Location from "expo-location";
-import bcrypt from "bcryptjs";
 import { Stack, useRouter } from 'expo-router';
-import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar,  } from 'react-native';
+import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, Alert   } from 'react-native';
 
 import { Feather as Icon, MaterialIcons } from '@expo/vector-icons';
 
@@ -18,6 +17,7 @@ export const FlatmateLogin: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [verifiedNIC, setVerifiedNIC] = useState("");
   const [verifiedBusno, setVerifiedBusno] = useState("");
+  
 
 const verify = async () => {
   try {
@@ -27,16 +27,7 @@ const verify = async () => {
       alert("Invalid Bus Number");
       return;
     }
-    else{
-       router.push({
-        pathname: "/admin/buses/todaydetail",
-        params: {
-            
-            Bno: bus.data.busNumber,
-            
-      } 
-    }); 
-    }
+     
 
     setVerifiedBusno(bus.data.busNumber);
 
@@ -47,33 +38,11 @@ const verify = async () => {
       return;
     }
 
-    else{
-       router.push({
-        pathname: "/admin/buses/todaydetail",
-        params: {
-            
-           DfirstName: driver.data.firstName,
-            
-      } 
-    }); 
-    }
-
     const conductorResponse = await fetch(`${API_URL}/conductors/check/${CNIC}`);
     const conductor = await conductorResponse.json();
     if (!conductor.exists) {
       alert("Invalid Conductor NIC");
       return;
-    }
-
-    else{
-       router.push({
-        pathname: "/admin/buses/todaydetail",
-        params: {
-            
-            CfirstName: conductor.data.firstName,
-            
-      } 
-    }); 
     }
 
     // Store the verified NIC clearly, not conductorId
@@ -93,31 +62,7 @@ const verify = async () => {
 const login = async () => {
   try {
 
-     const { status } = await Location.requestForegroundPermissionsAsync();
-
-  if (status !== "granted") {
-    return;
-  }
-
-  const location = await Location.getCurrentPositionAsync({
-    accuracy: Location.Accuracy.High,
-  });
-
-  await fetch(`${API_URL}/location/update`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      busNumber: verifiedBusno,
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-      speed: location.coords.speed,
-      heading: location.coords.heading,
-    }),
-  });
-
-
+    
     console.log("Sending password:", password1); // is this defined?
 
     const response = await fetch(`${API_URL}/conductors/login`, {
@@ -136,8 +81,11 @@ const login = async () => {
       alert(data.message);
       return;
     }
+    
 
     alert("Login Successful");
+
+    
     router.push({
       pathname: "/busStaff/index1",
       params: {
@@ -145,7 +93,7 @@ const login = async () => {
         conductorId: data.data.conductorId,
         cfirstName: data.data.firstName,
         clastName: data.data.lastName,
-        busNumber: verifiedBusno,
+        busNo: verifiedBusno,
         
       },
     });
@@ -155,13 +103,6 @@ const login = async () => {
   }
 };
 
-
-
-
-  
-
-
-  
 
   return (
     <>
@@ -184,8 +125,8 @@ const login = async () => {
                 {!showLogin ? (
 
 
-                <>
-                <View style={styles.card}>
+              <>
+              <View style={styles.card}>
                 <View style={styles.formContainer}>
                     <Text style={styles.inputLabel}>Bus Number</Text>
                     <View style={styles.inputWrapper1}>
@@ -222,7 +163,7 @@ const login = async () => {
                         />
                       </View>
                     </View>
-<View style={styles.footerContainer}>
+                  <View style={styles.footerContainer}>
             
                   <TouchableOpacity
                     style={styles.primaryButton}
@@ -233,8 +174,7 @@ const login = async () => {
                     </Text>
                   </TouchableOpacity>
            
-          </View>
-                  
+          </View>                  
                     </View>
                   </View>
                   

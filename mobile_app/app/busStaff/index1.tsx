@@ -1,6 +1,6 @@
-import React from 'react';
-import { Image } from 'react-native';
-import { Stack, useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from 'react';
+import { Image, Alert } from 'react-native';
+import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
   StyleSheet,
   ScrollView,
@@ -20,12 +20,101 @@ import {
   MaterialIcons, 
   FontAwesome5 
 } from '@expo/vector-icons';
-
-const router = useRouter();
-
+import * as Location from "expo-location";
 
 
+
+
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 export default function Index() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  
+  const locationInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  
+  const sendLocation = async () => {
+  try {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+
+    if (status !== "granted") return;
+
+    const location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.High,
+    });
+
+    await fetch(`${API_URL}/location/update`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        busNumber: params.busNo,
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        speed: location.coords.speed ?? 0,
+        heading: location.coords.heading ?? 0,
+      }),
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+useEffect(() => {
+  sendLocation();
+
+  locationInterval.current = setInterval(() => {
+    sendLocation();
+  }, 5 * 60 * 1000);
+
+  return () => {
+    if (locationInterval.current) {
+      clearInterval(locationInterval.current);
+    }
+  };
+}, []);
+
+  const logout = () => {
+  Alert.alert(
+    "Logout",
+    "Are you sure you want to logout?",
+    [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            if (locationInterval.current) {
+              clearInterval(locationInterval.current);
+              locationInterval.current = null;
+            }
+
+            await fetch(`${API_URL}/location/offline`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                busNumber: params.busNo, // <-- use busNumber, not busNo
+              }),
+            });
+
+            router.replace("/");
+          } catch (error) {
+            console.log(error);
+            router.replace("/");
+          }
+        },
+      },
+    ]
+  );
+};
+
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
@@ -37,7 +126,7 @@ export default function Index() {
             <Ionicons name="menu" size={30} color="#ffffff" />
           </TouchableOpacity>
           
-          <TouchableOpacity onPress={() => router.push("/")}><Text style={styles.title}>Jetlink</Text></TouchableOpacity>
+          <TouchableOpacity onPress={logout}><Text style={styles.title}>Jetlink</Text></TouchableOpacity>
           
           <TouchableOpacity>
             <Ionicons name="notifications" size={24} color="#ffffff" />

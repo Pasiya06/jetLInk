@@ -103,7 +103,7 @@ const BusScreen: React.FC = () => {
     <TouchableOpacity style={styles.friendRow}
       onPress={() =>
         router.push({
-          pathname: "/admin/buses/loaction",
+          pathname: "/admin/buses/index5",
           params: {
             Bid: item._id, 
             busId: String(item.busId),
@@ -133,11 +133,11 @@ const BusScreen: React.FC = () => {
       <TouchableOpacity style={styles.iconButton}>
         <MaterialIcons name="location-on" size={32} color="#32CD32" onPress={() =>
         router.push({
-          pathname: "/admin/buses/index5",
+          pathname: "/admin/buses/loaction",
           params: {
             Bid: item._id, 
             busId: String(item.busId),
-            busNumber: item.busNumber,
+            busNum: item.busNumber,
             chassis: item.chassisNo || "",
             engine: item.engineNo || "",
             colour: item.colour || "",
