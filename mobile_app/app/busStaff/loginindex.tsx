@@ -1,0 +1,550 @@
+import React, { useEffect, useRef, useState } from 'react';
+import * as Location from "expo-location";
+import bcrypt from "bcryptjs";
+import { Stack, useRouter } from 'expo-router';
+import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar,  } from 'react-native';
+
+import { Feather as Icon, MaterialIcons } from '@expo/vector-icons';
+
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+export const FlatmateLogin: React.FC = () => {
+  const router = useRouter();
+  const [showLogin, setShowOtp] = useState(false);
+  const [busNum, setBusNum] = useState('');
+  const [DNIC, DsetNIC] = useState('');
+  const [CNIC, CsetNIC] = useState('');
+  const [password1, setPassword1] = useState<string>('');
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [verifiedNIC, setVerifiedNIC] = useState("");
+  const [verifiedBusno, setVerifiedBusno] = useState("");
+
+const verify = async () => {
+  try {
+    const busResponse = await fetch(`${API_URL}/buses/check/${busNum}`);
+    const bus = await busResponse.json();
+    if (!bus.exists) {
+      alert("Invalid Bus Number");
+      return;
+    }
+    else{
+       router.push({
+        pathname: "/admin/buses/todaydetail",
+        params: {
+            
+            Bno: bus.data.busNumber,
+            
+      } 
+    }); 
+    }
+
+    setVerifiedBusno(bus.data.busNumber);
+
+    const driverResponse = await fetch(`${API_URL}/drivers/check/${DNIC}`);
+    const driver = await driverResponse.json();
+    if (!driver.exists) {
+      alert("Invalid Driver NIC");
+      return;
+    }
+
+    else{
+       router.push({
+        pathname: "/admin/buses/todaydetail",
+        params: {
+            
+           DfirstName: driver.data.firstName,
+            
+      } 
+    }); 
+    }
+
+    const conductorResponse = await fetch(`${API_URL}/conductors/check/${CNIC}`);
+    const conductor = await conductorResponse.json();
+    if (!conductor.exists) {
+      alert("Invalid Conductor NIC");
+      return;
+    }
+
+    else{
+       router.push({
+        pathname: "/admin/buses/todaydetail",
+        params: {
+            
+            CfirstName: conductor.data.firstName,
+            
+      } 
+    }); 
+    }
+
+    // Store the verified NIC clearly, not conductorId
+    setVerifiedNIC(conductor.data.NIC);
+
+    setShowOtp(true);
+  } catch (error) {
+    console.log(error);
+    alert("Server connection failed");
+  }
+};
+
+
+
+
+
+const login = async () => {
+  try {
+
+     const { status } = await Location.requestForegroundPermissionsAsync();
+
+  if (status !== "granted") {
+    return;
+  }
+
+  const location = await Location.getCurrentPositionAsync({
+    accuracy: Location.Accuracy.High,
+  });
+
+  await fetch(`${API_URL}/location/update`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      busNumber: verifiedBusno,
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      speed: location.coords.speed,
+      heading: location.coords.heading,
+    }),
+  });
+
+
+    console.log("Sending password:", password1); // is this defined?
+
+    const response = await fetch(`${API_URL}/conductors/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        NIC: verifiedNIC,
+        password: password1,
+      }),
+    });
+
+    const data = await response.json();
+    console.log("Response:", data); 
+
+    if (!data.success) {
+      alert(data.message);
+      return;
+    }
+
+    alert("Login Successful");
+    router.push({
+      pathname: "/busStaff/index1",
+      params: {
+        Cid: data.data._id,
+        conductorId: data.data.conductorId,
+        cfirstName: data.data.firstName,
+        clastName: data.data.lastName,
+        busNumber: verifiedBusno,
+        
+      },
+    });
+  } catch (error) {
+    console.log(error);
+    alert("Server Error");
+  }
+};
+
+useEffect(() => {
+
+  const interval = setInterval(() => {
+    login();
+  }, 5000);
+
+  return () => clearInterval(interval);
+
+}, []);
+
+
+  
+
+
+  
+
+  return (
+    <>
+      <Stack.Screen options={{ title: "", headerShown: false }} />
+      <StatusBar barStyle="light-content" backgroundColor="#7db300" />
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+         
+          
+          <TouchableOpacity onPress={() => router.push("/")}>
+            <Text style={styles.title}>Login</Text>
+          </TouchableOpacity>
+          
+          
+        </View>
+        
+        
+                
+              
+                {!showLogin ? (
+
+
+                <>
+                <View style={styles.card}>
+                <View style={styles.formContainer}>
+                    <Text style={styles.inputLabel}>Bus Number</Text>
+                    <View style={styles.inputWrapper1}>
+                    <Image source={require("../../assets/images/icons8-bus-94.png")} style={styles.input3dIcon}/>
+                    <View style={styles.inputInnerWrapper}>
+                        <TextInput style={styles.textInput} value={busNum} onChangeText={setBusNum} placeholder="Bus Number"/>
+                    </View>
+                    </View>
+
+                    <Text style={styles.inputLabel}>Driver NIC</Text>  
+                    <View style={styles.inputWrapper1}>
+                      <Image source={require("../../assets/images/icons8-loyalty-94.png")} style={styles.input3dIcon} />
+                      <View style={styles.inputInnerWrapper}>
+                        <TextInput
+                          style={styles.textInput}
+                          value={DNIC}
+                          onChangeText={DsetNIC}
+                          placeholder="123456789012"
+                          placeholderTextColor="#A3A3A3"
+                        />
+                        </View>
+                    </View>
+
+                    <Text style={styles.inputLabel}>Conductor NIC</Text>  
+                    <View style={styles.inputWrapper1}>
+                      <Image source={require("../../assets/images/icons8-loyalty-94.png")} style={styles.input3dIcon} />
+                      <View style={styles.inputInnerWrapper}>
+                        <TextInput
+                            style={styles.textInput}
+                            value={CNIC}
+                            onChangeText={CsetNIC}
+                            placeholder="123456789012"
+                            placeholderTextColor="#A3A3A3"
+                        />
+                      </View>
+                    </View>
+<View style={styles.footerContainer}>
+            
+                  <TouchableOpacity
+                    style={styles.primaryButton}
+                    onPress={showLogin ? login : verify}
+                  >
+                    <Text style={styles.primaryButtonText}>
+                      {showLogin ? "Login" : "Verify"}
+                    </Text>
+                  </TouchableOpacity>
+           
+          </View>
+                  
+                    </View>
+                  </View>
+                  
+
+                </>
+                ) : (
+                <>
+                  <View style={styles.card1}>
+                  <View style={styles.formContainer}>
+                    <Text style={styles.inputLabel}>Password</Text>
+              <View style={styles.inputWrapper}>
+                <Image source={require("../../assets/images/icons8-lock-94.png")} style={styles.input3dIcon} />
+                <View style={styles.inputInnerWrapper}>
+                  <TextInput
+                    style={styles.textInput}
+                    value={password1}
+                    onChangeText={setPassword1}
+                    placeholder="Abc@123"
+                    placeholderTextColor="#A3A3A3"
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                  />
+                </View>
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+                  <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color="#000000" />
+                </TouchableOpacity>
+              </View>
+                  </View>
+                  <View style={styles.footerContainer}>
+            
+                    <TouchableOpacity
+                      style={styles.primaryButton1}
+                      onPress={showLogin ? login : verify}
+                    >
+                      <Text style={styles.primaryButtonText}>
+                        {showLogin ? "Login" : "Verify"}
+                      </Text>
+                    </TouchableOpacity>
+           
+          </View>
+                  </View>
+                </>
+                )}
+              
+              
+
+         
+
+  
+
+        <View style={styles.footerGraphic}>
+            <View style={styles.blueCurve} />
+            <View style={styles.greenCurve} />
+        </View>
+      </SafeAreaView>
+    </>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',  
+  },
+
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 50,
+    paddingHorizontal: 20,
+    paddingBottom: 70,   
+    backgroundColor: '#0047AB',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  title: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#ffffff',
+    letterSpacing: 0.5,  
+  },
+
+  card: {
+    width: '90%',
+    height: '60%',
+    backgroundColor: '#FFF',
+    //padding: 24,
+    //alignItems: 'center',
+
+    marginTop: -50,   
+    alignSelf: 'center',
+
+    borderRadius: 20,
+    elevation: 10,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+
+  card1: {
+    width: '90%',
+    height: '25%',
+    backgroundColor: '#FFF',
+    //padding: 24,
+    //alignItems: 'center',
+
+    marginTop: -50,   
+    alignSelf: 'center',
+
+    borderRadius: 20,
+    elevation: 10,
+
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+  
+  eyeIcon: {
+    padding: 4,
+  },
+ 
+  
+  
+  
+
+  formContainer: {
+    
+    marginTop: 34,
+    //marginBottom:70,
+    //width: '90%',  
+  },
+
+
+  inputWrapper1: {
+    height: '12%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F2F4F5',
+    marginRight: 15,
+    marginLeft: 15,
+    marginBottom: 25,
+    borderLeftWidth: 1,
+    borderWidth: 1,
+    borderColor: '#32CD32',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+
+  inputWrapper: {
+    height: '45%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F2F4F5',
+    marginRight: 15,
+    marginLeft: 15,
+    
+    borderLeftWidth: 1,
+    borderWidth: 1,
+    borderColor: '#32CD32',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+
+  otpContainer: {
+    width: '100%',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    
+    marginBottom: 40,
+    paddingHorizontal: 25,
+    paddingTop: 40,
+  },
+
+  otpBox: {
+    width: 40,
+    height: 55,
+    borderRadius: 10,
+    backgroundColor: "#F5F5F5",
+    textAlign: "center",
+    fontSize: 28,
+    fontWeight: "700",
+    elevation: 3,
+  },
+
+  input3dIcon: {
+    marginRight: 12,
+    width:25,
+    height:25
+  },
+
+  inputInnerWrapper: {
+    flex: 1,
+  },
+
+  inputLabel: {
+    marginRight: 15,
+    marginLeft: 15,
+    fontSize: 16,
+    color: '#0056b3',
+    fontWeight: '500',
+    marginBottom: 10,
+  },
+
+  textInput: {
+    fontSize: 16,
+    color: '#0056b3',
+    fontWeight: '500',
+    padding: 0, 
+    marginTop: 2,
+  },
+
+  footerContainer: {
+    
+    marginTop: 'auto', 
+    paddingBottom: 10,
+    //marginBottom: 10,
+    marginRight: 15,
+    marginLeft: 15,
+  },
+
+  primaryButton: {
+    //marginBottom: 60,
+    width: '100%',
+    
+    backgroundColor: '#32CD32',
+    padding: 14,
+    alignItems: 'center',   
+    alignSelf: 'center',
+    marginBottom: 2,
+    borderRadius: 20,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+
+  primaryButton1: {
+    
+    width: '100%',
+    marginBottom: 10,
+    backgroundColor: '#32CD32',
+    padding: 14,
+    alignItems: 'center',   
+    alignSelf: 'center',
+    //marginTop: 10,
+    borderRadius: 20,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+
+  primaryButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  
+  footerGraphic: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    height: 45,
+    overflow: 'hidden',
+    marginTop: 22,
+  },
+
+  blueCurve: {
+    // backgroundColor: '#0052cc',
+    width: '100%',
+    borderRadius: 30,
+    position: 'absolute', 
+  },
+
+  greenCurve: {
+    backgroundColor: '#0052cc',
+    height: 100,
+    width: '100%',
+    borderRadius: 30,
+    position: 'absolute', 
+  },
+});
+
+export default FlatmateLogin;
