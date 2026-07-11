@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Image, TextInput } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
+  Alert,
   StyleSheet,
   ScrollView,
   Text,
@@ -21,6 +22,7 @@ import {
   FontAwesome5, FontAwesome, Feather 
 } from '@expo/vector-icons';
 import { HiOutlineLogout } from "react-icons/hi";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 
@@ -32,6 +34,29 @@ export default function Index() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState('');
   const params = useLocalSearchParams();
+
+  const handleLogout = () => {
+  Alert.alert(
+    "Logout",
+    "Are you sure you want to logout?",
+    [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          await AsyncStorage.clear(); // or remove specific keys
+          router.replace("/");
+        },
+      },
+    ]
+  );
+};
+
+  
 
   return (
     <>
@@ -151,25 +176,11 @@ export default function Index() {
         
                   
         
-                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                          setIsSearching(false); 
-                        }
-        
-                        else {
-                          router.push({
-                            pathname: "/",
-                            params: {
-                              Aid: params.Aid,
-                              firstName: params.firstName,
-                              lastName: params.lastName,
-                              email: params.email,
-                            },                    
-                          });
-                        };}}>
+                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); handleLogout();}}>
                     <Ionicons name="log-out-outline" size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
                     
                     <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
-                      Back
+                      Logout
                     </Text>
                   </TouchableOpacity>
         
