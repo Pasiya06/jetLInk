@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const locationSchema = new mongoose.Schema(
   {
-    busNumber: {
+    busNama: {
       type: String,
       required: true,
       unique: true,

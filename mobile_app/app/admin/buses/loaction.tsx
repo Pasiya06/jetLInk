@@ -23,44 +23,78 @@ const BusScreen: React.FC = () => {
   const [activeTab, setActiveTab] = useState('');
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const busNum = params.busNum as string;
-  const [location, setLocation] = useState<any>(null);
+  const [locations, setLocations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-    
 
-useEffect(() => {
+  const loadLocations = async () => {
 
- if(busNum){
-    getLocations();
-
-    const interval = setInterval(()=>{
-      getLocations();
-    },5000);
-
-    return ()=>clearInterval(interval);
- }
-
-},[busNum]);
-
-const getLocations = async () => {
   try {
 
     const response = await fetch(
-      `${API_URL}/location/busNumber}`
+      `${API_URL}/location/all-buses`
     );
+
 
     const result = await response.json();
 
+
+    console.log("Bus Locations:", result);
+
+
     if(result.success){
-      setLocation(result.data);
+
+      // only buses that have location
+      const activeBuses = result.data.filter(
+        (bus:any)=> bus.location !== null
+      );
+
+
+      setLocations(activeBuses);
+
     }
 
+
   } catch(error){
-    console.log(error);
-  } finally {
-    setLoading(false);
+
+    console.log(
+      "Load location error:",
+      error
+    );
+
   }
+
 };
+
+useEffect(()=>{
+
+
+  loadLocations();
+
+
+  const interval = setInterval(()=>{
+
+    loadLocations();
+
+  },5000);
+
+
+
+  return ()=>{
+
+    clearInterval(interval);
+
+  };
+
+
+},[]);
+
+
   
+      
+
+
+
+
 
 
 
@@ -77,28 +111,31 @@ const getLocations = async () => {
         
         <View style={styles.card}>
 
-          <MapView
-            style={{ flex: 1 }}
-            initialRegion={{
-              latitude: 6.9271,
-              longitude: 79.8612,
-              latitudeDelta: 0.05,
-              longitudeDelta: 0.05,
-            }}
-          >
-           {
-              location && (
-              <Marker
-              coordinate={{
-                latitude:Number(location.latitude),
-                longitude:Number(location.longitude)
-              }}
-              title={location.busNumber}
-              description={`Speed : ${location.speed ?? 0} km/h`}
-              />
-              )
-              }
-          </MapView>
+          {
+                locations.map((bus)=>(
+
+                <Marker
+
+                key={bus.busNo}
+
+                coordinate={{
+
+                latitude:Number(bus.location.latitude),
+
+                longitude:Number(bus.location.longitude)
+
+                }}
+
+                title={bus.busNo}
+
+                description={
+                `Speed: ${bus.location.speed ?? 0} km/h`
+                }
+
+                />
+
+                ))
+                }
                     
 
         </View>
@@ -133,6 +170,7 @@ const getLocations = async () => {
                     },                    
                   });
                 };}}>
+                  
             <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
               Back
