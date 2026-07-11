@@ -157,7 +157,7 @@ const AddBus = () => {
           </ScrollView>
 
           <TouchableOpacity style={styles.searchButton} onPress={handleAddBus }>
-            <Text style={styles.searchButtonText}>Add Bus</Text>
+            <Text style={styles.searchButtonText}>Add Schedule</Text>
           </TouchableOpacity>
 
       </View>

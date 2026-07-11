@@ -159,12 +159,10 @@ const BusScreen: React.FC = () => {
                 </View>
             </View>
             
-            <TouchableOpacity style={styles.iconButton}>
-                <MaterialIcons name="location-on" size={62} color="#32CD32"/>    
-            </TouchableOpacity>
+            
             </View>  
+            <Text style={styles.friendName}>Stops:</Text>
             <Text style={styles.friendName}>{item.stops}</Text>
-            <Text style={styles.friendName}>{params.busNumber}</Text>
             <TouchableOpacity onPress={()=>deleteBussched(item.scheduleId)}>
                 <Ionicons name="trash" size={30} color="red"/>
             </TouchableOpacity>
@@ -198,7 +196,7 @@ const BusScreen: React.FC = () => {
           />
         
         <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-          <Text style={styles.searchButtonText}>Add Bus</Text>
+          <Text style={styles.searchButtonText}>Add Schedule</Text>
         </TouchableOpacity>
 
       </View>

@@ -1,16 +1,24 @@
+// backend/routes/locationRoutes.js
 import express from "express";
-
 import {
   updateLocation,
   getBusLocation,
   getAllLocations,
+  setOffline,
 } from "../controllers/locationController.js";
 
 const router = express.Router();
 
+// POST /api/locations/update  → driver sends GPS
 router.post("/update", updateLocation);
 
+// GET  /api/locations         → get all bus locations
 router.get("/", getAllLocations);
 
-router.get("/location/:busNumber",getBusLocation);
+// GET  /api/locations/:busNama → get one bus location
+router.get("/:busNama", getBusLocation);
+
+// POST /api/locations/offline → set bus offline
+router.post("/offline", setOffline);
+
 export default router;

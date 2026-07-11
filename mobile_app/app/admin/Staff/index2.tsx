@@ -150,7 +150,7 @@ useFocusEffect(
           />
 
           <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-            <Text style={styles.searchButtonText}>Add Bus</Text>
+            <Text style={styles.searchButtonText}>Add Driver</Text>
           </TouchableOpacity>
 
         </View>

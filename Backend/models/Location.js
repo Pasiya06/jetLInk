@@ -1,3 +1,4 @@
+// backend/models/Location.js
 import mongoose from "mongoose";
 
 const locationSchema = new mongoose.Schema(
@@ -7,29 +8,33 @@ const locationSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-
     latitude: {
       type: Number,
       required: true,
+      default: 0,
     },
-
     longitude: {
       type: Number,
       required: true,
+      default: 0,
     },
-
-    speed: Number,
-
-    heading: Number,
-
-    updatedAt: {
-      type: Date,
-      default: Date.now,
+    speed: {
+      type: Number,
+      default: 0,
+    },
+    heading: {
+      type: Number,
+      default: 0,
+    },
+    isOnline: {
+      type: Boolean,
+      default: false,
     },
   },
   {
-    timestamps: true,
+    timestamps: true, // adds createdAt and updatedAt
   }
 );
 
-export default mongoose.model("Location", locationSchema);
+const Location = mongoose.model("Location", locationSchema);
+export default Location;

@@ -10,6 +10,7 @@ import {
   FlatList,
   Alert,
 } from 'react-native';
+
 import { Ionicons, MaterialIcons, FontAwesome, Feather, Entypo } from '@expo/vector-icons';
 import {getConductors, deleteConductor,} from "../../../services/conductorService";
 

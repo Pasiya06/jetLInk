@@ -57,7 +57,7 @@ export default function Index() {
               <View style={styles.iconContainer}>
                 <Fontisto name={"bus"}  size={22} color={"#32CD32" } />
               </View>
-              <Text style={styles.cardText}>Passenger</Text>
+              <Text style={styles.cardText}>Passenger and Admin</Text>
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 

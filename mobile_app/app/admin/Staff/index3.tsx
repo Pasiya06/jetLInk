@@ -240,7 +240,7 @@ const AddBus = () => {
         </ScrollView>
 
       <TouchableOpacity style={styles.searchButton} onPress={handleAddBus }>
-        <Text style={styles.searchButtonText}>Add Bus</Text>
+        <Text style={styles.searchButtonText}>Add Driver</Text>
       </TouchableOpacity>
            
     </View>
