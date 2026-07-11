@@ -164,7 +164,7 @@ const BusScreen: React.FC = () => {
             <Text style={styles.friendName}>Stops:</Text>
             <Text style={styles.friendName}>{item.stops}</Text>
             <TouchableOpacity onPress={()=>deleteBussched(item.scheduleId)}>
-              <Ionicons name="trash" size={30} color="red"/>
+              {/* <Ionicons name="trash" size={30} color="red"/> */}
             </TouchableOpacity>
             
         

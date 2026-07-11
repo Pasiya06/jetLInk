@@ -131,7 +131,8 @@ const BusScreen: React.FC = () => {
       </View>
       <Text style={styles.friendName}>{item.busNumber}</Text>
       <TouchableOpacity style={styles.iconButton}>
-        <MaterialIcons name="location-on" size={32} color="#32CD32" onPress={() =>
+        <MaterialIcons name="location-on" size={32} color="#32CD32" 
+        onPress={() =>
         router.push({
           pathname: "/admin/buses/loaction",
           params: {
@@ -153,7 +154,8 @@ const BusScreen: React.FC = () => {
             email: params.email,
           },
         })
-      }/>    
+      }
+      />    
       </TouchableOpacity>
       <TouchableOpacity onPress={() => deleteBus(item._id)}>
         <Ionicons name="trash" size={30} color="red" />

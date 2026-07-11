@@ -125,7 +125,31 @@ const BusScreen: React.FC = () => {
     >
       
       <View style={styles.profileCircle}>
-        <Fontisto name={"bus"} size={25} color="#32CD32" />
+        <Fontisto name={"bus"} size={25} color="#32CD32" 
+        onPress={() =>
+        router.push({
+          pathname: "/admin/buses/loaction",
+          params: {
+            Bid: item._id, 
+            busId: String(item.busId),
+            busNum: item.busNumber,
+            chassis: item.chassisNo || "",
+            engine: item.engineNo || "",
+            colour: item.colour || "",
+            fuel: item.fuelType || "",
+            serviceDate: item.serviceDate || "",
+            licenseDate: item.licenseDate || "",
+            emissionDate: item.emissionDate || "",
+            busType: item.busType || "",
+
+            Aid: params.Aid,
+            firstName: params.firstName,
+            lastName: params.lastName,
+            email: params.email,
+          },
+        })
+      }
+        />
       </View>
       <Text style={styles.friendName}>{item.busNumber}</Text>
       <TouchableOpacity style={styles.iconButton}>

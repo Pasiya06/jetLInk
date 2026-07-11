@@ -140,11 +140,15 @@ const ToursScreen: React.FC = () => {
                         
                         </View>
       
-                <TouchableOpacity style={styles.searchButton} onPress={handleAddBus }>
-                            <Text style={styles.searchButtonText}>Update Schedule</Text>
-                        </TouchableOpacity>
+                
       
               </ScrollView>
+
+              <TouchableOpacity style={styles.searchButton} onPress={handleAddBus }>
+                <Text style={styles.searchButtonText}>Update Schedule</Text>
+              </TouchableOpacity>
+
+
             </View>
       
       
