@@ -112,7 +112,7 @@ export default function DriverHome() {
       // FIXED: endpoint changed from /location/update 
       //        to /api/locations/update
       // FIXED: field changed from busNumber to busNama
-      const response = await fetch(`${API_URL}/api/locations/update`, {
+      const response = await fetch(`${API_URL}/locations/update`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -171,7 +171,7 @@ export default function DriverHome() {
       // FIXED: endpoint changed from /location/offline
       //        to /api/locations/offline
       // FIXED: field changed from busNumber to busNama
-      await fetch(`${API_URL}/api/locations/offline`, {
+      await fetch(`${API_URL}/locations/offline`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

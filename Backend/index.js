@@ -61,7 +61,7 @@ app.use("/api/buses", busRoutes);
 app.use("/api/schedules", scheduleRoutes);
 app.use("/api/drivers", driverRoutes);
 app.use("/api/conductors", conductorRoutes);
-app.use("/api/location", locationRoutes);
+app.use("/api/locations", locationRoutes);
 
 
 // Invalid Route Handler

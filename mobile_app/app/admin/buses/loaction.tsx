@@ -73,7 +73,7 @@ const AdminMapScreen: React.FC = () => {
   const fetchBusLocation = useCallback(async () => {
     try {
       const response = await fetch(
-        `${API_URL}/api/locations/${encodeURIComponent(busNum)}`
+        `${API_URL}/locations/${encodeURIComponent(busNum)}`
       );
       const result = await response.json();
 
