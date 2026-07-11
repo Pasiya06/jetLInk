@@ -130,7 +130,16 @@ export default function Index() {
               <Text style={styles.cardText}>Tours</Text>              
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card2} onPress={() => router.push("/admin/regpassengers/index1")} >
+          <TouchableOpacity style={styles.card1} onPress={() => router.push({
+                pathname: "/admin/regpassengers/index1", 
+                params: {
+                  Aid: params.Aid,
+                  firstName: params.firstName,
+                  lastName: params.lastName,
+                  email: params.email,
+                },
+              })} >
+                
               <View style={styles.iconContainer}>
                 <Image source ={require("../../assets/images/icons8-users-94.png")} style={styles.input3dIcon} />
               </View>

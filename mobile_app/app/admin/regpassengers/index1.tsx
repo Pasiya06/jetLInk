@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react';
-import { Stack, useRouter, useFocusEffect } from "expo-router";
+import { Stack, useRouter, useFocusEffect, useLocalSearchParams } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
+  Alert ,
   StyleSheet,
   View,
   Text,
@@ -14,14 +15,15 @@ import {Ionicons,
   MaterialCommunityIcons, 
   Fontisto, 
   FontAwesome6, 
-  MaterialIcons, 
-  FontAwesome5, 
+  Entypo, 
+  Feather, 
   FontAwesome} from '@expo/vector-icons';
 
 
 interface pasenger {
   id:string;
-  fullName:string;
+  firstName:string;
+  lastName:string;
   phoneNumber?:string;
   address?:string;
   NIC?:string;
@@ -31,43 +33,68 @@ interface pasenger {
   password?:string;
 }
 
-const BusScreen: React.FC = () => {
+const RGScreen: React.FC = () => {
   const router = useRouter();
+  const params = useLocalSearchParams();
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [passengerData, setPassengerData] = useState<pasenger[]>([]);
+  const [activeTab, setActiveTab] = useState('');
 
-  const loadPassenger = async()=>{
-    try{
-      const data = await AsyncStorage.getItem("passengers");
-      if(data){
-        setPassengerData(JSON.parse(data));
-      }
-      else{
-        setPassengerData([]);
-      }
+  const loadPassengers = async () => {
+  try {
+    const response = await fetch(`${API_URL}/passengers`);
+    const result = await response.json();
 
+    if (result.success) {
+      const formatted = result.data.map((item: any) => ({
+        id: item._id,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        phoneNumber: item.phoneNumber,
+        address: item.address,
+        NIC: item.NIC,
+        Birthday: item.Birthday,
+        gender: item.gender,
+        email: item.email,
+        password: item.password,
+      }));
+
+      setPassengerData(formatted);
     }
-    catch(error){
-      console.log(error);
-    }
-  };
+  } catch (error) {
+    console.log(error);
+  }
+};
 
-  useFocusEffect(useCallback(()=>{loadPassenger();},[]));
+useFocusEffect(
+  useCallback(() => {
+    loadPassengers();
+  }, [])
+);
 
-  const handleSearch = () => {
-    router.push({
-      pathname:"/admin/buses/index6"
+const deletePassenger = async (id: string) => {
+  try {
+    const response = await fetch(`${API_URL}/passengers/${id}`, {
+      method: "DELETE",
     });
-  };
 
-  const deletePassenger = async(id:string)=>{
-    const updated = passengerData.filter(
-      item=>item.id !== id
-    );
-    setPassengerData(updated);
-    await AsyncStorage.setItem( "passengers",JSON.stringify(updated));
-  };
+    const result = await response.json();
+
+    if (result.success) {
+      Alert.alert("Success", result.message);
+      loadPassengers();
+    } else {
+      Alert.alert("Error", result.message);
+    }
+  } catch (error) {
+    console.log(error);
+    Alert.alert("Error", "Unable to delete passenger.");
+  }
+};
+
+  
   
   
 
@@ -78,26 +105,29 @@ const BusScreen: React.FC = () => {
           pathname: "/admin/regpassengers/index2",
           params: {
             id: item.id,
-            fullName: item.fullName,
+            pfirstName: item.firstName,
+            plastName: item.lastName,
             phoneNumber: item.phoneNumber || "",
             address: item.address || "",
             NIC: item.NIC || "",
-            Birthday: item.Birthday || "",
-            gender: item.gender || "",
-            email: item.email || "",
-            password: item.password || "",
+            pemail: item.email || "",
+
+            Aid: params.Aid,
+            firstName: params.firstName,
+            lastName: params.lastName,
+            email: params.email,
+
+            
           },
         })
       }
     >
     <View style={styles.friendRow}>
       <View style={styles.profileCircle}>
-        <FontAwesome name="bus"size={14}color="#32CD32"/>
+        <Entypo name="user" size={14}color="#32CD32"/>
       </View>
-      <Text style={styles.friendName}>{item.fullName}</Text>
-      <TouchableOpacity style={styles.iconButton}>
-          <MaterialIcons name="location-on" size={32} color="#32CD32"/>    
-      </TouchableOpacity>
+      <Text style={styles.friendName}>{item.firstName} {item.lastName}</Text>
+      
       <TouchableOpacity onPress={()=>deletePassenger(item.id)}>
         <Ionicons name="trash" size={30} color="red"/>
       </TouchableOpacity>
@@ -112,54 +142,22 @@ const BusScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       
       <View style={styles.header}>
-        <TouchableOpacity>
-          <Ionicons name="menu" size={30} color="#ffffff" />
-        </TouchableOpacity>
+       
                 
         <TouchableOpacity >
           <Text style={styles.title}>Jetlink</Text>
         </TouchableOpacity>
                 
-        <TouchableOpacity>
-          <Ionicons name="notifications" size={24} color="#ffffff" />
-        </TouchableOpacity>
+        
       </View>
       
             
-      <View style={styles.subHeader}>
-        <TouchableOpacity 
-          onPress={() => {
-            if (isSearching) {
-              setIsSearching(false); 
-            } 
-            else {
-              router.push({pathname: "/admin/index1", }); 
-            }
-          }}
-        >
-          <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color="#0047AB"/>
-        </TouchableOpacity>
+      
               
-        {isSearching ? (
-          <TextInput
-            style={styles.searchBarInput}
-            placeholder="Search routes..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus={true}
-          />
-        ) : (
-          <Text style={styles.subHeaderTitle}>Normal Way Buses</Text>
-        )}
-              
-        <TouchableOpacity onPress={() => setIsSearching(!isSearching)}>
-          <FontAwesome name={isSearching ? "close" : "search"} size={24} color="#0047AB" />
-        </TouchableOpacity>
-      </View>
-
+     
         
-      <View style={styles.listContainer}>
-        <FlatList
+      <View style={styles.card}>
+        <FlatList style={styles.svw}
           data={passengerData}
           renderItem={renderBusItem}
           keyExtractor={(item)=>item.id}
@@ -170,30 +168,90 @@ const BusScreen: React.FC = () => {
 
       
       
+        {isSearching ? (
+              <TextInput
+                style={styles.searchBarInput}
+                placeholder="Search..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoFocus={true}
+              />
+            ) : null}
+        
 
-      
-      <View style={styles.footerGraphic}>
-        <View style={styles.blueCurve} />
-        <View style={styles.greenCurve} />
-      </View>
-    </SafeAreaView>
+        <View style={styles.bottomNav}>
+
+          
+
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
+                  setIsSearching(false); 
+                }
+
+                else {
+                  router.push({
+                    pathname: "/admin/index1",
+                    params: {
+                      Aid: params.Aid,
+                      firstName: params.firstName,
+                      lastName: params.lastName,
+                      email: params.email,
+                    },                    
+                  });
+                };}}>
+            <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
+            <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
+              Back
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+            <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
+            <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
+              Routes
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+            <Ionicons name="home-outline" size={28} color="#fff" />             
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+            <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
+              Alerts
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+            <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+            <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+              Profile
+            </Text>
+          </TouchableOpacity>
+        </View>
+              
+        <View style={styles.footerGraphic}>
+          <View style={styles.blueCurve} />
+          <View style={styles.greenCurve} />
+        </View>
+      </SafeAreaView>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#FFF' 
+  container:{
+    flex:1,
+    backgroundColor:"#fff"
   },
 
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', 
-    paddingTop: 50, 
+    justifyContent: 'center',
+    paddingTop: 50,
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 70,   
     backgroundColor: '#0047AB',
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
@@ -206,47 +264,35 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
-  subHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    justifyContent: 'space-between',
-  },
-
-  subHeaderTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#0047AB',
-  },
-
-  searchBarInput: {
+  card: {
+    width: '90%',
     flex: 1,
-    height: 40,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 10,
-    marginHorizontal: 15,
-    paddingHorizontal: 15,
-    fontSize: 16,
-    color: '#333',
-  },
-  
-  body: { 
-    flex: 1, 
-    paddingHorizontal: 20, 
-    alignItems: 'center' 
-  },
-  
-  listContainer: {  
-    flex: 0.85,
-    borderWidth: 0,
-    borderColor: '#39FF14',
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    paddingTop: 5, 
+    maxHeight: '68%',
+    backgroundColor: '#FFF',
+   
+    marginTop: -50,   
+    alignSelf: 'center',
+    borderRadius: 20,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
   },
 
+  svw: {
+    width: '100%',
+    marginBottom:80,
+    marginTop: 3, 
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25, 
+  },
+ 
   friendRow: {
-   backgroundColor: '#ffffff',
+    marginLeft: 10,
+    marginRight: 10,
+    
+    backgroundColor: '#ffffff',
     flexDirection: 'row',
     alignItems: 'center',
     padding: 16,
@@ -254,8 +300,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 0.5,
     borderColor: '#32CD32',
-    marginLeft:10,
-    marginRight:10,
+   
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4, },
@@ -281,15 +326,119 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 
-  actionGroup: { 
-    flexDirection: 'row', 
-    alignItems: 'center' 
-  },
-
   iconButton: { 
     marginRight: 10 
   },
 
+  searchButton: {
+    position: "absolute",
+    bottom: 15,
+    left: 10,
+    right: 10,
+
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+      
+    height: 55,
+    backgroundColor: "#32CD32",
+    borderRadius: 25,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    elevation: 10,
+  },
+
+  searchButtonText: {
+    color: '#ffffff',
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+
+  bottomNav: {
+    position: "absolute",
+    bottom: 15,
+    left: 10,
+    right: 10,
+
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginBottom: 60,
+    height: 75,
+    backgroundColor: "#fff",
+    borderRadius: 25,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    elevation: 10,
+  },
+
+  searchBarInput: {
+    position: "absolute",
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    marginLeft: 15,
+    marginTop: 45,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: '#333',
+    width:'90%' 
+  },
+
+  subHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+
+  item: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+
+  label1: {
+    marginTop: 4,
+    fontSize: 13,
+    color: "#8A8A8A",
+  },
+
+  activeLabel: {
+    color: "#0057D9",
+    fontWeight: "600",
+  },
+
+  centerButton: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: "#2F80ED",
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    marginTop: -28,
+
+    shadowColor: "#2F80ED",
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    elevation: 12,
+  },
 
   footerGraphic: {
     position: 'absolute',
@@ -302,19 +451,19 @@ const styles = StyleSheet.create({
   blueCurve: {
     backgroundColor: '#ffffff',
     height: 90,
-    width: '120%',
-    borderRadius: 100,
+    width: '100%',
+    borderRadius: 50,
     position: 'absolute',  
   },
 
   greenCurve: {
     backgroundColor: '#0052cc',
-    height: 120,
+    height: 100,
     width: '100%',
-    borderRadius: 30,
-    position: 'absolute',  
-  }
+    borderRadius: 25,
+    position: 'absolute',   
+  },
   
 });
 
-export default BusScreen;
+export default RGScreen;
