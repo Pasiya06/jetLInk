@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { Stack, useRouter, useFocusEffect, useLocalSearchParams } from "expo-router";
-import { getSchedules, deleteSchedule } from "../../../services/scheduleServices";
+import { getSchedules,  } from "../../../services/scheduleServices";
 import { 
   StyleSheet, 
   View, 
