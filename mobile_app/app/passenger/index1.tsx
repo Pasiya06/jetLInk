@@ -126,10 +126,6 @@ export default function Index() {
                 firstName: params.firstName,
                 lastName:params.lastName,
                 phoneNumber: params.phoneNumber,
-                address: params.address,
-                NIC: params.NIC,
-                Birthday: params.birthday,
-                gender: params.gender,
                 email: params.email,
               },
           })

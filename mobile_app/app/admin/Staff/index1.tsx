@@ -7,7 +7,6 @@ import {
   Text, 
   TouchableOpacity, 
   SafeAreaView, 
-  Image ,
   TextInput,
 } from 'react-native';
 import { Ionicons, 

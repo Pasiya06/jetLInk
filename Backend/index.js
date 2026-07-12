@@ -9,6 +9,8 @@ import scheduleRoutes from "./routes/scheduleRoutes.js";
 import driverRoutes from "./routes/driverRoutes.js";
 import conductorRoutes from "./routes/conductorRoutes.js";
 import locationRoutes from "./routes/locationRoutes.js";
+import parcelRoutes from "./routes/parcelRoutes.js";
+import parcelFeeRoutes from "./routes/parcelFeeRoutes.js";
 
 dotenv.config();
 
@@ -62,6 +64,8 @@ app.use("/api/schedules", scheduleRoutes);
 app.use("/api/drivers", driverRoutes);
 app.use("/api/conductors", conductorRoutes);
 app.use("/api/locations", locationRoutes);
+app.use("/api/parcel", parcelRoutes);
+app.use("/api/parcelfee", parcelFeeRoutes);
 
 
 // Invalid Route Handler

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Image } from 'react-native';
 import { 
   View, 
   Text, 
@@ -12,22 +11,14 @@ import {
 
 import {  } from "react-native-safe-area-context";
 import { Stack,useRouter,useLocalSearchParams } from "expo-router";
-import { Ionicons, FontAwesome, MaterialCommunityIcons, Feather } from '@expo/vector-icons';
-import { updateSchedule } from "../../../services/scheduleServices";
-
-
-
-
-
-
+import { Ionicons, FontAwesome, Feather } from '@expo/vector-icons';
 
 const AddBus = () => {
  
   const [busNumber, setBusNumber] = useState("");
   const [chassisNo, setChassisNo] = useState("");
   const [engineNo, setEngineNo] = useState("");
-  const [colour, setColour] = useState("");
-  const [fuelType, setFuelType] = useState("");
+  const [colour, setColour] = useState(""); 
   const [serviceDate, setServiceDate] = useState("");
   const [licenseDate, setLicenseDate] = useState("");
   const [emissionDate, setEmissionDate] = useState("");
@@ -62,7 +53,6 @@ const AddBus = () => {
           chassisNo,
           engineNo,
           colour,
-          fuelType,
           serviceDate,
           licenseDate,
           emissionDate,
@@ -140,12 +130,6 @@ const AddBus = () => {
           <Text style={styles.label}>Colour</Text>
           <View style={styles.inputWrapper}>
             <TextInput style={styles.input} value={colour} onChangeText={setColour} />
-            <Text style={styles.inputIcon}>📍</Text>
-          </View>
-      
-          <Text style={styles.label}>Fuel Type</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={fuelType} onChangeText={setFuelType} />
             <Text style={styles.inputIcon}>📍</Text>
           </View>
       

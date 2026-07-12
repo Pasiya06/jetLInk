@@ -21,7 +21,6 @@ const busSchema = new mongoose.Schema({
     unique: true,
   },
   colour: String,
-  fuelType: String,
   serviceDate: String,
   licenseDate: String,
   emissionDate: String,

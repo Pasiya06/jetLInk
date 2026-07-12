@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons, 
   MaterialCommunityIcons, 
-  Fontisto, 
+  Feather, 
   FontAwesome6, 
   MaterialIcons, 
   FontAwesome5, 
@@ -23,20 +23,17 @@ const ParcelService = () => {
       const [searchQuery, setSearchQuery] = useState<string>('');
       const params = useLocalSearchParams();
       const router = useRouter();
+      const [activeTab, setActiveTab] = useState('');
       const handleSearch = () => {
       router.push({
           pathname: "/passenger/parcel/index2",
           params:{ 
             Pid: params.Pid,
             Pid1: params.passengerId,
-            firstName: params.firstName,
-            lastName:params.lastName,
-            phoneNumber: params.phoneNumber,
-            address: params.address,
-            NIC: params.NIC,
-            Birthday: params.birthday,
-            gender: params.gender,
-            email: params.email,
+            pfirstName: params.firstName,
+            plastName:params.lastName,
+            pphoneNumber: params.phoneNumber,
+            pemail: params.email,
 
           } 
           
@@ -48,58 +45,14 @@ const ParcelService = () => {
       <SafeAreaView style={styles.container}>
        {/* Header Section */}
       <View style={styles.header}>
-          <TouchableOpacity>
-            <Ionicons name="menu" size={30} color="#ffffff" />
-          </TouchableOpacity>
+          
           
           <TouchableOpacity><Text style={styles.title}>Jetlink</Text></TouchableOpacity>
           
-          <TouchableOpacity>
-            <Ionicons name="notifications" size={24} color="#ffffff" />
-          </TouchableOpacity>
+          
         </View>
 
-      {/* Sub-Header */}
-      <View style={styles.subHeader}>
-        <TouchableOpacity 
-          onPress={() => {
-            if (isSearching) {
-              setIsSearching(false); // Close search bar if open
-            } else {
-              
-
-            
-              router.back() 
-            }
-          }}
-        >
-          <Ionicons 
-            name={isSearching ? "arrow-back" : "arrow-back-outline"} 
-            size={24} 
-            color="#0047AB" 
-          />
-        </TouchableOpacity>
-        
-        {isSearching ? (
-          <TextInput
-            style={styles.searchBarInput}
-            placeholder="Search parcel..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus={true}
-          />
-        ) : (
-          <Text style={styles.subHeaderTitle}>Parcel Service</Text>
-        )}
-        
-        <TouchableOpacity onPress={() => setIsSearching(!isSearching)}>
-          <FontAwesome 
-            name={isSearching ? "close" : "search"} 
-            size={24} 
-            color="#0047AB" 
-          />
-        </TouchableOpacity>
-      </View>
+      
       {/* Content Section */}
       <View style={styles.content}>
         
@@ -117,14 +70,83 @@ const ParcelService = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Footer / Illustration Section */}
+      {isSearching ? (
+                  <TextInput
+                    style={styles.searchBarInput}
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    autoFocus={true}
+                  />
+                ) : null}
+          
+        
+            <View style={styles.bottomNav}>
+        
+              
+              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
+                      setIsSearching(false); 
+                    }
+        
+                    else {
+                      router.push({
+                        pathname: "/passenger/parcel/index1",
+                        params: {
+                          Pid: params.Pid,
+                          Pid1: params.Pid1,
+                          firstName: params.firstName,
+                          lastName:params.lastName,
+                          phoneNumber: params.phoneNumber,
+                          email: params.email,
+                        },                    
+                      });
+                    };}}>
+                <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
+                <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
+                  Back
+                </Text>
+              </TouchableOpacity>
+        
+              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+                <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
+                <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
+                  Routes
+                </Text>
+              </TouchableOpacity>
+        
+              <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+                <Ionicons name="home-outline" size={28} color="#fff" />             
+              </TouchableOpacity>
+        
+              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+                <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+                <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
+                  Alerts
+                </Text>
+              </TouchableOpacity>
+        
+              <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+                <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                  Profile
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+        
+        
+
+        
+
+      
+
+      {/* Bottom Graphic Design Element */}
       <View style={styles.footerGraphic}>
-        <View style={styles.blueCurve} />
-        <View style={styles.greenCurve} />
+         <View style={styles.blueCurve} />
+         <View style={styles.greenCurve} />
       </View>
-            
-    </SafeAreaView></>
-    
+    </SafeAreaView>
+    </>
   );
 };
 
@@ -221,54 +243,109 @@ const styles = StyleSheet.create({
     height: 150,
     marginBottom: 20,
   },
-  searchBarInput: {
-  flex: 1,
-  height: 40,
-  backgroundColor: '#f0f0f0',
-  borderRadius: 10,
-  marginHorizontal: 15,
-  paddingHorizontal: 15,
-  fontSize: 16,
-  color: '#333',
-  },
+ 
    subHeaderTitle: {
     fontSize: 18,
     fontWeight: '600',
     color: '#0047AB',
   },
-   footerGraphic: {
+   bottomNav: {
+    position: "absolute",
+    bottom: 15,
+    left: 10,
+    right: 10,
+
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginBottom: 60,
+    height: 75,
+    backgroundColor: "#fff",
+    borderRadius: 25,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    elevation: 10,
+  },
+
+  searchBarInput: {
+    position: "absolute",
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    marginLeft: 15,
+    marginTop: 45,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: '#333',
+    width:'90%' 
+  },
+
+  item: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+
+  label1: {
+    marginTop: 4,
+    fontSize: 13,
+    color: "#8A8A8A",
+  },
+
+  activeLabel: {
+    color: "#0057D9",
+    fontWeight: "600",
+  },
+
+  centerButton: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: "#2F80ED",
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    marginTop: -28,
+
+    shadowColor: "#2F80ED",
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    elevation: 12,
+  },
+
+  footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
     height: 60,
     overflow: 'hidden',
   },
+
   blueCurve: {
     backgroundColor: '#ffffff',
     height: 90,
     width: '100%',
     borderRadius: 50,
-    position: 'absolute',
-    // bottom: -40,
-    // left: '-10%',
+    position: 'absolute',  
   },
+
   greenCurve: {
     backgroundColor: '#0052cc',
     height: 100,
     width: '100%',
     borderRadius: 25,
-    position: 'absolute',
-    // bottom: -60,
-    // left: '-10%',
+    position: 'absolute',   
   },
-  // pvc: {
-  //   backgroundColor: '#FFA500'+ '20',
-  //   justifyContent: 'center',
-  // },
-  // mmr: {
-  //   backgroundColor: '#FFA500'+ '20',
-  //   justifyContent: 'center',
-  // },
 });
 
 export default ParcelService;

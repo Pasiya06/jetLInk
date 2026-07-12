@@ -1,184 +1,226 @@
-import React, { useState } from 'react';
-import { Stack,useRouter} from "expo-router";
+import React, { useState, useCallback } from 'react';
+import { Stack, useRouter, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { getSchedules, deleteSchedule } from "../../../services/scheduleServices";
 import { 
   StyleSheet, 
   View, 
   Text, 
-  TextInput, 
+  FlatList, 
   TouchableOpacity, 
   SafeAreaView, 
-  StatusBar 
+  TextInput 
 } from 'react-native';
 import { 
   Ionicons, 
-  MaterialCommunityIcons, 
+  Feather, 
   Fontisto, 
   FontAwesome6, 
   MaterialIcons, 
   FontAwesome5, 
   FontAwesome
 } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-// Types for the Toggle Selection
+
+interface Bussched {
+  _id:string;
+  scheduleId:string;
+  busdate:string;
+  pickuploca?:string;
+  dropoffloca?:string;
+  arrivaltime?:string;
+  depaturetime?:string;
+  stops?:string;
+  busNo?:string;
+}
 
 
 const JetLinkInterface: React.FC = () => {
-  
-  const [sendername, setsendername] = useState<string>('');
-  const [mobilenumber, setmobilenumber] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  
+  const params = useLocalSearchParams();
   const router = useRouter();
-
+  const [activeTab, setActiveTab] = useState('');
+  const [busschedData, setBusschedData] = useState<Bussched[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const handlereceiveD = async () => {
-
-  if (!sendername || !mobilenumber || !email) {
-    alert("Please fill required fields");
-    return;
-  }
-
-  try {
-
-    const newBus = {
-      id: Date.now().toString(),
-      sendername,
-      mobilenumber,
-      email
-    };
-
-
-    const oldData = await AsyncStorage.getItem("receiveD");
-
-    const receiveD = oldData ? JSON.parse(oldData): [];
-
-
-    const updatedBuses = [...receiveD,newBus];
-
-    await AsyncStorage.setItem("receiveD",JSON.stringify(updatedBuses));
-
-
-    alert("Bus Added Successfully");
-
-
-    router.push("/passenger/parcel/index4");
-
-
-  } catch(error){
-
-    console.log(error);
-
-  }
-
-};
-  const handleSearch = () => {
-    router.push({
-        pathname: "/passenger/parcel/index4", 
-        
-    });
+  
+  const loadschedBuses = async () => {
+    try {
+      const result = await getSchedules();
+  
+      if (result.success) {
+        const filteredSchedules = result.data.filter(
+          (schedule: any) => 
+            schedule.pickuploca === params.pickup &&
+            schedule.dropoffloca === params.drop
+            
+        );
+  
+        setBusschedData(filteredSchedules);
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
+  
+    useFocusEffect(useCallback(()=>{loadschedBuses();},[]));
+    
+    const renderBusItem = ({item}:{item:Bussched}) => (
+      <TouchableOpacity
+        onPress={() => 
+          router.push({
+            pathname: "/admin/buses/index16",
+            params: {
+              Sid: item._id,
+              scheduleId: item.scheduleId,
+              busdate: item.busdate,
+              pickuploca: item.pickuploca || "",
+              dropoffloca: item.dropoffloca || "",
+              arrivaltime: item.arrivaltime || "",
+              depaturetime: item.depaturetime || "",
+              stops: item.stops || "",
+              busNo: item.busNo || "",
 
-  return (
-    <>
+              Pid: params.Pid,
+              Pid1: params.Pid1,
+              pfirstName: params.pfirstName,
+              plastName:params.plastName,
+              sendername:params.sendername,
+              Smobilenumber:params.Smobilenumber,
+              Semail:params.Semail,
+              receivername:params.receivername,
+              Rmobilenumber:params.Rmobilenumber,
+              Remail:params.Remail,
+              weight:params.weight,
+              pickup:params.pickup,
+              drop:params.drop,
+              time:params.time
+
+
+
+            },
+          })
+        }
+      >
+      <View style={styles.friendRow}>
+          <View style={styles.textline10}>
+          <View style={styles.textline0}>  
+                  <View style={styles.textline1}>
+                      <Text style={styles.friendName1}>{item.pickuploca} -  {item.dropoffloca}</Text>
+                      <Text style={styles.friendName}>{item.depaturetime}</Text>
+                      <Text style={styles.friendName1}>{item.pickuploca}</Text>
+                  </View>
+  
+                  <View style={styles.textline2}>
+                      <Text style={styles.friendName1}>{item.busdate}</Text>
+                      <Text style={styles.friendName}>{item.arrivaltime}</Text>
+                      <Text style={styles.friendName1}>{item.dropoffloca}</Text>
+                  </View>
+              </View>
+              
+              
+              </View>  
+              <Text style={styles.friendName}>Stops:</Text>
+              <Text style={styles.friendName}>{item.stops}</Text>
+              
+          
+      </View>
+      </TouchableOpacity>
+    );
+  
+    return (
+  
+      <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0056b3" />
-      
-      {/* Header Section */}
-      <View style={styles.header}>
-          <TouchableOpacity>
-            <Ionicons name="menu" size={30} color="#ffffff" />
+        
+        <View style={styles.header}>
+        
+          <TouchableOpacity >
+            <Text style={styles.title}>JetLink</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity><Text style={styles.title}>Jetlink</Text></TouchableOpacity>
-          
-          <TouchableOpacity>
-            <Ionicons name="notifications" size={24} color="#ffffff" />
-          </TouchableOpacity>
+                  
+        </View>
+             
+        <View style={styles.card}>
+          <FlatList style={styles.svw}
+            data={busschedData}
+            renderItem={renderBusItem}
+            keyExtractor={(item)=>item.scheduleId}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingVertical: 10 }}
+            />
+  
         </View>
 
-      {/* Sub-Header */}
-      <View style={styles.subHeader}>
-        <TouchableOpacity 
-          onPress={() => {
-            if (isSearching) {
-              setIsSearching(false); 
-            } else {
+      {isSearching ? (
+                  <TextInput
+                    style={styles.searchBarInput}
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    autoFocus={true}
+                  />
+                ) : null}
+          
+        
+            <View style={styles.bottomNav}>
+        
               
-
-            
-              router.back() 
-            }
-          }}
-        >
-          <Ionicons 
-            name={isSearching ? "arrow-back" : "arrow-back-outline"} 
-            size={24} 
-            color="#0047AB" 
-          />
-        </TouchableOpacity>
+              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
+                      setIsSearching(false); 
+                    }
         
-        {isSearching ? (
-          <TextInput
-            style={styles.searchBarInput}
-            placeholder="Search routes..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus={true}
-          />
-        ) : (
-          <Text style={styles.subHeaderTitle}>Receiver Details</Text>
-        )}
+                    else {
+                      router.push({
+                        pathname: "/passenger/parcel/index1",
+                        params: {
+                          Pid: params.Pid,
+                          Pid1: params.Pid1,
+                          firstName: params.pfirstName,
+                          lastName:params.plastName,
+                          phoneNumber: params.pphoneNumber,
+                          email: params.pemail,
+                        },                    
+                      });
+                    };}}>
+                <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
+                <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
+                  Back
+                </Text>
+              </TouchableOpacity>
         
-        <TouchableOpacity onPress={() => setIsSearching(!isSearching)}>
-          <FontAwesome 
-            name={isSearching ? "close" : "search"} 
-            size={24} 
-            color="#0047AB" 
-          />
-        </TouchableOpacity>
-      </View>
-    
-
-      {/* Main Search Form Container */}
-      <View style={styles.formContainer}>
+              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+                <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
+                <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
+                  Routes
+                </Text>
+              </TouchableOpacity>
         
+              <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+                <Ionicons name="home-outline" size={28} color="#fff" />             
+              </TouchableOpacity>
         
-
-        {/* Input Fields */}
-        <View style={styles.inputGroup}>
-          <Text style={styles.label}>Receiver Name</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={sendername} onChangeText={setsendername} />
-            <Text style={styles.inputIcon}>📍</Text>
-          </View>
-
-          <Text style={styles.label}>Mobile Number</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={mobilenumber} onChangeText={setmobilenumber} />
-            <Text style={styles.inputIcon}>📍</Text>
-          </View>
-
-          <Text style={styles.label}>Email</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={email} onChangeText={setEmail} />
-            <Text style={styles.inputIcon}>📍</Text>
-          </View>
-
-          
-        </View>
+              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+                <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+                <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
+                  Alerts
+                </Text>
+              </TouchableOpacity>
+        
+              <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+                <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                  Profile
+                </Text>
+              </TouchableOpacity>
+            </View>
 
         
-        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-            <Text style={styles.searchButtonText}>Next</Text>
-        </TouchableOpacity>
+        
 
         
 
-      </View>
+      
 
       {/* Bottom Graphic Design Element */}
       <View style={styles.footerGraphic}>
@@ -191,135 +233,226 @@ const JetLinkInterface: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
+  container:{
+    flex:1,
+    backgroundColor:"#fff"
   },
+
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', // Spaced items
-    paddingTop: 50, // Added padding for top status bar area
+    justifyContent: 'center',
+    paddingTop: 50,
     paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingBottom: 70,   
     backgroundColor: '#0047AB',
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
+
   title: {
     fontSize: 28,
     fontWeight: '800',
     color: '#ffffff',
     letterSpacing: 0.5,
   },
-  
-  subHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    justifyContent: 'space-between',
-  },
-  
-  subHeaderTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#0047AB',
-  },
-  formContainer: {
-    marginHorizontal: 20,
-    padding: 5,
-    borderWidth: 0,
-    borderColor: '#32CD32',
-    borderRadius: 25,
-    
-  },
-  toggleWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-    color: '#32CD32',
-    
-  },
-  toggleBtn: {
-    
-    flex: 0.48,
-    paddingVertical: 8,
-    borderWidth: 2,
-    borderColor: '#32CD32',
-    borderRadius: 8,
-    alignItems: 'center',
-    
-  },
-  activeToggle: {
-    backgroundColor: '#32CD32',
-    color: '#f1f7ff',
-    fontWeight: 'bold',
-    
-  },
-  activetoggleText: {
-    
-    color: '#e9e9e9',
-    fontWeight: 'bold',
-  },
-  activeToggleText: {
-    color: '#FFFFFF', 
-  },
-  toggleText: {
-    fontSize: 18,
-    color: '#0052cc',
-    fontWeight: 'bold',
-  },
-  inputGroup: {
-    marginBottom: 20,
-  },
-  label: {
-    color: '#0052cc',
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 5,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#32CD32',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    height: 45,
-    marginBottom: 15,
-  },
-  input: {
+
+  card: {
+    width: '90%',
     flex: 1,
-    height: '100%',
-    color: '#333',
-  },
-  inputIcon: {
-    fontSize: 18,
-    color: '#999',
-  },
-  searchButton: {
-    backgroundColor:'#32CD32',
-    borderWidth: 2,
-    borderColor: '#32CD32',
+    maxHeight: '68%',
+    backgroundColor: '#FFF',
+   
+    marginTop: -50,   
+    alignSelf: 'center',
     borderRadius: 20,
-    paddingVertical: 12,
-    alignItems: 'center',
-    elevation: 8, 
-    
-    // iOS
+    elevation: 10,
     shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+
+  svw: {
+    width: '100%',
+    marginBottom:80,
+    marginTop: 3, 
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25, 
+  },
+
+  friendRow: {
+    backgroundColor: '#ffffff',
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 12,
+    borderWidth: 0.5,
+    borderColor: '#32CD32',
+    marginLeft:10,
+    marginRight:10,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4, },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+
+  textline0:{
+    flex: 1,
+    
+    flexDirection: 'row',
+
+  },
+
+  textline10:{
+    justifyContent: 'space-between', 
+    flexDirection: 'row',
+
+  },
+
+  textline1:{
+    
+    
+    
+  },
+
+  textline2:{
+    marginLeft: 50, 
+    
+    
+  },
+
+  friendName: {
+    //flex: 1,
+    // marginLeft: 10,
+    fontSize: 14,
+    color: '#0047AB',
+    fontWeight: '500',
+  },
+
+  friendName1: {
+    //flex: 1,
+    //marginRight: 100,
+    fontSize: 14,
+    color: '#0047AB',
+    fontWeight: '500',
+  },
+
+
+  iconButton: { 
+    marginRight: 10 
+  },
+
+  searchButton: {
+    position: "absolute",
+    bottom: 15,
+    left: 10,
+    right: 10,
+
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+      
+    height: 55,
+    backgroundColor: "#32CD32",
+    borderRadius: 25,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: -2,
     },
-    shadowOpacity: 0.30,
-    shadowRadius: 4.65,
+    elevation: 10,
   },
+
   searchButtonText: {
     color: '#ffffff',
     fontSize: 20,
     fontWeight: 'bold',
   },
+
+  bottomNav: {
+    position: "absolute",
+    bottom: 15,
+    left: 10,
+    right: 10,
+
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginBottom: 60,
+    height: 75,
+    backgroundColor: "#fff",
+    borderRadius: 25,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    elevation: 10,
+  },
+
+  searchBarInput: {
+    position: "absolute",
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    marginLeft: 15,
+    marginTop: 45,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: '#333',
+    width:'90%' 
+  },
+
+  subHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+
+  item: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+
+  label1: {
+    marginTop: 4,
+    fontSize: 13,
+    color: "#8A8A8A",
+  },
+
+  activeLabel: {
+    color: "#0057D9",
+    fontWeight: "600",
+  },
+
+  centerButton: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: "#2F80ED",
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    marginTop: -28,
+
+    shadowColor: "#2F80ED",
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    elevation: 12,
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
@@ -327,33 +460,21 @@ const styles = StyleSheet.create({
     height: 60,
     overflow: 'hidden',
   },
+
   blueCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    backgroundColor: '#ffffff',
+    height: 90,
     width: '100%',
-    borderRadius: 25,
-    position: 'absolute',
-    // bottom: -40,
-    // left: '-10%',
+    borderRadius: 50,
+    position: 'absolute',  
   },
+
   greenCurve: {
     backgroundColor: '#0052cc',
     height: 100,
     width: '100%',
     borderRadius: 25,
-    position: 'absolute',
-    // bottom: -60,
-    // left: '-10%',
-  },
-  searchBarInput: {
-  flex: 1,
-  height: 40,
-  backgroundColor: '#f0f0f0',
-  borderRadius: 10,
-  marginHorizontal: 15,
-  paddingHorizontal: 15,
-  fontSize: 16,
-  color: '#333',
+    position: 'absolute',   
   },
 });
 

@@ -12,24 +12,15 @@ import {
 } from 'react-native';
 import { 
   Ionicons, 
-  Feather , 
-  Fontisto, 
-  FontAwesome6, 
-  MaterialIcons, 
-  FontAwesome5, 
+  Feather ,  
   FontAwesome
 } from '@expo/vector-icons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
-// Types for the Toggle Selection
-
 
 const JetLinkInterface: React.FC = () => {
   const params = useLocalSearchParams();
-  const [sendername, setsendername] = useState(`${params.firstName ?? ""} ${params.lastName ?? ""}`.trim());
-  const [Smobilenumber, Ssetmobilenumber] = useState(String(params.phoneNumber || ""));
-  const [Semail, SsetEmail] = useState(String(params.email || ""));
+  const [sendername, setsendername] = useState(`${params.pfirstName ?? ""} ${params.plastName ?? ""}`.trim());
+  const [Smobilenumber, Ssetmobilenumber] = useState(String(params.pphoneNumber || ""));
+  const [Semail, SsetEmail] = useState(String(params.pemail || ""));
   const [receivername, setreceivername] = useState<string>('');
   const [Rmobilenumber, Rsetmobilenumber] = useState<string>('');
   const [Remail, RsetEmail] = useState<string>('');
@@ -53,35 +44,26 @@ const JetLinkInterface: React.FC = () => {
 
   try {
 
-    const newBus = {
-      id: Date.now().toString(),
-      sendername,
-      Smobilenumber,
-      Semail,
-      receivername,
-      Rmobilenumber,
-      Remail,
-      weight,
-      pickup,
-      drop,
-      time
-    };
-
-
-    const oldData = await AsyncStorage.getItem("senderD");
-
-    const senderD = oldData ? JSON.parse(oldData): [];
-
-
-    const updatedBuses = [...senderD,newBus];
-
-    await AsyncStorage.setItem("senderD",JSON.stringify(updatedBuses));
-
-
-    alert("Bus Added Successfully");
-
-
-    router.push("/passenger/parcel/index3");
+    router.push({
+          pathname: "/passenger/parcel/index3",
+          params:{ 
+            Pid: params.Pid,
+            Pid1: params.Pid1,
+            pfirstName: params.pfirstName,
+            plastName:params.plastName,
+            sendername,
+            Smobilenumber,
+            Semail,
+            receivername,
+            Rmobilenumber,
+            Remail,
+            weight,
+            pickup,
+            drop,
+            time
+          } 
+          
+      });
 
 
   } catch(error){
@@ -209,12 +191,14 @@ const JetLinkInterface: React.FC = () => {
         
                     else {
                       router.push({
-                        pathname: "/passenger/index1",
+                        pathname: "/passenger/parcel/index1",
                         params: {
-                          Aid: params.Aid,
-                          firstName: params.firstName,
-                          lastName: params.lastName,
-                          email: params.email,
+                          Pid: params.Pid,
+                          Pid1: params.Pid1,
+                          firstName: params.pfirstName,
+                          lastName:params.plastName,
+                          phoneNumber: params.pphoneNumber,
+                          email: params.pemail,
                         },                    
                       });
                     };}}>
@@ -249,13 +233,6 @@ const JetLinkInterface: React.FC = () => {
                 </Text>
               </TouchableOpacity>
             </View>
-
-        
-        
-
-        
-
-      
 
       {/* Bottom Graphic Design Element */}
       <View style={styles.footerGraphic}>
