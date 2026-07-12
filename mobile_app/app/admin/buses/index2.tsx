@@ -82,21 +82,46 @@ const BusScreen: React.FC = () => {
   
 
   const deleteBus = async (id: string) => {
-    try {
-      const response = await fetch(`${API_URL}/buses/${id}`, {
-        method: "DELETE",
-      });
-      const result = await response.json();
-      if (result.success) {
-        
-        loadBuses();
-      } else {
-        Alert.alert("Failed", result.message || "Could not complete deletion.");
-      }
-    } catch (error) {
-      console.log(error);
-      Alert.alert("Error", "Server connection failed during deletion handling.");
-    }
+    Alert.alert(
+      "Confirm Delete",
+      "Are you sure you want to delete this bus?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const response = await fetch(`${API_URL}/buses/${id}`, {
+                method: "DELETE",
+              });
+
+              const result = await response.json();
+
+              if (result.success) {
+                Alert.alert("Success", "Bus deleted successfully.");
+                loadBuses();
+              } else {
+                Alert.alert(
+                  "Failed",
+                  result.message || "Could not complete deletion."
+                );
+              }
+            } catch (error) {
+              console.log(error);
+              Alert.alert(
+                "Error",
+                "Server connection failed during deletion handling."
+              );
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
   };
   
   const renderBusItem = ({ item }: { item: Bus }) => (

@@ -67,23 +67,43 @@ useFocusEffect(
   };
 
     const deleteDriver = async (id: string) => {
-    try {
-        const response = await fetch(`${API_URL}/drivers/${id}`, {
-        method: "DELETE",
-        });
+      Alert.alert(
+        "Confirm Delete",
+        "Are you sure you want to delete this driver?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: async () => {
+              try {
+                const response = await fetch(`${API_URL}/drivers/${id}`, {
+                  method: "DELETE",
+                });
 
-        const result = await response.json();
+                const result = await response.json();
 
-        if (result.success) {
-        Alert.alert("Success", "Driver deleted successfully.");
-        loadDrivers();
-        } else {
-        Alert.alert("Failed", result.message || "Could not delete driver.");
-        }
-    } catch (error) {
-        console.log(error);
-        Alert.alert("Error", "Server connection failed.");
-    }
+                if (result.success) {
+                  Alert.alert("Success", "Driver deleted successfully.");
+                  loadDrivers();
+                } else {
+                  Alert.alert(
+                    "Failed",
+                    result.message || "Could not delete driver."
+                  );
+                }
+              } catch (error) {
+                console.log(error);
+                Alert.alert("Error", "Server connection failed.");
+              }
+            },
+          },
+        ],
+        { cancelable: true }
+      );
     };
   
   const renderBusItem = ({ item }: { item: Driver }) => (

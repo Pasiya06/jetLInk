@@ -66,19 +66,36 @@ useFocusEffect(
   };
 
     const handleDeleteConductor = async (id: string) => {
-        try {
-            const result = await deleteConductor(id);
+      Alert.alert(
+        "Confirm Delete",
+        "Are you sure you want to delete this conductor?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: async () => {
+              try {
+                const result = await deleteConductor(id);
 
-            if (result.success) {
-            Alert.alert("Success", "Conductor deleted successfully.");
-            loadConductors();
-            } else {
-            Alert.alert("Failed", result.message);
-            }
-        } catch (error) {
-            console.log(error);
-            Alert.alert("Error", "Server connection failed.");
-        }
+                if (result.success) {
+                  Alert.alert("Success", "Conductor deleted successfully.");
+                  loadConductors();
+                } else {
+                  Alert.alert("Failed", result.message);
+                }
+              } catch (error) {
+                console.log(error);
+                Alert.alert("Error", "Server connection failed.");
+              }
+            },
+          },
+        ],
+        { cancelable: true }
+      );
     };
   
   const renderConductorItem = ({ item }: { item: Conductor }) => (

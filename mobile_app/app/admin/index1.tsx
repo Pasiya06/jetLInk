@@ -130,7 +130,7 @@ export default function Index() {
               <Text style={styles.cardText}>Tours</Text>              
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card1} onPress={() => router.push({
+          <TouchableOpacity style={styles.card2} onPress={() => router.push({
                 pathname: "/admin/regpassengers/index1", 
                 params: {
                   Aid: params.Aid,

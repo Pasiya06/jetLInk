@@ -1,7 +1,8 @@
-import React from 'react';
-import { Image } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { Image, TextInput } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
+  Alert,
   StyleSheet,
   ScrollView,
   Text,
@@ -14,13 +15,13 @@ import {
 // Icons
 import { 
   Ionicons, 
-  MaterialCommunityIcons, 
+  Feather, 
   Fontisto, 
-  FontAwesome6, 
+  FontAwesome, 
   MaterialIcons, 
   FontAwesome5 
 } from '@expo/vector-icons';
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 
@@ -28,6 +29,30 @@ import {
 export default function Index() {
   const params = useLocalSearchParams();
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleLogout = () => {
+  Alert.alert(
+    "Logout",
+    "Are you sure you want to logout?",
+    [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Logout",
+        style: "destructive",
+        onPress: async () => {
+          await AsyncStorage.clear(); // or remove specific keys
+          router.replace("/");
+        },
+      },
+    ]
+  );
+};
 
   return (
     <>
@@ -36,15 +61,11 @@ export default function Index() {
       <SafeAreaView style={styles.container}>
         {/* Header Section */}
         <View style={styles.header}>
-          <TouchableOpacity>
-            <Ionicons name="menu" size={30} color="#ffffff" />
-          </TouchableOpacity >
+          
           
           <TouchableOpacity onPress={() => router.push("/")}><Text style={styles.title}>Jetlink</Text></TouchableOpacity>
           
-          <TouchableOpacity>
-            <Ionicons name="notifications" size={24} color="#ffffff" />
-          </TouchableOpacity>
+          
         </View>
 
         
@@ -154,11 +175,60 @@ export default function Index() {
 
         
 
-        {/* Footer */}
+        {isSearching ? (
+              <TextInput
+                style={styles.searchBarInput}
+                placeholder="Search..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoFocus={true}
+              />
+            ) : (
+              <Text style={styles.subHeaderTitle}>{params.busNumber}</Text>
+          )}
+
+        <View style={styles.bottomNav}>
+        
+                  
+        
+                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); handleLogout();}}>
+                    <Ionicons name="log-out-outline" size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
+                    
+                    <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
+                      Logout
+                    </Text>
+                  </TouchableOpacity>
+        
+                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+                    <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
+                      Routes
+                    </Text>
+                  </TouchableOpacity>
+        
+                  <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+                    <Ionicons name="home-outline" size={28} color="#fff" />             
+                  </TouchableOpacity>
+        
+                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+                    <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
+                      Alerts
+                    </Text>
+                  </TouchableOpacity>
+        
+                  <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+                    <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                      Profile
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
         <View style={styles.footerGraphic}>
-                 <View style={styles.blueCurve} />
-                 <View style={styles.greenCurve} />
-              </View>
+          <View style={styles.blueCurve} />
+          <View style={styles.greenCurve} />
+        </View>
       </SafeAreaView>
     </>
   );
@@ -357,27 +427,107 @@ const styles = StyleSheet.create({
     color: '#0047AB',
   },
 
+  bottomNav: {
+    position: "absolute",
+    bottom: 15,
+    left: 10,
+    right: 10,
+
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginBottom: 60,
+    height: 75,
+    backgroundColor: "#fff",
+    borderRadius: 25,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    elevation: 10,
+  },
+
+  searchBarInput: {
+    position: "absolute",
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    marginLeft: 15,
+    marginTop: 45,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: '#333',
+    width:'90%' 
+  },
+
+  subHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+
+  item: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+
+  label1: {
+    marginTop: 4,
+    fontSize: 13,
+    color: "#8A8A8A",
+  },
+
+  activeLabel: {
+    color: "#0057D9",
+    fontWeight: "600",
+  },
+
+  centerButton: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: "#2F80ED",
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    marginTop: -28,
+
+    shadowColor: "#2F80ED",
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    elevation: 12,
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
     height: 60,
     overflow: 'hidden',
-    marginTop: 22,
   },
 
   blueCurve: {
     backgroundColor: '#ffffff',
     height: 90,
-    width: '120%',
-    borderRadius: 100,
-    position: 'absolute', 
+    width: '100%',
+    borderRadius: 50,
+    position: 'absolute',  
   },
+
   greenCurve: {
     backgroundColor: '#0052cc',
-    height: 120,
+    height: 100,
     width: '100%',
-    borderRadius: 30,
-    position: 'absolute', 
+    borderRadius: 25,
+    position: 'absolute',   
   },
 });

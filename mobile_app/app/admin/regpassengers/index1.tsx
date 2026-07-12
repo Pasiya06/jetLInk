@@ -75,23 +75,40 @@ useFocusEffect(
 );
 
 const deletePassenger = async (id: string) => {
-  try {
-    const response = await fetch(`${API_URL}/passengers/${id}`, {
-      method: "DELETE",
-    });
+  Alert.alert(
+    "Confirm Delete",
+    "Are you sure you want to delete this passenger?",
+    [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const response = await fetch(`${API_URL}/passengers/${id}`, {
+              method: "DELETE",
+            });
 
-    const result = await response.json();
+            const result = await response.json();
 
-    if (result.success) {
-      Alert.alert("Success", result.message);
-      loadPassengers();
-    } else {
-      Alert.alert("Error", result.message);
-    }
-  } catch (error) {
-    console.log(error);
-    Alert.alert("Error", "Unable to delete passenger.");
-  }
+            if (result.success) {
+              Alert.alert("Success", result.message);
+              loadPassengers();
+            } else {
+              Alert.alert("Error", result.message);
+            }
+          } catch (error) {
+            console.log(error);
+            Alert.alert("Error", "Unable to delete passenger.");
+          }
+        },
+      },
+    ],
+    { cancelable: true }
+  );
 };
 
   
