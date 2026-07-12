@@ -1,5 +1,5 @@
 import React from 'react';
-import  { useState } from 'react';
+import  { useState,useEffect } from 'react';
 import { Stack,useRouter,useLocalSearchParams} from "expo-router";
 import { 
   StyleSheet, 
@@ -8,6 +8,7 @@ import {
   TouchableOpacity, 
   SafeAreaView, 
   TextInput,
+  Alert
 } from 'react-native';
 import { Ionicons, 
   MaterialCommunityIcons, 
@@ -15,38 +16,152 @@ import { Ionicons,
   FontAwesome, Feather } from '@expo/vector-icons'; 
 
 const ParcelService = () => {
+    const API_URL = process.env.EXPO_PUBLIC_API_URL;
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const params = useLocalSearchParams();
     const [activeTab, setActiveTab] = useState('');
     const router = useRouter();
-    const [busFee, setBusFee] = useState("");
-    const [weightFee, setWeightFee] = useState("");
+
+    const [busFare, setBusFare] = useState("");
+    const [weighFare, setWeighFare] = useState("");
     const [serviceTax, setServiceTax] = useState("");
-    const handleSearch = () => {
-      router.push({
-          pathname: "/admin/Staff/index2", 
-           params: {
-                  
-                  Aid: params.Aid,
-                  firstName: params.firstName,
-                  lastName: params.lastName,
-                  email: params.email,
-                },
+
+    const [loading, setLoading] = useState(false);
+    
+    const getParcelFee = async () => {
+    try {
+
+      const response = await fetch(`${API_URL}/parcelfee`);
+
+      const result = await response.json();
+
+
+      if (result.success) {
+
+        setBusFare(result.data.busFare.toString());
+        setWeighFare(result.data.weighFare.toString());
+        setServiceTax(result.data.serviceTax.toString());
+
+      } else {
+
+        Alert.alert("Error", result.message);
+
+      }
+
+    } catch (error) {
+
+      console.log(error);
+      Alert.alert("Error", "Failed to load parcel fee");
+
+    }
+  };
+
+
+
+  // Update Parcel Fee
+  const updateParcelFee = async () => {
+
+    try {
+
+      setLoading(true);
+
+
+      const response = await fetch(`${API_URL}/parcelfee`, {
+
+        method: "PUT",
+
+        headers: {
+          "Content-Type": "application/json",
+        },
+
+        body: JSON.stringify({
+
+          busFare: Number(busFare),
+
+          weighFare: Number(weighFare),
+
+          serviceTax: Number(serviceTax),
+
+        }),
+
       });
-    };
-    const handleSearch1 = () => {
-      router.push({
-          pathname: "/admin/Staff/index5", 
-           params: {
-                  
-                  Aid: params.Aid,
-                  firstName: params.firstName,
-                  lastName: params.lastName,
-                  email: params.email,
-                },
-      });
-    };
+
+
+      const result = await response.json();
+
+
+      if (result.success) {
+
+        Alert.alert(
+          "Success",
+          "Parcel fee updated successfully"
+        );
+
+        getParcelFee();
+
+      } else {
+
+        Alert.alert(
+          "Failed",
+          result.message
+        );
+
+      }
+
+
+    } catch (error) {
+
+      console.log(error);
+
+      Alert.alert(
+        "Error",
+        "Server connection failed"
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+
+
+  useEffect(() => {
+
+    getParcelFee();
+
+  }, []);
+
+  
+  const total = (
+    Number(busFare || 0) +
+    Number(weighFare || 0) +
+    Number(serviceTax || 0)
+  ).toFixed(2);
+
+  const rows = [
+    {
+      label: 'Bus Fare',
+      value: busFare,
+      icon: 'bus-outline',
+      color: '#4A90E2',
+    },
+    {
+      label: 'Weight Fee (1kg)',
+      value: weighFare,
+      icon: 'cube-outline',
+      color: '#F5A623',
+    },
+    {
+      label: 'Service Tax',
+      value: serviceTax,
+      icon: 'receipt-outline',
+      color: '#7ED321',
+    },
+  ];
     
   return (
     <>
@@ -54,7 +169,7 @@ const ParcelService = () => {
       <SafeAreaView style={styles.container}>
        
       <View style={styles.header}> 
-          <TouchableOpacity><Text style={styles.title}>Buses</Text></TouchableOpacity>
+          <TouchableOpacity><Text style={styles.title}>Parcel Fare</Text></TouchableOpacity>
       </View>
       
       
@@ -62,10 +177,28 @@ const ParcelService = () => {
         
         <View style={styles.card} >
           <View style={styles.svw}>
-            
+            <Text style={styles.cardTitle}>Fare Breakdown</Text>
 
+            {rows.map((row, index) => (
+              <View key={index} style={styles.row}>
+                <View style={styles.rowLeft}>
+                  <View style={[styles.iconWrap, { backgroundColor: `${row.color}20` }]}>
+                    <Ionicons name ={row.icon as any} size={18} color={row.color} />
+                  </View>
+                  <Text style={styles.label}>{row.label}</Text>
+                </View>
+                <Text style={styles.value}>Rs. {row.value}</Text>
+              </View>
+            ))}
+
+              {/* <View style={styles.divider} />
+
+              <View style={styles.totalRow}>
+                <Text style={styles.totalLabel}>Total</Text>
+                <Text style={styles.totalValue}>Rs. {total}</Text>
+              </View> */}
           </View>
-          
+                
         </View>
 
         <View style={styles.card1} >
@@ -75,8 +208,8 @@ const ParcelService = () => {
               <View style={styles.inputInnerWrapper}>
                 <TextInput
                   style={styles.textInput}
-                  value={busFee}
-                  onChangeText={setBusFee}
+                  value={busFare}
+                  onChangeText={setBusFare}
                   
                   placeholderTextColor="#A3A3A3"
                   keyboardType="phone-pad"
@@ -89,8 +222,8 @@ const ParcelService = () => {
               <View style={styles.inputInnerWrapper}>
                 <TextInput
                   style={styles.textInput}
-                  value={weightFee}
-                  onChangeText={setWeightFee}
+                  value={weighFare}
+                  onChangeText={setWeighFare}
                   
                   placeholderTextColor="#A3A3A3"
                   keyboardType="phone-pad"
@@ -115,8 +248,8 @@ const ParcelService = () => {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.searchButton} >
-          <Text style={styles.searchButtonText}>Add Fees</Text>
+        <TouchableOpacity style={styles.searchButton} onPress={updateParcelFee} disabled={loading}>
+          <Text style={styles.searchButtonText}>{loading ? "Updating..." : "Update Fee"}</Text>
         </TouchableOpacity>
 
 
@@ -225,7 +358,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     flex: 1,
-    maxHeight: '20%',
+    maxHeight: '22%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
@@ -259,6 +392,77 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
 
+  card2: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 20,
+    marginHorizontal: 16,
+    marginVertical: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  cardTitle: {
+    marginLeft: 20,
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1A1A1A',
+    marginBottom: 16,
+  },
+  row: {
+    marginLeft: 20,
+    marginRight: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  rowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  label: {
+    fontSize: 14,
+    color: '#4A4A4A',
+    fontWeight: '500',
+  },
+  value: {
+    fontSize: 14,
+    color: '#1A1A1A',
+    fontWeight: '600',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#EEEEEE',
+    marginVertical: 8,
+  },
+  totalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  totalLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1A1A1A',
+  },
+  totalValue: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#4A90E2',
+  },
+
   svw: {
     width: '100%',
       
@@ -268,7 +472,7 @@ const styles = StyleSheet.create({
   inputWrapper: {
     marginLeft: 20,
     marginRight: 20,
-    minHeight: 50,
+    minHeight: 30,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F2F4F5',

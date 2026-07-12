@@ -68,7 +68,7 @@ const JetLinkInterface: React.FC = () => {
       <TouchableOpacity
         onPress={() => 
           router.push({
-            pathname: "/admin/buses/index16",
+            pathname: "/passenger/parcel/index4",
             params: {
               Sid: item._id,
               scheduleId: item.scheduleId,
@@ -78,7 +78,7 @@ const JetLinkInterface: React.FC = () => {
               arrivaltime: item.arrivaltime || "",
               depaturetime: item.depaturetime || "",
               stops: item.stops || "",
-              busNo: item.busNo || "",
+              bNumber: item.busNo || "",
 
               Pid: params.Pid,
               Pid1: params.Pid1,
@@ -214,13 +214,6 @@ const JetLinkInterface: React.FC = () => {
                 </Text>
               </TouchableOpacity>
             </View>
-
-        
-        
-
-        
-
-      
 
       {/* Bottom Graphic Design Element */}
       <View style={styles.footerGraphic}>
