@@ -17,6 +17,7 @@ import {
   FontAwesome5
 } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const JetLinkInterface: React.FC = () => {
   const params = useLocalSearchParams();
@@ -87,13 +88,21 @@ const JetLinkInterface: React.FC = () => {
       <StatusBar barStyle="light-content" backgroundColor="#0056b3" />
       
       {/* Header Section */}
-      <View style={styles.header}>
-          
-          
-          <TouchableOpacity><Text style={styles.title}>Jetlink</Text></TouchableOpacity>
-          
-          
-        </View>
+      <LinearGradient
+                      colors={['#4B6CF5', '#32CD32']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.submitGradient1}
+                  >
+              <View style={styles.header}>
+                  
+              
+                <TouchableOpacity >
+                  <Text style={styles.title}>JetLink</Text>
+                </TouchableOpacity>
+                       
+              </View>
+              </LinearGradient> 
 
       
     
@@ -191,9 +200,16 @@ const JetLinkInterface: React.FC = () => {
         
       </View>
 
-      <TouchableOpacity style={styles.searchButton} onPress={handlesenderD}>
-        <Text style={styles.searchButtonText}>Next</Text>
-      </TouchableOpacity>
+      <TouchableOpacity style={styles.submitButton}>
+                          <LinearGradient
+                              colors={['#4B6CF5', '#32CD32']}
+                              start={{ x: 0, y: 0 }}
+                              end={{ x: 1, y: 0 }}
+                              style={styles.submitGradient}
+                          >
+                          <Text style={styles.submitText}>Submit payment</Text>
+                          </LinearGradient>
+                      </TouchableOpacity>
 
         {isSearching ? (
                   <TextInput
@@ -259,8 +275,22 @@ const JetLinkInterface: React.FC = () => {
 
       {/* Bottom Graphic Design Element */}
       <View style={styles.footerGraphic}>
-         <View style={styles.blueCurve} />
-         <View style={styles.greenCurve} />
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
+      </View>
+      <View style={styles.footerGraphic1}>
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
       </View>
     </SafeAreaView>
     </>
@@ -280,7 +310,11 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 70,   
-    backgroundColor: '#0047AB',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  submitGradient1: {
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -340,15 +374,13 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   
-  searchButton: {
+  submitButton: {
     
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-around",
     marginLeft: 20,
     marginRight: 20,  
     height: 55,
-    backgroundColor: "#32CD32",
+    overflow: 'hidden',
     borderRadius: 25,
     marginTop: 15,
     shadowColor: "#000",
@@ -361,10 +393,10 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
 
-  searchButtonText: {
-    color: '#ffffff',
-    fontSize: 20,
-    fontWeight: 'bold',
+   submitText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
   },
 
 
@@ -442,28 +474,29 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
 
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '100%',
-    borderRadius: 50,
-    position: 'absolute',  
-  },
+  footerGraphic1: {
 
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 25,
-    position: 'absolute',   
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 });
 

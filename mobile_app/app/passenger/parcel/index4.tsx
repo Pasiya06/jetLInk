@@ -13,7 +13,8 @@ import {
 import { Ionicons, 
   MaterialCommunityIcons, 
   Fontisto, 
-  FontAwesome, Feather } from '@expo/vector-icons'; 
+  FontAwesome, Feather } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const ParcelService = () => {
     const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -152,9 +153,21 @@ const ParcelService = () => {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
        
-      <View style={styles.header}> 
-          <TouchableOpacity><Text style={styles.title}>Comfirm Parcel</Text></TouchableOpacity>
-      </View>
+      <LinearGradient
+                      colors={['#4B6CF5', '#32CD32']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.submitGradient1}
+                  >
+              <View style={styles.header}>
+                  
+              
+                <TouchableOpacity >
+                  <Text style={styles.title}>JetLink</Text>
+                </TouchableOpacity>
+                       
+              </View>
+              </LinearGradient> 
 
         <View style={styles.card} >
           <View style={styles.svw}> 
@@ -197,9 +210,16 @@ const ParcelService = () => {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.searchButton}  >
-          <Text style={styles.searchButtonText}>Pay</Text>
-        </TouchableOpacity>
+        <TouchableOpacity style={styles.submitButton}>
+                    <LinearGradient
+                        colors={['#4B6CF5', '#32CD32']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.submitGradient}
+                    >
+                    <Text style={styles.submitText}>Submit payment</Text>
+                    </LinearGradient>
+                </TouchableOpacity>
 
 
 
@@ -279,9 +299,22 @@ const ParcelService = () => {
 
       
       <View style={styles.footerGraphic}>
-        
-        <View style={styles.blueCurve} />
-        <View style={styles.greenCurve} />
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
+      </View>
+      <View style={styles.footerGraphic1}>
+        <LinearGradient
+        colors={['#4B6CF5', '#32CD32']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.submitGradient}
+        >
+        </LinearGradient>
       </View>
             
     </SafeAreaView></>
@@ -302,7 +335,11 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 70,   
-    backgroundColor: '#0047AB',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  submitGradient1: {
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -518,15 +555,13 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 
-  searchButton: {
+  submitButton: {
     
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-around",
     marginLeft: 20,
     marginRight: 20,  
     height: 55,
-    backgroundColor: "#32CD32",
+    overflow: 'hidden',
     borderRadius: 25,
     marginTop: 15,
     shadowColor: "#000",
@@ -539,10 +574,10 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
 
-  searchButtonText: {
-    color: '#ffffff',
-    fontSize: 20,
-    fontWeight: 'bold',
+   submitText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
   },
    
   bottomNav: {
@@ -625,28 +660,29 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
 
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '100%',
-    borderRadius: 50,
-    position: 'absolute',  
-  },
+  footerGraphic1: {
 
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 25,
-    position: 'absolute',   
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
   
   

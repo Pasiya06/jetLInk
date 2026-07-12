@@ -17,6 +17,7 @@ import { Ionicons,
   MaterialIcons, 
   FontAwesome5, 
   FontAwesome } from '@expo/vector-icons'; // Standard icon sets
+  import { LinearGradient } from 'expo-linear-gradient';
 
 const ParcelService = () => {
     const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -44,13 +45,21 @@ const ParcelService = () => {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
        {/* Header Section */}
-      <View style={styles.header}>
-          
-          
-          <TouchableOpacity><Text style={styles.title}>Jetlink</Text></TouchableOpacity>
-          
-          
-        </View>
+      <LinearGradient
+                      colors={['#4B6CF5', '#32CD32']}
+                      start={{ x: 0, y: 0 }}
+                      end={{ x: 1, y: 0 }}
+                      style={styles.submitGradient1}
+                  >
+              <View style={styles.header}>
+                  
+              
+                <TouchableOpacity >
+                  <Text style={styles.title}>JetLink</Text>
+                </TouchableOpacity>
+                       
+              </View>
+              </LinearGradient> 
 
       
       {/* Content Section */}
@@ -142,8 +151,23 @@ const ParcelService = () => {
 
       {/* Bottom Graphic Design Element */}
       <View style={styles.footerGraphic}>
-         <View style={styles.blueCurve} />
-         <View style={styles.greenCurve} />
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
+      </View>
+      <View style={styles.footerGraphic1}>
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
+
       </View>
     </SafeAreaView>
     </>
@@ -155,17 +179,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
- header: {
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', // Spaced items
-    paddingTop: 50, // Added padding for top status bar area
+    justifyContent: 'center',
+    paddingTop: 50,
     paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: '#0047AB',
+    paddingBottom: 70,   
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
+
+  submitGradient1: {
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
   title: {
     fontSize: 28,
     fontWeight: '800',
@@ -323,28 +352,29 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
 
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '100%',
-    borderRadius: 50,
-    position: 'absolute',  
-  },
+  footerGraphic1: {
 
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 25,
-    position: 'absolute',   
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 });
 
