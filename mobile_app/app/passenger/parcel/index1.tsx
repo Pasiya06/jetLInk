@@ -29,11 +29,11 @@ const ParcelService = () => {
           pathname: "/passenger/parcel/index2",
           params:{ 
             Pid: params.Pid,
-            Pid1: params.passengerId,
-            pfirstName: params.firstName,
-            plastName:params.lastName,
-            pphoneNumber: params.phoneNumber,
-            pemail: params.email,
+            Pid1: params.Pid1,
+            pfirstName: params.pfirstName,
+            plastName:params.plastName,
+            pphoneNumber: params.pphoneNumber,
+            pemail: params.pemail,
 
           } 
           
@@ -90,14 +90,14 @@ const ParcelService = () => {
         
                     else {
                       router.push({
-                        pathname: "/passenger/parcel/index1",
+                        pathname: "/passenger/index1",
                         params: {
                           Pid: params.Pid,
                           Pid1: params.Pid1,
-                          firstName: params.firstName,
-                          lastName:params.lastName,
-                          phoneNumber: params.phoneNumber,
-                          email: params.email,
+                          pfirstName: params.pfirstName,
+                          plastName:params.plastName,
+                          pphoneNumber: params.pphoneNumber,
+                          pemail: params.pemail,
                         },                    
                       });
                     };}}>

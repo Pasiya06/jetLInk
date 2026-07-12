@@ -13,22 +13,26 @@ import {
 import { 
   Ionicons, 
   Feather ,  
-  FontAwesome
+  FontAwesome,
+  FontAwesome5
 } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const JetLinkInterface: React.FC = () => {
   const params = useLocalSearchParams();
   const [sendername, setsendername] = useState(`${params.pfirstName ?? ""} ${params.plastName ?? ""}`.trim());
-  const [Smobilenumber, Ssetmobilenumber] = useState(String(params.pphoneNumber || ""));
-  const [Semail, SsetEmail] = useState(String(params.pemail || ""));
-  const [receivername, setreceivername] = useState<string>('');
-  const [Rmobilenumber, Rsetmobilenumber] = useState<string>('');
-  const [Remail, RsetEmail] = useState<string>('');
-  const [weight, setWeight] = useState<string>('');
-  const [pickup, setPickup] = useState<string>('');
-  const [drop, setDrop] = useState<string>('');
-  const [date, setDate] = useState<string>('');
-  const [time, setTime] = useState<string>('');
+  const [smobilenumber, Ssetmobilenumber] = useState(String(params.pphoneNumber || params.smobilenumber || ""));
+  const [semail, SsetEmail] = useState(String(params.pemail || params.semail || ""));
+  const [receivername, setreceivername] = useState(String(params.receivername || ""));
+  const [rmobilenumber, Rsetmobilenumber] = useState(String(params.rmobilenumber || ""));
+  const [remail, RsetEmail] = useState(String(params.remail || ""));
+  const [weight, setWeight] = useState(String(params.weight || ""));
+  const [pickup, setPickup] = useState(String(params.pickup || ""));
+  const [drop, setDrop] = useState(String(params.drop || ""));
+  const [date, setDate] = useState(String(params.date || ""));
+  const [date1, setdate] = useState(new Date());
+  const [showCalendar, setShowCalendar] = useState<boolean>(false);
+  const [time, setTime] = useState(String(params.time || ""));
   const [activeTab, setActiveTab] = useState('');
   
   const router = useRouter();
@@ -37,7 +41,7 @@ const JetLinkInterface: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const handlesenderD = async () => {
 
-  if (!sendername || !Smobilenumber || !Semail || !receivername || !Remail || !Rmobilenumber || !weight || !pickup || !drop || !date || !time) {
+  if (!sendername || !smobilenumber || !semail || !receivername || !remail || !rmobilenumber || !weight || !pickup || !drop || !date || !time) {
     alert("Please fill required fields");
     return;
   }
@@ -52,14 +56,15 @@ const JetLinkInterface: React.FC = () => {
             pfirstName: params.pfirstName,
             plastName:params.plastName,
             sendername,
-            Smobilenumber,
-            Semail,
+            smobilenumber,
+            semail,
             receivername,
-            Rmobilenumber,
-            Remail,
+            rmobilenumber,
+            remail,
             weight,
             pickup,
             drop,
+            date,
             time
           } 
           
@@ -108,13 +113,13 @@ const JetLinkInterface: React.FC = () => {
 
           <Text style={styles.label}>Mobile Number</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={Smobilenumber} onChangeText={Ssetmobilenumber} />
+            <TextInput style={styles.input} value={smobilenumber} onChangeText={Ssetmobilenumber} />
             
           </View>
 
           <Text style={styles.label}>Email</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={Semail} onChangeText={SsetEmail} />
+            <TextInput style={styles.input} value={semail} onChangeText={SsetEmail} />
             
           </View>
 
@@ -126,13 +131,13 @@ const JetLinkInterface: React.FC = () => {
 
           <Text style={styles.label}>Mobile Number</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={Rmobilenumber} onChangeText={Rsetmobilenumber} />
+            <TextInput style={styles.input} value={rmobilenumber} onChangeText={Rsetmobilenumber} />
             
           </View>
 
           <Text style={styles.label}>Email</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={Remail} onChangeText={RsetEmail} />
+            <TextInput style={styles.input} value={remail} onChangeText={RsetEmail} />
             
           </View>
 
@@ -156,8 +161,25 @@ const JetLinkInterface: React.FC = () => {
           <Text style={styles.label}>Date</Text>
           <View style={styles.inputWrapper}>
             <TextInput style={styles.input} value={date} placeholder="YYYY-MM-DD" onChangeText={setDate} />
-            <Text style={styles.inputIcon}>📅</Text>
+            <TouchableOpacity onPress={() => setShowCalendar(true)}>
+              <FontAwesome5 name="calendar-alt" size={24} color="black" />  
+            </TouchableOpacity>
           </View>
+
+          {showCalendar && (
+                  <DateTimePicker
+                    value={date1}
+                    mode="date"
+                    display="default"
+                    onChange={(event, selectedDate) => {
+                      setShowCalendar(false);
+                      if (selectedDate) {
+                        setdate(selectedDate);
+                        setDate(selectedDate.toLocaleDateString());
+                      }
+                    }}
+                  />
+                )}
           
           <Text style={styles.label}>Time</Text>
           <View style={styles.inputWrapper}>
@@ -166,10 +188,12 @@ const JetLinkInterface: React.FC = () => {
           </View>                    
  
         </ScrollView>
-        <TouchableOpacity style={styles.searchButton} onPress={handlesenderD}>
-            <Text style={styles.searchButtonText}>Next</Text>
-        </TouchableOpacity>
+        
       </View>
+
+      <TouchableOpacity style={styles.searchButton} onPress={handlesenderD}>
+        <Text style={styles.searchButtonText}>Next</Text>
+      </TouchableOpacity>
 
         {isSearching ? (
                   <TextInput
@@ -195,10 +219,9 @@ const JetLinkInterface: React.FC = () => {
                         params: {
                           Pid: params.Pid,
                           Pid1: params.Pid1,
-                          firstName: params.pfirstName,
-                          lastName:params.plastName,
-                          phoneNumber: params.pphoneNumber,
-                          email: params.pemail,
+                          pfirstName: params.pfirstName,
+                          plastName:params.plastName,
+                          
                         },                    
                       });
                     };}}>
@@ -272,9 +295,9 @@ const styles = StyleSheet.create({
   card: {
     width: '90%',
     flex: 1,
-    maxHeight: '68%',
+    maxHeight: '60%',
     backgroundColor: '#FFF',
-    padding: 24,
+    padding: 15,
     alignItems: 'center',
     marginTop: -50,   
     alignSelf: 'center',
@@ -288,7 +311,7 @@ const styles = StyleSheet.create({
 
   svw: {
     width: '100%',
-    marginBottom:70,  
+      
   },
 
   label: {
@@ -318,19 +341,16 @@ const styles = StyleSheet.create({
   },
   
   searchButton: {
-    position: "absolute",
-    bottom: 15,
-    left: 10,
-    right: 10,
-
+    
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-      
+    marginLeft: 20,
+    marginRight: 20,  
     height: 55,
     backgroundColor: "#32CD32",
     borderRadius: 25,
-
+    marginTop: 15,
     shadowColor: "#000",
     shadowOpacity: 0.08,
     shadowRadius: 10,

@@ -76,7 +76,7 @@ export default function Index() {
             <Text style={styles.title1}>Good Morning</Text>
           </View>  
           <View style={styles.iconContainer1}>
-            <Text style={styles.title2}>{params.firstName} {params.lastName}</Text>
+            <Text style={styles.title2}>{params.pfirstName} {params.plastName}</Text>
             <MaterialIcons name="waving-hand" size={30} color={"#FFA500"} />
           </View>
           
@@ -96,14 +96,12 @@ export default function Index() {
               params: {
                 Pid: params.Pid,
                 Pid1: params.Pid1,
-                firstName: params.firstName,
-                lastName:params.lastName,
-                phoneNumber: params.phoneNumber,
+                pfirstName: params.pfirstName,
+                plastName:params.plastName,
+                pphoneNumber: params.pphoneNumber,
                 address: params.address,
                 NIC: params.NIC,
-                Birthday: params.birthday,
-                gender: params.gender,
-                email: params.email,
+                pemail: params.pemail,
               },
           })
       }
@@ -123,10 +121,10 @@ export default function Index() {
               params: {
                 Pid: params.Pid,
                 Pid1: params.Pid1,
-                firstName: params.firstName,
-                lastName:params.lastName,
-                phoneNumber: params.phoneNumber,
-                email: params.email,
+                pfirstName: params.pfirstName,
+                plastName:params.plastName,
+                pphoneNumber: params.pphoneNumber,
+                pemail: params.pemail,
               },
           })
       } 

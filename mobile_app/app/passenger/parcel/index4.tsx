@@ -60,6 +60,39 @@ const ParcelService = () => {
   const weight = Number(params.weight);
   const allweightfair = weight * weightfare;
 
+  const handleSearch = () => {
+      router.push({
+          pathname: "/passenger/parcel/index4", 
+           params: {    
+              Sid: params._id,
+              scheduleId: params.scheduleId,
+              busdate: params.busdate,
+              pickuploca: params.pickuploca || "",
+              dropoffloca: params.dropoffloca || "",
+              arrivaltime: params.arrivaltime || "",
+              depaturetime: params.depaturetime || "",
+              stops: params.stops || "",
+              bNumber: params.bNumber || "",
+
+              Pid: params.Pid,
+              Pid1: params.Pid1,
+              pfirstName: params.pfirstName,
+              plastName:params.plastName,
+              sendername:params.sendername,
+              smobilenumber:params.smobilenumber,
+              semail:params.semail,
+              receivername:params.receivername,
+              rmobilenumber:params.rmobilenumber,
+              remail:params.remail,
+              weight:params.weight,
+              pickup:params.pickup,
+              drop:params.drop,
+              date:params.date,
+              time:params.time
+        },
+      });
+    };
+
 
 
   
@@ -99,6 +132,20 @@ const ParcelService = () => {
       color: '#7ED321',
     },
   ];
+
+  // Guard against params possibly being arrays (repeated query keys)
+  const getParam = (key: string) => {
+    const val = params[key];
+    return Array.isArray(val) ? val[0] : val;
+  };
+
+  const details = [
+    { label: 'Weight', value: `${getParam('weight')} kg`, icon: 'cube-outline', color: '#F5A623' },
+    { label: 'Pickup Location', value: getParam('pickup'), icon: 'location-outline', color: '#4A90E2' },
+    { label: 'Drop Location', value: getParam('drop'), icon: 'flag-outline', color: '#7ED321' },
+    { label: 'Date', value: getParam('date'), icon: 'calendar-outline', color: '#9B59B6' },
+    { label: 'Time', value: getParam('time'), icon: 'time-outline', color: '#E74C3C' },
+  ] as const;
     
   return (
     <>
@@ -106,13 +153,23 @@ const ParcelService = () => {
       <SafeAreaView style={styles.container}>
        
       <View style={styles.header}> 
-          <TouchableOpacity><Text style={styles.title}>Parcel Fare</Text></TouchableOpacity>
+          <TouchableOpacity><Text style={styles.title}>Comfirm Parcel</Text></TouchableOpacity>
       </View>
 
         <View style={styles.card} >
-          <View style={styles.svw}>
-            
-
+          <View style={styles.svw}> 
+            {/* <Text style={styles.cardTitle}>Shipment Summary</Text> */}
+            {details.map((item, index) => (
+              <View key={index} style={styles.detailRow}>
+                <View style={[styles.iconWrap, { backgroundColor: `${item.color}20` }]}>
+                  <Ionicons name={item.icon} size={18} color={item.color} />
+                </View>
+                <View style={styles.detailTextWrap}>
+                  <Text style={styles.detailLabel}>{item.label}</Text>
+                  <Text style={styles.detailValue}>{item.value}</Text>
+                </View>
+              </View>
+            ))}
           </View>      
         </View>
 
@@ -122,7 +179,7 @@ const ParcelService = () => {
             {rows.map((row, index) => (
               <View key={index} style={styles.row}>
                 <View style={styles.rowLeft}>
-                  <View style={[styles.iconWrap, { backgroundColor: `${row.color}20` }]}>
+                  <View style={[styles.iconWrap1, { backgroundColor: `${row.color}20` }]}>
                     <Ionicons name ={row.icon as any} size={18} color={row.color} />
                   </View>
                   <Text style={styles.label}>{row.label}</Text>
@@ -168,12 +225,23 @@ const ParcelService = () => {
 
                 else {
                   router.push({
-                    pathname: "/admin/index1",
+                    pathname: "/passenger/parcel/index3",
                     params: {
-                      Aid: params.Aid,
-                      firstName: params.firstName,
-                      lastName: params.lastName,
-                      email: params.email,
+                      Pid: params.Pid,
+                      Pid1: params.Pid1,
+                      pfirstName: params.pfirstName,
+                      plastName:params.plastName,
+                      sendername:params.sendername,
+                      smobilenumber:params.smobilenumber,
+                      semail:params.semail,
+                      receivername:params.receivername,
+                      rmobilenumber:params.rmobilenumber,
+                      remail:params.remail,
+                      weight:params.weight,
+                      pickup:params.pickup,
+                      drop:params.drop,
+                      date:params.date,
+                      time:params.time
                     },                    
                   });
                 };}}>
@@ -247,10 +315,11 @@ const styles = StyleSheet.create({
   },
 
   card: {
+    paddingTop:10,
     marginLeft: 20,
     marginRight: 20,
     flex: 1,
-    maxHeight: '22%',
+    maxHeight: '33%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
@@ -268,13 +337,14 @@ const styles = StyleSheet.create({
   card1: {
     marginLeft: 20,
     marginRight: 20,
+    
     flex: 1,
-    maxHeight: '35%',
+    maxHeight: '25%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-    marginTop: 20,   
+    marginTop: 15,   
     alignSelf: 'center',
     borderRadius: 20,
     elevation: 10,
@@ -284,18 +354,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
 
-  card2: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 20,
-    marginHorizontal: 16,
-    marginVertical: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 4,
-  },
+  
   cardTitle: {
     marginLeft: 20,
     fontSize: 16,
@@ -324,6 +383,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   label: {
+    marginLeft: 20,
     fontSize: 14,
     color: '#4A4A4A',
     fontWeight: '500',
@@ -334,22 +394,28 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   divider: {
+    marginLeft: 20,
+    marginRight: 20,
     height: 1,
-    backgroundColor: '#EEEEEE',
+    backgroundColor: '#515151a0',
     marginVertical: 8,
   },
   totalRow: {
+    
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginTop: 8,
   },
   totalLabel: {
+    marginLeft: 20,
+    
     fontSize: 16,
     fontWeight: '700',
     color: '#1A1A1A',
   },
   totalValue: {
+    marginRight: 20,
     fontSize: 18,
     fontWeight: '800',
     color: '#4A90E2',
@@ -358,6 +424,39 @@ const styles = StyleSheet.create({
   svw: {
     width: '100%',
       
+  },
+
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    marginLeft: 20,
+  },
+
+  iconWrap1: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  detailTextWrap: {
+    marginLeft: 12,
+    flex: 1,
+  },
+
+  detailLabel: {
+    fontSize: 12,
+    color: '#8A8A8A',
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+
+  detailValue: {
+    fontSize: 15,
+    color: '#1A1A1A',
+    fontWeight: '600',
   },
 
   
@@ -429,7 +528,7 @@ const styles = StyleSheet.create({
     height: 55,
     backgroundColor: "#32CD32",
     borderRadius: 25,
-    marginTop: 20,
+    marginTop: 15,
     shadowColor: "#000",
     shadowOpacity: 0.08,
     shadowRadius: 10,

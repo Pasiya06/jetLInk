@@ -85,14 +85,15 @@ const JetLinkInterface: React.FC = () => {
               pfirstName: params.pfirstName,
               plastName:params.plastName,
               sendername:params.sendername,
-              Smobilenumber:params.Smobilenumber,
-              Semail:params.Semail,
+              smobilenumber:params.smobilenumber,
+              semail:params.semail,
               receivername:params.receivername,
-              Rmobilenumber:params.Rmobilenumber,
-              Remail:params.Remail,
+              rmobilenumber:params.rmobilenumber,
+              remail:params.remail,
               weight:params.weight,
               pickup:params.pickup,
               drop:params.drop,
+              date:params.date,
               time:params.time
 
 
@@ -172,14 +173,24 @@ const JetLinkInterface: React.FC = () => {
         
                     else {
                       router.push({
-                        pathname: "/passenger/parcel/index1",
+                        pathname: "/passenger/parcel/index2",
                         params: {
                           Pid: params.Pid,
                           Pid1: params.Pid1,
-                          firstName: params.pfirstName,
-                          lastName:params.plastName,
-                          phoneNumber: params.pphoneNumber,
-                          email: params.pemail,
+                          pfirstName: params.pfirstName,
+                          plastName:params.plastName,
+                          sendername:params.sendername,
+                          smobilenumber:params.smobilenumber,
+                          semail:params.semail,
+                          receivername:params.receivername,
+                          rmobilenumber:params.rmobilenumber,
+                          remail:params.remail,
+                          weight:params.weight,
+                          pickup:params.pickup,
+                          drop:params.drop,
+                          date:params.date,
+                          time:params.time
+                                      
                         },                    
                       });
                     };}}>

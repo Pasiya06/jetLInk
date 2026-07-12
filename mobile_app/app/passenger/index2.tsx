@@ -89,12 +89,12 @@ const loginPassenger = async () => {
         params: {
           Pid: user._id,
           Pid1: user.passengerId,
-          firstName: user.firstName,
-          lastName: user.lastName,
-          phoneNumber: user.phoneNumber,
+          pfirstName: user.firstName,
+          plastName: user.lastName,
+          pphoneNumber: user.phoneNumber,
           address: user.address,
           NIC: user.NIC,
-          email: user.email,
+          pemail: user.email,
         },
       });
 
