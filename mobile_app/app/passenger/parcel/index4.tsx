@@ -28,8 +28,6 @@ const ParcelService = () => {
     const [weighFare, setWeighFare] = useState("");
     const [serviceTax, setServiceTax] = useState("");
 
-    
-    
     const getParcelFee = async () => {
     try {
 
@@ -57,61 +55,82 @@ const ParcelService = () => {
 
     }
   };
-  const weightfare = Number(weighFare);
-  const weight = Number(params.weight);
-  const allweightfair = weight * weightfare;
 
-  const handleSearch = () => {
-      router.push({
-          pathname: "/passenger/parcel/index4", 
-           params: {    
-              Sid: params._id,
-              scheduleId: params.scheduleId,
-              busdate: params.busdate,
-              pickuploca: params.pickuploca || "",
-              dropoffloca: params.dropoffloca || "",
-              arrivaltime: params.arrivaltime || "",
-              depaturetime: params.depaturetime || "",
-              stops: params.stops || "",
-              bNumber: params.bNumber || "",
-
-              Pid: params.Pid,
-              Pid1: params.Pid1,
-              pfirstName: params.pfirstName,
-              plastName:params.plastName,
-              sendername:params.sendername,
-              smobilenumber:params.smobilenumber,
-              semail:params.semail,
-              receivername:params.receivername,
-              rmobilenumber:params.rmobilenumber,
-              remail:params.remail,
-              weight:params.weight,
-              pickup:params.pickup,
-              drop:params.drop,
-              date:params.date,
-              time:params.time
-        },
-      });
-    };
-
-
-
-  
-
-
-
-  useEffect(() => {
+   useEffect(() => {
 
     getParcelFee();
 
   }, []);
 
-  
+  const weightfare = Number(weighFare);
+  const weight = Number(params.weight);
+  const allweightfair = weight * weightfare;
+
   const total = (
     Number(busFare || 0) +
     Number(allweightfair || 0) +
     Number(serviceTax || 0)
   ).toFixed(2);
+
+ const createParcel = async (parcelData: any) => {
+  try {
+    const response = await fetch(`${API_URL}/parcels`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(parcelData),
+    });
+
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      message: "Server connection failed",
+    };
+  }
+};
+
+  const handleSaveParcel = async () => {
+    const parcelData = {
+      sendername:params.sendername,
+      Smobilenumber:params.smobilenumber,
+      Semail:params.semail,
+      receivername:params.receivername,
+      Rmobilenumber:params.rmobilenumber,
+      Remail:params.remail,
+      weight:params.weight,
+      pickup:params.pickup,
+      drop:params.drop,
+      date:params.date,
+      time:params.time,
+      Bnumber:params.bNumber,
+      totalFare:total,
+    };
+
+    const result = await createParcel(parcelData);
+
+    if (result.success) {
+      Alert.alert("Success", "Parcel added successfully.");
+
+
+    } else {
+      Alert.alert("Error", result.message);
+    }
+  };
+
+
+  
+
+
+
+ 
+
+  
+  
 
   const rows = [
     {
@@ -210,7 +229,7 @@ const ParcelService = () => {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.submitButton}>
+        <TouchableOpacity style={styles.submitButton} onPress={handleSaveParcel}>
                     <LinearGradient
                         colors={['#4B6CF5', '#32CD32']}
                         start={{ x: 0, y: 0 }}

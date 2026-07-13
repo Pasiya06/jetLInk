@@ -15,9 +15,12 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.4.0",
     "mongoose": "^9.7.3",
-    "nodemailer": "^9.0.3"
+    "nodemailer": "^9.0.3",
+    "react-native-qrcode-svg": "^6.3.21",
+    "react-native-svg": "^15.15.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

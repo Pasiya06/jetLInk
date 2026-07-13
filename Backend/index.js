@@ -1,7 +1,11 @@
+import dotenv from "dotenv";
+
+dotenv.config();
 import express from "express";
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+
 import cors from "cors";
+
 import adminRoutes from "./routes/adminRoutes.js";
 import busRoutes from "./routes/busRoutes.js";
 import passengerRoutes from "./routes/passengerRoutes.js";
@@ -11,7 +15,7 @@ import conductorRoutes from "./routes/conductorRoutes.js";
 import locationRoutes from "./routes/locationRoutes.js";
 import parcelRoutes from "./routes/parcelRoutes.js";
 import parcelFeeRoutes from "./routes/parcelFeeRoutes.js";
-
+import ticketRoute from "./routes/ticketRoute.js";
 dotenv.config();
 
 const app = express();
@@ -57,6 +61,7 @@ app.get("/", (req, res) => {
 });
 
 // API Routes
+app.use("/api/tickets", ticketRoute);
 app.use("/api/passengers", passengerRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/buses", busRoutes);

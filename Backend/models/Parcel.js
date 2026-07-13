@@ -63,11 +63,20 @@ const parcelSchema = new mongoose.Schema(
       required: true,
       
     },
-    busFare: {},
+    totalFare: {
+      type: Number,
+      required: true,
+    },
 
-    weighFare: {},
-
-    serviceTax: {}
+    used: {
+      type: Boolean,
+      default: false,
+    },
+    
+    usedAt: {
+      type: Date,
+      default: null,
+    },
     
   },
   {
