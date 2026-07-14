@@ -2,21 +2,26 @@ import mongoose from "mongoose";
 
 const parcelSchema = new mongoose.Schema(
   {
+    parcelId: {
+      type: String,
+      unique: true,
+    },
+
     sendername: {
       type: String,
-      required: true, 
+       
     },
 
     Smobilenumber: {
       type: String,
       required: true,
-      unique: true,
+      
     },
 
     Semail: {
       type: String,
       required: true,
-      unique: true, 
+      
     },
 
     receivername: {
@@ -27,13 +32,13 @@ const parcelSchema = new mongoose.Schema(
     Rmobilenumber: {
       type: String,
       required: true,
-      unique: true,
+      
     },
 
     Remail: {
       type: String,
       required: true,
-      unique: true,
+      
     },
 
     weight: {
@@ -51,6 +56,11 @@ const parcelSchema = new mongoose.Schema(
       type: String,
       required: true,
       
+    },
+
+    date: {
+      type: String,
+      required: true,
     },
 
     time: {
@@ -72,7 +82,7 @@ const parcelSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    
+
     usedAt: {
       type: Date,
       default: null,

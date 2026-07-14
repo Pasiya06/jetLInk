@@ -74,7 +74,7 @@ const ParcelService = () => {
 
  const createParcel = async (parcelData: any) => {
   try {
-    const response = await fetch(`${API_URL}/parcels`, {
+    const response = await fetch(`${API_URL}/parcel`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -114,7 +114,32 @@ const ParcelService = () => {
     const result = await createParcel(parcelData);
 
     if (result.success) {
-      Alert.alert("Success", "Parcel added successfully.");
+      router.push({
+            pathname: "/passenger/parcel/paymentGateway",
+            params: {
+              Sid: params.Sid,
+              scheduleId: params.scheduleId,
+              bNumber: params.bNumber,
+
+              Pid: params.Pid,
+              Pid1: params.Pid1,
+              pfirstName: params.pfirstName,
+              plastName:params.plastName,
+              sendername:params.sendername,
+              smobilenumber:params.smobilenumber,
+              semail:params.semail,
+              receivername:params.receivername,
+              rmobilenumber:params.rmobilenumber,
+              remail:params.remail,
+              weight:params.weight,
+              pickup:params.pickup,
+              drop:params.drop,
+              date:params.date,
+              time:params.time
+
+            },
+          })
+      
 
 
     } else {
@@ -122,15 +147,6 @@ const ParcelService = () => {
     }
   };
 
-
-  
-
-
-
- 
-
-  
-  
 
   const rows = [
     {
@@ -140,7 +156,7 @@ const ParcelService = () => {
       color: '#4A90E2',
     },
     {
-      label: 'Weight Fee (1kg)',
+      label: 'Weight Fee ',
       value: allweightfair,
       icon: 'cube-outline',
       color: '#F5A623',

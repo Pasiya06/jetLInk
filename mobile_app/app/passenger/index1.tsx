@@ -167,7 +167,19 @@ export default function Index() {
               {/* <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" /> */}
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card2} onPress={() => router.push("/passenger/receipt/index1")} >
+          <TouchableOpacity style={styles.card2} onPress={() =>
+            router.push({
+              pathname: "/passenger/parcel/parcelReceipt",
+              params: {
+                Pid: params.Pid,
+                Pid1: params.Pid1,
+                pfirstName: params.pfirstName,
+                plastName:params.plastName,
+                pphoneNumber: params.pphoneNumber,
+                pemail: params.pemail,
+              },
+          })
+      } >
               <View style={styles.iconContainer}>
                 <Image source ={require("../../assets/images/icons8-bill-94.png")} style={styles.input3dIcon} />
               </View>

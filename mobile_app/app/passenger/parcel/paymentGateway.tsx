@@ -30,7 +30,7 @@ const JetLinkInterface: React.FC = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab1, setActiveTab1] = useState<'card' | 'qr'>('card');
-  const [nameOnCard, setNameOnCard] = useState('Pasindu Sandaruwan');
+  const [nameOnCard, setNameOnCard] = useState('');
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
   const [cvc, setCvc] = useState('');

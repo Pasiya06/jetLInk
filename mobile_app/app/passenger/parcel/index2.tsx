@@ -19,6 +19,7 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
 
+
 const JetLinkInterface: React.FC = () => {
   const params = useLocalSearchParams();
   const [sendername, setsendername] = useState(`${params.pfirstName ?? ""} ${params.plastName ?? ""}`.trim());
@@ -33,10 +34,27 @@ const JetLinkInterface: React.FC = () => {
   const [date, setDate] = useState(String(params.date || ""));
   const [date1, setdate] = useState(new Date());
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
-  const [time, setTime] = useState(String(params.time || ""));
+  const [time, setTime] = useState(new Date());
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedTime, setSelectedTime] = useState("");
   const [activeTab, setActiveTab] = useState('');
   
   const router = useRouter();
+
+  const onTimeChange = (event: any, selected?: Date) => {
+  setShowTimePicker(false);
+
+  if (selected) {
+    setTime(selected);
+
+    const formatted = selected.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    setSelectedTime(formatted);
+  }
+};
 
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -66,7 +84,7 @@ const JetLinkInterface: React.FC = () => {
             pickup,
             drop,
             date,
-            time
+            time:selectedTime
           } 
           
       });
@@ -120,9 +138,9 @@ const JetLinkInterface: React.FC = () => {
             
           </View>
 
-          <Text style={styles.label}>Mobile Number</Text>
+          <Text style={styles.label}>Sender Mobile Number</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={smobilenumber} onChangeText={Ssetmobilenumber} />
+            <TextInput style={styles.input} value={smobilenumber} onChangeText={Ssetmobilenumber} keyboardType="phone-pad"/>
             
           </View>
 
@@ -138,9 +156,9 @@ const JetLinkInterface: React.FC = () => {
             
           </View>
 
-          <Text style={styles.label}>Mobile Number</Text>
+          <Text style={styles.label}>Receiver Mobile Number</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={rmobilenumber} onChangeText={Rsetmobilenumber} />
+            <TextInput style={styles.input} value={rmobilenumber} onChangeText={Rsetmobilenumber} keyboardType="phone-pad"/>
             
           </View>
 
@@ -152,7 +170,7 @@ const JetLinkInterface: React.FC = () => {
 
           <Text style={styles.label}>Weight(kg)</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={weight} onChangeText={setWeight} />           
+            <TextInput style={styles.input} value={weight} onChangeText={setWeight} keyboardType="phone-pad" />           
           </View>
           
           <Text style={styles.label}>Pick up Location</Text>
@@ -190,24 +208,40 @@ const JetLinkInterface: React.FC = () => {
                   />
                 )}
           
-          <Text style={styles.label}>Time</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={time} placeholder="00:00" onChangeText={setTime} />
-            <Text style={styles.inputIcon}>🕒</Text>
-          </View>                    
+            <TextInput style={styles.input}
+              
+              value={selectedTime}
+              placeholder="00:00"
+              editable={false}
+            />
+
+            <TouchableOpacity onPress={() => setShowTimePicker(true)}>
+              <Ionicons name="time-outline" size={24} color="black" />
+            </TouchableOpacity>
+          </View> 
+
+          {showTimePicker && (
+            <DateTimePicker
+              value={time}
+              mode="time"
+              display="default"
+              onChange={onTimeChange}
+            />
+          )}                   
  
         </ScrollView>
         
       </View>
 
-      <TouchableOpacity style={styles.submitButton}>
+      <TouchableOpacity style={styles.submitButton} onPress={handlesenderD}>
                           <LinearGradient
                               colors={['#4B6CF5', '#32CD32']}
                               start={{ x: 0, y: 0 }}
                               end={{ x: 1, y: 0 }}
                               style={styles.submitGradient}
                           >
-                          <Text style={styles.submitText}>Submit payment</Text>
+                          <Text style={styles.submitText}>Next</Text>
                           </LinearGradient>
                       </TouchableOpacity>
 
@@ -237,6 +271,8 @@ const JetLinkInterface: React.FC = () => {
                           Pid1: params.Pid1,
                           pfirstName: params.pfirstName,
                           plastName:params.plastName,
+                          pphoneNumber: params.pphoneNumber,
+                          pemail: params.pemail,
                           
                         },                    
                       });

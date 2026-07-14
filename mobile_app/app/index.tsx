@@ -69,7 +69,7 @@ export default function Index() {
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
-           <TouchableOpacity style={styles.card} onPress={() => router.push("/passenger/parcel/TicketQRScreen")} >
+           <TouchableOpacity style={styles.card} onPress={() => router.push("/passenger/parcel/parcelReceipt")} >
               <View style={styles.iconContainer}>
                 <MaterialIcons name={"tour"}  size={22} color={"#FF0000" } />
               </View>

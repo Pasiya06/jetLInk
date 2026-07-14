@@ -2,43 +2,73 @@ import jwt from "jsonwebtoken";
 import Parcel from "../models/Parcel.js";
 
 export const createParcel = async (req, res) => {
-    try {
-        const parcel = await Parcel.create(req.body);
+  try {
+    // Find the last parcel
+    const lastParcel = await Parcel.findOne().sort({ createdAt: -1 });
 
-        res.status(201).json({
-            success: true,
-            data: parcel,
-        });
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: err.message,
-        });
+    let parcelId = "P0001";
+
+    if (lastParcel && lastParcel.parcelId) {
+      const lastNumber = parseInt(lastParcel.parcelId.substring(1), 10);
+      parcelId = `P${String(lastNumber + 1).padStart(4, "0")}`;
     }
+
+    const parcel = await Parcel.create({
+      ...req.body,
+      parcelId,
+    });
+
+    res.status(201).json({
+      success: true,
+      data: parcel,
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
 };
 
-export const getParcels = async (req, res) => {
-    try {
-        const parcels = await Parcel.find();
+export const getParcelByEmailAndUsed = async (req, res) => {
+  try {
+    const { Semail, used } = req.params;
 
-        res.json({
-            success: true,
-            data: parcels,
-        });
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: err.message,
-        });
+    console.log("Search:", Semail, used);
+
+    const parcels = await Parcel.find({
+      Semail: Semail,
+      used: used === "true"
+    });
+
+    console.log("Parcels:", parcels);
+
+    if (parcels.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No parcels found",
+      });
     }
+
+    res.json({
+      success: true,
+      data: parcels,
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
 };
 
 export const generateParcelQR = async (req, res) => {
-  const { parcelId } = req.params;
-
+  const { parcelId} = req.params;
+    
   try {
-    const parcel = await Parcel.findById(parcelId);
-
+    const parcel = await Parcel.findOne({parcelId});
+    
     if (!parcel) {
       return res.status(404).json({
         error: "Parcel not found",
@@ -46,7 +76,8 @@ export const generateParcelQR = async (req, res) => {
     }
 
     const payload = {
-      parcelId: parcel._id,
+      ParlId: parcel._id,
+      parcelId: parcel.parcelId,
       sendername: parcel.sendername,
       receivername: parcel.receivername,
       pickup: parcel.pickup,
@@ -62,15 +93,7 @@ export const generateParcelQR = async (req, res) => {
 
     res.json({
       qrToken: token,
-      parcel: {
-        id: parcel._id,
-        sendername: parcel.sendername,
-        receivername: parcel.receivername,
-        pickup: parcel.pickup,
-        drop: parcel.drop,
-        weight: parcel.weight,
-        totalFare: parcel.totalFare,
-      },
+      parcel,
     });
   } catch (error) {
     console.log(error);

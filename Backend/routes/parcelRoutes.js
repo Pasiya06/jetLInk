@@ -1,7 +1,7 @@
 import express from "express";
 import {
     createParcel,
-    getParcels,
+    getParcelByEmailAndUsed,
     generateParcelQR,
     verifyParcelQR,
 } from "../controllers/parcelController.js";
@@ -9,7 +9,7 @@ import {
 const router = express.Router();
 
 router.post("/", createParcel);
-router.get("/", getParcels);
+router.get("/:Semail/:used", getParcelByEmailAndUsed);
 router.get("/parcel/:parcelId/qr", generateParcelQR);
 
 router.post("/parcel/verify", verifyParcelQR);
