@@ -7,7 +7,6 @@ import {
   Text, 
   TouchableOpacity, 
   SafeAreaView, 
-  Image ,
   TextInput,
 } from 'react-native';
 import { Ionicons, 
@@ -123,7 +122,17 @@ const ParcelService = () => {
                 </Text>
               </TouchableOpacity>
         
-              <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+              <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                        pathname: "/passenger/index1",
+                        params: {
+                          Pid: params.Pid,
+                          Pid1: params.Pid1,
+                          pfirstName: params.pfirstName,
+                          plastName:params.plastName,
+                          pphoneNumber: params.pphoneNumber,
+                          pemail: params.pemail,
+                        },                    
+                      });}} > 
                 <Ionicons name="home-outline" size={28} color="#fff" />             
               </TouchableOpacity>
         

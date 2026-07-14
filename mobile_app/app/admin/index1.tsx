@@ -15,13 +15,10 @@ import {
 // Icons
 import { 
   Ionicons, 
-  MaterialCommunityIcons, 
-  Fontisto, 
-  FontAwesome6, 
   MaterialIcons, 
-  FontAwesome5, FontAwesome, Feather 
+  FontAwesome, 
+  Feather 
 } from '@expo/vector-icons';
-import { HiOutlineLogout } from "react-icons/hi";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 

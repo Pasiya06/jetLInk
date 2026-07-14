@@ -169,7 +169,7 @@ export default function Index() {
 
           <TouchableOpacity style={styles.card2} onPress={() =>
             router.push({
-              pathname: "/passenger/parcel/parcelReceipt",
+              pathname: "/passenger/receipt/index1",
               params: {
                 Pid: params.Pid,
                 Pid1: params.Pid1,
@@ -221,7 +221,7 @@ export default function Index() {
                     </Text>
                   </TouchableOpacity>
         
-                  <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+                  <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/passenger/index1");}} > 
                     <Ionicons name="home-outline" size={28} color="#fff" />             
                   </TouchableOpacity>
         

@@ -20,7 +20,8 @@
     "mongoose": "^9.7.3",
     "nodemailer": "^9.0.3",
     "react-native-qrcode-svg": "^6.3.21",
-    "react-native-svg": "^15.15.5"
+    "react-native-svg": "^15.15.5",
+    "stripe": "^22.3.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

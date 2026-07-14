@@ -85,6 +85,8 @@ const JetLinkInterface: React.FC = () => {
               Pid1: params.Pid1,
               pfirstName: params.pfirstName,
               plastName:params.plastName,
+              pphoneNumber: params.pphoneNumber,
+              pemail: params.pemail,
               sendername:params.sendername,
               smobilenumber:params.smobilenumber,
               semail:params.semail,
@@ -188,6 +190,8 @@ const JetLinkInterface: React.FC = () => {
                           Pid1: params.Pid1,
                           pfirstName: params.pfirstName,
                           plastName:params.plastName,
+                          pphoneNumber: params.pphoneNumber,
+                          pemail: params.pemail,
                           sendername:params.sendername,
                           smobilenumber:params.smobilenumber,
                           semail:params.semail,
@@ -216,7 +220,17 @@ const JetLinkInterface: React.FC = () => {
                 </Text>
               </TouchableOpacity>
         
-              <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+              <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                        pathname: "/passenger/index1",
+                        params: {
+                          Pid: params.Pid,
+                          Pid1: params.Pid1,
+                          pfirstName: params.pfirstName,
+                          plastName:params.plastName,
+                          pphoneNumber: params.pphoneNumber,
+                          pemail: params.pemail,
+                        },                    
+                      });}} > 
                 <Ionicons name="home-outline" size={28} color="#fff" />             
               </TouchableOpacity>
         

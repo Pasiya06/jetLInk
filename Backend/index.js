@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
-
 dotenv.config();
+
+
 import express from "express";
 import mongoose from "mongoose";
 
@@ -16,7 +17,9 @@ import locationRoutes from "./routes/locationRoutes.js";
 import parcelRoutes from "./routes/parcelRoutes.js";
 import parcelFeeRoutes from "./routes/parcelFeeRoutes.js";
 import ticketRoute from "./routes/ticketRoute.js";
-dotenv.config();
+import paymentRoutes from "./routes/paymentRoutes.js";
+
+
 
 const app = express();
 
@@ -71,7 +74,7 @@ app.use("/api/conductors", conductorRoutes);
 app.use("/api/locations", locationRoutes);
 app.use("/api/parcel", parcelRoutes);
 app.use("/api/parcelfee", parcelFeeRoutes);
-
+app.use("/api/payment", paymentRoutes);
 
 // Invalid Route Handler
 app.use((req, res) => {

@@ -10,10 +10,13 @@ import {
   TextInput,
   Alert
 } from 'react-native';
-import { Ionicons, 
+import { 
+  Ionicons, 
   MaterialCommunityIcons, 
   Fontisto, 
-  FontAwesome, Feather } from '@expo/vector-icons';
+  FontAwesome, 
+  Feather } from '@expo/vector-icons';
+
 import { LinearGradient } from 'expo-linear-gradient';
 
 const ParcelService = () => {
@@ -71,52 +74,11 @@ const ParcelService = () => {
     Number(allweightfair || 0) +
     Number(serviceTax || 0)
   ).toFixed(2);
-
- const createParcel = async (parcelData: any) => {
-  try {
-    const response = await fetch(`${API_URL}/parcel`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(parcelData),
-    });
-
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    console.log(error);
-    return {
-      success: false,
-      message: "Server connection failed",
-    };
-  }
-};
-
-  const handleSaveParcel = async () => {
-    const parcelData = {
-      sendername:params.sendername,
-      Smobilenumber:params.smobilenumber,
-      Semail:params.semail,
-      receivername:params.receivername,
-      Rmobilenumber:params.rmobilenumber,
-      Remail:params.remail,
-      weight:params.weight,
-      pickup:params.pickup,
-      drop:params.drop,
-      date:params.date,
-      time:params.time,
-      Bnumber:params.bNumber,
-      totalFare:total,
-    };
-
-    const result = await createParcel(parcelData);
-
-    if (result.success) {
-      router.push({
+ 
+  const handleSearch = () => {
+        router.push({
             pathname: "/passenger/parcel/paymentGateway",
-            params: {
+            params:{ 
               Sid: params.Sid,
               scheduleId: params.scheduleId,
               bNumber: params.bNumber,
@@ -125,6 +87,8 @@ const ParcelService = () => {
               Pid1: params.Pid1,
               pfirstName: params.pfirstName,
               plastName:params.plastName,
+              pphoneNumber: params.pphoneNumber,
+              pemail: params.pemail,
               sendername:params.sendername,
               smobilenumber:params.smobilenumber,
               semail:params.semail,
@@ -135,17 +99,13 @@ const ParcelService = () => {
               pickup:params.pickup,
               drop:params.drop,
               date:params.date,
-              time:params.time
-
-            },
-          })
-      
-
-
-    } else {
-      Alert.alert("Error", result.message);
-    }
-  };
+              time:params.time,
+              totalFare:total,
+            } 
+            
+        });
+      };
+  
 
 
   const rows = [
@@ -245,7 +205,7 @@ const ParcelService = () => {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSaveParcel}>
+        <TouchableOpacity style={styles.submitButton} onPress={handleSearch}>
                     <LinearGradient
                         colors={['#4B6CF5', '#32CD32']}
                         start={{ x: 0, y: 0 }}
@@ -286,6 +246,8 @@ const ParcelService = () => {
                       Pid1: params.Pid1,
                       pfirstName: params.pfirstName,
                       plastName:params.plastName,
+                      pphoneNumber: params.pphoneNumber,
+                      pemail: params.pemail,
                       sendername:params.sendername,
                       smobilenumber:params.smobilenumber,
                       semail:params.semail,
@@ -313,7 +275,17 @@ const ParcelService = () => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+          <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                    pathname: "/passenger/index1",
+                    params: {
+                      Pid: params.Pid,
+                      Pid1: params.Pid1,
+                      pfirstName: params.pfirstName,
+                      plastName:params.plastName,
+                      pphoneNumber: params.pphoneNumber,
+                      pemail: params.pemail,
+                    },                    
+                  });}} > 
             <Ionicons name="home-outline" size={28} color="#fff" />             
           </TouchableOpacity>
 

@@ -149,3 +149,44 @@ export const verifyParcelQR = async (req, res) => {
     });
   }
 };
+
+export const generateParQR = async (req, res) => {
+  try {
+    const {
+      
+      sendername,
+      receivername,
+      pickup,
+      drop,
+      weight,
+      totalFare,
+    } = req.body;
+
+    const payload = {
+      
+      sendername,
+      receivername,
+      pickup,
+      drop,
+      weight,
+      totalFare,
+      issuedAt: Date.now(),
+    };
+
+    const token = jwt.sign(payload, process.env.QR_SECRET, {
+      expiresIn: "12h",
+    });
+
+    res.status(200).json({
+      success: true,
+      qrToken: token,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to generate Parcel QR",
+    });
+  }
+};

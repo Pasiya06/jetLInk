@@ -1,36 +1,34 @@
 import React, { useState, useCallback } from 'react';
 import { Stack, useRouter, useFocusEffect, useLocalSearchParams } from "expo-router";
-import { getSchedules,  } from "../../../services/scheduleServices";
+
 import { 
   StyleSheet, 
   View, 
-  Text, 
-  FlatList, 
+  Text,  
   TouchableOpacity, 
   SafeAreaView, 
-  TextInput 
+  TextInput,
+  Alert 
 } from 'react-native';
 import { 
   Ionicons, 
   Feather, 
-  MaterialCommunityIcons, 
-  FontAwesome6, 
-  MaterialIcons, 
-  FontAwesome5, 
+  MaterialCommunityIcons,  
   FontAwesome
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 
 const JetLinkInterface: React.FC = () => {
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const params = useLocalSearchParams();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('');
-  
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab1, setActiveTab1] = useState<'card' | 'qr'>('card');
-  const [nameOnCard, setNameOnCard] = useState('');
+  const card:string = "card"
+  const [nameOnCard, setNameOnCard] = useState('Visa');
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
   const [cvc, setCvc] = useState('');
@@ -43,9 +41,87 @@ const JetLinkInterface: React.FC = () => {
       { name: 'DISC', icon: 'credit-card-scan-outline' },
       { name: 'UPAY', icon: 'credit-card-wireless-outline' },
     ];
-  
-  
-    
+
+    const handlePayment = async () => {
+      try {
+        const response = await fetch(`${API_URL}/payment/pay`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            cardNumber,
+            expiry,
+            cvc,
+          }),
+        });
+
+        const data = await response.json();
+
+       if (data.success) {
+            router.push({
+            pathname: "/passenger/parcel/paymentSuccessful",
+            params: {
+              Sid: params.Sid,
+              scheduleId: params.scheduleId,
+              bNumber: params.bNumber,
+
+              Pid: params.Pid,
+              Pid1: params.Pid1,
+              pfirstName: params.pfirstName,
+              plastName:params.plastName,
+              pphoneNumber: params.pphoneNumber,
+              pemail: params.pemail,
+              sendername:params.sendername,
+              smobilenumber:params.smobilenumber,
+              semail:params.semail,
+              receivername:params.receivername,
+              rmobilenumber:params.rmobilenumber,
+              remail:params.remail,
+              weight:params.weight,
+              pickup:params.pickup,
+              drop:params.drop,
+              date:params.date,
+              time:params.time,
+              totalFare:params.totalFare,
+              paymentMethod:card,
+            },
+          });
+            return;
+        }
+
+        switch (data.message) {
+            case "Invalid card number":
+                Alert.alert("Invalid Card Number");
+                break;
+
+            case "Card expired":
+                Alert.alert("Card Expired");
+                break;
+
+            case "CVC validation failed":
+                router.push({
+                        pathname: "/passenger/parcel/paymentFail",
+                        params: {
+                          Pid: params.Pid,
+                          Pid1: params.Pid1,
+                          pfirstName: params.pfirstName,
+                          plastName:params.plastName,
+                          pphoneNumber: params.pphoneNumber,
+                          pemail: params.pemail,
+                        },                    
+                      });
+                break;
+
+            default:
+                Alert.alert("Payment Failed", data.message);
+        }
+      } catch (error) {
+        console.log(error);
+        Alert.alert("Error", "Unable to connect to the server.");
+      }
+    };
+ 
     return (
   
       <>
@@ -149,7 +225,7 @@ const JetLinkInterface: React.FC = () => {
                         onChangeText={setExpiry}
                         placeholder="MM / YY"
                         placeholderTextColor="#B0B0B0"
-                        keyboardType="number-pad"
+                        //keyboardType="number-pad"
                         maxLength={5}
                       />
                     </View>
@@ -186,14 +262,14 @@ const JetLinkInterface: React.FC = () => {
               </View>
             )}
           </View>
-        <TouchableOpacity style={styles.submitButton}>
+        <TouchableOpacity style={styles.submitButton} onPress={handlePayment}>
             <LinearGradient
                 colors={['#4B6CF5', '#32CD32']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.submitGradient}
             >
-            <Text style={styles.submitText}>Submit payment</Text>
+            <Text style={styles.submitText}>Pay</Text>
             </LinearGradient>
         </TouchableOpacity>
 
@@ -223,6 +299,8 @@ const JetLinkInterface: React.FC = () => {
                           Pid1: params.Pid1,
                           pfirstName: params.pfirstName,
                           plastName:params.plastName,
+                          pphoneNumber: params.pphoneNumber,
+                          pemail: params.pemail,
                           sendername:params.sendername,
                           smobilenumber:params.smobilenumber,
                           semail:params.semail,
@@ -251,7 +329,17 @@ const JetLinkInterface: React.FC = () => {
                 </Text>
               </TouchableOpacity>
         
-              <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+              <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                        pathname: "/passenger/index1",
+                        params: {
+                          Pid: params.Pid,
+                          Pid1: params.Pid1,
+                          pfirstName: params.pfirstName,
+                          plastName:params.plastName,
+                          pphoneNumber: params.pphoneNumber,
+                          pemail: params.pemail,
+                        },                    
+                      });}} > 
                 <Ionicons name="home-outline" size={28} color="#fff" />             
               </TouchableOpacity>
         
