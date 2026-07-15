@@ -32,7 +32,7 @@ export const FlatmateLogin: React.FC = () => {
   const [password1, setPassword1] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
   
-
+//register passenger
   const registerPassenger = async () => {
 
     if (!firstName || !lastName  || !phoneNumber || !address || !NIC || !email || !password ) {
@@ -99,7 +99,7 @@ export const FlatmateLogin: React.FC = () => {
       alert("Server connection failed");
     }
   };
-
+//login passenger
 const loginPassenger = async () => {
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
