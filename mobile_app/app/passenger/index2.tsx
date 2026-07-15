@@ -57,6 +57,17 @@ export const FlatmateLogin: React.FC = () => {
     return false;
   }
 
+  const nicRegex = /^(\d{12}|\d{9}[VXvx])$/;
+
+    if (!nicRegex.test(NIC)) {
+      Alert.alert(
+        "Invalid NIC",
+        "NIC must be either 12 digits or 9 digits followed by V/X"
+      );
+      return false;
+    }
+
+
     try {
       const response = await fetch(`${API_URL}/passengers/register`, {
         method: "POST",
@@ -274,10 +285,11 @@ const loginPassenger = async () => {
                     <TextInput
                       style={styles.textInput}
                       value={NIC}
-                      onChangeText={setNIC}
-                      placeholder="123456789012"
+                      onChangeText={(text) => setNIC(text.toUpperCase())}
+                      placeholder="123456789012 or 123456789V"
                       placeholderTextColor="#A3A3A3"
                       maxLength={12}
+                      autoCapitalize="characters"
                     />
                   </View>
                 </View>
