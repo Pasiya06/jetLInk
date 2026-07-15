@@ -32,13 +32,13 @@ export const createParcel = async (req, res) => {
 
 export const getParcelByEmailAndUsed = async (req, res) => {
   try {
-    const { Semail, used } = req.params;
+    const { Semail, pickupVerified } = req.params;
 
-    console.log("Search:", Semail, used);
+    console.log("Search:", Semail, pickupVerified);
 
     const parcels = await Parcel.find({
       Semail: Semail,
-      used: used === "true"
+      pickupVerified: pickupVerified === "true"
     });
 
     console.log("Parcels:", parcels);

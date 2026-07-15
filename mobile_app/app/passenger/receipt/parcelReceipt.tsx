@@ -50,13 +50,13 @@ const JetLinkInterface: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isactiveTab, setIsactiveTab] = useState<boolean>(true);
   const Semail = params.pemail as string ;
-  const used : boolean = false;
+  const pickupVerified : boolean = false;
 
   const getParcelByEmailAndUsed = async () => {
     try {
 
         const response = await fetch(
-        `${API_URL}/parcel/${encodeURIComponent(Semail)}/${used}`
+        `${API_URL}/parcel/${encodeURIComponent(Semail)}/${pickupVerified}`
         );
 
         const data = await response.json();
