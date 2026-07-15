@@ -3,24 +3,37 @@ export const pay = async (req, res) => {
     const { cardNumber, expiry, cvc } = req.body;
 
     // Card Number
-    if (!/^\d{16}$/.test(cardNumber)) {
-        return res.status(400).json({
-            success:false,
-            message:"Card number must contain 16 digits"
-        });
-    }
 
-    const card = BigInt(cardNumber);
+        const cleanCard = cardNumber.replace(/\s/g, "");
 
-    if (
-        card < 4000000000000000n ||
-        card > 5000000000000000n
-    ) {
+        // Must be exactly 16 digits
+        if (!/^\d{16}$/.test(cleanCard)) {
         return res.status(400).json({
-            success:false,
-            message:"Invalid card number"
+            success: false,
+            message: "Card number must contain exactly 16 digits",
         });
-    }
+        }
+
+        // Must start with 4 or 5
+        if (!/^[45]/.test(cleanCard)) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid card number",
+        });
+        }
+
+        const card = BigInt(cleanCard);
+
+        // Optional numeric range check
+        if (
+        card < 4_000_000_000_000_000n ||
+        card > 5_999_999_999_999_999n
+        ) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid card number",
+        });
+        }
 
     // Expiry
     const [month, year] = expiry.split("/");

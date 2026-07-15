@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
 
   svw: {
     width: '100%',
-    marginBottom:80,
+    
     marginTop: 3, 
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25, 

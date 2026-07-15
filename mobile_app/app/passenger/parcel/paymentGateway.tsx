@@ -114,7 +114,7 @@ const JetLinkInterface: React.FC = () => {
               date:params.date,
               time:params.time,
               totalFare:params.totalFare,
-              paymentMethod:card,
+              
             },
           });
             return;
@@ -133,12 +133,29 @@ const JetLinkInterface: React.FC = () => {
                 router.push({
                         pathname: "/passenger/parcel/paymentFail",
                         params: {
+                          Sid: params.Sid,
+                          scheduleId: params.scheduleId,
+                          bNumber: params.bNumber,
+
                           Pid: params.Pid,
                           Pid1: params.Pid1,
                           pfirstName: params.pfirstName,
                           plastName:params.plastName,
                           pphoneNumber: params.pphoneNumber,
                           pemail: params.pemail,
+                          sendername:params.sendername,
+                          smobilenumber:params.smobilenumber,
+                          semail:params.semail,
+                          receivername:params.receivername,
+                          rmobilenumber:params.rmobilenumber,
+                          remail:params.remail,
+                          weight:params.weight,
+                          pickup:params.pickup,
+                          drop:params.drop,
+                          date:params.date,
+                          time:params.time,
+                          totalFare:params.totalFare,
+                          
                         },                    
                       });
                 break;
