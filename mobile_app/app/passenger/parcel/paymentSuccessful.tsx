@@ -123,23 +123,46 @@ export default function PaymentSuccessScreen() {
       }
     };
 
-    const handleSearch = () => {
-        router.push({
-            pathname: "/passenger/index1",
-            params:{ 
-
-              Pid: params.Pid,
-              Pid1: params.Pid1,
-              pfirstName: params.pfirstName,
-              plastName:params.plastName,
-              pphoneNumber: params.pphoneNumber,
-              pemail: params.pemail,
-              
-            } 
-            
-        });
+    const handleSearch = async () => {
+        const parcelData = {
+        sendername:params.sendername,
+        Smobilenumber:params.smobilenumber,
+        Semail:params.semail,
+        receivername:params.receivername,
+        Rmobilenumber:params.rmobilenumber,
+        Remail:params.remail,
+        weight:params.weight,
+        pickup:params.pickup,
+        drop:params.drop,
+        date:params.date,
+        time:params.time,
+        Bnumber:params.bNumber,
+        totalFare:params.totalFare,
       };
-
+  
+      const result = await createParcel(parcelData);
+  
+      if (result.success) {
+        router.push({
+              pathname: "/passenger/index1",
+              params: {
+                
+                Pid: params.Pid,
+                Pid1: params.Pid1,
+                pfirstName: params.pfirstName,
+                plastName:params.plastName,
+                pphoneNumber: params.pphoneNumber,
+                pemail: params.pemail,
+                
+              },
+            })
+        
+  
+  
+      } else {
+        Alert.alert("Error", result.message);
+      }
+    };
   
 
   useEffect(() => {

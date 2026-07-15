@@ -119,31 +119,46 @@ export const verifyParcelQR = async (req, res) => {
       });
     }
 
-    if (parcel.used) {
+    // First Scan - Pickup
+    if (!parcel.pickupVerified) {
+      parcel.pickupVerified = true;
+      parcel.pickupVerifiedAt = new Date();
+      parcel.status = "Picked Up";
+
+      await parcel.save();
+
       return res.json({
-        valid: false,
-        reason: "Parcel already collected",
+        valid: true,
+        stage: "pickup",
+        message: "Parcel pickup verified successfully.",
+        parcel,
       });
     }
 
-    parcel.used = true;
-    parcel.usedAt = new Date();
-    await parcel.save();
+    // Second Scan - Delivery
+    if (!parcel.delivered) {
+      parcel.delivered = true;
+      parcel.deliveredAt = new Date();
+      parcel.status = "Delivered";
 
-    res.json({
-      valid: true,
-      message: "Parcel verified successfully",
-      parcel: {
-        sendername: parcel.sendername,
-        receivername: parcel.receivername,
-        pickup: parcel.pickup,
-        drop: parcel.drop,
-        weight: parcel.weight,
-        totalFare: parcel.totalFare,
-      },
+      await parcel.save();
+
+      return res.json({
+        valid: true,
+        stage: "delivery",
+        message: "Parcel delivered successfully.",
+        parcel,
+      });
+    }
+
+    // Already Delivered
+    return res.json({
+      valid: false,
+      reason: "Parcel already delivered.",
     });
+
   } catch (error) {
-    res.json({
+    return res.json({
       valid: false,
       reason: "Invalid or expired QR",
     });

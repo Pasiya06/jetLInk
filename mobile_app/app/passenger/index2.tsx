@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Stack, useRouter } from "expo-router";
 import { Image } from 'react-native';
 import {
+  Alert,
   StyleSheet,
   Text,
   View,
@@ -33,6 +34,29 @@ export const FlatmateLogin: React.FC = () => {
   
 
   const registerPassenger = async () => {
+
+    if (!firstName || !lastName  || !phoneNumber || !address || !NIC || !email || !password ) {
+    alert("Please fill required fields");
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email)) {
+      Alert.alert("Invalid Email", "Please enter a valid email address.");
+      return false;
+    }
+
+  const phoneRegex = /^[0-9]{10}$/;
+
+  if (!phoneRegex.test(phoneNumber)) {
+    Alert.alert(
+      "Invalid Phone Number",
+      "Phone number must contain exactly 10 digits."
+    );
+    return false;
+  }
+
     try {
       const response = await fetch(`${API_URL}/passengers/register`, {
         method: "POST",
@@ -66,6 +90,14 @@ export const FlatmateLogin: React.FC = () => {
   };
 
 const loginPassenger = async () => {
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  
+    if (!emailRegex.test(email1)) {
+      Alert.alert("Invalid Email", "Please enter a valid email address.");
+      return false;
+    }
+
   try {
     
     const response1 = await fetch(`${API_URL}/passengers/login`, {
@@ -133,7 +165,7 @@ const loginPassenger = async () => {
       return;
     }
 
-    alert("Invalid Email or Password");
+    alert(data1.message );
 
   } catch (error) {
     console.log(error);
@@ -216,6 +248,7 @@ const loginPassenger = async () => {
                       placeholder="077 1234567"
                       placeholderTextColor="#A3A3A3"
                       keyboardType="phone-pad"
+                      maxLength={10}
                     />
                   </View>
                 </View>
@@ -244,6 +277,7 @@ const loginPassenger = async () => {
                       onChangeText={setNIC}
                       placeholder="123456789012"
                       placeholderTextColor="#A3A3A3"
+                      maxLength={12}
                     />
                   </View>
                 </View>

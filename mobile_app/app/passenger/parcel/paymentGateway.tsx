@@ -32,6 +32,36 @@ const JetLinkInterface: React.FC = () => {
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
   const [cvc, setCvc] = useState('');
+
+  const handleCardNumberChange = (text: string) => {
+    // Remove non-digits
+    let formatted = text.replace(/\D/g, "");
+
+    // Limit to 16 digits
+    formatted = formatted.substring(0, 16);
+
+    // Add a space every 4 digits
+    formatted = formatted.replace(/(.{4})/g, "$1 ").trim();
+
+    setCardNumber(formatted);
+  };
+
+  const handleExpiryChange = (text: string) => {
+    // Keep only numbers
+    let formatted = text.replace(/\D/g, "");
+
+    // Limit to 4 digits (MMYY)
+    if (formatted.length > 4) {
+      formatted = formatted.substring(0, 4);
+    }
+
+    // Add "/" after month
+    if (formatted.length > 2) {
+      formatted = `${formatted.substring(0, 2)}/${formatted.substring(2)}`;
+    }
+
+    setExpiry(formatted);
+  };
   
     const cardBrands = [
       { name: 'VISA', icon: 'credit-card' },
@@ -206,11 +236,11 @@ const JetLinkInterface: React.FC = () => {
                   <TextInput
                     style={styles.textInput}
                     value={cardNumber}
-                    onChangeText={setCardNumber}
+                    onChangeText={handleCardNumberChange}
                     placeholder="•••• •••• •••• 4831"
                     placeholderTextColor="#B0B0B0"
                     keyboardType="number-pad"
-                    maxLength={19}
+                    maxLength={19} 
                   />
                 </View>
 
@@ -222,10 +252,10 @@ const JetLinkInterface: React.FC = () => {
                       <TextInput
                         style={styles.textInput}
                         value={expiry}
-                        onChangeText={setExpiry}
+                        onChangeText={handleExpiryChange}
                         placeholder="MM / YY"
                         placeholderTextColor="#B0B0B0"
-                        //keyboardType="number-pad"
+                        keyboardType="number-pad"
                         maxLength={5}
                       />
                     </View>

@@ -1,5 +1,6 @@
-import React from 'react';
-import  { useState,useEffect} from 'react';
+import React, { useState, useEffect, useRef } from "react";
+import * as Sharing from "expo-sharing";
+import * as FileSystem from "expo-file-system/legacy";
 import { Stack,useRouter,useLocalSearchParams} from "expo-router";
 import { 
   StyleSheet, 
@@ -38,7 +39,7 @@ const ParcelService = () => {
     const time = params.time as string ;
     const Bnumber = params.Bnumber as string ;
     const totalFare = params.totalFare as string ;
-    
+    const qrRef = useRef<any>(null);
     const [qrToken, setQrToken] = useState("");
     const [error, setError] = useState<string | null>(null);
     const fetchParcelQR = async () => {
@@ -82,6 +83,42 @@ const ParcelService = () => {
             fetchParcelQR();
         
           }, []);
+
+    const shareQR = async () => {
+      try {
+        if (!qrRef.current) {
+          Alert.alert("Error", "QR Code not available.");
+          return;
+        }
+
+        qrRef.current.toDataURL(async (data: string) => {
+          try {
+            const fileUri = FileSystem.cacheDirectory + "parcelQR.png";
+
+            await FileSystem.writeAsStringAsync(fileUri, data, {
+              encoding: FileSystem.EncodingType.Base64,
+            });
+
+            if (!(await Sharing.isAvailableAsync())) {
+              Alert.alert("Sharing is not available on this device.");
+              return;
+            }
+
+            await Sharing.shareAsync(fileUri, {
+              mimeType: "image/png",
+              dialogTitle: "Share Parcel QR Code",
+            });
+          } catch (err) {
+            console.log(err);
+            Alert.alert("Error", "Unable to share QR Code.");
+          }
+        });
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    
  
   return (
     <>
@@ -113,8 +150,14 @@ const ParcelService = () => {
             <Text style={styles.title}>Your Ticket</Text>
             {qrToken && (
                 <View style={styles.qrWrapper}>
-                <QRCode value={String(qrToken)} size={220} />
-                </View>
+                <QRCode
+                  value={String(qrToken)}
+                  size={220}
+                  getRef={(ref) => {
+                    qrRef.current = ref;
+                  }}
+                />
+              </View>
             )}
             
           </View>      
@@ -122,14 +165,14 @@ const ParcelService = () => {
 
         
 
-        <TouchableOpacity style={styles.submitButton} >
+        <TouchableOpacity style={styles.submitButton} onPress={shareQR}> 
             <LinearGradient
                 colors={['#4B6CF5', '#32CD32']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.submitGradient}
             >
-                <Text style={styles.submitText}>Book Another</Text>
+                <Text style={styles.submitText}>Share QR Code</Text>
             </LinearGradient>
         </TouchableOpacity>
 

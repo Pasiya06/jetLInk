@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Stack,useRouter,useLocalSearchParams} from "expo-router";
 import { 
+  Alert ,
   StyleSheet, 
   View, 
   Text, 
@@ -24,7 +25,6 @@ const JetLinkInterface: React.FC = () => {
   const params = useLocalSearchParams();
   const [sendername, setsendername] = useState(`${params.pfirstName ?? ""} ${params.plastName ?? ""}`.trim());
   const [smobilenumber, Ssetmobilenumber] = useState(String(params.pphoneNumber || params.smobilenumber || ""));
-  const [semail, SsetEmail] = useState(String(params.pemail || params.semail || ""));
   const [receivername, setreceivername] = useState(String(params.receivername || ""));
   const [rmobilenumber, Rsetmobilenumber] = useState(String(params.rmobilenumber || ""));
   const [remail, RsetEmail] = useState(String(params.remail || ""));
@@ -40,6 +40,7 @@ const JetLinkInterface: React.FC = () => {
   const [activeTab, setActiveTab] = useState('');
   
   const router = useRouter();
+
 
   const onTimeChange = (event: any, selected?: Date) => {
   setShowTimePicker(false);
@@ -60,10 +61,35 @@ const JetLinkInterface: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const handlesenderD = async () => {
 
-  if (!sendername || !smobilenumber || !semail || !receivername || !remail || !rmobilenumber || !weight || !pickup || !drop || !date || !time) {
+  if (!sendername || !smobilenumber  || !receivername || !remail || !rmobilenumber || !weight || !pickup || !drop || !date || !time) {
     alert("Please fill required fields");
     return;
   }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(remail)) {
+        Alert.alert("Invalid Receiver Email", "Please enter a valid email address.");
+        return false;
+      }
+  const phoneRegex = /^[0-9]{10}$/;
+
+  if (!phoneRegex.test(smobilenumber)) {
+    Alert.alert(
+      "Invalid Sender Phone Number",
+      "Phone number must contain exactly 10 digits."
+    );
+    return false;
+  }
+
+  if (!phoneRegex.test(rmobilenumber)) {
+    Alert.alert(
+      "Invalid Receiver Phone Number",
+      "Phone number must contain exactly 10 digits."
+    );
+    return false;
+  }
+
 
   try {
 
@@ -78,7 +104,7 @@ const JetLinkInterface: React.FC = () => {
             pemail: params.pemail,
             sendername,
             smobilenumber,
-            semail,
+            semail:params.pemail,
             receivername,
             rmobilenumber,
             remail,
@@ -142,13 +168,13 @@ const JetLinkInterface: React.FC = () => {
 
           <Text style={styles.label}>Sender Mobile Number</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={smobilenumber} onChangeText={Ssetmobilenumber} keyboardType="phone-pad"/>
+            <TextInput style={styles.input} value={smobilenumber} onChangeText={Ssetmobilenumber} keyboardType="phone-pad" maxLength={10}/>
             
           </View>
 
           <Text style={styles.label}>Email</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={semail} onChangeText={SsetEmail} />
+            <Text style={styles.input1}>{params.pemail}</Text>
             
           </View>
 
@@ -160,7 +186,7 @@ const JetLinkInterface: React.FC = () => {
 
           <Text style={styles.label}>Receiver Mobile Number</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={rmobilenumber} onChangeText={Rsetmobilenumber} keyboardType="phone-pad"/>
+            <TextInput style={styles.input} value={rmobilenumber} onChangeText={Rsetmobilenumber} keyboardType="phone-pad" maxLength={10}/>
             
           </View>
 
@@ -172,18 +198,18 @@ const JetLinkInterface: React.FC = () => {
 
           <Text style={styles.label}>Weight(kg)</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={weight} onChangeText={setWeight} keyboardType="phone-pad" />           
+            <TextInput style={styles.input} value={weight} onChangeText={setWeight} keyboardType="phone-pad" maxLength={2} />           
           </View>
           
           <Text style={styles.label}>Pick up Location</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={pickup} onChangeText={setPickup} />
+            <TextInput style={styles.input} value={pickup}  onChangeText={(text) => setPickup(text.replace(/\s/g, ""))}/>
             
           </View>
           
           <Text style={styles.label}>Delivery Location</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={drop} onChangeText={setDrop} />
+            <TextInput style={styles.input} value={drop} onChangeText={(text) => setDrop(text.replace(/\s/g, ""))}/>
             
           </View>
           
@@ -417,6 +443,14 @@ const styles = StyleSheet.create({
     height: '100%',
     color: '#333',
   },
+
+  input1: {
+    flex: 1,
+    height: '100%',
+    color: '#333',
+    marginTop:20,
+  },
+
   inputIcon: {
     fontSize: 18,
     color: '#999',

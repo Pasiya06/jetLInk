@@ -78,16 +78,30 @@ const parcelSchema = new mongoose.Schema(
       required: true,
     },
 
-    used: {
+    pickupVerified: {
       type: Boolean,
       default: false,
     },
 
-    usedAt: {
+    pickupVerifiedAt: {
       type: Date,
-      default: null,
     },
-    
+
+    delivered: {
+      type: Boolean,
+      default: false,
+    },
+
+    deliveredAt: {
+      type: Date,
+    },
+
+    status: {
+      type: String,
+      enum: ["Pending", "Picked Up", "Delivered"],
+      default: "Pending",
+    },
+      
   },
   {
     timestamps: true,
