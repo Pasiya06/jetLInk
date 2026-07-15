@@ -25,7 +25,7 @@ const AddBus = () => {
   const [stops, setstops] = useState("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
-   const [activeTab, setActiveTab] = useState('');
+  const [activeTab, setActiveTab] = useState('');
   const params = useLocalSearchParams();
   const router = useRouter();
   const busNumber = params.busNumber as string;
