@@ -29,6 +29,7 @@ const AddBus = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAdress] = useState("");
   const [NIC, setNIC] = useState("");
+  const [drivingLicense, setdrivingLicense] = useState("");
   const [Birthday, setBirthday] = useState<string>('');
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [date, setDate] = useState(new Date());
@@ -55,6 +56,7 @@ const AddBus = () => {
       phoneNumber,
       address,
       NIC,
+      drivingLicense,
       Birthday,
       email,
       password,
@@ -174,6 +176,20 @@ const AddBus = () => {
                   </View>
                 </View>
 
+                <Text style={styles.inputLabel}>Driving License</Text>  
+                <View style={styles.inputWrapper}>
+                  
+                  <View style={styles.inputInnerWrapper}>
+                    <TextInput
+                      style={styles.textInput}
+                      value={drivingLicense}
+                      onChangeText={setdrivingLicense}
+                      placeholder="123456789012"
+                      placeholderTextColor="#A3A3A3"
+                    />
+                  </View>
+                </View>
+
                 <Text style={styles.inputLabel}>Birth Day</Text>                
                 <View style={styles.inputWrapper}>
                   
@@ -287,7 +303,17 @@ const AddBus = () => {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+      <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                pathname: "/admin/index1",
+                params: {
+                  Pid: params.Pid,
+                  Pid1: params.Pid1,
+                  pfirstName: params.pfirstName,
+                  plastName:params.plastName,
+                  pphoneNumber: params.pphoneNumber,
+                  pemail: params.pemail,
+                },                    
+              });}} > 
         <Ionicons name="home-outline" size={28} color="#fff" />             
       </TouchableOpacity>
 

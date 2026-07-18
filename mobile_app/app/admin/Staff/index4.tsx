@@ -27,6 +27,7 @@ const driverScreen: React.FC = () => {
     const [phoneNumber, setPhoneNumber] = useState(String(params.phoneNumber || ""));
     const [address, setAddress] = useState(String(params.address || ""));
     const [NIC, setNIC] = useState(String(params.NIC || ""));
+    const [drivingLicense, setdrivingLicense] = useState(String(params.drivingLicense || ""));
     const [Birthday, setBirthday] = useState(String(params.Birthday || ""));
     const [showCalendar, setShowCalendar] = useState<boolean>(false);
     const [date, setDate] = useState(new Date());
@@ -50,6 +51,7 @@ const driverScreen: React.FC = () => {
             phoneNumber,
             address,
             NIC,
+            drivingLicense,
             Birthday,
             email,
             password,
@@ -161,6 +163,20 @@ const driverScreen: React.FC = () => {
                       style={styles.textInput}
                       value={NIC}
                       onChangeText={setNIC}
+                      placeholder="123456789012"
+                      placeholderTextColor="#A3A3A3"
+                    />
+                  </View>
+                </View>
+
+                <Text style={styles.inputLabel}>Driving License</Text>  
+                <View style={styles.inputWrapper}>
+                  
+                  <View style={styles.inputInnerWrapper}>
+                    <TextInput
+                      style={styles.textInput}
+                      value={drivingLicense}
+                      onChangeText={setdrivingLicense}
                       placeholder="123456789012"
                       placeholderTextColor="#A3A3A3"
                     />
@@ -281,7 +297,17 @@ const driverScreen: React.FC = () => {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+      <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                pathname: "/admin/index1",
+                params: {
+                  Pid: params.Pid,
+                  Pid1: params.Pid1,
+                  pfirstName: params.pfirstName,
+                  plastName:params.plastName,
+                  pphoneNumber: params.pphoneNumber,
+                  pemail: params.pemail,
+                },                    
+              });}} > 
         <Ionicons name="home-outline" size={28} color="#fff" />             
       </TouchableOpacity>
 

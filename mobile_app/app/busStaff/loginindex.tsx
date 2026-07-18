@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Stack, useRouter } from 'expo-router';
 import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, Alert   } from 'react-native';
-
-import { Feather as Icon, MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Feather as Icon, AntDesign, Fontisto, EvilIcons } from '@expo/vector-icons';
 
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -124,15 +124,20 @@ const login = async () => {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <StatusBar barStyle="light-content" backgroundColor="#7db300" />
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-         
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient1}
+        >
+          <View style={styles.header}>
           
-          <TouchableOpacity onPress={() => router.push("/")}>
-            <Text style={styles.title}>Login</Text>
-          </TouchableOpacity>
-          
-          
-        </View>
+            <TouchableOpacity >
+              <Text style={styles.title}>JetLink</Text>
+            </TouchableOpacity>
+                  
+          </View>
+        </LinearGradient>
         
         
                 
@@ -145,15 +150,25 @@ const login = async () => {
                 <View style={styles.formContainer}>
                     <Text style={styles.inputLabel}>Bus Number</Text>
                     <View style={styles.inputWrapper1}>
-                    <Image source={require("../../assets/images/icons8-bus-94.png")} style={styles.input3dIcon}/>
+                    <View style={[styles.iconWrap, { backgroundColor: "#FF9F1C1A"  }]}>
+                      <Fontisto name="bus" size={18} color="#FF9F1C" />
+                    </View>
                     <View style={styles.inputInnerWrapper}>
-                        <TextInput style={styles.textInput} value={busNum} onChangeText={setBusNum} placeholder="Bus Number"/>
+                      <TextInput 
+                        style={styles.textInput} 
+                        value={busNum} 
+                        onChangeText={setBusNum} 
+                        placeholder="Bus Number"
+                        placeholderTextColor="#A3A3A3"
+                      />
                     </View>
                     </View>
 
                     <Text style={styles.inputLabel}>Driver NIC</Text>  
                     <View style={styles.inputWrapper1}>
-                      <Image source={require("../../assets/images/icons8-loyalty-94.png")} style={styles.input3dIcon} />
+                      <View style={[styles.iconWrap, { backgroundColor: "#38B0001A"  }]}>
+                      <AntDesign name="idcard" size={18} color="#38B000" />
+                      </View>
                       <View style={styles.inputInnerWrapper}>
                         <TextInput
                           style={styles.textInput}
@@ -167,7 +182,9 @@ const login = async () => {
 
                     <Text style={styles.inputLabel}>Conductor NIC</Text>  
                     <View style={styles.inputWrapper1}>
-                      <Image source={require("../../assets/images/icons8-loyalty-94.png")} style={styles.input3dIcon} />
+                      <View style={[styles.iconWrap, { backgroundColor: "#F725851A"  }]}>
+                        <AntDesign name="idcard" size={18} color="#F72585" />
+                      </View>
                       <View style={styles.inputInnerWrapper}>
                         <TextInput
                             style={styles.textInput}
@@ -200,8 +217,11 @@ const login = async () => {
                   <View style={styles.card1}>
                   <View style={styles.formContainer}>
                     <Text style={styles.inputLabel}>Password</Text>
-              <View style={styles.inputWrapper}>
-                <Image source={require("../../assets/images/icons8-lock-94.png")} style={styles.input3dIcon} />
+                <View style={styles.inputWrapper}>
+                <View style={[styles.iconWrap, { backgroundColor: "#FF9F1C1A"  }]}>
+                  <EvilIcons name="lock" size={18} color="#FF9F1C" />
+                </View>
+                    
                 <View style={styles.inputInnerWrapper}>
                   <TextInput
                     style={styles.textInput}
@@ -241,8 +261,22 @@ const login = async () => {
   
 
         <View style={styles.footerGraphic}>
-            <View style={styles.blueCurve} />
-            <View style={styles.greenCurve} />
+          <LinearGradient
+            colors={['#4B6CF5', '#32CD32']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
+        </View>
+        <View style={styles.footerGraphic1}>
+          <LinearGradient
+            colors={['#4B6CF5', '#32CD32']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
         </View>
       </SafeAreaView>
     </>
@@ -262,7 +296,11 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 70,   
-    backgroundColor: '#0047AB',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  submitGradient1: {
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -276,7 +314,7 @@ const styles = StyleSheet.create({
 
   card: {
     width: '90%',
-    height: '60%',
+    height: '50%',
     backgroundColor: '#FFF',
     //padding: 24,
     //alignItems: 'center',
@@ -344,7 +382,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     borderLeftWidth: 1,
     borderWidth: 1,
-    borderColor: '#32CD32',
+    borderColor: '#ECEEF2',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -360,10 +398,19 @@ const styles = StyleSheet.create({
     
     borderLeftWidth: 1,
     borderWidth: 1,
-    borderColor: '#32CD32',
+    borderColor: '#ECEEF2',
     borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 8,
+  },
+
+  iconWrap: {
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
   },
 
   otpContainer: {
@@ -401,14 +448,15 @@ const styles = StyleSheet.create({
     marginRight: 15,
     marginLeft: 15,
     fontSize: 16,
-    color: '#0056b3',
+    color: '#000000',
     fontWeight: '500',
     marginBottom: 10,
   },
 
   textInput: {
+    
     fontSize: 16,
-    color: '#0056b3',
+    color: '#000000',
     fontWeight: '500',
     padding: 0, 
     marginTop: 2,
@@ -469,28 +517,29 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 45,
     overflow: 'hidden',
-    marginTop: 22,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 
-  blueCurve: {
-    // backgroundColor: '#0052cc',
-    width: '100%',
-    borderRadius: 30,
-    position: 'absolute', 
-  },
+  footerGraphic1: {
 
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 30,
-    position: 'absolute', 
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 });
 

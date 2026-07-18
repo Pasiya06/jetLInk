@@ -21,6 +21,7 @@ import {
   MaterialIcons, 
   FontAwesome5 
 } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 
@@ -33,18 +34,21 @@ export default function Index() {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <StatusBar barStyle="light-content" backgroundColor="#0056b3" />
       <SafeAreaView style={styles.container}>
-        {/* Header Section */}
+      <LinearGradient
+                colors={['#4B6CF5', '#32CD32']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.submitGradient1}
+            >
         <View style={styles.header}>
-          <TouchableOpacity>
-            <Ionicons name="menu" size={30} color="#ffffff" />
+            
+        
+          <TouchableOpacity >
+            <Text style={styles.title}>JetLink</Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity><Text style={styles.title}>Jetlink</Text></TouchableOpacity>
-          
-          <TouchableOpacity>
-            <Ionicons name="notifications" size={24} color="#ffffff" />
-          </TouchableOpacity>
+                  
         </View>
+        </LinearGradient>
 
         
        
@@ -55,17 +59,17 @@ export default function Index() {
           
           <TouchableOpacity style={styles.card} onPress={() => router.push("/passenger/index2")} >
               <View style={styles.iconContainer}>
-                <Fontisto name={"bus"}  size={22} color={"#32CD32" } />
+                <MaterialIcons name="people"  size={22} color={"#32CD32" } />
               </View>
-              <Text style={styles.cardText}>Passenger and Admin</Text>
+              <Text style={styles.cardText}>Passenger</Text>
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card} onPress={() => router.push("/busStaff/loginindex")} >
               <View style={styles.iconContainer}>
-                <FontAwesome6 name={"gift"}  size={22} color={"#FFA500" } />
+                <Fontisto name="bus" size={22} color={"#FFA500" } />
               </View>
-              <Text style={styles.cardText}>Bus Staff</Text>
+              <Text style={styles.cardText}>Bus</Text>
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
@@ -100,8 +104,22 @@ export default function Index() {
 
         {/* Footer */}
         <View style={styles.footerGraphic}>
-          <View style={styles.blueCurve} />
-          <View style={styles.greenCurve} />
+          <LinearGradient
+            colors={['#4B6CF5', '#32CD32']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
+        </View>
+        <View style={styles.footerGraphic1}>
+          <LinearGradient
+            colors={['#4B6CF5', '#32CD32']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
         </View>
       </SafeAreaView>
     </>
@@ -116,19 +134,19 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', 
-    paddingTop: 50, 
+    justifyContent: 'center',
+    paddingTop: 50,
     paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: '#0047AB',
+    paddingBottom: 70,   
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4, },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
   },
+
+  submitGradient1: {
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
   title: {
     fontSize: 28,
     fontWeight: '800',
@@ -198,30 +216,28 @@ const styles = StyleSheet.create({
     paddingBottom: 70,
     
   },
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
-    marginTop: 22,
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '120%',
-    borderRadius: 100,
+
+  footerGraphic1: {
+
     position: 'absolute',
-    
-   
-  },
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 120,
+    bottom: 20,
     width: '100%',
-    borderRadius: 30,
-    position: 'absolute',
-    
-    
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 });
