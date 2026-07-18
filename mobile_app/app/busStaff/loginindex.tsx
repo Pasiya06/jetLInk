@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import * as Location from "expo-location";
 import { Stack, useRouter } from 'expo-router';
 import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, Alert   } from 'react-native';
 
@@ -15,8 +14,13 @@ export const FlatmateLogin: React.FC = () => {
   const [CNIC, CsetNIC] = useState('');
   const [password1, setPassword1] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [verifiedNIC, setVerifiedNIC] = useState("");
+  const [verifiedCNIC, setVerifiedCNIC] = useState("");
+  const [verifiedDNIC, setVerifiedDNIC] = useState("");
   const [verifiedBusno, setVerifiedBusno] = useState("");
+  const [dfirstname, setdfirstname] = useState("");
+  const [dlastname, setdlastname] = useState("");
+  const [dphonenumber, setdphonenumber] = useState("");
+
   
 
 const verify = async () => {
@@ -38,6 +42,11 @@ const verify = async () => {
       return;
     }
 
+    setVerifiedDNIC(driver.data.NIC);
+    setdfirstname(driver.data.firstName);
+    setdlastname(driver.data.lastName);
+    setdphonenumber(driver.data.phoneNumber);
+  
     const conductorResponse = await fetch(`${API_URL}/conductors/check/${CNIC}`);
     const conductor = await conductorResponse.json();
     if (!conductor.exists) {
@@ -46,7 +55,7 @@ const verify = async () => {
     }
 
     // Store the verified NIC clearly, not conductorId
-    setVerifiedNIC(conductor.data.NIC);
+    setVerifiedCNIC(conductor.data.NIC);
 
     setShowOtp(true);
   } catch (error) {
@@ -69,7 +78,7 @@ const login = async () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        NIC: verifiedNIC,
+        NIC: verifiedCNIC,
         password: password1,
       }),
     });
@@ -91,8 +100,14 @@ const login = async () => {
       params: {
         Cid: data.data._id,
         conductorId: data.data.conductorId,
+        conductorNIC:verifiedCNIC,
         cfirstName: data.data.firstName,
         clastName: data.data.lastName,
+        cphoneNumber:data.data.phoneNumber,
+        driverId:verifiedDNIC,
+        dfirstName:dfirstname,
+        dlastName:dlastname,
+        dphoneNumber:dphonenumber,
         busNo: verifiedBusno,
         
       },

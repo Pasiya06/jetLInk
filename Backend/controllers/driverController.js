@@ -341,10 +341,12 @@ export const checkNIC = async (req, res) => {
       exists: true,
       data: {
         _id: driver._id,
-        driverId: driver.busIdriverIdd,
+        driverId: driver.driverId,
         firstName: driver.firstName,
         lastName:driver.lastName,
+        phoneNumber:driver.phoneNumber,
         NIC:driver.NIC,
+        
         
       },
     });

@@ -91,7 +91,7 @@ export default function Index() {
         <View style={styles.listContainer}>
           
           <TouchableOpacity style={styles.card1} onPress={() => router.push({
-                pathname: "/admin/buses/index1", 
+                pathname: "/admin/buses/busType", 
                 params: {
                   Aid: params.Aid,
                   firstName: params.firstName,

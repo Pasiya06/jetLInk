@@ -6,9 +6,12 @@ import {
   updateBus,
   checkBusNumber,
   logoutBus,
+  getBusesByBusType,
 } from "../controllers/busController.js";
 
 const router = express.Router();
+
+router.get("/buses", getBusesByBusType);
 
 router.post("/offline", logoutBus);
 

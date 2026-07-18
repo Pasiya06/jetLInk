@@ -147,3 +147,27 @@ export const logoutBus = async (req, res) => {
     });
   }
 };
+
+export const getBusesByBusType = async (req, res) => {
+  try {
+    const { busType } = req.query; // Get busType from query params
+    console.log(busType);
+    let filter = {};
+
+    if (busType) {
+      filter.busType = busType;
+    }
+
+    const buses = await Bus.find(filter).sort({ busId: 1 });
+
+    res.status(200).json({
+      success: true,
+      data: buses,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

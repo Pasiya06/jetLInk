@@ -16,7 +16,7 @@ router.post("/update", updateLocation);
 router.get("/", getAllLocations);
 
 // GET  /api/locations/:busNama → get one bus location
-router.get("/:busNama", getBusLocation);
+router.get("/:busNumber", getBusLocation);
 
 // POST /api/locations/offline → set bus offline
 router.post("/offline", setOffline);

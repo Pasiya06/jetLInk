@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Image, TextInput } from 'react-native';
+
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
   Alert,
@@ -10,6 +10,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
+  Image, 
+  TextInput 
 } from "react-native";
 
 // Icons

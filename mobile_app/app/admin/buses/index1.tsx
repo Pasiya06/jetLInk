@@ -19,6 +19,9 @@ const ParcelService = () => {
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const params = useLocalSearchParams();
+    const busType1: string = "NormalWay";
+    const busType2: string = "Highway";
+    const busType3: string = "tour";
     const [activeTab, setActiveTab] = useState('');
     const router = useRouter();
     const handleSearch = () => {
@@ -30,6 +33,7 @@ const ParcelService = () => {
                   firstName: params.firstName,
                   lastName: params.lastName,
                   email: params.email,
+                  busType:busType1,
                 },
       });
     };
@@ -42,6 +46,7 @@ const ParcelService = () => {
                   firstName: params.firstName,
                   lastName: params.lastName,
                   email: params.email,
+                  busType:busType2
                 },
       });
     };
@@ -54,6 +59,7 @@ const ParcelService = () => {
                   firstName: params.firstName,
                   lastName: params.lastName,
                   email: params.email,
+                  busType:busType3
                 },
       });
     };

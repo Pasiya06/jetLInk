@@ -1,451 +1,322 @@
-// import React, { useEffect, useRef, useState } from 'react';
-// import { Stack, useRouter } from 'expo-router';
-// import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar } from 'react-native';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import API from "../../services/api";
-// export const FlatmateLogin: React.FC = () => {
-//   const router = useRouter();
-//   const [showOtp, setShowOtp] = useState(false);
-//   const [busNum, setBusNum] = useState('');
-//   const [DNIC, DsetNIC] = useState('');
-//   const [CNIC, CsetNIC] = useState('');
-//   const [email, setEmail] = useState('');
-//   const [otp, setOtp] = useState<string[]>(Array(6).fill(''));
-//   const otpInputRefs = useRef<Array<TextInput | null>>([]);
+import React from 'react';
+import { Stack, useRouter, useLocalSearchParams } from "expo-router";
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
-//   await sendOTP({
-//     busNum,
-//     driverNIC:DNIC,
-//     conductorNIC:CNIC,
-//     email
-// });
-
-//   useEffect(() => {
-//     if (showOtp) {
-//       const timer = setTimeout(() => otpInputRefs.current[0]?.focus(), 100);
-//       return () => clearTimeout(timer);
-//     }
-//   }, [showOtp]);
-
-//   const sendOtp = async () => {
-//     if (!busNum.trim() || !DNIC.trim() || !CNIC.trim() || !email.trim()) {
-//       alert('Please fill all fields');
-//       return;
-//     }
-
-//     try {
-//       const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-//       await AsyncStorage.setItem('generatedOtp', otpCode);
-//       setOtp(Array(6).fill(''));
-//       setShowOtp(true);
-//       alert('OTP Sent Successfully');
-//     } catch (error) {
-//       console.log(error);
-//       alert('Failed to send OTP');
-//     }
-//   };
-
-//   const handleChange = (text: string, index: number) => {
-//     const digit = text.replace(/\D/g, '').slice(0, 1);
-//     const nextOtp = [...otp];
-//     nextOtp[index] = digit;
-//     setOtp(nextOtp);
-
-//     if (digit && index < 5) {
-//       otpInputRefs.current[index + 1]?.focus();
-//     }
-//   };
-
-//   const handleBackspace = (key: string, index: number) => {
-//     if (key !== 'Backspace') return;
-
-//     const nextOtp = [...otp];
-
-//     if (nextOtp[index] !== '') {
-//       nextOtp[index] = '';
-//       setOtp(nextOtp);
-//       return;
-//     }
-
-//     if (index > 0) {
-//       nextOtp[index - 1] = '';
-//       setOtp(nextOtp);
-//       otpInputRefs.current[index - 1]?.focus();
-//     }
-//   };
-
-//   const verifyOTP = async () => {
-//     const code = otp.join('');
-
-//     if (code.length !== 6) {
-//       alert('Enter OTP');
-//       return;
-//     }
-
-//     try {
-//       const savedOtp = await AsyncStorage.getItem('generatedOtp');
-
-//       if (code === savedOtp) {
-//         await AsyncStorage.removeItem('generatedOtp');
-//         alert('OTP Verified');
-//         router.replace('/');
-//       } else {
-//         alert('Invalid OTP');
-//       }
-//     } catch (error) {
-//       console.log(error);
-//       alert('OTP verification failed');
-//     }
-//   };
-
- 
-
-  
-
+// const InfoRow = ({ icon, iconSet = 'ion', label, value, color = '#3B82F6' }) => {
+//   const IconComponent = iconSet === 'material' ? MaterialCommunityIcons : Ionicons;
 //   return (
-//     <>
-//       <Stack.Screen options={{ title: "", headerShown: false }} />
-//       <StatusBar barStyle="light-content" backgroundColor="#7db300" />
-//       <SafeAreaView style={styles.container}>
-//         <View style={styles.header}>
-         
-          
-//           <TouchableOpacity onPress={() => router.push("/")}>
-//             <Text style={styles.title}>Login</Text>
-//           </TouchableOpacity>
-          
-          
-//         </View>
-        
-        
-                
-              
-//                 {!showOtp ? (
-
-
-//                 <>
-//                 <View style={styles.card}>
-//                 <View style={styles.formContainer}>
-//                     <Text style={styles.inputLabel}>Bus Number</Text>
-//                     <View style={styles.inputWrapper1}>
-//                     <Image source={require("../../assets/images/icons8-bus-94.png")} style={styles.input3dIcon}/>
-//                     <View style={styles.inputInnerWrapper}>
-//                         <TextInput style={styles.textInput} value={busNum} onChangeText={setBusNum} placeholder="Bus Number"/>
-//                     </View>
-//                     </View>
-
-//                     <Text style={styles.inputLabel}>Driver NIC</Text>  
-//                     <View style={styles.inputWrapper1}>
-//                       <Image source={require("../../assets/images/icons8-loyalty-94.png")} style={styles.input3dIcon} />
-//                       <View style={styles.inputInnerWrapper}>
-//                         <TextInput
-//                           style={styles.textInput}
-//                           value={DNIC}
-//                           onChangeText={DsetNIC}
-//                           placeholder="123456789012"
-//                           placeholderTextColor="#A3A3A3"
-//                         />
-//                         </View>
-//                     </View>
-
-//                     <Text style={styles.inputLabel}>Conductor NIC</Text>  
-//                     <View style={styles.inputWrapper1}>
-//                       <Image source={require("../../assets/images/icons8-loyalty-94.png")} style={styles.input3dIcon} />
-//                       <View style={styles.inputInnerWrapper}>
-//                         <TextInput
-//                             style={styles.textInput}
-//                             value={CNIC}
-//                             onChangeText={CsetNIC}
-//                             placeholder="123456789012"
-//                             placeholderTextColor="#A3A3A3"
-//                         />
-//                       </View>
-//                     </View>
-
-//                     <Text style={styles.inputLabel}>Driver or Conductor Email Address</Text>
-//                     <View style={styles.inputWrapper1}>
-//                       <Image source={require("../../assets/images/icons8-gmail-logo-94.png")} style={styles.input3dIcon} />
-//                       <View style={styles.inputInnerWrapper}>
-//                         <TextInput
-//                           style={styles.textInput}
-//                           value={email}
-//                           onChangeText={setEmail}
-//                           placeholder="ABC@gmail.com"
-//                           placeholderTextColor="#A3A3A3"
-//                           keyboardType="email-address"
-//                           autoCapitalize="none"
-//                         />
-//                       </View>
-//                     </View>
-//                     </View>
-//                   </View>
-//                 </>
-//                 ) : (
-//                 <>
-//                   <View style={styles.card1}>
-//                   <View style={styles.formContainer}>
-//                     <Text style={styles.inputLabel}>Enter OTP</Text>
-
-//                     <View style={styles.otpContainer}>
-//                     {otp.map((digit, index) => (
-//                       <TextInput
-//                         key={index}
-//                         ref={(ref) => {
-//                           otpInputRefs.current[index] = ref;
-//                         }}
-//                         value={digit}
-//                         style={styles.otpBox}
-//                         keyboardType="number-pad"
-//                         maxLength={1}
-//                         textContentType="oneTimeCode"
-//                         autoComplete="sms-otp"
-//                         onChangeText={(text) => handleChange(text, index)}
-//                         onKeyPress={({ nativeEvent }) => handleBackspace(nativeEvent.key, index)}
-//                       />
-//                     ))}
-//                     </View>
-//                   </View>
-//                   </View>
-//                 </>
-//                 )}
-              
-              
-
-         
-
-//         <View style={styles.footerContainer}>
-            
-//             <TouchableOpacity
-//                 style={styles.primaryButton}
-//                 onPress={() => {
-//                     if (!showOtp) {
-//                     sendOtp();
-//                     } else {
-//                     verifyOTP();
-//                     }
-//                 }}
-//                 >
-//                 <Text style={styles.primaryButtonText}>
-//                     {showOtp ? "Verify OTP" : "Send OTP"}
-//                 </Text>
-//             </TouchableOpacity>
-
-           
-//           </View>
-
-//         <View style={styles.footerGraphic}>
-//             <View style={styles.blueCurve} />
-//             <View style={styles.greenCurve} />
-//         </View>
-//       </SafeAreaView>
-//     </>
+//     <View style={styles.row}>
+//       <View style={[styles.iconWrap, { backgroundColor: `${color}18` }]}>
+//         <IconComponent name={icon} size={18} color={color} />
+//       </View>
+//       <View style={styles.rowText}>
+//         <Text style={styles.label}>{label}</Text>
+//         <Text style={styles.value}>{value || '—'}</Text>
+//       </View>
+//     </View>
 //   );
 // };
 
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     backgroundColor: '#F9FAFB',  
-//   },
+const BusDetailsCard = () => {
+    const params = useLocalSearchParams();
+  const isOnline = params.status === 'online';
 
-//   header: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//     paddingTop: 50,
-//     paddingHorizontal: 20,
-//     paddingBottom: 70,   
-//     backgroundColor: '#0047AB',
-//     borderBottomLeftRadius: 25,
-//     borderBottomRightRadius: 25,
-//   },
+  return (
+    <View style={styles.card}>
+      {/* Header */}
+      <LinearGradient
+        colors={['#F4F7FC', '#F4F7FC']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.header1}
+      >
+        
+            <View style={styles.avatar}>
+                <MaterialCommunityIcons name="bus" size={32} color="#ffffff" />
+            </View>
 
-//   title: {
-//     fontSize: 28,
-//     fontWeight: '800',
-//     color: '#ffffff',
-//     letterSpacing: 0.5,  
-//   },
+            <Text style={styles.fullName}>{params.busNumber || 'N/A'}</Text>
 
-//   card: {
-//     width: '90%',
-//     height: '60%',
-//     backgroundColor: '#FFF',
-//     //padding: 24,
-//     //alignItems: 'center',
+            <View
+                style={[
+                styles.badge,
+                { backgroundColor: isOnline ? '#EAFBEF' : '#FDEDED' },
+                ]}
+            >
+                <View
+                style={[
+                    styles.statusDot,
+                    { backgroundColor: isOnline ? '#22C55E' : '#EF4444' },
+                ]}
+                />
+                <Text
+                style={[
+                    styles.badgeText,
+                    { color: isOnline ? '#2F9E44' : '#DC2626' },
+                ]}
+                >
+                {isOnline ? 'Online' : 'Offline'}
+                </Text>
+            </View>
+        
+      </LinearGradient>
 
-//     marginTop: -50,   
-//     alignSelf: 'center',
+      {/* Body */}
+      <View style={styles.body}>
+       
+        
+        <View style={styles.row}>
+        <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
+            <Ionicons name="person-circle-outline" size={18} color="#8B5CF6" />
+        </View>
+        <View style={styles.rowText}>
+            <Text style={styles.label}>Conductor</Text>
+            <Text style={styles.value}>not yet</Text>
+        </View>
+        </View>
 
-//     borderRadius: 20,
-//     elevation: 10,
+        <View style={styles.row}>
+        <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
+            <Ionicons name="car-outline" size={18} color="#F59E0B" />
+        </View>
+        <View style={styles.rowText}>
+            <Text style={styles.label}>Driver</Text>
+            <Text style={styles.value}>not yet</Text>
+        </View>
+        </View>
 
-//     shadowColor: '#000',
-//     shadowOffset: {
-//       width: 0,
-//       height: 5,
-//     },
-//     shadowOpacity: 0.2,
-//     shadowRadius: 5,
-//   },
+        <View style={styles.row}>
+        <View style={[styles.iconWrap, { backgroundColor: "#06B6D418" }]}>
+            <Ionicons name="barcode-outline" size={18} color="#06B6D4" />
+        </View>
+        <View style={styles.rowText}>
+            <Text style={styles.label}>Chassis Number</Text>
+            <Text style={styles.value}>not yet</Text>
+        </View>
+        </View>
 
-//   card1: {
-//     width: '90%',
-//     height: '25%',
-//     backgroundColor: '#FFF',
-//     //padding: 24,
-//     //alignItems: 'center',
+        <View style={styles.row}>
+        <View style={[styles.iconWrap, { backgroundColor: "#EF444418" }]}>
+            <MaterialCommunityIcons name ="engine-outline" size={18} color="#EF4444" />
+        </View>
+        <View style={styles.rowText}>
+            <Text style={styles.label}>Engine Number</Text>
+            <Text style={styles.value}>not yet</Text>
+        </View>
+        </View>
 
-//     marginTop: -50,   
-//     alignSelf: 'center',
+        <View style={styles.row}>
+        <View style={[styles.iconWrap, { backgroundColor: "#EC489918" }]}>
+            <Ionicons name="color-palette-outline" size={18} color="#EC4899" />
+        </View>
+        <View style={styles.rowText}>
+            <Text style={styles.label}>Colour</Text>
+            <Text style={styles.value}>not yet</Text>
+        </View>
+        </View>
 
-//     borderRadius: 20,
-//     elevation: 10,
+        <View style={styles.row}>
+        <View style={[styles.iconWrap, { backgroundColor: "#10B98118" }]}>
+            <Ionicons name="calendar-outline" size={18} color="#10B981" />
+        </View>
+        <View style={styles.rowText}>
+            <Text style={styles.label}>Service Date</Text>
+            <Text style={styles.value}>not yet</Text>
+        </View>
+        </View>
 
-//     shadowColor: '#000',
-//     shadowOffset: {
-//       width: 0,
-//       height: 5,
-//     },
-//     shadowOpacity: 0.2,
-//     shadowRadius: 5,
-//   },
-  
- 
-  
-  
-  
+        <View style={styles.row}>
+        <View style={[styles.iconWrap, { backgroundColor: "#3B82F618" }]}>
+            <Ionicons name="document-text-outline" size={18} color="#3B82F6" />
+        </View>
+        <View style={styles.rowText}>
+            <Text style={styles.label}>License Date</Text>
+            <Text style={styles.value}>not yet</Text>
+        </View>
+        </View>
 
-//   formContainer: {
-    
-//     marginTop: 34,
-//     //marginBottom:70,
-//     //width: '90%',  
-//   },
+        <View style={styles.row}>
+        <View style={[styles.iconWrap, { backgroundColor: "#84CC1618" }]}>
+            <Ionicons name="leaf-outline" size={18} color="#84CC16" />
+        </View>
+        <View style={styles.rowText}>
+            <Text style={styles.label}>Emission Date</Text>
+            <Text style={styles.value}>not yet</Text>
+        </View>
+        </View>
 
 
-//   inputWrapper1: {
-//     height: '12%',
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     backgroundColor: '#F2F4F5',
-//     marginRight: 15,
-//     marginLeft: 15,
-//     marginBottom: 25,
-//     borderLeftWidth: 1,
-//     borderWidth: 1,
-//     borderColor: '#32CD32',
-//     borderRadius: 12,
-//     paddingHorizontal: 12,
-//     paddingVertical: 8,
-//   },
 
-//   otpContainer: {
-//     width: '100%',
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-    
-//     marginBottom: 40,
-//     paddingHorizontal: 25,
-//     paddingTop: 40,
-//   },
 
-//   otpBox: {
-//     width: 40,
-//     height: 55,
-//     borderRadius: 10,
-//     backgroundColor: "#F5F5F5",
-//     textAlign: "center",
-//     fontSize: 28,
-//     fontWeight: "700",
-//     elevation: 3,
-//   },
 
-//   input3dIcon: {
-//     marginRight: 12,
-//     width:25,
-//     height:25
-//   },
+      </View>
 
-//   inputInnerWrapper: {
-//     flex: 1,
-//   },
+      {/* Edit Button */}
+      <TouchableOpacity activeOpacity={0.85} >
+        <LinearGradient
+          colors={['#2563EB', '#1E40AF']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.searchButton}
+        >
+          <Ionicons name="create-outline" size={18} color="#fff" style={{ marginRight: 8 }} />
+          <Text style={styles.searchButtonText}>Edit Details</Text>
+        </LinearGradient>
+      </TouchableOpacity>
+    </View>
+  );
+};
 
-//   inputLabel: {
-//     marginRight: 15,
-//     marginLeft: 15,
-//     fontSize: 16,
-//     color: '#0056b3',
-//     fontWeight: '500',
-//     marginBottom: 10,
-//   },
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    marginHorizontal: 16,
+    marginVertical: 12,
+    overflow: 'hidden',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+  },
+  header1: {
+    alignItems: 'center',
+    paddingTop: 28,
+    paddingBottom: 20,
+    backgroundColor: '#F4F7FC',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+  avatar: {
+    width: 64, 
+    height: 64, 
+    borderRadius: 32,
+    backgroundColor: '#4A6FA5',
+    justifyContent: 'center', 
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  avatarText: { 
+    color: '#FFF', 
+    fontSize: 22, 
+    fontWeight: '700' 
+  },
 
-//   textInput: {
-//     fontSize: 16,
-//     color: '#0056b3',
-//     fontWeight: '500',
-//     padding: 0, 
-//     marginTop: 2,
-//   },
+  fullName: { 
+    fontSize: 18, 
+    fontWeight: '700', 
+    color: '#1E293B' 
+  },
 
-//   footerContainer: {
-    
-//     marginTop: 'auto', 
-//     paddingBottom: 10,
-//     marginBottom: 10,
-//     marginRight: 15,
-//     marginLeft: 15,
-//   },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EAF7EC',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginTop: 8,
+    gap: 4,
+  },
 
-//   primaryButton: {
-//     marginBottom: 60,
-//     width: '100%',
-    
-//     backgroundColor: '#32CD32',
-//     padding: 14,
-//     alignItems: 'center',   
-//     alignSelf: 'center',
-//     marginTop: 10,
-//     borderRadius: 20,
-//     elevation: 10,
-//     shadowColor: '#000',
-//     shadowOffset: {
-//       width: 0,
-//       height: 5,
-//     },
-//     shadowOpacity: 0.2,
-//     shadowRadius: 5,
-//   },
+  badgeText: { 
+    fontSize: 11, 
+    color: '#2F9E44', 
+    fontWeight: '600', 
+    marginLeft: 4 
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  busNumber: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+    marginLeft: 10,
+    letterSpacing: 0.5,
+  },
+  statusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#fff',
+    marginRight: 6,
+  },
+  statusText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  body: {
+    paddingHorizontal: 18,
+    paddingTop: 14,
+    paddingBottom: 6,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  iconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  rowText: {
+    flex: 1,
+  },
+  label: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  value: {
+    fontSize: 15,
+    color: '#1F2937',
+    fontWeight: '600',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#F3F4F6',
+    marginVertical: 8,
+  },
+  searchButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 14,
+    marginHorizontal: 18,
+    marginTop: 8,
+    marginBottom: 18,
+    borderRadius: 14,
+  },
+  searchButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 15,
+  },
+});
 
-//   primaryButtonText: {
-//     color: '#FFF',
-//     fontSize: 16,
-//     fontWeight: '500',
-//   },
-  
-//   footerGraphic: {
-//     position: 'absolute',
-//     bottom: 0,
-//     width: '100%',
-//     height: 45,
-//     overflow: 'hidden',
-//     marginTop: 22,
-//   },
-
-//   blueCurve: {
-//     backgroundColor: '#0052cc',
-//     width: '100%',
-//     borderRadius: 30,
-//     position: 'absolute', 
-//   },
-
-//   greenCurve: {
-//     backgroundColor: '#0052cc',
-//     height: 100,
-//     width: '100%',
-//     borderRadius: 30,
-//     position: 'absolute', 
-//   },
-// });
-
-// export default FlatmateLogin;
+export default BusDetailsCard;

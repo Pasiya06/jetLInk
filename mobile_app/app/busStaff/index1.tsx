@@ -27,6 +27,8 @@ const WEATHER_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
 export default function DriverHome() {
   const router  = useRouter();
   const params  = useLocalSearchParams();
+  const driverD = `${params.dfirstName} ${params.dlastName} ${params.dphoneNumber}`;
+  const conductorD = `${params.cfirstName} ${params.clastName} ${params.cphoneNumber}`;
 
   // ─── State ──────────────────────────────────────────────────────
   const [loading, setLoading]               = useState(false);
@@ -116,10 +118,14 @@ export default function DriverHome() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          busNama:   busNum,      // ← FIXED field name
+          busNumber:   busNum,      // ← FIXED field name
           latitude:  latitude,
           longitude: longitude,
           speed:     speedKmh,
+          driverNIC:params.driverId,
+          conductorNIC:params.conductorNIC,
+          driverD:driverD,
+          conductorD:conductorD,
           heading:   heading ?? 0,
         }),
       });
@@ -175,7 +181,7 @@ export default function DriverHome() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          busNama: busNum, // ← FIXED field name
+          busNumber: busNum, // ← FIXED field name
         }),
       });
 
@@ -186,7 +192,7 @@ export default function DriverHome() {
       setUpdateCount(0);
       setLastSentTime("--");
 
-      console.log("✅ Bus marked offline");
+      console.log("✅ Bus marked offline" );
     } catch (error) {
       console.log("Stop sharing error:", error);
     }
@@ -260,6 +266,7 @@ export default function DriverHome() {
   // 6. Logout Function
   // ────────────────────────────────────────────────────────────────
   const logout = () => {
+    stopSharing();
     Alert.alert(
       "Logout",
       "Are you sure you want to logout?",
@@ -273,7 +280,7 @@ export default function DriverHome() {
           style: "destructive",
           onPress: async () => {
             // Stop sharing before logout
-            await stopSharing();
+            
             router.replace("/");
           },
         },

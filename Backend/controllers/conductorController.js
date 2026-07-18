@@ -362,6 +362,7 @@ export const checkNIC = async (req, res) => {
         NIC: conductor.NIC,
         firstName: conductor.firstName,
         lastName: conductor.lastName,
+        phoneNumber:conductor.phoneNumber,
       },
     });
 
@@ -402,6 +403,7 @@ export const loginConductor = async (req, res) => {
         firstName: conductor.firstName,
         lastName: conductor.lastName,
         NIC: conductor.NIC,
+        phoneNumber:conductor.phoneNumber,
       },
     });
   } catch (error) {

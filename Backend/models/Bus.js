@@ -29,6 +29,46 @@ const busSchema = new mongoose.Schema({
     enum: ["NormalWay", "Highway", "tour"],
     required: true,
   },
+
+  latitude: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  longitude: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
+  speed: {
+    type: Number,
+    default: 0,
+  },
+  heading: {
+    type: Number,
+    default: 0,
+  },
+  isOnline: {
+    type: Boolean,
+    default: false,
+  },
+
+  driverNIC: {
+    type: String,
+  },
+
+  conductorNIC: {
+    type: String,
+  },
+
+  driverD: {
+    type: String,
+  },
+
+  conductorD: {
+    type: String,
+  }
+
 });
 
 // Auto increment busId
