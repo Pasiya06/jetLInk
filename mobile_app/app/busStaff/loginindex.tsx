@@ -21,8 +21,6 @@ export const FlatmateLogin: React.FC = () => {
   const [dlastname, setdlastname] = useState("");
   const [dphonenumber, setdphonenumber] = useState("");
 
-  
-
 const verify = async () => {
   try {
     const busResponse = await fetch(`${API_URL}/buses/check/${busNum}`);
