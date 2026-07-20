@@ -96,8 +96,8 @@ const JetLinkInterface: React.FC = () => {
               weight:params.weight,
               pickup:params.pickup,
               drop:params.drop,
-              date:params.date,
-              time:params.time
+              //date:params.date,
+              //time:params.time
 
 
 

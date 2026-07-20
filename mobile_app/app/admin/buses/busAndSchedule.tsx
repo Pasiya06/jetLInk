@@ -19,6 +19,7 @@ import {
   FontAwesome5,
   Feather, 
   FontAwesome } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 const ToursScreen: React.FC = () => {
@@ -34,11 +35,18 @@ return (
     <Stack.Screen options={{ title: "", headerShown: false }} />
     <SafeAreaView style={styles.container}>
       
-      <View style={styles.header}>
-          
-          <TouchableOpacity><Text style={styles.title}>{params.busNumber}</Text></TouchableOpacity>
+      <LinearGradient
+        colors={['#4B6CF5', '#32CD32']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.submitGradient1}
+      >
 
-      </View>
+        <View style={styles.header}>          
+          <TouchableOpacity><Text style={styles.title}>{params.busTypeTopic}</Text></TouchableOpacity>          
+        </View>
+
+      </LinearGradient>
 
         <TouchableOpacity
           onPress={() =>
@@ -160,8 +168,22 @@ return (
         
         
         <View style={styles.footerGraphic}>
-          <View style={styles.blueCurve} />
-          <View style={styles.greenCurve} />
+          <LinearGradient
+            colors={['#4B6CF5', '#32CD32']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
+        </View>
+        <View style={styles.footerGraphic1}>
+          <LinearGradient
+            colors={['#4B6CF5', '#32CD32']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
         </View>
       </SafeAreaView>
     </>
@@ -181,7 +203,11 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 70,   
-    backgroundColor: '#0047AB',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  submitGradient1: {
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -333,28 +359,29 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
 
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '100%',
-    borderRadius: 50,
-    position: 'absolute',  
-  },
+  footerGraphic1: {
 
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 25,
-    position: 'absolute',   
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
   
 });

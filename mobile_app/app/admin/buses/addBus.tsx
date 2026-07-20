@@ -32,8 +32,8 @@ const AddBus = () => {
   const busType = params.busType as string;
   const driverNIC:string = "Not ";
   const conductorNIC:string = "Not ";
-  const driverD:string = "login yet";
-  const conductorD:string = "login yet";
+  const driverD:string = "Not login yet";
+  const conductorD:string = "Not login yet";
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab, setActiveTab] = useState('');

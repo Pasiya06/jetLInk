@@ -14,7 +14,9 @@ import {
 import {  
   Ionicons, 
   Feather, 
-  FontAwesome,  } from '@expo/vector-icons';
+  FontAwesome,
+  Fontisto,
+  } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import QRCode from 'react-native-qrcode-svg';
 
@@ -161,6 +163,41 @@ const ParcelService = () => {
             )}
             
           </View>      
+        </View>
+
+        <View style={styles.card1} >
+          <View style={styles.svw1}> 
+            <View  style={styles.detailRow}>
+              <View style={[styles.iconWrap, { backgroundColor: "#FFA50020" }]}>
+                <Fontisto name="bus" size={22} color="#FFA500"  />
+              </View>
+              <View style={styles.detailTextWrap}>
+                <Text style={styles.detailLabel}>Bus Number</Text>
+                <Text style={styles.detailValue}>{params.Bnumber}</Text>
+              </View>
+            </View>
+
+            <View  style={styles.detailRow}>
+              <View style={[styles.iconWrap, { backgroundColor: "#7ED32120" }]}>
+                <Ionicons name="calendar-outline" size={22} color="#7ED321"  />
+              </View>
+              <View style={styles.detailTextWrap}>
+                <Text style={styles.detailLabel}>Date</Text>
+                <Text style={styles.detailValue}>{params.date}</Text>
+              </View>
+            </View>
+
+            <View  style={styles.detailRow}>
+              <View style={[styles.iconWrap, { backgroundColor: "#E74C3C20" }]}>
+                <Ionicons name="time-outline" size={22} color="#E74C3C"  />
+              </View>
+              <View style={styles.detailTextWrap}>
+                <Text style={styles.detailLabel}>Time</Text>
+                <Text style={styles.detailValue}>{params.time}</Text>
+              </View>
+            </View>
+
+          </View>
         </View>
 
         
@@ -327,16 +364,16 @@ const styles = StyleSheet.create({
   },
 
   card1: {
+    paddingTop:10,
     marginLeft: 20,
     marginRight: 20,
-    
     flex: 1,
     maxHeight: '25%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-    marginTop: 15,   
+    marginTop: 10,   
     alignSelf: 'center',
     borderRadius: 20,
     elevation: 10,
@@ -428,6 +465,11 @@ const styles = StyleSheet.create({
   svw: {
     width: '100%',
     padding: 50,
+      
+  },
+
+  svw1: {
+    width: '100%',
       
   },
 

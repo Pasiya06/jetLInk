@@ -132,3 +132,46 @@ export const setOffline = async (req, res) => {
     });
   }
 };
+
+export const updateLocation1 = async (req, res) => {
+  try {
+    const { busNumber, latitude, longitude, speed, driverNIC, conductorNIC, driverD, conductorD, heading } = req.body;
+
+    // Validate required fields
+    if (!busNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "busNama is required",
+      });
+    }
+
+    
+    // Update or create location record
+    const location = await Location.findOneAndUpdate(
+      { busNumber },
+      {
+        latitude,
+        longitude,
+        speed: speed || 0,
+        driverNIC,
+        conductorNIC,
+        driverD,
+        conductorD,
+        heading: heading || 0,
+        isOnline: false,
+      },
+      
+    );
+
+    res.json({
+      success: true,
+      data: location,
+    });
+  } catch (error) {
+    console.error("updateLocation error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

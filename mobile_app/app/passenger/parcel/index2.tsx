@@ -61,7 +61,7 @@ const JetLinkInterface: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const handlesenderD = async () => {
 
-  if (!sendername || !smobilenumber  || !receivername || !remail || !rmobilenumber || !weight || !pickup || !drop || !date || !time) {
+  if (!sendername || !smobilenumber  || !receivername || !remail || !rmobilenumber || !weight || !pickup || !drop ) {
     alert("Please fill required fields");
     return;
   }
@@ -111,8 +111,8 @@ const JetLinkInterface: React.FC = () => {
             weight,
             pickup,
             drop,
-            date,
-            time:selectedTime
+            //date,
+            //time:selectedTime
           } 
           
       });
@@ -213,7 +213,7 @@ const JetLinkInterface: React.FC = () => {
             
           </View>
           
-          <Text style={styles.label}>Date</Text>
+          {/* <Text style={styles.label}>Date</Text>
           <View style={styles.inputWrapper}>
             <TextInput style={styles.input} value={date} placeholder="YYYY-MM-DD" onChangeText={setDate} />
             <TouchableOpacity onPress={() => setShowCalendar(true)}>
@@ -256,7 +256,7 @@ const JetLinkInterface: React.FC = () => {
               display="default"
               onChange={onTimeChange}
             />
-          )}                   
+          )}                    */}
  
         </ScrollView>
         
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    color: '#0052cc',
+    color: '#000000',
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 5,

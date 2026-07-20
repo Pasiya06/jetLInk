@@ -17,6 +17,7 @@ import {Ionicons,
   MaterialIcons, 
   FontAwesome5, 
   FontAwesome, Feather} from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 interface Bussched {
@@ -176,13 +177,20 @@ const BusScreen: React.FC = () => {
     <Stack.Screen options={{ title: "", headerShown: false }} />
     <SafeAreaView style={styles.container}>
       
-      <View style={styles.header}>
-      
-        <TouchableOpacity >
-          <Text style={styles.title}>JetLink</Text>
-        </TouchableOpacity>
-                
-      </View>
+      <LinearGradient
+        colors={['#4B6CF5', '#32CD32']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.submitGradient1}
+      >
+        <View style={styles.header}>
+
+          <TouchableOpacity >
+            <Text style={styles.title}>JetLink</Text>
+          </TouchableOpacity>
+                  
+        </View>
+      </LinearGradient> 
            
       <View style={styles.card}>
         <FlatList style={styles.svw}
@@ -193,12 +201,19 @@ const BusScreen: React.FC = () => {
           contentContainerStyle={{ paddingVertical: 10 }}
           />
         
-        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-          <Text style={styles.searchButtonText}>Add Schedule</Text>
-        </TouchableOpacity>
+        
 
       </View>
-
+      <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+        <LinearGradient
+            colors={['#4B6CF5', '#32CD32']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitGradient}
+        >
+          <Text style={styles.searchButtonText}>Add Schedule</Text>
+        </LinearGradient>
+      </TouchableOpacity>
       
 
       {isSearching ? (
@@ -274,8 +289,22 @@ const BusScreen: React.FC = () => {
 
       
       <View style={styles.footerGraphic}>
-        <View style={styles.blueCurve} />
-        <View style={styles.greenCurve} />
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
+      </View>
+      <View style={styles.footerGraphic1}>
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
       </View>
     </SafeAreaView>
     </>
@@ -295,7 +324,11 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 70,   
-    backgroundColor: '#0047AB',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  submitGradient1: {
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -308,25 +341,25 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    width: '90%',
+    width: '100%',
     flex: 1,
-    maxHeight: '68%',
+    maxHeight: '60%',
+    //paddingTop:20,
     backgroundColor: '#FFF',
-   
+    borderTopLeftRadius: 55,
+    borderTopRightRadius: 55,
     marginTop: -50,   
     alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    
   },
 
   svw: {
     width: '100%',
-    marginBottom:80,
-    marginTop: 3, 
+    
+    //marginBottom:80,
+    marginTop: 10, 
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25, 
   },
@@ -338,8 +371,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     borderWidth: 0.5,
     borderColor: '#32CD32',
-    marginLeft:10,
-    marginRight:10,
+    marginLeft:15,
+    marginRight:15,
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4, },
@@ -393,19 +426,13 @@ const styles = StyleSheet.create({
   },
 
   searchButton: {
-    position: "absolute",
-    bottom: 15,
-    left: 10,
-    right: 10,
-
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-around",
-      
+    marginLeft: 20,
+    marginRight: 20,  
     height: 55,
-    backgroundColor: "#32CD32",
+    overflow: 'hidden',
     borderRadius: 25,
-
+    marginTop: 15,
     shadowColor: "#000",
     shadowOpacity: 0.08,
     shadowRadius: 10,
@@ -502,28 +529,31 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
 
+  
+
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '100%',
-    borderRadius: 50,
-    position: 'absolute',  
-  },
+  footerGraphic1: {
 
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 25,
-    position: 'absolute',   
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
   
 });

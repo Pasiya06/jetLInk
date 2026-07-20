@@ -9,6 +9,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { Ionicons, Feather, FontAwesome } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const ToursScreen: React.FC = () => {
   const router = useRouter();
@@ -36,10 +37,17 @@ const ToursScreen: React.FC = () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient1}
+        >
 
-        <View style={styles.header}>
-          <Text style={styles.title}>Jetlink</Text>
-        </View>
+          <View style={styles.header}>
+            <Text style={styles.title}>Jetlink</Text>
+          </View>
+        </LinearGradient>
 
         <View style={styles.card}>
           <View style={styles.header1}>
@@ -130,8 +138,22 @@ const ToursScreen: React.FC = () => {
         </View>
 
         <View style={styles.footerGraphic}>
-          <View style={styles.blueCurve} />
-          <View style={styles.greenCurve} />
+          <LinearGradient
+            colors={['#4B6CF5', '#32CD32']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
+        </View>
+        <View style={styles.footerGraphic1}>
+          <LinearGradient
+            colors={['#4B6CF5', '#32CD32']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
         </View>
 
       </SafeAreaView>
@@ -145,15 +167,21 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff" },
 
   header: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 50,
     paddingHorizontal: 20,
-    paddingBottom: 70,
-    backgroundColor: '#0047AB',
+    paddingBottom: 70,   
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
+
+  submitGradient1: {
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
   title: { 
     fontSize: 28, 
     fontWeight: '800', 
@@ -327,28 +355,29 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
 
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '100%',
-    borderRadius: 50,
-    position: 'absolute',  
-  },
+  footerGraphic1: {
 
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 25,
-    position: 'absolute',   
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 
 });

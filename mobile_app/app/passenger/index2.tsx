@@ -366,8 +366,8 @@ const loginPassenger = async () => {
             <View style={styles.formContainer}>
               <Text style={styles.inputLabel}>Email Address</Text>
               <View style={styles.inputWrapper}>
-                <View style={[styles.iconWrap, { backgroundColor: "#F725851A"  }]}>
-                    <Fontisto name="email" size={18} color="#F72585" />
+                <View style={[styles.iconWrap, { backgroundColor: "#4B6CF51A"  }]}>
+                    <Fontisto name="email" size={18} color="#4B6CF5" />
                 </View>
                 <View style={styles.inputInnerWrapper}>
                   <TextInput

@@ -1,10 +1,11 @@
 // app/driver/index1.tsx (or wherever your file is)
 import React, { useEffect, useRef, useState } from 'react';
-import { Image, Alert } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
+  Image, 
+  Alert,
   StyleSheet,
-  ScrollView,
+  TextInput,
   Text,
   View,
   TouchableOpacity,
@@ -17,8 +18,11 @@ import {
   Ionicons,
   MaterialCommunityIcons,
   MaterialIcons,
+  Feather,
+  FontAwesome
 } from '@expo/vector-icons';
 import * as Location from "expo-location";
+import { LinearGradient } from 'expo-linear-gradient';
 
 // ─── Environment Variables ─────────────────────────────────────────
 const API_URL     = process.env.EXPO_PUBLIC_API_URL;
@@ -27,6 +31,13 @@ const WEATHER_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
 export default function DriverHome() {
   const router  = useRouter();
   const params  = useLocalSearchParams();
+  const [isSearching, setIsSearching] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState('');
+  const driverNIC1:string = "Not ";
+  const conductorNIC1:string = "Not ";
+  const driverD1:string = "Not login yet";
+  const conductorD1:string = "Not login yet";
   const driverD = `${params.dfirstName} ${params.dlastName} ${params.dphoneNumber}`;
   const conductorD = `${params.cfirstName} ${params.clastName} ${params.cphoneNumber}`;
 
@@ -162,7 +173,6 @@ export default function DriverHome() {
   // ────────────────────────────────────────────────────────────────
   const stopSharing = async () => {
     try {
-      // Clear interval
       if (locationInterval.current) {
         clearInterval(locationInterval.current);
         locationInterval.current = null;
@@ -174,14 +184,20 @@ export default function DriverHome() {
         locationSub.current = null;
       }
 
-      // FIXED: endpoint changed from /location/offline
-      //        to /api/locations/offline
-      // FIXED: field changed from busNumber to busNama
-      await fetch(`${API_URL}/locations/offline`, {
+      const response1 = await fetch(`${API_URL}/locations/update1`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          busNumber: busNum, // ← FIXED field name
+          busNumber:   busNum,      // ← FIXED field name
+          latitude:  Number(0),
+          longitude: Number(0),
+          speed:     Number(0),
+          driverNIC:driverNIC1,
+          conductorNIC:conductorNIC1,
+          driverD:driverD1,
+          conductorD:conductorD1,
+          heading:   Number(0),
+          
         }),
       });
 
@@ -266,8 +282,24 @@ export default function DriverHome() {
   // 6. Logout Function
   // ────────────────────────────────────────────────────────────────
   const logout = () => {
-    stopSharing();
-    Alert.alert(
+    if (sharingActive) {
+      Alert.alert(
+        "Stop Sharing?",
+        "Admin will no longer see your location.",
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Stop",
+            style: "destructive",
+            onPress: stopSharing,
+            
+          },
+        ]
+      );
+    } 
+    else {
+      stopSharing();
+      Alert.alert(
       "Logout",
       "Are you sure you want to logout?",
       [
@@ -279,13 +311,17 @@ export default function DriverHome() {
           text: "Logout",
           style: "destructive",
           onPress: async () => {
-            // Stop sharing before logout
-            
-            router.replace("/");
+            if (sharingActive) {
+              await stopSharing();
+            }
+
+            router.replace("/passenger/selectScreen");
           },
         },
       ]
     );
+    }
+    
   };
 
   // ────────────────────────────────────────────────────────────────
@@ -302,6 +338,7 @@ export default function DriverHome() {
             text: "Stop",
             style: "destructive",
             onPress: stopSharing,
+            
           },
         ]
       );
@@ -309,6 +346,7 @@ export default function DriverHome() {
       startSharing();
     }
   };
+
 
   // ────────────────────────────────────────────────────────────────
   // RENDER
@@ -320,23 +358,27 @@ export default function DriverHome() {
       <SafeAreaView style={styles.container}>
 
         {/* ── Header ──────────────────────────────────────────── */}
-        <View style={styles.header}>
-          <TouchableOpacity>
-            <Ionicons name="menu" size={30} color="#ffffff" />
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={logout}>
-            <Text style={styles.title}>Jetlink</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={logout}>
-            <Ionicons name="log-out-outline" size={26} color="#ffffff" />
-          </TouchableOpacity>
-        </View>
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient1}
+        >
+        
+          <View style={styles.header}>
+            
+            
+            <TouchableOpacity >
+              <Text style={styles.title}>Jetlink</Text>
+            </TouchableOpacity>
+            
+            
+          </View>
+        </LinearGradient>
 
         {/* ── Welcome Card ────────────────────────────────────── */}
         <View style={styles.card}>
-          <Text style={styles.title1}>Good Morning, Driver 👋</Text>
+          <Text style={styles.title1}>Good Morning, {params.busNum} 👋</Text>
 
           <View style={styles.iconContainer1}>
             <Text style={styles.title2}>{busNum || "No Bus"}</Text>
@@ -351,26 +393,26 @@ export default function DriverHome() {
         </View>
 
         {/* ── Location Status Card ─────────────────────────────── */}
-        <View style={styles.locationCard}>
+        {/* <View style={styles.locationCard}> */}
 
           {/* Current Place */}
-          <View style={styles.locationRow}>
+          {/* <View style={styles.locationRow}>
             <MaterialIcons name="location-on" size={20} color="#0047AB" />
             <Text style={styles.locationText} numberOfLines={1}>
               {locationName}
             </Text>
-          </View>
+          </View> */}
 
           {/* Speed */}
-          <View style={styles.locationRow}>
+          {/* <View style={styles.locationRow}>
             <MaterialIcons name="speed" size={20} color="#0047AB" />
             <Text style={styles.locationText}>
               Speed: {currentSpeed.toFixed(1)} km/h
             </Text>
-          </View>
+          </View> */}
 
           {/* Stats Row */}
-          <View style={styles.statsRow}>
+          {/* <View style={styles.statsRow}>
             <View style={styles.statBox}>
               <Text style={styles.statValue}>{updateCount}</Text>
               <Text style={styles.statLabel}>Updates Sent</Text>
@@ -380,10 +422,10 @@ export default function DriverHome() {
               <Text style={styles.statValue}>{lastSentTime}</Text>
               <Text style={styles.statLabel}>Last Sent</Text>
             </View>
-          </View>
+          </View> */}
 
           {/* Coordinates */}
-          {currentCoords && (
+          {/* {currentCoords && (
             <View style={styles.coordBox}>
               <Text style={styles.coordText}>
                 Lat: {currentCoords.lat.toFixed(6)}
@@ -393,7 +435,7 @@ export default function DriverHome() {
               </Text>
             </View>
           )}
-        </View>
+        </View> */}
 
         {/* ── GPS Toggle Button ────────────────────────────────── */}
         <TouchableOpacity
@@ -443,7 +485,7 @@ export default function DriverHome() {
         <View style={styles.listContainer}>
           <TouchableOpacity
             style={styles.card1}
-            onPress={() => router.push("/busStaff/index1")}
+            onPress={stopSharing}
           >
             <View style={styles.iconContainer}>
               <Image
@@ -494,36 +536,111 @@ export default function DriverHome() {
           </TouchableOpacity>
         </View>
 
-        {/* ── Footer ───────────────────────────────────────────── */}
-        <View style={styles.footerGraphic}>
-          <View style={styles.blueCurve} />
-          <View style={styles.greenCurve} />
-        </View>
+        {isSearching ? (
+              <TextInput
+                style={styles.searchBarInput}
+                placeholder="Search..."
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoFocus={true}
+              />
+            ) : (
+              <Text style={styles.subHeaderTitle}>{params.busNumber}</Text>
+          )}
 
+        <View style={styles.bottomNav}>
+        
+                  
+        
+                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); logout();}}>
+                    <Ionicons name="log-out-outline" size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
+                    
+                    <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
+                      Logout
+                    </Text>
+                  </TouchableOpacity>
+        
+                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+                    <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
+                      Routes
+                    </Text>
+                  </TouchableOpacity>
+        
+                  <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                            pathname: "/admin/index1",
+                            params: {
+                              Pid: params.Pid,
+                              Pid1: params.Pid1,
+                              pfirstName: params.pfirstName,
+                              plastName:params.plastName,
+                              pphoneNumber: params.pphoneNumber,
+                              pemail: params.pemail,
+                            },                    
+                          });}} > 
+                    <Ionicons name="home-outline" size={28} color="#fff" />             
+                  </TouchableOpacity>
+        
+                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+                    <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
+                      Alerts
+                    </Text>
+                  </TouchableOpacity>
+        
+                  <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+                    <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                      Profile
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+        <View style={styles.footerGraphic}>
+          <LinearGradient
+            colors={['#4B6CF5', '#32CD32']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
+        </View>
+        <View style={styles.footerGraphic1}>
+          <LinearGradient
+            colors={['#4B6CF5', '#32CD32']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
+        </View>
       </SafeAreaView>
     </>
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F8F9FA",
+   container:{
+    flex:1,
+    backgroundColor:"#fff"
   },
 
-  // ── Header ──────────────────────────────────────────────────────
   header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingTop: 50,
     paddingHorizontal: 20,
-    paddingBottom: 70,
-    backgroundColor: "#0047AB",
+    paddingBottom: 70,   
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
+
+  submitGradient1: {
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
   title: {
     fontSize: 28,
     fontWeight: "800",
@@ -766,25 +883,108 @@ const styles = StyleSheet.create({
   },
 
   // ── Footer ────────────────────────────────────────────────────────
+  bottomNav: {
+    position: "absolute",
+    bottom: 15,
+    left: 10,
+    right: 10,
+
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginBottom: 60,
+    height: 75,
+    backgroundColor: "#fff",
+    borderRadius: 25,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    elevation: 10,
+  },
+
+  searchBarInput: {
+    position: "absolute",
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    marginLeft: 15,
+    marginTop: 45,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: '#333',
+    width:'90%' 
+  },
+
+  subHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+
+  item: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+
+  label1: {
+    marginTop: 4,
+    fontSize: 13,
+    color: "#8A8A8A",
+  },
+
+  activeLabel: {
+    color: "#0057D9",
+    fontWeight: "600",
+  },
+
+  centerButton: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: "#2F80ED",
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    marginTop: -28,
+
+    shadowColor: "#2F80ED",
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    elevation: 12,
+  },
+
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
-    width: "100%",
-    height: 60,
-    overflow: "hidden",
+    width: '100%',
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
-  blueCurve: {
-    backgroundColor: "#ffffff",
-    height: 90,
-    width: "120%",
-    borderRadius: 100,
-    position: "absolute",
-  },
-  greenCurve: {
-    backgroundColor: "#0052cc",
-    height: 120,
-    width: "100%",
-    borderRadius: 30,
-    position: "absolute",
+
+  footerGraphic1: {
+
+    position: 'absolute',
+    bottom: 20,
+    width: '100%',
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 });

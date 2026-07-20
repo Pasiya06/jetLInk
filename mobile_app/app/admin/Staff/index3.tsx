@@ -13,7 +13,7 @@ import {
 import {  } from "react-native-safe-area-context";
 import { Stack,useRouter,useLocalSearchParams } from "expo-router";
 import { Ionicons, FontAwesome, FontAwesome5, Feather, Feather as Icon } from '@expo/vector-icons';
-
+import { LinearGradient } from 'expo-linear-gradient';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addDriver } from "../../../services/driverService";
 
@@ -94,12 +94,19 @@ const AddBus = () => {
     <>
     <Stack.Screen options={{ title: "", headerShown: false }} />
     <SafeAreaView style={styles.container}>
+      <LinearGradient
+        colors={['#4B6CF5', '#32CD32']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.submitGradient1}
+      >
       
       <View style={styles.header}> 
           <TouchableOpacity>
             <Text style={styles.title}>Drivers</Text>
             </TouchableOpacity>
       </View>
+      </LinearGradient>
     
       <View style={styles.card}>
 
@@ -255,11 +262,19 @@ const AddBus = () => {
       
         </ScrollView>
 
-      <TouchableOpacity style={styles.searchButton} onPress={handleAddBus }>
+    </View>
+
+    <TouchableOpacity style={styles.searchButton} onPress={handleAddBus }>
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient}
+        >
         <Text style={styles.searchButtonText}>Add Driver</Text>
+        </LinearGradient>
       </TouchableOpacity>
            
-    </View>
 
       {isSearching ? (
           <TextInput
@@ -333,9 +348,23 @@ const AddBus = () => {
     </View>
       
 
-    <View style={styles.footerGraphic}>          
-      <View style={styles.blueCurve} />
-      <View style={styles.greenCurve} />
+    <View style={styles.footerGraphic}>
+      <LinearGradient
+        colors={['#4B6CF5', '#32CD32']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.submitGradient}
+      >
+      </LinearGradient>
+    </View>
+    <View style={styles.footerGraphic1}>
+      <LinearGradient
+        colors={['#4B6CF5', '#32CD32']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
+        style={styles.submitGradient}
+      >
+      </LinearGradient>
     </View>
 
     </SafeAreaView>
@@ -358,7 +387,11 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 70,   
-    backgroundColor: '#0047AB',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  submitGradient1: {
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -373,7 +406,7 @@ const styles = StyleSheet.create({
   card: {
     width: '90%',
     flex: 1,
-    maxHeight: '68%',
+    maxHeight: '60%',
     backgroundColor: '#FFF',
     padding: 24,
     alignItems: 'center',
@@ -389,7 +422,7 @@ const styles = StyleSheet.create({
 
   svw: {
     width: '100%',
-    marginBottom:70,  
+     
   },
 
   
@@ -463,19 +496,13 @@ const styles = StyleSheet.create({
   },
 
   searchButton: {
-    position: "absolute",
-    bottom: 15,
-    left: 10,
-    right: 10,
-
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-around",
-      
+    marginLeft: 20,
+    marginRight: 20,  
     height: 55,
-    backgroundColor: "#32CD32",
+    overflow: 'hidden',
     borderRadius: 25,
-
+    marginTop: 15,
     shadowColor: "#000",
     shadowOpacity: 0.08,
     shadowRadius: 10,
@@ -573,28 +600,29 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
 
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '100%',
-    borderRadius: 50,
-    position: 'absolute',  
-  },
+  footerGraphic1: {
 
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 25,
-    position: 'absolute',   
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
     
 

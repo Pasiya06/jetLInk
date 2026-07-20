@@ -10,10 +10,12 @@ import {
   TextInput,
   Alert
 } from 'react-native';
-import { Ionicons, 
-  MaterialCommunityIcons, 
-  Fontisto, 
-  FontAwesome, Feather } from '@expo/vector-icons'; 
+import { 
+  Ionicons,  
+  FontAwesome, 
+  Feather 
+} from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient'; 
 
 const ParcelService = () => {
     const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -167,10 +169,17 @@ const ParcelService = () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient1}
+        >
        
-      <View style={styles.header}> 
-          <TouchableOpacity><Text style={styles.title}>Parcel Fare</Text></TouchableOpacity>
-      </View>
+          <View style={styles.header}> 
+              <TouchableOpacity><Text style={styles.title}>Parcel Fare</Text></TouchableOpacity>
+          </View>
+        </LinearGradient>
       
       
         
@@ -249,7 +258,14 @@ const ParcelService = () => {
         </View>
 
         <TouchableOpacity style={styles.searchButton} onPress={updateParcelFee} disabled={loading}>
-          <Text style={styles.searchButtonText}>{loading ? "Updating..." : "Update Fee"}</Text>
+          <LinearGradient
+            colors={['#4B6CF5', '#32CD32']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitGradient}
+          >
+            <Text style={styles.searchButtonText}>{loading ? "Updating..." : "Update Fee"}</Text>
+          </LinearGradient>
         </TouchableOpacity>
 
 
@@ -329,9 +345,22 @@ const ParcelService = () => {
 
       
       <View style={styles.footerGraphic}>
-        
-        <View style={styles.blueCurve} />
-        <View style={styles.greenCurve} />
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
+      </View>
+      <View style={styles.footerGraphic1}>
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
       </View>
             
     </SafeAreaView></>
@@ -352,7 +381,11 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 70,   
-    backgroundColor: '#0047AB',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  submitGradient1: {
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -402,18 +435,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
 
-  card2: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 20,
-    marginHorizontal: 16,
-    marginVertical: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 4,
-  },
+  
   cardTitle: {
     marginLeft: 20,
     fontSize: 16,
@@ -482,17 +504,17 @@ const styles = StyleSheet.create({
   inputWrapper: {
     marginLeft: 20,
     marginRight: 20,
-    minHeight: 30,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F2F4F5',
-    borderWidth: 1,
-    borderColor: '#32CD32',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    backgroundColor: '#F9FAFC',
+    borderWidth: 2,
+    borderColor: '#ECEEF2',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    height: 45,
     marginBottom: 15,
   },
+
   input3dIcon: {
     marginRight: 12,
     width: 25,
@@ -506,13 +528,13 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     fontSize: 16,
-    color: '#0056b3',
+    color: '#000000',
     fontWeight: '500',
     marginBottom: 10,
   },
   textInput: {
     fontSize: 16,
-    color: '#0056b3',
+    color: '#1A1A1A',
     fontWeight: '500',
     padding: 0, 
   },
@@ -539,15 +561,13 @@ const styles = StyleSheet.create({
 
   searchButton: {
     
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-around",
     marginLeft: 20,
     marginRight: 20,  
     height: 55,
-    backgroundColor: "#32CD32",
+    overflow: 'hidden',
     borderRadius: 25,
-    marginTop: 20,
+    marginTop: 15,
     shadowColor: "#000",
     shadowOpacity: 0.08,
     shadowRadius: 10,
@@ -644,28 +664,29 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
 
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '100%',
-    borderRadius: 50,
-    position: 'absolute',  
-  },
+  footerGraphic1: {
 
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 25,
-    position: 'absolute',   
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
   
   

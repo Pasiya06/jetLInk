@@ -219,7 +219,7 @@ const login = async () => {
                     <Text style={styles.inputLabel}>Password</Text>
                 <View style={styles.inputWrapper}>
                 <View style={[styles.iconWrap, { backgroundColor: "#FF9F1C1A"  }]}>
-                  <EvilIcons name="lock" size={18} color="#FF9F1C" />
+                  <EvilIcons name="lock" size={28} color="#FF9F1C" />
                 </View>
                     
                 <View style={styles.inputInnerWrapper}>
@@ -373,7 +373,7 @@ const styles = StyleSheet.create({
 
 
   inputWrapper1: {
-    height: '12%',
+    height: '13%',
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F2F4F5',

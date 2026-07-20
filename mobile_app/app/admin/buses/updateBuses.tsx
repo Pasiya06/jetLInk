@@ -19,6 +19,7 @@ import {
 } from '@expo/vector-icons';
 import { updateBus } from "../../../services/busService";
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const ToursScreen: React.FC = () => {
   const router = useRouter();
@@ -80,7 +81,13 @@ const ToursScreen: React.FC = () => {
     <>
     <Stack.Screen options={{ title: "", headerShown: false }} />
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      <LinearGradient
+              colors={['#4B6CF5', '#32CD32']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.submitGradient1}
+      >
+        <View style={styles.header}>
               
                       
               <TouchableOpacity >
@@ -88,8 +95,8 @@ const ToursScreen: React.FC = () => {
               </TouchableOpacity>
                       
     
-            </View>
-            
+        </View>
+      </LinearGradient>      
 
       <View style={styles.card}>
         <ScrollView style={styles.svw} >
@@ -248,11 +255,20 @@ const ToursScreen: React.FC = () => {
                 )}           
       
         </ScrollView>
-        <TouchableOpacity style={styles.searchButton} onPress={handleUpdate}>
-          <Text style={styles.searchButtonText}>Update</Text>
-        </TouchableOpacity>
+       
       
       </View>
+
+      <TouchableOpacity style={styles.searchButton} onPress={handleUpdate}>
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient}
+        >
+          <Text style={styles.searchButtonText}>Update</Text>
+        </LinearGradient>
+      </TouchableOpacity>
 
       {isSearching ? (
           <TextInput
@@ -339,9 +355,23 @@ const ToursScreen: React.FC = () => {
     </View>
       
       <View style={styles.footerGraphic}>
-               <View style={styles.blueCurve} />
-               <View style={styles.greenCurve} />
-        </View>
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
+      </View>
+      <View style={styles.footerGraphic1}>
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
+      </View>
     </SafeAreaView>
     </>
   );
@@ -360,7 +390,11 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 70,   
-    backgroundColor: '#0047AB',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  submitGradient1: {
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -439,19 +473,13 @@ const styles = StyleSheet.create({
   
    
   searchButton: {
-    position: "absolute",
-    bottom: 15,
-    left: 10,
-    right: 10,
-
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-around",
-      
+    marginLeft: 20,
+    marginRight: 20,  
     height: 55,
-    backgroundColor: "#32CD32",
+    overflow: 'hidden',
     borderRadius: 25,
-
+    marginTop: 15,
     shadowColor: "#000",
     shadowOpacity: 0.08,
     shadowRadius: 10,
@@ -554,28 +582,29 @@ const styles = StyleSheet.create({
     marginBottom:70,  
   },
 
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '100%',
-    borderRadius: 50,
-    position: 'absolute',  
-  },
+  footerGraphic1: {
 
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 25,
-    position: 'absolute',   
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
     
   
