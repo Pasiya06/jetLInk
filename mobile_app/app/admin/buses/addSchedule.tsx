@@ -165,13 +165,13 @@ const AddBus = () => {
 
           <Text style={styles.label}>Depature location</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={pickuploca} onChangeText={setpickuploca} />
+            <TextInput style={styles.input} value={pickuploca} onChangeText={(text) => setpickuploca(text.replace(/\s/g, "").toUpperCase())} />
             <Text style={styles.inputIcon}>📍</Text>
           </View>
 
           <Text style={styles.label}>Arrival location</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={dropoffloca} onChangeText={setdropoffloca} />
+            <TextInput style={styles.input} value={dropoffloca} onChangeText={(text) => setdropoffloca(text.replace(/\s/g, "").toUpperCase())} />
             <Text style={styles.inputIcon}>📍</Text>
           </View>
 

@@ -40,6 +40,22 @@ const AddBus = () => {
   const router = useRouter();
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
+  const handleBusNumber = (text: string) => {
+    let value = text.toUpperCase();
+    // Remove spaces
+    text = text.replace(/\s/g, "");
+
+    // Keep only letters and numbers
+    text = text.replace(/[^a-zA-Z0-9]/g, "");
+
+    // Format as HH-8888
+    if (text.length > 2) {
+      text = text.slice(0, 2) + "-" + text.slice(2, 6);
+    }
+
+    setBusNumber(text);
+  };
+
   
 
   const handleAddBus = async () => {
@@ -127,9 +143,11 @@ const AddBus = () => {
                 <TextInput
                     style={styles.input}
                     value={busNumber}
-                    onChangeText={(text) => setBusNumber(text.toUpperCase())}
+                    onChangeText={handleBusNumber}
                     placeholder="BB-1234"
                     placeholderTextColor="#A0A5B1"
+                    autoCapitalize="characters"
+                    autoCorrect={false}
                 />
                 </View>
             </View>
@@ -146,6 +164,8 @@ const AddBus = () => {
                     onChangeText={(text) => setChassisNo(text.toUpperCase())}
                     placeholder="CHS987654321"
                     placeholderTextColor="#A0A5B1"
+                    autoCapitalize="characters"
+                    autoCorrect={false}
                 />
                 </View>
             </View>
@@ -162,6 +182,8 @@ const AddBus = () => {
                     onChangeText={(text) => setEngineNo(text.toUpperCase())}
                     placeholder="EN12345678"
                     placeholderTextColor="#A0A5B1"
+                    autoCapitalize="characters"
+                    autoCorrect={false}
                 />
                 </View>
             </View>
@@ -178,6 +200,8 @@ const AddBus = () => {
                     onChangeText={(text) => setColour(text.toUpperCase())}
                     placeholder="GREEN"
                     placeholderTextColor="#A0A5B1"
+                    autoCapitalize="characters"
+                    autoCorrect={false}
                 />
                 </View>
             </View>

@@ -24,7 +24,7 @@ import {
 } from '@expo/vector-icons';
 import * as Location from "expo-location";
 import { LinearGradient } from 'expo-linear-gradient';
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
 // ─── Environment Variables ─────────────────────────────────────────
 const API_URL     = process.env.EXPO_PUBLIC_API_URL;
 const WEATHER_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
@@ -173,47 +173,65 @@ export default function DriverHome() {
   //    Fixed: field changed from busNumber to busNama
   // ────────────────────────────────────────────────────────────────
   const stopSharing = async () => {
-    try {
-      if (locationInterval.current) {
-        clearInterval(locationInterval.current);
-        locationInterval.current = null;
-      }
-
-      // Remove location watcher
-      if (locationSub.current) {
-        locationSub.current.remove();
-        locationSub.current = null;
-      }
-
-      const response1 = await fetch(`${API_URL}/locations/update1`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          busNumber:   busNum,      // ← FIXED field name
-          latitude:  Number(0),
-          longitude: Number(0),
-          speed:     Number(0),
-          driverNIC:driverNIC1,
-          conductorNIC:conductorNIC1,
-          driverD:driverD1,
-          conductorD:conductorD1,
-          heading:   Number(0),
-          
-        }),
-      });
-
-      setSharingActive(false);
-      setCurrentCoords(null);
-      setCurrentSpeed(0);
-      setLocationName("Not sharing location");
-      setUpdateCount(0);
-      setLastSentTime("--");
-
-      console.log("✅ Bus marked offline" );
-    } catch (error) {
-      console.log("Stop sharing error:", error);
+  try {
+    // Stop location updates
+    if (locationInterval.current) {
+      clearInterval(locationInterval.current);
+      locationInterval.current = null;
     }
-  };
+
+    if (locationSub.current) {
+      locationSub.current.remove();
+      locationSub.current = null;
+    }
+
+    const sendOfflineRequest = async () => {
+      try {
+        const response = await fetch(`${API_URL}/locations/update1`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            busNumber: busNum,
+            latitude: 0,
+            longitude: 0,
+            speed: 0,
+            driverNIC: driverNIC1,
+            conductorNIC: conductorNIC1,
+            driverD: driverD1,
+            conductorD: conductorD1,
+            heading: 0,
+          }),
+        });
+
+        console.log("✅ Bus marked offline");
+      } catch (err) {
+        console.log("Request failed:", err);
+      }
+    };
+
+    // Send immediately
+    await sendOfflineRequest();
+
+    // Send every 2 seconds
+    const retryInterval = setInterval(sendOfflineRequest, 2000);
+
+    // Stop after 10 seconds
+    setTimeout(() => {
+      clearInterval(retryInterval);
+      console.log("Stopped retrying");
+    }, 30000);
+
+    setSharingActive(false);
+    setCurrentCoords(null);
+    setCurrentSpeed(0);
+    setLocationName("Not sharing location");
+    setUpdateCount(0);
+    setLastSentTime("--");
+
+  } catch (error) {
+    console.log("Stop sharing error:", error);
+  }
+};
 
   // ────────────────────────────────────────────────────────────────
   // 4. Start sharing location
@@ -237,9 +255,27 @@ export default function DriverHome() {
     setLoading(false);
 
     Alert.alert(
-      "✅ Location Sharing Active",
-      "Your location is updating every 5 seconds."
+      "Location Sharing Active",
+      "Your location is updating every 5 seconds. Do you want to continue?",
+      [
+        {
+          text: "No",
+          onPress: () => stopSharing(),
+          style: "cancel",
+        },
+        {
+          text: "Yes",
+          onPress: () => console.log("Continue sharing"),
+        },
+      ]
     );
+      
+
+          
+
+          
+    
+    
   };
 
   // ────────────────────────────────────────────────────────────────
@@ -248,6 +284,7 @@ export default function DriverHome() {
   useEffect(() => {
 
         const backAction = () => {
+        
         logout(); // Navigate to a specific path
         return true; // Prevent default back behavior
       };
@@ -326,7 +363,7 @@ export default function DriverHome() {
             if (sharingActive) {
               await stopSharing();
             }
-
+            await AsyncStorage.clear();
             router.replace("/passenger/selectScreen");
           },
         },
@@ -564,7 +601,7 @@ export default function DriverHome() {
         
                   
         
-                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); logout();}}>
+                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); logout();}} >
                     <Ionicons name="log-out-outline" size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
                     
                     <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>

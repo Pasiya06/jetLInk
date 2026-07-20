@@ -21,6 +21,22 @@ export const FlatmateLogin: React.FC = () => {
   const [dlastname, setdlastname] = useState("");
   const [dphonenumber, setdphonenumber] = useState("");
 
+  const handleBusNumber = (text: string) => {
+    let value = text.toUpperCase();
+    // Remove spaces
+    text = text.replace(/\s/g, "");
+
+    // Keep only letters and numbers
+    text = text.replace(/[^a-zA-Z0-9]/g, "");
+
+    // Format as HH-8888
+    if (text.length > 2) {
+      text = text.slice(0, 2) + "-" + text.slice(2, 6);
+    }
+
+    setBusNum(text);
+  };
+
   useEffect(() => {
     const backAction = () => {
       router.replace("/passenger/selectScreen"); // Navigate to a specific path
@@ -184,9 +200,12 @@ const login = async () => {
                       <TextInput 
                         style={styles.textInput} 
                         value={busNum} 
-                        onChangeText={setBusNum} 
+                        onChangeText={handleBusNumber} 
                         placeholder="Bus Number"
                         placeholderTextColor="#A3A3A3"
+                        autoCapitalize="characters"
+                        autoCorrect={false}
+                        maxLength={7}
                       />
                     </View>
                     </View>

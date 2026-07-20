@@ -113,6 +113,8 @@ const ToursScreen: React.FC = () => {
                     onChangeText={(text) => setChassisNo(text.toUpperCase())}
                     placeholder="CHS987654321"
                     placeholderTextColor="#A0A5B1"
+                    autoCapitalize="characters"
+                    autoCorrect={false}
                 />
                 </View>
             </View>
@@ -129,6 +131,8 @@ const ToursScreen: React.FC = () => {
                     onChangeText={(text) => setEngineNo(text.toUpperCase())}
                     placeholder="EN12345678"
                     placeholderTextColor="#A0A5B1"
+                    autoCapitalize="characters"
+                    autoCorrect={false}
                 />
                 </View>
             </View>
@@ -145,6 +149,8 @@ const ToursScreen: React.FC = () => {
                     onChangeText={(text) => setColour(text.toUpperCase())}
                     placeholder="GREEN"
                     placeholderTextColor="#A0A5B1"
+                    autoCapitalize="characters"
+                    autoCorrect={false}
                 />
                 </View>
             </View>

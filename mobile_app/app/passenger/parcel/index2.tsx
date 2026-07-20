@@ -203,13 +203,13 @@ const JetLinkInterface: React.FC = () => {
           
           <Text style={styles.label}>Pick up Location</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={pickup}  onChangeText={(text) => setPickup(text.replace(/\s/g, ""))}/>
+            <TextInput style={styles.input} value={pickup}  onChangeText={(text) => setPickup(text.replace(/\s/g, "").toUpperCase())}/>
             
           </View>
           
           <Text style={styles.label}>Delivery Location</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={drop} onChangeText={(text) => setDrop(text.replace(/\s/g, ""))}/>
+            <TextInput style={styles.input} value={drop} onChangeText={(text) => setDrop(text.replace(/\s/g, "").toUpperCase())}/>
             
           </View>
           
