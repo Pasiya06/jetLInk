@@ -147,7 +147,7 @@ const JetLinkInterface: React.FC = () => {
                     
                 
                   <TouchableOpacity >
-                    <Text style={styles.title}>JetLink</Text>
+                    <Text style={styles.title}>Select Schedule</Text>
                   </TouchableOpacity>
                          
                 </View>

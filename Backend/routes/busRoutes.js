@@ -5,6 +5,8 @@ import {
   deleteBus,
   updateBus,
   checkBusNumber,
+  checkDriver,
+  checkConductor,
   logoutBus,
   getBusesByBusType,
 } from "../controllers/busController.js";
@@ -17,6 +19,10 @@ router.post("/offline", logoutBus);
 
 // Check bus number
 router.get("/check/:busNumber", checkBusNumber);
+
+router.get("/check1/:driverNIC", checkDriver);
+
+router.get("/check2/:conductorNIC", checkConductor);
 
 // Get all buses & create bus
 router

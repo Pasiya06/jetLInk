@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Stack, useRouter } from 'expo-router';
-import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, Alert   } from 'react-native';
+import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, Alert, BackHandler    } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather as Icon, AntDesign, Fontisto, EvilIcons } from '@expo/vector-icons';
 
@@ -21,6 +21,22 @@ export const FlatmateLogin: React.FC = () => {
   const [dlastname, setdlastname] = useState("");
   const [dphonenumber, setdphonenumber] = useState("");
 
+  useEffect(() => {
+    const backAction = () => {
+      router.replace("/passenger/selectScreen"); // Navigate to a specific path
+      return true; // Prevent default back behavior
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => subscription.remove();
+  }, []);
+
+  
+
 const verify = async () => {
   try {
     const busResponse = await fetch(`${API_URL}/buses/check/${busNum}`);
@@ -30,13 +46,26 @@ const verify = async () => {
       return;
     }
      
-
     setVerifiedBusno(bus.data.busNumber);
+
+    const dResponse = await fetch(`${API_URL}/buses/check1/${DNIC}`);
+    const d = await dResponse.json();
+    if (d.exists) {
+      alert("Driver login with another bus");
+      return;
+    }
+
+    const cResponse = await fetch(`${API_URL}/buses/check2/${CNIC}`);
+    const c = await cResponse.json();
+    if (c.exists) {
+      alert("Conductor login with another bus");
+      return;
+    }
 
     const driverResponse = await fetch(`${API_URL}/drivers/check/${DNIC}`);
     const driver = await driverResponse.json();
     if (!driver.exists) {
-      alert("Invalid Driver NIC");
+      alert(driver.message || "Invalid Driver NIC");
       return;
     }
 
@@ -48,7 +77,7 @@ const verify = async () => {
     const conductorResponse = await fetch(`${API_URL}/conductors/check/${CNIC}`);
     const conductor = await conductorResponse.json();
     if (!conductor.exists) {
-      alert("Invalid Conductor NIC");
+      alert(conductor.message ||"Invalid Conductor NIC");
       return;
     }
 
@@ -204,9 +233,9 @@ const login = async () => {
                     </Text>
                   </TouchableOpacity>
            
-          </View>                  
-                    </View>
-                  </View>
+                </View>                  
+              </View>
+            </View>
                   
 
                 </>

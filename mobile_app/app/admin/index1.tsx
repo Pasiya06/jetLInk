@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Image, TextInput } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
@@ -9,7 +9,7 @@ import {
   View,
   TouchableOpacity,
   SafeAreaView,
-  StatusBar,
+  BackHandler,
 } from "react-native";
 
 // Icons
@@ -32,6 +32,20 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState('');
   const params = useLocalSearchParams();
 
+  useEffect(() => {
+    const backAction = () => {
+      handleLogout(); // Navigate to a specific path
+      return true; // Prevent default back behavior
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => subscription.remove();
+  }, []);
+
   const handleLogout = () => {
   Alert.alert(
     "Logout",
@@ -46,7 +60,7 @@ export default function Index() {
         style: "destructive",
         onPress: async () => {
           await AsyncStorage.clear(); // or remove specific keys
-          router.replace("/");
+          router.replace("/passenger/selectScreen");
         },
       },
     ]

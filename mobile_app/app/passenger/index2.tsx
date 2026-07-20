@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Stack, useRouter } from "expo-router";
 import { Image } from 'react-native';
 import {
@@ -10,7 +10,8 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  ScrollView
+  ScrollView,
+  BackHandler
 } from 'react-native';
 
 import { Feather as Icon, EvilIcons, Fontisto, MaterialCommunityIcons, Entypo, AntDesign, Feather, Ionicons  } from '@expo/vector-icons';
@@ -32,6 +33,20 @@ export const FlatmateLogin: React.FC = () => {
   const [email1, setEmail1] = useState<string>('');
   const [password1, setPassword1] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  useEffect(() => {
+      const backAction = () => {
+        router.replace("/passenger/selectScreen"); // Navigate to a specific path
+        return true; // Prevent default back behavior
+      };
+  
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction
+      );
+  
+      return () => subscription.remove();
+    }, []);
   
 //register passenger
   const registerPassenger = async () => {

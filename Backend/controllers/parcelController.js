@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import Parcel from "../models/Parcel.js";
+import Bus from "../models/Bus.js"; // adjust path to match your project
 
 export const createParcel = async (req, res) => {
   try {
@@ -84,6 +85,8 @@ export const generateParcelQR = async (req, res) => {
       drop: parcel.drop,
       weight: parcel.weight,
       totalFare: parcel.totalFare,
+      pickupVerified:parcel.pickupVerified,
+      status:parcel.status,
       issuedAt: Date.now(),
     };
 
@@ -110,7 +113,7 @@ export const verifyParcelQR = async (req, res) => {
   try {
     const decoded = jwt.verify(qrToken, process.env.QR_SECRET);
 
-    const parcel = await Parcel.findById(decoded.parcelId);
+    const parcel = await Parcel.findById({ parcelId: decoded.parcelId });
 
     if (!parcel) {
       return res.json({

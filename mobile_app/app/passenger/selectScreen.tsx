@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { Stack, useRouter } from "expo-router";
 import {
@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
+  BackHandler,
 } from "react-native";
 
 // Icons
@@ -29,6 +30,19 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 export default function Index() {
   const router = useRouter();
+  useEffect(() => {
+        const backAction = () => {
+          router.replace("/passenger/selectScreen"); // Navigate to a specific path
+          return true; // Prevent default back behavior
+        };
+    
+        const subscription = BackHandler.addEventListener(
+          "hardwareBackPress",
+          backAction
+        );
+    
+        return () => subscription.remove();
+      }, []);
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
@@ -73,7 +87,7 @@ export default function Index() {
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
-            {/* <TouchableOpacity style={styles.card} onPress={() => router.push("/admin/buses/busType")} >
+            {/* <TouchableOpacity style={styles.card} onPress={() => router.push("/busStaff/scanParcel")} >
               <View style={styles.iconContainer}>
                 <MaterialIcons name={"tour"}  size={22} color={"#FF0000" } />
               </View>

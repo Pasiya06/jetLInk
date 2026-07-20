@@ -171,3 +171,71 @@ export const getBusesByBusType = async (req, res) => {
     });
   }
 };
+
+export const checkDriver = async (req, res) => {
+  try {
+    const bus = await Bus.findOne({
+      driverNIC: req.params.driverNIC,
+    });
+
+    if (!bus) {
+      return res.status(404).json({
+        success: false,
+        exists: false,
+        message: "Driver not found",
+      });
+    }
+
+    res.status(200).json({
+      
+      success: true,
+      exists: true,
+      data: {
+        _id: bus._id,
+        busId: bus.busId,
+        driverNIC: bus.driverNIC,
+        
+      },
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const checkConductor = async (req, res) => {
+  try {
+    const bus = await Bus.findOne({
+      conductorNIC: req.params.conductorNIC,
+    });
+
+    if (!bus) {
+      return res.status(404).json({
+        success: false,
+        exists: false,
+        message: "Conductor not found",
+      });
+    }
+
+    res.status(200).json({
+      
+      success: true,
+      exists: true,
+      data: {
+        _id: bus._id,
+        busId: bus.busId,
+        conductorNIC: bus.conductorNIC,
+        
+      },
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

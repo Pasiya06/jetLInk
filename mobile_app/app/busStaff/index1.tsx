@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
+  BackHandler,
 } from "react-native";
 
 // Icons
@@ -245,6 +246,17 @@ export default function DriverHome() {
   // 5. Auto-ask on screen load if busNum exists
   // ────────────────────────────────────────────────────────────────
   useEffect(() => {
+
+        const backAction = () => {
+        logout(); // Navigate to a specific path
+        return true; // Prevent default back behavior
+      };
+  
+      const subscription = BackHandler.addEventListener(
+        "hardwareBackPress",
+        backAction
+      );
+
     if (!busNum) {
       console.log("No busNum in params — sharing skipped.");
       return;
