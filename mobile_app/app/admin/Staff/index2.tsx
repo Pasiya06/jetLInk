@@ -22,6 +22,7 @@ interface Driver {
   phoneNumber: string;
   address: string;
   NIC: string;
+  drivingLicense:string;
   Birthday: string;
   email: string;
   password: string;
@@ -111,7 +112,7 @@ useFocusEffect(
     <TouchableOpacity style={styles.friendRow}
       onPress={() =>
         router.push({
-          pathname: "/admin/Staff/index4",
+          pathname: "/admin/Staff/driverProfile",
           params: {
             Did: item._id, 
             driverId: String(item.driverId),
@@ -120,6 +121,7 @@ useFocusEffect(
             phoneNumber: item.phoneNumber || "",
             address: item.address || "",
             NIC: item.NIC || "",
+            drivingLicense:item.drivingLicense,
             Birthday: item.Birthday || "",
             demail: item.email || "",
             password: item.password || "",

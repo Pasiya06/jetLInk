@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
   card: {
     width: '90%',
     flex: 1,
-    maxHeight: '68%',
+    maxHeight: '60%',
     backgroundColor: '#FFF',
     padding: 24,
     alignItems: 'center',
@@ -585,7 +585,7 @@ const styles = StyleSheet.create({
 
   svw: {
     width: '100%',
-    marginBottom:70,  
+      
   },
 
   submitGradient: {

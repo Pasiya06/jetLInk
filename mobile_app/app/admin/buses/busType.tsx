@@ -102,13 +102,13 @@ const ParcelService = () => {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.card1} onPress={handleSearch1}>
-          <Fontisto name={"bus"} size={55} color="#32CD32" style={styles.mmr}/>
+          <Fontisto name={"bus"} size={55} color="#f49e00" style={styles.mmr}/>
           <Text style={styles.cardText}>High Way</Text>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.card2} onPress={handleSearch2}>
-          <Fontisto name={"bus"} size={55} color="#32CD32" style={styles.mmr}/>
+          <Fontisto name={"bus"} size={55} color="#7209B7" style={styles.mmr}/>
           <Text style={styles.cardText}>Tour</Text>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>

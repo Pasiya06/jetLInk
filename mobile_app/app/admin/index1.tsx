@@ -136,7 +136,7 @@ export default function Index() {
               <View style={styles.iconContainer}>
                 <Image source ={require("../../assets/images/icons8-bus-94.png")} style={styles.input3dIcon1} />
               </View>
-              <Text style={styles.cardText}>Busses</Text>
+              <Text style={styles.cardText}>Buses</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card2} onPress={() => router.push({

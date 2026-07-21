@@ -20,10 +20,15 @@ const busSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  
   colour: String,
+
   serviceDate: String,
+
   licenseDate: String,
+
   emissionDate: String,
+
   busType: {
     type: String,
     enum: ["NormalWay", "Highway", "tour"],

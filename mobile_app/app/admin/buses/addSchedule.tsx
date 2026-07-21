@@ -131,7 +131,7 @@ const AddBus = () => {
             
         
           <TouchableOpacity >
-            <Text style={styles.title}>JetLink</Text>
+            <Text style={styles.title}>{params.busNumber}</Text>
           </TouchableOpacity>
                   
         </View>
