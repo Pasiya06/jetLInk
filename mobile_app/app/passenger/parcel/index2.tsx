@@ -168,7 +168,12 @@ const JetLinkInterface: React.FC = () => {
 
           <Text style={styles.label}>Sender Mobile Number</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={smobilenumber} onChangeText={Ssetmobilenumber} keyboardType="phone-pad" maxLength={10}/>
+            <TextInput 
+              style={styles.input} 
+              value={smobilenumber} 
+              onChangeText={Ssetmobilenumber} 
+              keyboardType="phone-pad" 
+              maxLength={10}/>
             
           </View>
 
@@ -192,7 +197,13 @@ const JetLinkInterface: React.FC = () => {
 
           <Text style={styles.label}>Email</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={remail} onChangeText={RsetEmail} />
+            <TextInput 
+              style={styles.input} 
+              value={remail} 
+              onChangeText={(text) => RsetEmail(text.replace(/\s/g, "").toLowerCase())} 
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
             
           </View>
 
@@ -203,13 +214,24 @@ const JetLinkInterface: React.FC = () => {
           
           <Text style={styles.label}>Pick up Location</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={pickup}  onChangeText={(text) => setPickup(text.replace(/\s/g, "").toUpperCase())}/>
-            
+            <TextInput 
+              style={styles.input} 
+              value={pickup}  
+              onChangeText={(text) => setPickup(text.replace(/\s/g, "").toUpperCase())}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              />
           </View>
           
           <Text style={styles.label}>Delivery Location</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={drop} onChangeText={(text) => setDrop(text.replace(/\s/g, "").toUpperCase())}/>
+            <TextInput 
+              style={styles.input} 
+              value={drop} 
+              onChangeText={(text) => setDrop(text.replace(/\s/g, "").toUpperCase())}
+              autoCapitalize="characters"
+              autoCorrect={false} 
+            />
             
           </View>
           

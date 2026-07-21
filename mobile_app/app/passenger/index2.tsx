@@ -340,11 +340,12 @@ const loginPassenger = async () => {
                     <TextInput
                       style={styles.textInput}
                       value={email}
-                      onChangeText={setEmail}
                       placeholder="ABC@gmail.com"
                       placeholderTextColor="#A3A3A3"
                       keyboardType="email-address"
+                      onChangeText={(text) => setEmail(text.replace(/\s/g, "").toLowerCase())} 
                       autoCapitalize="none"
+                      autoCorrect={false}
                     />
                   </View>
                 </View>
@@ -388,11 +389,12 @@ const loginPassenger = async () => {
                   <TextInput
                     style={styles.textInput}
                     value={email1}
-                    onChangeText={setEmail1}
                     placeholder="ABC@gmail.com"
                     placeholderTextColor="#A3A3A3"
                     keyboardType="email-address"
+                    onChangeText={(text) => setEmail1(text.replace(/\s/g, "").toLowerCase())} 
                     autoCapitalize="none"
+                    autoCorrect={false}
                   />
                 </View>
               </View>

@@ -228,7 +228,7 @@ const driverScreen: React.FC = () => {
                       placeholderTextColor="#A3A3A3"
                       keyboardType="email-address"
                       onChangeText={(text) => setEmail(text.replace(/\s/g, "").toLowerCase())} 
-                      autoCapitalize="characters"
+                      autoCapitalize="none"
                       autoCorrect={false}
                     />
                   </View>

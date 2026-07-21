@@ -217,11 +217,12 @@ const AddConductor = () => {
                     <TextInput
                       style={styles.textInput}
                       value={email}
-                      onChangeText={setEmail}
                       placeholder="ABC@gmail.com"
                       placeholderTextColor="#A3A3A3"
                       keyboardType="email-address"
+                      onChangeText={(text) => setEmail(text.replace(/\s/g, "").toLowerCase())} 
                       autoCapitalize="none"
+                      autoCorrect={false}
                     />
                   </View>
                 </View>
