@@ -9,10 +9,13 @@ import {
   SafeAreaView, 
   Image 
 } from 'react-native';
-import { Ionicons, 
+import { 
+  Ionicons, 
   MaterialCommunityIcons, 
   Feather, 
-  FontAwesome } from '@expo/vector-icons';
+  FontAwesome,
+  MaterialIcons
+} from '@expo/vector-icons';
   import { LinearGradient } from 'expo-linear-gradient';
 
 
@@ -61,14 +64,14 @@ const ToursScreen: React.FC = () => {
               },
           })
       }>
-          <MaterialCommunityIcons name="highway" size={33} color="#32CD32" />     
+          <MaterialCommunityIcons name="package-variant-closed" size={33} color="#32CD32" />     
           <Text style={styles.cardText}>Parcel</Text>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
 
         {/* Option 2: Additional Payment */}
         <TouchableOpacity style={styles.card}>
-          <FontAwesome name="road" size={33} color="#FFA500" />
+          <MaterialIcons name="tour" size={33} color="#FFA500" />
           <Text style={styles.cardText}>Tour</Text>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>

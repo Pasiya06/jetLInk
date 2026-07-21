@@ -42,6 +42,20 @@ export default function DriverHome() {
   const driverD = `${params.dfirstName} ${params.dlastName} ${params.dphoneNumber}`;
   const conductorD = `${params.cfirstName} ${params.clastName} ${params.cphoneNumber}`;
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+
+    if (hour >= 5 && hour < 12) {
+      return "Good Morning ";
+    } else if (hour >= 12 && hour < 17) {
+      return "Good Afternoon ";
+    } else if (hour >= 17 && hour < 21) {
+      return "Good Evening ";
+    } else {
+      return "Good Night 🌙";
+    }
+  };
+
   // ─── State ──────────────────────────────────────────────────────
   const [loading, setLoading]               = useState(false);
   const [sharingActive, setSharingActive]   = useState(false);
@@ -427,7 +441,7 @@ export default function DriverHome() {
 
         {/* ── Welcome Card ────────────────────────────────────── */}
         <View style={styles.card}>
-          <Text style={styles.title1}>Good Morning, {params.busNum} 👋</Text>
+          <Text style={styles.title1}>{getGreeting()}, {params.busNum} 👋</Text>
 
           <View style={styles.iconContainer1}>
             <Text style={styles.title2}>{busNum || "No Bus"}</Text>

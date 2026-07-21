@@ -37,6 +37,20 @@ export default function Index() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+
+    if (hour >= 5 && hour < 12) {
+      return "Good Morning ";
+    } else if (hour >= 12 && hour < 17) {
+      return "Good Afternoon ";
+    } else if (hour >= 17 && hour < 21) {
+      return "Good Evening ";
+    } else {
+      return "Good Night 🌙";
+    }
+  };
+
   useEffect(() => {
     const backAction = () => {
       handleLogout(); // Navigate to a specific path
@@ -99,7 +113,7 @@ export default function Index() {
         
         <View style={styles.card}>
           <View>
-            <Text style={styles.title1}>Good Morning</Text>
+            <Text style={styles.title1}>{getGreeting()}</Text>
           </View>  
           <View style={styles.iconContainer1}>
             <Text style={styles.title2}>{params.pfirstName} {params.plastName}</Text>
