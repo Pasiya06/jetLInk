@@ -103,7 +103,7 @@ useFocusEffect(
     style={styles.friendRow}
     onPress={() =>
       router.push({
-        pathname: "/admin/Staff/index7",
+        pathname: "/admin/Staff/conductorProfile",
         params: {
           Cid: item._id,
           conductorId: String(item.conductorId),

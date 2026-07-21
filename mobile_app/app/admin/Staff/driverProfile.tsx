@@ -17,21 +17,33 @@ const ToursScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const params = useLocalSearchParams();
   const [activeTab, setActiveTab] = useState('');
-
-  const InfoRow = ({ icon, label, value }: { icon: any; label: string; value?: string }) => (
-    <View style={styles.row}>
-      <View style={styles.iconWrap}>
-        <Ionicons name={icon} size={18} color="#4A6FA5" />
-      </View>
-      <View style={styles.rowText}>
-        <Text style={styles.label}>{label}</Text>
-        <Text style={styles.value}>{value || '—'}</Text>
-      </View>
-    </View>
-  );
-
   const firstInitial = String(params.dfirstName ?? '').charAt(0).toUpperCase();
   const lastInitial = String(params.dlastName ?? '').charAt(0).toUpperCase();
+
+  const handleSearch = () => {
+    router.push({
+      pathname: "/admin/Staff/index4",
+      params: {
+        Did: params.Did,
+        driverId: params.driverId,
+        dfirstName: params.dfirstName,
+        dlastName: params.dlastName,
+        phoneNumber: params.phoneNumber,
+        address: params.address,
+        NIC: params.NIC,
+        drivingLicense: params.drivingLicense,
+        Birthday: params.Birthday,
+        demail: params.demail,
+        password: params.password,
+        
+
+        Aid: params.Aid,
+        firstName: params.firstName,
+        lastName: params.lastName,
+        email: params.email,
+      } 
+    });
+  };
 
   return (
     <>
@@ -51,15 +63,26 @@ const ToursScreen: React.FC = () => {
 
         <View style={styles.card}>
           <View style={styles.header1}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {firstInitial}{lastInitial}
-              </Text>
+            <View style={styles.searchButton}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>
+                  {firstInitial}{lastInitial}
+                </Text>
+              </View>
+              <View style={styles.avatar1}>
+                <Text style={styles.fullName}>
+                  {params.dfirstName} {params.dlastName}
+                </Text>
+                <View style={styles.badge}>
+                  
+                  <Text style={styles.badgeText}>Driver</Text>
+                </View>
+              </View>
             </View>
-            <Text style={styles.fullName}>
-              {params.dfirstName} {params.dlastName}
-            </Text>
-            
+            <TouchableOpacity activeOpacity={0.85} onPress={handleSearch}>
+              <Ionicons name="create-outline" size={28} color="#8A8A8A" style={{ marginRight: 8 }} />
+              <Text style={styles.searchButtonText}>Edit</Text> 
+            </TouchableOpacity>
           </View>
 
           <View style={styles.svw}>
@@ -151,7 +174,7 @@ const ToursScreen: React.FC = () => {
                 setIsSearching(false);
               } else {
                 router.push({
-                  pathname: "/admin/regpassengers/index1",
+                  pathname: "/admin/Staff/index2",
                   params: {
                     Aid: params.Aid,
                     firstName: params.firstName,
@@ -174,12 +197,10 @@ const ToursScreen: React.FC = () => {
           <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
                     pathname: "/admin/index1",
                     params: {
-                      Pid: params.Pid,
-                      Pid1: params.Pid1,
-                      pfirstName: params.pfirstName,
-                      plastName:params.plastName,
-                      pphoneNumber: params.pphoneNumber,
-                      pemail: params.pemail,
+                      Aid: params.Aid,
+                      firstName: params.firstName,
+                      lastName: params.lastName,
+                      email: params.email,
                     },                    
                   });}} > 
             <Ionicons name="home-outline" size={28} color="#fff" />             
@@ -264,6 +285,8 @@ const styles = StyleSheet.create({
   },
 
   header1: {
+    justifyContent: "space-between",
+    flexDirection: 'row',
     alignItems: 'center',
     paddingTop: 28,
     paddingBottom: 20,
@@ -272,6 +295,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 25,
   },
   avatar: {
+    marginLeft: 10,
     width: 64, 
     height: 64, 
     borderRadius: 32,
@@ -286,6 +310,11 @@ const styles = StyleSheet.create({
     fontWeight: '700' 
   },
 
+  avatar1: {
+    marginTop:7,
+    marginLeft: 10,
+  },
+
   fullName: { 
     fontSize: 18, 
     fontWeight: '700', 
@@ -293,10 +322,10 @@ const styles = StyleSheet.create({
   },
 
   badge: {
-    flexDirection: 'row',
+    //flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#EAF7EC',
-    paddingHorizontal: 10,
+    //paddingHorizontal: 1,
     paddingVertical: 4,
     borderRadius: 12,
     marginTop: 8,
@@ -307,7 +336,7 @@ const styles = StyleSheet.create({
     fontSize: 11, 
     color: '#2F9E44', 
     fontWeight: '600', 
-    marginLeft: 4 
+    //marginLeft: 4 
   },
 
   svw: { 
@@ -351,6 +380,19 @@ const styles = StyleSheet.create({
     fontSize: 15, 
     color: '#1E293B', 
     fontWeight: '500' 
+  },
+
+  searchButton: {
+   
+    flexDirection: 'row',
+ 
+  },
+
+  searchButtonText: {
+    
+    color: '#8A8A8A',
+    fontSize: 13,
+    fontWeight: 'bold',
   },
 
   searchBarInput: {

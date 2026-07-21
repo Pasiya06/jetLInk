@@ -44,46 +44,35 @@ const BusScreen: React.FC = () => {
 
   
   const loadBuses = async () => {
-  try {
-    const response = await fetch(`${API_URL}/buses?busType=${busType}`);
+    try {
+      const response = await fetch(`${API_URL}/buses?busType=${busType}`);
 
-    if (!response.ok) {
-      throw new Error("Network issues encountered");
+      if (!response.ok) {
+        throw new Error("Network issues encountered");
+      }
+
+      const data = await response.json();
+
+      const typeOfBuses = data.filter(
+        (bus: any) => bus.busType === busType
+      );
+
+      setBusData(typeOfBuses);
+
+      
+
+    } catch (error) {
+      console.log("Error details:", error);
+      Alert.alert(
+        "Network Error",
+        "Unable to load data elements from database server context."
+      );
     }
-
-    const data = await response.json();
-
-    const typeOfBuses = data.filter(
-      (bus: any) => bus.busType === busType
-    );
-
-    setBusData(typeOfBuses);
-
-    
-
-  } catch (error) {
-    console.log("Error details:", error);
-    Alert.alert(
-      "Network Error",
-      "Unable to load data elements from database server context."
-    );
-  }
-};
+  };
 
   useFocusEffect(
     useCallback(() => {
-      // Run immediately
-      loadBuses();
-
-      // Run every 5 seconds
-      const interval = setInterval(() => {
-        loadBuses();
-      }, 5000);
-
-      // Cleanup when screen loses focus
-      return () => {
-        clearInterval(interval);
-      };
+      loadBuses();  
     }, [])
   );
 

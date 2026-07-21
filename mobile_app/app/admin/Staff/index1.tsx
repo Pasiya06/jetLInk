@@ -58,7 +58,7 @@ const ParcelService = () => {
         >
        
         <View style={styles.header}> 
-            <TouchableOpacity><Text style={styles.title}>Buses</Text></TouchableOpacity>
+            <TouchableOpacity><Text style={styles.title}>Staff</Text></TouchableOpacity>
         </View>
       </LinearGradient>
       
@@ -66,14 +66,24 @@ const ParcelService = () => {
         
         
         <TouchableOpacity style={styles.card} onPress={handleSearch}>
-          <Fontisto name={"bus"}  size={55} color={"#32CD32" } style={styles.mmr}/>
-          <Text style={styles.cardText}>Drivers</Text>
+          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
+              <MaterialCommunityIcons name="steering" size={58} color="#F59E0B" />
+          </View>
+          <View style={styles.cardText}>
+            <Text style={styles.text1}>Drivers</Text>
+            <Text style={styles.text2}>Manage drivers accounts</Text>
+          </View>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.card1} onPress={handleSearch1}>
-          <Fontisto name={"bus"} size={55} color="#32CD32" style={styles.mmr}/>
-          <Text style={styles.cardText}>Conductors</Text>
+          <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
+              <Ionicons name="person-circle-outline" size={58} color="#8B5CF6" />
+          </View>
+          <View style={styles.cardText}>
+            <Text style={styles.text1}>Conductors</Text>
+            <Text style={styles.text2}>Manage conductor accounts</Text>
+          </View>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
 
@@ -208,7 +218,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     flex: 1,
-    maxHeight: '20%',
+    maxHeight: '15%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
@@ -227,7 +237,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     flex: 1,
-    maxHeight: '20%',
+    maxHeight: '15%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
@@ -242,23 +252,28 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
 
-  card2: {
+  iconWrap: {
+    width: 76,
+    height: 76,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
     marginLeft: 20,
-    marginRight: 20,
-    flex: 1,
-    maxHeight: '20%',
-    backgroundColor: '#FFF',
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    marginTop: 30,   
-    alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+  },
+
+  text1:{
+    fontSize: 24,
+    color: '#000000',
+    fontWeight: '600',
+  
+  },
+
+  text2:{
+    fontSize: 14,
+    color: '#7b7b7b',
+    fontWeight: '600',
+  
   },
 
   content: {

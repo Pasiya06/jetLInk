@@ -44,6 +44,9 @@ const AddBus = () => {
         emissionDate: params.emissionDate || "",
         busType: params.busType || "",
         busTypeTopic:params.busTypeTopic,
+        driverD:params.driverD,
+        conductorD: params.conductorD,
+        isOnline: params.isOnline,
 
         Aid: params.Aid,
         firstName: params.firstName,

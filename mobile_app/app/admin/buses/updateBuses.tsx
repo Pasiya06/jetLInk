@@ -104,8 +104,8 @@ const ToursScreen: React.FC = () => {
             <View style={styles.fieldContainer}>
                 <Text style={styles.label}>Chassis No</Text>
                 <View style={styles.inputWrapper}>
-                <View style={[styles.iconWrap, { backgroundColor: "#F725851A"  }]}>
-                    <MaterialCommunityIcons name="car-side" size={18} color="#F72585" />
+                <View style={[styles.iconWrap, { backgroundColor: "#06B6D418" }]}>
+                    <Ionicons name="barcode-outline" size={18} color="#06B6D4" />
                 </View>
                 <TextInput
                     style={styles.input}
@@ -122,8 +122,8 @@ const ToursScreen: React.FC = () => {
             <View style={styles.fieldContainer}>
                 <Text style={styles.label}>Engine No</Text>
                 <View style={styles.inputWrapper}>
-                <View style={[styles.iconWrap, { backgroundColor: "#FF9F1C1A"  }]}>
-                    <MaterialCommunityIcons name="engine" size={18} color="#FF9F1C" />
+                <View style={[styles.iconWrap, { backgroundColor: "#EF444418" }]}>
+                    <MaterialCommunityIcons name ="engine-outline" size={18} color="#EF4444" />
                 </View>
                 <TextInput
                     style={styles.input}
@@ -140,8 +140,8 @@ const ToursScreen: React.FC = () => {
             <View style={styles.fieldContainer}>
                 <Text style={styles.label}>Colour</Text>
                 <View style={styles.inputWrapper}>
-                <View style={[styles.iconWrap, { backgroundColor: "#2EC4B61A"  }]}>
-                    <MaterialCommunityIcons name="palette" size={18} color="#2EC4B6" />
+                <View style={[styles.iconWrap, { backgroundColor: "#EC489918" }]}>
+                    <Ionicons name="color-palette-outline" size={18} color="#EC4899" />
                 </View>
                 <TextInput
                     style={styles.input}
@@ -158,8 +158,8 @@ const ToursScreen: React.FC = () => {
             <View style={styles.fieldContainer}>
                 <Text style={styles.label}>Service Date</Text>
                 <View style={styles.inputWrapper}>
-                    <View style={[styles.iconWrap, { backgroundColor: "#7209B71A"  }]}>
-                        <MaterialCommunityIcons name="calendar-check" size={18} color="#7209B7" />
+                    <View style={[styles.iconWrap, { backgroundColor: "#10B98118" }]}>
+                        <Ionicons name="calendar-outline" size={18} color="#10B981" />
                     </View>
                     <TextInput
                         style={styles.input}
@@ -178,8 +178,8 @@ const ToursScreen: React.FC = () => {
             <View style={styles.fieldContainer}>
                 <Text style={styles.label}>License Date</Text>
                 <View style={styles.inputWrapper}>
-                    <View style={[styles.iconWrap, { backgroundColor: "#3A86FF1A"  }]}>
-                        <Ionicons name="calendar-clear" size={18} color="#3A86FF" />
+                    <View style={[styles.iconWrap, { backgroundColor: "#3B82F618" }]}>
+                        <Ionicons name="document-text-outline" size={18} color="#3B82F6" />
                     </View>
                     <TextInput
                         style={styles.input}
@@ -198,8 +198,8 @@ const ToursScreen: React.FC = () => {
             <View style={styles.fieldContainer}>
                 <Text style={styles.label}>Emission Date</Text>
                 <View style={styles.inputWrapper}>
-                    <View style={[styles.iconWrap, { backgroundColor: "#38B0001A"  }]}>
-                        <MaterialCommunityIcons name="leaf" size={18} color="#38B000" />
+                    <View style={[styles.iconWrap, { backgroundColor: "#84CC1618" }]}>
+                        <Ionicons name="leaf-outline" size={18} color="#84CC16" />
                     </View>
                     <TextInput
                         style={styles.input}
@@ -310,6 +310,9 @@ const ToursScreen: React.FC = () => {
                         emissionDate: params.emissionDate || "",
                         busType: params.busType || "",
                         busTypeTopic:params.busTypeTopic,
+                        driverD:params.driverD,
+                        conductorD: params.conductorD,
+                        isOnline: params.isOnline,
 
                         Aid: params.Aid,
                         firstName: params.firstName,
