@@ -161,7 +161,7 @@ const AddBus = () => {
                 <TextInput
                     style={styles.input}
                     value={chassisNo}
-                    onChangeText={(text) => setChassisNo(text.toUpperCase())}
+                    onChangeText={(text) => setChassisNo(text.replace(/\s/g, "").toUpperCase())}
                     placeholder="CHS987654321"
                     placeholderTextColor="#A0A5B1"
                     autoCapitalize="characters"
@@ -179,7 +179,7 @@ const AddBus = () => {
                 <TextInput
                     style={styles.input}
                     value={engineNo}
-                    onChangeText={(text) => setEngineNo(text.toUpperCase())}
+                    onChangeText={(text) => setEngineNo(text.replace(/\s/g, "").toUpperCase())}
                     placeholder="EN12345678"
                     placeholderTextColor="#A0A5B1"
                     autoCapitalize="characters"
@@ -197,7 +197,7 @@ const AddBus = () => {
                 <TextInput
                     style={styles.input}
                     value={colour}
-                    onChangeText={(text) => setColour(text.toUpperCase())}
+                    onChangeText={(text) => setColour(text.replace(/\s/g, "").toUpperCase())}
                     placeholder="GREEN"
                     placeholderTextColor="#A0A5B1"
                     autoCapitalize="characters"

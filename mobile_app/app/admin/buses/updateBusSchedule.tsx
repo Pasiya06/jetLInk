@@ -161,13 +161,25 @@ const ToursScreen: React.FC = () => {
 
                 <Text style={styles.label}>Depature location</Text>
                 <View style={styles.inputWrapper}>
-                    <TextInput style={styles.input} value={pickuploca} onChangeText={(text) => setpickuploca(text.replace(/\s/g, "").toUpperCase())}/>
+                    <TextInput 
+                      style={styles.input} 
+                      value={pickuploca} 
+                      onChangeText={(text) => setpickuploca(text.replace(/\s/g, "").toUpperCase())}
+                      autoCapitalize="characters"
+                      autoCorrect={false}
+                      />
                     <Text style={styles.inputIcon}>📍</Text>
                 </View>
 
                 <Text style={styles.label}>Arrival location</Text>
                 <View style={styles.inputWrapper}>
-                    <TextInput style={styles.input} value={dropoffloca} onChangeText={(text) => setdropoffloca(text.replace(/\s/g, "").toUpperCase())} />
+                    <TextInput 
+                      style={styles.input} 
+                      value={dropoffloca} 
+                      onChangeText={(text) => setdropoffloca(text.replace(/\s/g, "").toUpperCase())}
+                      autoCapitalize="characters"
+                      autoCorrect={false} 
+                    />
                     <Text style={styles.inputIcon}>📍</Text>
                 </View>
 
@@ -207,7 +219,13 @@ const ToursScreen: React.FC = () => {
 
                 <Text style={styles.label}>Stops</Text>
                 <View style={styles.inputWrapper}>
-                    <TextInput style={styles.input} value={stops} onChangeText={setstops} />
+                    <TextInput 
+                      style={styles.input} 
+                      value={stops} 
+                      onChangeText={(text) => setstops(text.replace(/\s/g, "").toUpperCase())}
+                      autoCapitalize="characters"
+                      autoCorrect={false}
+                      />
                     <Text style={styles.inputIcon}>📍</Text>
 
                 
