@@ -43,7 +43,7 @@ return (
       >
 
         <View style={styles.header}>          
-          <TouchableOpacity><Text style={styles.title}>{params.busTypeTopic}</Text></TouchableOpacity>          
+          <TouchableOpacity><Text style={styles.title}>Bus and Schedule</Text></TouchableOpacity>          
         </View>
 
       </LinearGradient>
