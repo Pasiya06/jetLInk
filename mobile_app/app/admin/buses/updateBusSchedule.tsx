@@ -96,6 +96,8 @@ const ToursScreen: React.FC = () => {
                 firstName: params.firstName,
                 lastName: params.lastName,
                 email: params.email,
+                busType: params.busType ,
+                busTypeTopic:params.busTypeTopic,
 
                 
                 }, 
@@ -272,6 +274,8 @@ const ToursScreen: React.FC = () => {
                     firstName: params.firstName,
                     lastName: params.lastName,
                     email: params.email,
+                    busType: params.busType ,
+                    busTypeTopic:params.busTypeTopic,
                 },                    
               });
             };}}>

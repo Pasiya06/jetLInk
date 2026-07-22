@@ -163,7 +163,7 @@ useFocusEffect(
         </LinearGradient>      
         
         <View style={styles.card}>
-
+          <Text style={styles.cardtitle}>Manage all Conductors</Text>
           <FlatList style={styles.svw}
             data={filteredConductors}
             renderItem={renderConductorItem}
@@ -310,19 +310,25 @@ const styles = StyleSheet.create({
     width: '100%',
     flex: 1,
     maxHeight: '60%',
-    //paddingTop:20,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#FFF',
     borderTopLeftRadius: 55,
     borderTopRightRadius: 55,
     marginTop: -50,   
     alignSelf: 'center',
-    
+  },
+
+  cardtitle:{
+    marginTop:10,
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#999797',
+    letterSpacing: 0.5,
   },
 
   svw: {
     width: '100%',
-    
-    //marginBottom:80,
     marginTop: 10, 
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,

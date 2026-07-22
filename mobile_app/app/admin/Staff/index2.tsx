@@ -170,7 +170,7 @@ useFocusEffect(
               
         
         <View style={styles.card}>
-
+          <Text style={styles.cardtitle}>Manage all Drivers</Text>
           <FlatList style={styles.svw}
             data={filtereddriversData}
             renderItem={renderBusItem}
@@ -317,22 +317,28 @@ const styles = StyleSheet.create({
   },
 
   card: {
+    alignItems: 'center',
+    justifyContent: 'center',
     width: '100%',
     flex: 1,
     maxHeight: '60%',
-    //paddingTop:20,
     backgroundColor: '#FFF',
     borderTopLeftRadius: 55,
     borderTopRightRadius: 55,
     marginTop: -50,   
-    alignSelf: 'center',
-    
+    alignSelf: 'center', 
+  },
+
+  cardtitle:{
+    marginTop:10,
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#999797',
+    letterSpacing: 0.5,
   },
 
   svw: {
     width: '100%',
-    
-    //marginBottom:80,
     marginTop: 10, 
     borderTopLeftRadius: 50,
     borderTopRightRadius: 50,

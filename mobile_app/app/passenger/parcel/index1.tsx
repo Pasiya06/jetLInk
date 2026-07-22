@@ -62,21 +62,31 @@ const ParcelService = () => {
 
       
       {/* Content Section */}
-      <View style={styles.content}>
+      
         
         {/* Action Buttons */}
         <TouchableOpacity style={styles.card} onPress={handleSearch}>
-          <MaterialCommunityIcons name="package-variant-closed" size={50} color="#32CD32" /*style={styles.pvc}*/ />
-          <Text style={styles.cardText}>Parcel Booking</Text>
+          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
+              <Feather name="gift" size={50} color="#F59E0B" />
+          </View>
+          <View style={styles.cardText}>
+            <Text style={styles.text1}>Booking</Text>
+            <Text style={styles.text2}>Send a parcel on the next available bus </Text>
+          </View>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card}>
-          <MaterialCommunityIcons name="map-marker-radius" size={50} color="#FF0000" /*style={styles.mmr}*//>
-          <Text style={styles.cardText}>Parcel Tracking</Text>
+        <TouchableOpacity style={styles.card1}>
+          <View style={[styles.iconWrap, { backgroundColor: "#FF000018" }]}>
+              <MaterialCommunityIcons name="map-marker-radius" size={50} color="#FF0000" />
+          </View>
+          <View style={styles.cardText}>
+            <Text style={styles.text1}>Tracking</Text>
+            <Text style={styles.text2}>Follow your parcel live from pickup to hand-off</Text>
+          </View>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
-      </View>
+      
 
       {isSearching ? (
                   <TextInput
@@ -236,25 +246,53 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   card: {
-    backgroundColor: '#ffffff',
-    width: "100%" ,
-    // height: "30%",
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 22,
-    borderWidth: 0.5,
-    borderColor: '#32CD32',
-     //justifyContent: 'space-between',
-    
-    // Shadow
-    elevation: 3,
+    marginLeft: 20,
+    marginRight: 20,
+    flex: 1,
+    maxHeight: '15%',
+    backgroundColor: '#FFF',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginTop: -50,   
+    alignSelf: 'center',
+    borderRadius: 20,
+    elevation: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
   },
+
+  card1: {
+    marginLeft: 20,
+    marginRight: 20,
+    flex: 1,
+    maxHeight: '15%',
+    backgroundColor: '#FFF',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginTop: 30,   
+    alignSelf: 'center',
+    borderRadius: 20,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+
+  iconWrap: {
+    width: 76,
+    height: 76,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    marginLeft: 20,
+  },
+
   cardText: {
     paddingHorizontal: 10,
     flex: 1,
@@ -262,31 +300,27 @@ const styles = StyleSheet.create({
     color: '#0047AB',
     fontWeight: '600',
   },
+
+  text1:{
+    fontSize: 24,
+    color: '#000000',
+    fontWeight: '600',
+  
+  },
+
+  text2:{
+    fontSize: 14,
+    color: '#7b7b7b',
+    fontWeight: '600',
+  
+  },
+  
   footer: {
     height: 250,
     alignItems: 'center',
     justifyContent: 'flex-end',
   },
-  footerCurve: {
-    position: 'absolute',
-    top: 0,
-    width: '100%',
-    height: 10,
-    backgroundColor: '#0047AB',
-    borderBottomWidth: 5,
-    borderBottomColor: '#32CD32',
-  },
-  busImage: {
-    width: '80%',
-    height: 150,
-    marginBottom: 20,
-  },
- 
-   subHeaderTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#0047AB',
-  },
+  
    bottomNav: {
     position: "absolute",
     bottom: 15,

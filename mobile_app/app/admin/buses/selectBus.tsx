@@ -144,6 +144,7 @@ const BusScreen: React.FC = () => {
               
         
         <View style={styles.card}>
+          <Text style={styles.cardtitle}>Select a bus for add schedule</Text>
           <FlatList style={styles.svw}
             data={filteredBusData}
             renderItem={renderBusItem}
@@ -175,7 +176,7 @@ const BusScreen: React.FC = () => {
 
                 else {
                   router.push({
-                    pathname: "/admin/buses/chooseBusType",
+                    pathname: "/admin/buses/showShedule",
                     params: {
                       Aid: params.Aid,
                       firstName: params.firstName,
@@ -280,13 +281,22 @@ const styles = StyleSheet.create({
   card: {
     width: '100%',
     flex: 1,
-    maxHeight: '80%',
-    //paddingTop:20,
+    maxHeight: '70%',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#FFF',
     borderTopLeftRadius: 55,
     borderTopRightRadius: 55,
     marginTop: -50,   
     alignSelf: 'center',
+  },
+
+  cardtitle:{
+    marginTop:10,
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#999797',
+    letterSpacing: 0.5,
   },
 
   svw: {

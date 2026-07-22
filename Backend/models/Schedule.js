@@ -42,6 +42,12 @@ const scheduleSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    busType: {
+      type: String,
+      required: true,
+    },
+
   },
   {
     timestamps: true,

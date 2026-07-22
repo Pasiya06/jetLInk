@@ -86,6 +86,7 @@ const AddBus = () => {
         arrivaltime,
         stops,
         busNo: busNumber,
+        busType:params.busType
       }),
     });
 

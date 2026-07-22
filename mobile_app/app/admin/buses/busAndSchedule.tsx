@@ -76,7 +76,7 @@ return (
           style={styles.card1} 
           onPress={() =>
             router.push({
-              pathname: "/admin/buses/showShedule",
+              pathname: "/admin/buses/chooseBusType",
               params: {
                 Aid: params.Aid,
                 firstName: params.firstName,

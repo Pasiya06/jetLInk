@@ -33,7 +33,7 @@ const ParcelService = () => {
     const router = useRouter();
     const handleSearch = () => {
       router.push({
-          pathname: "/admin/buses/selectBus", 
+          pathname: "/admin/buses/showShedule", 
            params: {
                   
                   Aid: params.Aid,
@@ -48,7 +48,7 @@ const ParcelService = () => {
 
     const handleSearch1 = () => {
       router.push({
-          pathname: "/admin/buses/selectBus", 
+          pathname: "/admin/buses/showShedule", 
            params: {
                   
                   Aid: params.Aid,
@@ -128,7 +128,7 @@ const ParcelService = () => {
 
                 else {
                   router.push({
-                    pathname: "/admin/buses/showShedule",
+                    pathname: "/admin/buses/busAndSchedule",
                     params: {
                       Aid: params.Aid,
                       firstName: params.firstName,

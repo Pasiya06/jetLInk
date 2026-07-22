@@ -262,7 +262,7 @@ const login = async () => {
                 <>
                   <View style={styles.card1}>
                   <View style={styles.formContainer}>
-                    <Text style={styles.inputLabel}>Password</Text>
+                    <Text style={styles.inputLabel}>Passcode</Text>
                 <View style={styles.inputWrapper}>
                 <View style={[styles.iconWrap, { backgroundColor: "#FF9F1C1A"  }]}>
                   <EvilIcons name="lock" size={28} color="#FF9F1C" />
@@ -280,7 +280,7 @@ const login = async () => {
                   />
                 </View>
                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-                  <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color="#000000" />
+                  <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color="#A3A3A3" />
                 </TouchableOpacity>
               </View>
                   </View>

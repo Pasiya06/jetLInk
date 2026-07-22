@@ -17,10 +17,14 @@ import {
   Ionicons, 
   MaterialIcons, 
   FontAwesome, 
-  Feather 
+  Feather,
+  FontAwesome5,
+  MaterialCommunityIcons,
+  SimpleLineIcons 
 } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from 'expo-linear-gradient';
+import { BiTrip } from "react-icons/bi";
 
 
 
@@ -133,10 +137,12 @@ export default function Index() {
                   email: params.email,
                 },
               })} >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-bus-94.png")} style={styles.input3dIcon1} />
+                
+              <View style={[styles.iconContainer, { backgroundColor: "#8B5CF618"  }]}>
+                <FontAwesome5 name="bus-alt" size={24} color="#8B5CF6" />
               </View>
               <Text style={styles.cardText}>Buses</Text>
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card2} onPress={() => router.push({
@@ -148,17 +154,20 @@ export default function Index() {
                   email: params.email,
                 },
               })} >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-package-94.png")} style={styles.input3dIcon} />
+          
+              <View style={[styles.iconContainer, { backgroundColor: "#ffc40018"  }]}>
+                <Feather name="gift" size={24} color="#ffc400" />
               </View>
               <Text style={styles.cardText}>Parcel</Text>
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card1} onPress={() => router.push("/admin/buses/index1")} >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-beach-94.png")} style={styles.input3dIcon} />
+              <View style={[styles.iconContainer, { backgroundColor: "#EC489918"  }]}>
+                <FontAwesome5 name="route" size={24} color="#EC4899" />
               </View>
-              <Text style={styles.cardText}>Tours</Text>              
+              <Text style={styles.cardText}>Tours</Text>  
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />            
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card2} onPress={() => router.push({
@@ -171,10 +180,12 @@ export default function Index() {
                 },
               })} >
                 
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-users-94.png")} style={styles.input3dIcon} />
+              <View style={[styles.iconContainer, { backgroundColor: "#10B98118"  }]}>
+                <SimpleLineIcons name="people" size={24} color="#10B981" />
               </View>
-              <Text style={styles.cardText}>Passengers</Text>              
+              
+              <Text style={styles.cardText}>Passengers</Text>
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />              
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card1} onPress={() => router.push({
@@ -186,17 +197,19 @@ export default function Index() {
                   email: params.email,
                 },
               })} >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-administrator-94.png")} style={styles.input3dIcon} />
+              <View style={[styles.iconContainer, { backgroundColor: "#84CC1618"  }]}>
+                <SimpleLineIcons name="people" size={24} color="#84CC16" />
               </View>
-              <Text style={styles.cardText}>Staff</Text>              
+              <Text style={styles.cardText}>Staff</Text> 
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />             
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card2} onPress={() => router.push("/admin/buses/index1")} >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-hospital-94.png")} style={styles.input3dIcon} />
+              <View style={[styles.iconContainer, { backgroundColor: "#ff000018"  }]}>
+                <MaterialCommunityIcons name="alarm-light-outline" size={24} color="#ff0000" />
               </View>
               <Text style={styles.cardText}>Emergency</Text>
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
         </View>
 
@@ -374,6 +387,8 @@ const styles = StyleSheet.create({
   },
 
   card1: {
+    paddingLeft:10,
+    flexDirection: 'row',
     backgroundColor: '#ffffff',
     width: '48%',
     height: 100,
@@ -381,10 +396,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderRadius: 16,
     marginBottom: 15,
-    borderLeftWidth: 6,
-    borderTopColor: '#32CD32',
-    borderTopWidth: 2,
-    borderLeftColor: '#32CD32',
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -393,6 +404,8 @@ const styles = StyleSheet.create({
   },
 
   card2: {
+    paddingLeft:10,
+    flexDirection: 'row',
     backgroundColor: '#ffffff',
     width: '48%',
     height: 100,
@@ -400,10 +413,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderRadius: 16,
     marginBottom: 15,
-    borderTopColor: '#32CD32',
-    borderTopWidth: 2,
-    borderRightWidth: 6,
-    borderRightColor: '#32CD32',
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -436,14 +445,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 15,
+    marginRight: 9,
   },
 
   cardText: {
     flex: 1,
-    fontSize: 17,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#0047AB',
+    color: '#000000',
   },
  
   bottomNav: {

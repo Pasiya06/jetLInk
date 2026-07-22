@@ -72,7 +72,7 @@ const JetLinkInterface: React.FC = () => {
       { name: 'UPAY', icon: 'credit-card-wireless-outline' },
     ];
 
-    const handlePayment = async () => {
+    const processPayment = async () => {
       try {
         const response = await fetch(`${API_URL}/payment/pay`, {
           method: "POST",
@@ -167,6 +167,24 @@ const JetLinkInterface: React.FC = () => {
         console.log(error);
         Alert.alert("Error", "Unable to connect to the server.");
       }
+    };
+
+    const handlePayment = () => {
+      Alert.alert(
+        "Confirm Payment",
+        "Are you sure you want to proceed with this payment?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Pay Now",
+            onPress: processPayment,
+          },
+        ],
+        { cancelable: true }
+      );
     };
  
     return (

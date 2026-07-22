@@ -288,13 +288,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     alignItems: 'center',
   },
-
-  mmr:{
-    marginRight: 10,
-    marginLeft: 20,
-  },
-
-  
    
   bottomNav: {
     position: "absolute",

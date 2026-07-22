@@ -20,7 +20,8 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
   Feather,
-  FontAwesome
+  FontAwesome,
+  FontAwesome5,
 } from '@expo/vector-icons';
 import * as Location from "expo-location";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -529,11 +530,8 @@ export default function DriverHome() {
             style={styles.card0}
             onPress={() => router.push("/busStaff/index1")}
           >
-            <View style={styles.iconContainer}>
-              <Image
-                source={require("../../assets/images/icons8-bus-94.png")}
-                style={styles.input3dIcon1}
-              />
+            <View style={[styles.iconContainer, { backgroundColor: "#8B5CF618"  }]}>
+              <FontAwesome5 name="bus-alt" size={24} color="#8B5CF6" />
             </View>
             <Text style={styles.cardText}>Scan Bus Ticket</Text>
             <MaterialCommunityIcons
@@ -550,52 +548,44 @@ export default function DriverHome() {
             style={styles.card1}
             onPress={stopSharing}
           >
-            <View style={styles.iconContainer}>
-              <Image
-                source={require("../../assets/images/icons8-package-94.png")}
-                style={styles.input3dIcon}
-              />
+            <View style={[styles.iconContainer, { backgroundColor: "#ffc40018"  }]}>
+              <Feather name="gift" size={24} color="#ffc400" />
             </View>
             <Text style={styles.cardText}>Parcel</Text>
+            <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.card2}
             onPress={() => router.push("/busStaff/index1")}
           >
-            <View style={styles.iconContainer}>
-              <Image
-                source={require("../../assets/images/icons8-beach-94.png")}
-                style={styles.input3dIcon}
-              />
+            <View style={[styles.iconContainer, { backgroundColor: "#EC489918"  }]}>
+              <FontAwesome5 name="route" size={24} color="#EC4899" />
             </View>
-            <Text style={styles.cardText}>Tours</Text>
+            <Text style={styles.cardText}>Tours</Text>  
+            <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.card1}
             onPress={() => router.push("/busStaff/index1")}
           >
-            <View style={styles.iconContainer}>
-              <Image
-                source={require("../../assets/images/icons8-hospital-94.png")}
-                style={styles.input3dIcon}
-              />
+            <View style={[styles.iconContainer, { backgroundColor: "#ff000018"  }]}>
+              <MaterialCommunityIcons name="alarm-light-outline" size={24} color="#ff0000" />
             </View>
             <Text style={styles.cardText}>Emergency</Text>
+            <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.card2}
             onPress={() => router.push("/busStaff/index1")}
           >
-            <View style={styles.iconContainer}>
-              <Image
-                source={require("../../assets/images/icons8-help-94.png")}
-                style={styles.input3dIcon}
-              />
-            </View>
-            <Text style={styles.cardText}>Help</Text>
+            <View style={[styles.iconContainer, { backgroundColor: "#10B98118"  }]}>
+                <FontAwesome5 name="hands-helping" size={24} color="#10B981" />
+              </View>
+              <Text style={styles.cardText}>Help</Text>
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
         </View>
 
@@ -633,12 +623,17 @@ export default function DriverHome() {
                   <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
                             pathname: "/admin/index1",
                             params: {
-                              Pid: params.Pid,
-                              Pid1: params.Pid1,
-                              pfirstName: params.pfirstName,
-                              plastName:params.plastName,
-                              pphoneNumber: params.pphoneNumber,
-                              pemail: params.pemail,
+                              Cid: params.Cid,
+                              conductorId: params.conductorId,
+                              conductorNIC:params.conductorNIC,
+                              cfirstName: params.cfirstName,
+                              clastName: params.clastName,
+                              cphoneNumber:params.cphoneNumber,
+                              driverId:params.driverId,
+                              dfirstName:params.dfirstName,
+                              dlastName:params.dlastName,
+                              dphoneNumber:params.dphoneNumber,
+                              busNo: params.busNo,
                             },                    
                           });}} > 
                     <Ionicons name="home-outline" size={28} color="#fff" />             
@@ -859,12 +854,6 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     marginBottom: 12,
-    borderLeftWidth: 6,
-    borderRightWidth: 6,
-    borderTopWidth: 2,
-    borderLeftColor: "#32CD32",
-    borderRightColor: "#32CD32",
-    borderTopColor: "#32CD32",
     elevation: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
@@ -879,37 +868,34 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   card1: {
-    backgroundColor: "#ffffff",
-    width: "48%",
+    paddingLeft:10,
+    flexDirection: 'row',
+    backgroundColor: '#ffffff',
+    width: '48%',
     height: 100,
-    alignItems: "center",
-    justifyContent: "space-between",
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderRadius: 16,
     marginBottom: 15,
-    borderLeftWidth: 6,
-    borderTopColor: "#32CD32",
-    borderTopWidth: 2,
-    borderLeftColor: "#32CD32",
     elevation: 8,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
   },
+
   card2: {
-    backgroundColor: "#ffffff",
-    width: "48%",
+    paddingLeft:10,
+    flexDirection: 'row',
+    backgroundColor: '#ffffff',
+    width: '48%',
     height: 100,
-    alignItems: "center",
-    justifyContent: "space-between",
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderRadius: 16,
     marginBottom: 15,
-    borderTopColor: "#32CD32",
-    borderTopWidth: 2,
-    borderRightWidth: 6,
-    borderRightColor: "#32CD32",
     elevation: 8,
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
@@ -918,10 +904,11 @@ const styles = StyleSheet.create({
     width: 45,
     height: 45,
     borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 9,
   },
+
   input3dIcon: {
     marginRight: 12,
     marginLeft: 19,
@@ -940,7 +927,7 @@ const styles = StyleSheet.create({
   },
   cardText: {
     flex: 1,
-    fontSize: 17,
+    fontSize: 14,
     fontWeight: "600",
     color: "#0047AB",
   },

@@ -67,27 +67,31 @@ export default function Index() {
         
        
         
-        {/* List Section */}
-        <ScrollView contentContainerStyle={styles.ScrollContainer}>
-        <View style={styles.listContainer}>
+      
           
           <TouchableOpacity style={styles.card} onPress={() => router.push("/passenger/index2")} >
-              <View style={styles.iconContainer}>
-                <MaterialIcons name="people"  size={22} color={"#32CD32" } />
+              <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
+                  <Ionicons name="person-circle-outline" size={50} color="#F59E0B" />
               </View>
-              <Text style={styles.cardText}>Passenger</Text>
+              <View style={styles.cardText}>
+                <Text style={styles.text1}>Passenger</Text>
+                <Text style={styles.text2}>Book bus tickets, parcels, tours</Text>
+              </View>
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card} onPress={() => router.push("/busStaff/loginindex")} >
-              <View style={styles.iconContainer}>
-                <Fontisto name="bus" size={22} color={"#FFA500" } />
+          <TouchableOpacity style={styles.card1} onPress={() => router.push("/busStaff/loginindex")} >
+              <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
+                  <Fontisto name="bus" size={50} color="#8B5CF6" />
               </View>
-              <Text style={styles.cardText}>Bus</Text>
+              <View style={styles.cardText}>
+                <Text style={styles.text1}>Bus</Text>
+                <Text style={styles.text2}>Manage parcels, trips, scan tickets</Text>
+              </View>
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
-            {/* <TouchableOpacity style={styles.card} onPress={() => router.push("/busStaff/scanParcel")} >
+            {/* <TouchableOpacity style={styles.card} onPress={() => router.push("/admin/index21")} >
               <View style={styles.iconContainer}>
                 <MaterialIcons name={"tour"}  size={22} color={"#FF0000" } />
               </View>
@@ -111,10 +115,7 @@ export default function Index() {
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity> */}
 
-          
-        </View>
-
-        </ScrollView>
+        
 
         {/* Footer */}
         <View style={styles.footerGraphic}>
@@ -172,40 +173,73 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   card: {
-    backgroundColor: '#ffffff',
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
-    borderWidth: 0.5,
-    borderColor: '#32CD32',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4, },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-  },
-  card1: {
-    
-    backgroundColor: '#0047AB',
-    flexDirection: 'row',
-    
-    paddingLeft:10,
-    paddingBottom:80,
-    borderRadius: 16,
-    
     marginLeft: 20,
     marginRight: 20,
-    marginBottom: 20,
-    marginTop: 22,
-    borderWidth: 0.5,
-    borderColor: '#0047AB',
-    elevation: 8,
+    flex: 1,
+    maxHeight: '15%',
+    backgroundColor: '#FFF',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginTop: -50,   
+    alignSelf: 'center',
+    borderRadius: 20,
+    elevation: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4, },
+    shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.2,
-    shadowRadius: 6,
+    shadowRadius: 5,
+  },
+
+  card1: {
+    marginLeft: 20,
+    marginRight: 20,
+    flex: 1,
+    maxHeight: '15%',
+    backgroundColor: '#FFF',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginTop: 30,   
+    alignSelf: 'center',
+    borderRadius: 20,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+
+  iconWrap: {
+    width: 76,
+    height: 76,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    marginLeft: 20,
+  },
+
+  cardText: {
+    paddingHorizontal: 10,
+    flex: 1,
+    fontSize: 24,
+    color: '#0047AB',
+    fontWeight: '600',
+  },
+
+  text1:{
+    fontSize: 24,
+    color: '#000000',
+    fontWeight: '600',
+  
+  },
+
+  text2:{
+    fontSize: 14,
+    color: '#7b7b7b',
+    fontWeight: '600',
+  
   },
   title1: {
     color: '#ffffff',
@@ -220,12 +254,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 15,
   },
-  cardText: {
-    flex: 1,
-    fontSize: 17,
-    fontWeight: '600',
-    color: '#0047AB',
-  },
+  
   ScrollContainer:{
     paddingBottom: 70,
     

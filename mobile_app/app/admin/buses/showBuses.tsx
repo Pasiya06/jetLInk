@@ -230,6 +230,7 @@ const BusScreen: React.FC = () => {
               
         
         <View style={styles.card}>
+          <Text style={styles.cardtitle}>Manage all buses</Text>
           <FlatList style={styles.svw}
             data={filteredBusData}
             renderItem={renderBusItem}
@@ -378,13 +379,22 @@ const styles = StyleSheet.create({
     width: '100%',
     flex: 1,
     maxHeight: '60%',
-    //paddingTop:20,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#FFF',
     borderTopLeftRadius: 55,
     borderTopRightRadius: 55,
     marginTop: -50,   
     alignSelf: 'center',
     
+  },
+
+  cardtitle:{
+    marginTop:10,
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#999797',
+    letterSpacing: 0.5,
   },
 
   svw: {
@@ -408,8 +418,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     marginBottom: 12,
-    borderWidth: 0.5,
-    borderColor: '#32CD32',
+    
    
     elevation: 8,
     shadowColor: '#000',
