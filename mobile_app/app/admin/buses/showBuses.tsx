@@ -298,12 +298,10 @@ const BusScreen: React.FC = () => {
           <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
                         pathname: "/admin/index1",
                         params: {
-                        Pid: params.Pid,
-                        Pid1: params.Pid1,
-                        pfirstName: params.pfirstName,
-                        plastName:params.plastName,
-                        pphoneNumber: params.pphoneNumber,
-                        pemail: params.pemail,
+                          Aid: params.Aid,
+                          firstName: params.firstName,
+                          lastName: params.lastName,
+                          email: params.email,
                         },                    
                     });}} > 
                 <Ionicons name="home-outline" size={28} color="#fff" />             
