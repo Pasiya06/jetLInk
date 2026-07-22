@@ -929,7 +929,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     fontWeight: "600",
-    color: "#0047AB",
+    color: "#000000",
   },
 
   // ── Footer ────────────────────────────────────────────────────────
