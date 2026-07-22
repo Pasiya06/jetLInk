@@ -15,7 +15,8 @@ import {
   MaterialCommunityIcons, 
   Fontisto, 
   FontAwesome, 
-  Feather 
+  Feather,
+  AntDesign 
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient'; 
 
@@ -96,20 +97,35 @@ const ParcelService = () => {
         
         
         <TouchableOpacity style={styles.card} onPress={handleSearch}>
-          <Fontisto name={"bus"}  size={55} color={"#32CD32" } style={styles.mmr}/>
-          <Text style={styles.cardText}>Normal Way</Text>
+          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
+              <Fontisto name={"bus"} size={50} color="#F59E0B" />
+          </View>
+          <View style={styles.cardText}>
+            <Text style={styles.text1}>Normal Way</Text>
+            <Text style={styles.text2}>Manage normal way buses </Text>
+          </View>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.card1} onPress={handleSearch1}>
-          <Fontisto name={"bus"} size={55} color="#f49e00" style={styles.mmr}/>
-          <Text style={styles.cardText}>High Way</Text>
+          <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
+              <Fontisto name={"bus"} size={50} color="#8B5CF6" />
+          </View>
+          <View style={styles.cardText}>
+            <Text style={styles.text1}>High Way</Text>
+            <Text style={styles.text2}>Manage high way buses </Text>
+          </View>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.card2} onPress={handleSearch2}>
-          <Fontisto name={"bus"} size={55} color="#7209B7" style={styles.mmr}/>
-          <Text style={styles.cardText}>Tour</Text>
+          <View style={[styles.iconWrap, { backgroundColor: "#32CD3218" }]}>
+              <Fontisto name={"bus"} size={50} color="#32CD32" />
+          </View>
+          <View style={styles.cardText}>
+            <Text style={styles.text1}>Tour</Text>
+            <Text style={styles.text2}>Manage tour buses </Text>
+          </View>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
         
@@ -243,7 +259,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     flex: 1,
-    maxHeight: '20%',
+    maxHeight: '15%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
@@ -262,7 +278,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     flex: 1,
-    maxHeight: '20%',
+    maxHeight: '15%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
@@ -281,7 +297,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     flex: 1,
-    maxHeight: '20%',
+    maxHeight: '15%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
@@ -296,6 +312,38 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
 
+  iconWrap: {
+    width: 76,
+    height: 76,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    marginLeft: 20,
+  },
+
+  cardText: {
+    paddingHorizontal: 10,
+    flex: 1,
+    fontSize: 24,
+    color: '#0047AB',
+    fontWeight: '600',
+  },
+
+  text1:{
+    fontSize: 24,
+    color: '#000000',
+    fontWeight: '600',
+  
+  },
+
+  text2:{
+    fontSize: 14,
+    color: '#7b7b7b',
+    fontWeight: '600',
+  
+  },
+
   content: {
     flex: 1,
     paddingHorizontal: 30,
@@ -308,13 +356,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
 
-  cardText: {
-    paddingHorizontal: 10,
-    flex: 1,
-    fontSize: 24,
-    color: '#0047AB',
-    fontWeight: '600',
-  },
+  
    
   bottomNav: {
     position: "absolute",

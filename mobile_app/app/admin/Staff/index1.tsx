@@ -262,6 +262,14 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
 
+  cardText: {
+    paddingHorizontal: 10,
+    flex: 1,
+    fontSize: 24,
+    color: '#0047AB',
+    fontWeight: '600',
+  },
+
   text1:{
     fontSize: 24,
     color: '#000000',
@@ -288,13 +296,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
 
-  cardText: {
-    paddingHorizontal: 10,
-    flex: 1,
-    fontSize: 24,
-    color: '#0047AB',
-    fontWeight: '600',
-  },
+  
    
   bottomNav: {
     position: "absolute",

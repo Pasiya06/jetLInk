@@ -62,8 +62,13 @@ return (
             }
           style={styles.card} 
         >
-          <AntDesign name="profile" size={33} color="#32CD32" />
-          <Text style={styles.menuLabel}>Profile</Text>
+          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
+              <AntDesign name="profile" size={50} color="#F59E0B" />
+          </View>
+          <View style={styles.cardText}>
+            <Text style={styles.text1}>Profile</Text>
+            <Text style={styles.text2}>Manage bus profile</Text>
+          </View>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
  
@@ -81,8 +86,13 @@ return (
             })
           }
         >
-          <AntDesign name="schedule" size={33} color="#FFA500" />
-          <Text style={styles.menuLabel}>Schedule</Text>
+          <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
+              <AntDesign name="schedule" size={50} color="#8B5CF6" />
+          </View>
+          <View style={styles.cardText}>
+            <Text style={styles.text1}>Schedule</Text>
+            <Text style={styles.text2}>Manage bus schedule</Text>
+          </View>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
 
@@ -223,7 +233,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     flex: 1,
-    maxHeight: '20%',
+    maxHeight: '15%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
@@ -242,7 +252,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     flex: 1,
-    maxHeight: '20%',
+    maxHeight: '15%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
@@ -257,23 +267,36 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
 
-  card2: {
+  iconWrap: {
+    width: 76,
+    height: 76,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
     marginLeft: 20,
-    marginRight: 20,
+  },
+
+  cardText: {
+    paddingHorizontal: 10,
     flex: 1,
-    maxHeight: '20%',
-    backgroundColor: '#FFF',
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    marginTop: 30,   
-    alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    fontSize: 24,
+    color: '#0047AB',
+    fontWeight: '600',
+  },
+
+  text1:{
+    fontSize: 24,
+    color: '#000000',
+    fontWeight: '600',
+  
+  },
+
+  text2:{
+    fontSize: 14,
+    color: '#7b7b7b',
+    fontWeight: '600',
+  
   },
 
   menuLabel: {
