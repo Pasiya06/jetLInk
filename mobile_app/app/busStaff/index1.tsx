@@ -297,44 +297,28 @@ export default function DriverHome() {
   // 5. Auto-ask on screen load if busNum exists
   // ────────────────────────────────────────────────────────────────
   useEffect(() => {
+    const backAction = () => {
+      logout();
+      return true;
+    };
 
-        const backAction = () => {
-        
-        logout(); // Navigate to a specific path
-        return true; // Prevent default back behavior
-      };
-  
-      const subscription = BackHandler.addEventListener(
-        "hardwareBackPress",
-        backAction
-      );
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
 
     if (!busNum) {
       console.log("No busNum in params — sharing skipped.");
-      return;
+      return () => subscription.remove();
     }
 
-    Alert.alert(
-      "📍 Location Sharing",
-      `Start sharing location for Bus ${busNum}?`,
-      [
-        {
-          text: "No",
-          style: "cancel",
-          onPress: () => {
-            setLocationName("Location sharing declined");
-          },
-        },
-        {
-          text: "Yes",
-          onPress: startSharing,
-        },
-      ],
-      { cancelable: false }
-    );
+    // Start sharing automatically
+    startSharing();
 
     // Cleanup on unmount
     return () => {
+      subscription.remove();
+
       if (locationInterval.current) {
         clearInterval(locationInterval.current);
         locationInterval.current = null;
@@ -412,7 +396,9 @@ export default function DriverHome() {
   };
 
   const handleSearch = () => {
+      stopSharing();
       router.push({
+
         pathname: "/busStaff/manageParcel",
         params: {
             Cid: params.Cid,

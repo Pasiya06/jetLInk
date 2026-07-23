@@ -1,189 +1,282 @@
-// import React from 'react';
-// import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-// import { Ionicons } from '@expo/vector-icons';
+import React, { useRef, useState } from "react";
+import {
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  Platform,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { Ionicons } from "@expo/vector-icons";
+import QRCode from "react-native-qrcode-svg";
+import ViewShot from "react-native-view-shot";
+import * as Sharing from "expo-sharing";
 
-// const BusScheduleCard = ({ item, onDelete }) => {
-//   return (
-//     <View style={styles.card}>
-//       {/* Bus number + date pill row */}
-//       <View style={styles.topRow}>
-//         <View style={styles.busNoPill}>
-//           <Ionicons name="bus" size={14} color="#4B7BEC" />
-//           <Text style={styles.busNoText}>{item.busNo}</Text>
-//         </View>
-//         <Text style={styles.dateText}>{item.busdate}</Text>
-//       </View>
+interface ParcelQRDialogProps {
+  visible: boolean;
+  onClose: () => void;
+  qrToken: string;
+  error?: string | null;
+  parcelId?: string;
+  loading?: boolean;
+}
 
-//       {/* Route visual */}
-//       <View style={styles.routeRow}>
-//         <View style={styles.routeLine}>
-//           <View style={styles.dotFilled} />
-//           <View style={styles.connector} />
-//           <View style={styles.dotOutline} />
-//         </View>
+export default function ParcelQRDialog({
+  visible,
+  onClose,
+  qrToken,
+  error,
+  parcelId,
+  loading,
+}: ParcelQRDialogProps) {
+  const viewShotRef = useRef<ViewShot>(null);
+  const [sharing, setSharing] = useState(false);
 
-//         <View style={styles.routeDetails}>
-//           <View style={styles.routeStop}>
-//             <Text style={styles.locationText}>{item.pickuploca}</Text>
-//             <Text style={styles.timeText}>{item.depaturetime}</Text>
-//           </View>
+  const handleShare = async () => {
+    if (!viewShotRef.current) return;
+    try {
+      setSharing(true);
+      const uri = await viewShotRef.current.capture?.();
+      if (!uri) return;
 
-//           <View style={[styles.routeStop, { marginTop: 22 }]}>
-//             <Text style={styles.locationText}>{item.dropoffloca}</Text>
-//             <Text style={styles.timeText}>{item.arrivaltime}</Text>
-//           </View>
-//         </View>
-//       </View>
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (!isAvailable) {
+        alert("Sharing isn't available on this device");
+        return;
+      }
 
-//       {/* Stops row */}
-//       <View style={styles.infoRow}>
-//         <View style={styles.iconWrap}>
-//           <Ionicons name="location-outline" size={16} color="#4B7BEC" />
-//         </View>
-//         <View style={{ flex: 1 }}>
-//           <Text style={styles.infoLabel}>Stops</Text>
-//           <Text style={styles.infoValue}>{item.stops}</Text>
-//         </View>
-//       </View>
+      await Sharing.shareAsync(uri, {
+        mimeType: "image/png",
+        dialogTitle: "Share Parcel QR Code",
+        UTI: "public.png",
+      });
+    } catch (err) {
+      console.log("Share error:", err);
+    } finally {
+      setSharing(false);
+    }
+  };
 
-//       {/* Delete button */}
-//       <TouchableOpacity
-//         style={styles.deleteBtn}
-//         onPress={() => onDelete(item.scheduleId)}
-//       >
-//         <Ionicons name="trash-outline" size={18} color="#FF5252" />
-//       </TouchableOpacity>
-//     </View>
-//   );
-// };
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+    >
+      <View style={styles.backdrop}>
+        <View style={styles.card}>
+          {/* Gradient header */}
+          <LinearGradient
+            colors={["#4C6EF5", "#7C3AED"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.header}
+          >
+            <View style={styles.iconCircle}>
+              <Ionicons name="cube-outline" size={26} color="#4C6EF5" />
+            </View>
+            <Text style={styles.headerTitle}>Parcel QR Code</Text>
+            {parcelId && (
+              <Text style={styles.headerSubtitle}>ID: {parcelId}</Text>
+            )}
 
-// const styles = StyleSheet.create({
-//   card: {
-//     backgroundColor: '#FFFFFF',
-//     borderRadius: 18,
-//     padding: 18,
-//     marginVertical: 8,
-//     marginHorizontal: 16,
-//     shadowColor: '#000',
-//     shadowOffset: { width: 0, height: 4 },
-//     shadowOpacity: 0.06,
-//     shadowRadius: 10,
-//     elevation: 3,
-//   },
-//   topRow: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     marginBottom: 16,
-//   },
-//   busNoPill: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     backgroundColor: '#EAF1FF',
-//     paddingHorizontal: 10,
-//     paddingVertical: 5,
-//     borderRadius: 20,
-//     gap: 6,
-//   },
-//   busNoText: {
-//     color: '#4B7BEC',
-//     fontWeight: '700',
-//     fontSize: 13,
-//   },
-//   dateText: {
-//     color: '#8A94A6',
-//     fontSize: 13,
-//     fontWeight: '500',
-//   },
-//   routeRow: {
-//     flexDirection: 'row',
-//     marginBottom: 16,
-//   },
-//   routeLine: {
-//     alignItems: 'center',
-//     width: 20,
-//     marginRight: 12,
-//   },
-//   dotFilled: {
-//     width: 10,
-//     height: 10,
-//     borderRadius: 5,
-//     backgroundColor: '#4B7BEC',
-//   },
-//   connector: {
-//     width: 2,
-//     flex: 1,
-//     minHeight: 30,
-//     backgroundColor: '#D8E2F5',
-//     marginVertical: 4,
-//   },
-//   dotOutline: {
-//     width: 10,
-//     height: 10,
-//     borderRadius: 5,
-//     borderWidth: 2,
-//     borderColor: '#4B7BEC',
-//     backgroundColor: '#FFFFFF',
-//   },
-//   routeDetails: {
-//     flex: 1,
-//     justifyContent: 'space-between',
-//   },
-//   routeStop: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'flex-start',
-//   },
-//   locationText: {
-//     fontSize: 15,
-//     fontWeight: '700',
-//     color: '#1A1F36',
-//     flex: 1,
-//     marginRight: 8,
-//   },
-//   timeText: {
-//     fontSize: 13,
-//     fontWeight: '600',
-//     color: '#4B7BEC',
-//   },
-//   infoRow: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     backgroundColor: '#F7F9FC',
-//     borderRadius: 12,
-//     padding: 10,
-//     marginTop: 4,
-//   },
-//   iconWrap: {
-//     width: 28,
-//     height: 28,
-//     borderRadius: 14,
-//     backgroundColor: '#EAF1FF',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//     marginRight: 10,
-//   },
-//   infoLabel: {
-//     fontSize: 11,
-//     color: '#8A94A6',
-//     fontWeight: '600',
-//   },
-//   infoValue: {
-//     fontSize: 13,
-//     color: '#1A1F36',
-//     fontWeight: '500',
-//   },
-//   deleteBtn: {
-//     position: 'absolute',
-//     top: 16,
-//     right: 16,
-//     width: 30,
-//     height: 30,
-//     borderRadius: 15,
-//     backgroundColor: '#FFF0F0',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// });
+            <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+              <Ionicons name="close" size={20} color="#fff" />
+            </TouchableOpacity>
+          </LinearGradient>
 
-// export default BusScheduleCard;
+          {/* Body */}
+          <View style={styles.body}>
+            {loading ? (
+              <ActivityIndicator size="large" color="#4C6EF5" />
+            ) : error ? (
+              <View style={styles.errorBox}>
+                <Ionicons name="alert-circle-outline" size={36} color="#EF4444" />
+                <Text style={styles.errorText}>{error}</Text>
+              </View>
+            ) : qrToken ? (
+              <>
+                <ViewShot
+                  ref={viewShotRef}
+                  options={{ format: "png", quality: 1 }}
+                  style={styles.qrWrapper}
+                >
+                  <View style={styles.qrInner}>
+                    <QRCode value={qrToken} size={200} />
+                  </View>
+                </ViewShot>
+
+                <Text style={styles.helperText}>
+                  Show this code to the courier for verification
+                </Text>
+
+                <View style={styles.actionsRow}>
+                  <TouchableOpacity
+                    style={[styles.actionBtn, styles.shareBtn]}
+                    onPress={handleShare}
+                    disabled={sharing}
+                  >
+                    {sharing ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <>
+                        <Ionicons name="share-social-outline" size={18} color="#fff" />
+                        <Text style={styles.shareBtnText}>Share</Text>
+                      </>
+                    )}
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[styles.actionBtn, styles.closeActionBtn]}
+                    onPress={onClose}
+                  >
+                    <Text style={styles.closeActionBtnText}>Done</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
+            ) : null}
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+const styles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    backgroundColor: "rgba(15, 15, 25, 0.55)",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 24,
+  },
+  card: {
+    width: "100%",
+    maxWidth: 380,
+    borderRadius: 24,
+    backgroundColor: "#fff",
+    overflow: "hidden",
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.25,
+        shadowRadius: 20,
+      },
+      android: { elevation: 12 },
+    }),
+  },
+  header: {
+    paddingTop: 28,
+    paddingBottom: 22,
+    paddingHorizontal: 20,
+    alignItems: "center",
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
+  },
+  iconCircle: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: "#fff",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    ...Platform.select({
+      ios: {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 6,
+      },
+      android: { elevation: 4 },
+    }),
+  },
+  headerTitle: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  headerSubtitle: {
+    color: "rgba(255,255,255,0.85)",
+    fontSize: 12,
+    marginTop: 4,
+  },
+  closeBtn: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: "rgba(255,255,255,0.2)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  body: {
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    paddingBottom: 26,
+    alignItems: "center",
+  },
+  qrWrapper: {
+    backgroundColor: "#fff",
+  },
+  qrInner: {
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: "#F8F9FC",
+    borderWidth: 1,
+    borderColor: "#EEF0F5",
+  },
+  helperText: {
+    marginTop: 16,
+    fontSize: 13,
+    color: "#6B7280",
+    textAlign: "center",
+  },
+  actionsRow: {
+    flexDirection: "row",
+    marginTop: 22,
+    width: "100%",
+    gap: 12,
+  },
+  actionBtn: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 13,
+    borderRadius: 14,
+    gap: 6,
+  },
+  shareBtn: {
+    backgroundColor: "#4C6EF5",
+  },
+  shareBtnText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  closeActionBtn: {
+    backgroundColor: "#F1F2F6",
+  },
+  closeActionBtnText: {
+    color: "#4B5563",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  errorBox: {
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  errorText: {
+    marginTop: 10,
+    color: "#EF4444",
+    fontSize: 14,
+    textAlign: "center",
+  },
+});

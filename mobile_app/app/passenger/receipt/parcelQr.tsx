@@ -21,104 +21,90 @@ import { LinearGradient } from 'expo-linear-gradient';
 import QRCode from 'react-native-qrcode-svg';
 
 const ParcelService = () => {
-    const API_URL = process.env.EXPO_PUBLIC_API_URL;
-    const [isSearching, setIsSearching] = useState<boolean>(false);
-    const [searchQuery, setSearchQuery] = useState<string>('');
-    const params = useLocalSearchParams();
-    const [activeTab, setActiveTab] = useState('');
-    const router = useRouter();
-    const parcelId = params.parcelId as string ;
-    const sendername = params.sendername as string ;
-    const Smobilenumber = params.Smobilenumber as string ;
-    const Semail = params.Semail as string ;
-    const receivername = params.receivername as string ;
-    const Rmobilenumber = params.Rmobilenumber as string ;
-    const Remail = params.Remail as string ;
-    const weight = params.weight as string ;
-    const pickup = params.pickup as string ;
-    const drop = params.drop as string ;
-    const date = params.date as string ;
-    const time = params.time as string ;
-    const Bnumber = params.Bnumber as string ;
-    const totalFare = params.totalFare as string ;
-    const qrRef = useRef<any>(null);
-    const [qrToken, setQrToken] = useState("");
-    const [error, setError] = useState<string | null>(null);
-    const fetchParcelQR = async () => {
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const params = useLocalSearchParams();
+  const [activeTab, setActiveTab] = useState('');
+  const router = useRouter();
+  const parcelId = params.parcelId as string ;
+  const sendername = params.sendername as string ;
+  const Smobilenumber = params.Smobilenumber as string ;
+  const Semail = params.Semail as string ;
+  const receivername = params.receivername as string ;
+  const Rmobilenumber = params.Rmobilenumber as string ;
+  const Remail = params.Remail as string ;
+  const weight = params.weight as string ;
+  const pickup = params.pickup as string ;
+  const drop = params.drop as string ;
+  const date = params.date as string ;
+  const time = params.time as string ;
+  const Bnumber = params.Bnumber as string ;
+  const totalFare = params.totalFare as string ;
+  const qrRef = useRef<any>(null);
+  const [qrToken, setQrToken] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const fetchParcelQR = async () => {
 
-        
+    try {
+      const url = `${API_URL}/parcel/parcel/${parcelId}/qr`;
+      console.log("Request URL:", url);
+      const response = await fetch(url);
+      console.log("Status:", response.status);
+      const data = await response.json();
+      console.log("Backend Data:", data);
 
-        try {
-
-            setError(null);
-
-            const url = `${API_URL}/parcel/parcel/${parcelId}/qr`;
-
-            console.log("Request URL:", url);
-
-            const response = await fetch(url);
-
-            console.log("Status:", response.status);
-
-            const data = await response.json();
-
-            console.log("Backend Data:", data);
-
-            if (!response.ok) {
-            throw new Error(data.error);
-            }
-
-            setQrToken(data.qrToken);
-
-        } catch (error: any) {
-
-            console.log("QR Error:", error);
-
-            
-
-            setError(error.message || "Could not generate QR");
-        }
-        };
-
-        useEffect(() => {
-        
-            fetchParcelQR();
-        
-          }, []);
-
-    const shareQR = async () => {
-      try {
-        if (!qrRef.current) {
-          Alert.alert("Error", "QR Code not available.");
-          return;
-        }
-
-        qrRef.current.toDataURL(async (data: string) => {
-          try {
-            const fileUri = FileSystem.cacheDirectory + "parcelQR.png";
-
-            await FileSystem.writeAsStringAsync(fileUri, data, {
-              encoding: FileSystem.EncodingType.Base64,
-            });
-
-            if (!(await Sharing.isAvailableAsync())) {
-              Alert.alert("Sharing is not available on this device.");
-              return;
-            }
-
-            await Sharing.shareAsync(fileUri, {
-              mimeType: "image/png",
-              dialogTitle: "Share Parcel QR Code",
-            });
-          } catch (err) {
-            console.log(err);
-            Alert.alert("Error", "Unable to share QR Code.");
-          }
-        });
-      } catch (err) {
-        console.log(err);
+      if (!response.ok) {
+        throw new Error(data.error);
       }
-    };
+      setQrToken(data.qrToken);
+
+    } 
+    catch (error: any) {
+
+      console.log("QR Error:", error);
+      setError(error.message || "Could not generate QR");
+    }
+  };
+
+  useEffect(() => {
+    fetchParcelQR();
+  }, []);
+
+  const shareQR = async () => {
+    try {
+      if (!qrRef.current) {
+        Alert.alert("Error", "QR Code not available.");
+        return;
+      }
+
+      qrRef.current.toDataURL(async (data: string) => {
+        try {
+          const fileUri = FileSystem.cacheDirectory + "parcelQR.png";
+
+          await FileSystem.writeAsStringAsync(fileUri, data, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+
+          if (!(await Sharing.isAvailableAsync())) {
+            Alert.alert("Sharing is not available on this device.");
+            return;
+          }
+
+          await Sharing.shareAsync(fileUri, {
+            mimeType: "image/png",
+            dialogTitle: "Share Parcel QR Code",
+          });
+        } catch (err) {
+          console.log(err);
+          Alert.alert("Error", "Unable to share QR Code.");
+        }
+      });
+    } 
+    catch (err) {
+      console.log(err);
+    }
+  };
 
     
  
@@ -127,21 +113,18 @@ const ParcelService = () => {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
        
-      <LinearGradient
-                      colors={['#4B6CF5', '#32CD32']}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                      style={styles.submitGradient1}
-                  >
-              <View style={styles.header}>
-                  
-              
-                <TouchableOpacity >
-                  <Text style={styles.title}>JetLink</Text>
-                </TouchableOpacity>
-                       
-              </View>
-              </LinearGradient> 
+        <LinearGradient
+          colors={['#4B6CF5', '#32CD32']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={styles.submitGradient1}
+        >
+          <View style={styles.header}>    
+            <TouchableOpacity >
+              <Text style={styles.title}>JetLink</Text>
+            </TouchableOpacity>          
+          </View>
+        </LinearGradient> 
 
         <View style={styles.card} >
           <View style={styles.svw}> 
@@ -203,14 +186,14 @@ const ParcelService = () => {
         
 
         <TouchableOpacity style={styles.submitButton} onPress={shareQR}> 
-            <LinearGradient
-                colors={['#4B6CF5', '#32CD32']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.submitGradient}
-            >
-                <Text style={styles.submitText}>Share QR Code</Text>
-            </LinearGradient>
+          <LinearGradient
+              colors={['#4B6CF5', '#32CD32']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.submitGradient}
+          >
+              <Text style={styles.submitText}>Share QR Code</Text>
+          </LinearGradient>
         </TouchableOpacity>
 
 
@@ -243,7 +226,8 @@ const ParcelService = () => {
                       Pid1: params.Pid1,
                       pfirstName: params.pfirstName,
                       plastName:params.plastName,
-                      pemail:params.pemail,                     
+                      pemail:params.pemail, 
+                      pphoneNumber: params.pphoneNumber,                    
                     },                    
                   });
                 };}}>

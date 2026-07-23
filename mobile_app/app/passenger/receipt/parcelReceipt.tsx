@@ -47,15 +47,16 @@ const JetLinkInterface: React.FC = () => {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('');
   const [parcelData, setParcelData] = useState<parcel[]>([]);
+  const [deliveryData, setDeliveryData] = useState<parcel[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isactiveTab, setIsactiveTab] = useState<boolean>(true);
   const Semail = params.pemail as string ;
-  const status : string = "Pending";
+  
 
   const getParcelByEmailAndUsed = async () => {
     try {
-
+        const status : string = "Pending";
         const response = await fetch(
         `${API_URL}/parcel/${encodeURIComponent(Semail)}/${status}`
         );
@@ -80,10 +81,41 @@ const JetLinkInterface: React.FC = () => {
         setParcelData([]);
 
     }
-};
+  }; 
+
+  const getParcelByEmailAnddelivery = async () => {
+    try {
+        const status : string = "Delivered";
+        const response = await fetch(
+        `${API_URL}/parcel/${encodeURIComponent(Semail)}/${status}`
+        );
+
+        const data = await response.json();
+
+        console.log("Parcel Data:", data);
+
+
+        if (!response.ok) {
+        throw new Error(data.message);
+        }
+
+
+        setDeliveryData(data.data);
+
+
+    } catch (error) {
+
+        console.log("Get Parcel Error:", error);
+
+        setDeliveryData([]);
+
+    }
+  };
 
   
     useFocusEffect(useCallback(()=>{getParcelByEmailAndUsed();},[]));
+
+    useFocusEffect(useCallback(()=>{getParcelByEmailAnddelivery();},[]));
     
     const renderBusItem = ({item}:{item:parcel}) => (
       <TouchableOpacity
@@ -112,7 +144,59 @@ const JetLinkInterface: React.FC = () => {
               pfirstName: params.pfirstName,
               plastName:params.plastName,
               pemail: params.pemail,
+              pphoneNumber: params.pphoneNumber,
 
+
+            },
+          })
+        }
+      >
+      <View style={styles.friendRow}>
+        <View style={styles.icon}>
+          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
+            <Feather name="gift" size={50} color="#F59E0B" />
+          </View>
+          <View>
+            <Text style={styles.friendName1}>{item.parcelId}</Text>
+            <Text style={styles.friendName}>{item.pickup} - {item.drop}</Text>
+            <Text style={styles.friendName}>{item.date} - {item.time}</Text>
+            <Text style={styles.friendName}>{item.Bnumber}</Text>
+          </View>
+        </View>
+        <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC"  />
+        
+      </View>
+      </TouchableOpacity>
+    );
+
+    const renderParcelItem = ({item}:{item:parcel}) => (
+      <TouchableOpacity
+        onPress={() => 
+          router.push({
+            pathname: "/passenger/receipt/parcelQr",
+            params: {
+              parId: item._id,
+              parcelId: item.parcelId,
+              sendername: item.sendername,
+              Smobilenumber: item.Smobilenumber || "",
+              Semail: item.Semail || "",
+              receivername: item.receivername || "",
+              Rmobilenumber: item.Rmobilenumber || "",
+              Remail: item.Remail || "",
+              weight: item.weight || "",
+              pickup: item.pickup || "",
+              drop: item.drop || "",
+              date: item.date || "",
+              time: item.time || "",
+              Bnumber: item.Bnumber || "",
+              totalFare: item.totalFare || "",
+
+              Pid: params.Pid,
+              Pid1: params.Pid1,
+              pfirstName: params.pfirstName,
+              plastName:params.plastName,
+              pemail: params.pemail,
+              pphoneNumber: params.pphoneNumber,
 
 
             },
@@ -191,6 +275,18 @@ const JetLinkInterface: React.FC = () => {
                 contentContainerStyle={{ paddingVertical: 10 }}
                 />
                 
+            )} 
+
+            {!isactiveTab &&(
+            
+            <FlatList style={styles.svw}
+                data={deliveryData}
+                renderItem={renderParcelItem}
+                keyExtractor={(item)=>item.parcelId}
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={{ paddingVertical: 10 }}
+                />
+                
             )}  
             
         </View>
@@ -223,8 +319,7 @@ const JetLinkInterface: React.FC = () => {
                           plastName:params.plastName,
                           pemail:params.pemail,
                           pphoneNumber: params.pphoneNumber,
-                          
-                                      
+             
                         },                    
                       });
                     };}}>

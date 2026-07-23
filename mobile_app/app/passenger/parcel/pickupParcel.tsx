@@ -89,7 +89,7 @@ const JetLinkInterface: React.FC = () => {
       <TouchableOpacity
         onPress={() => 
           router.push({
-            pathname: "/passenger/receipt/parcelQr",
+            pathname: "/passenger/parcel/parcelTrack",
             params: {
               parId: item._id,
               parcelId: item.parcelId,
@@ -112,6 +112,7 @@ const JetLinkInterface: React.FC = () => {
               pfirstName: params.pfirstName,
               plastName:params.plastName,
               pemail: params.pemail,
+              pphoneNumber: params.pphoneNumber,
 
 
 
