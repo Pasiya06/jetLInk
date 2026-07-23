@@ -14,7 +14,8 @@ import {
 import { 
   Ionicons, 
   Feather,  
-  FontAwesome
+  FontAwesome,
+  MaterialCommunityIcons
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView } from 'react-native-reanimated/lib/typescript/Animated';
@@ -50,13 +51,13 @@ const JetLinkInterface: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isactiveTab, setIsactiveTab] = useState<boolean>(true);
   const Semail = params.pemail as string ;
-  const pickupVerified : boolean = false;
+  const status : string = "Pending";
 
   const getParcelByEmailAndUsed = async () => {
     try {
 
         const response = await fetch(
-        `${API_URL}/parcel/${encodeURIComponent(Semail)}/${pickupVerified}`
+        `${API_URL}/parcel/${encodeURIComponent(Semail)}/${status}`
         );
 
         const data = await response.json();
@@ -119,12 +120,19 @@ const JetLinkInterface: React.FC = () => {
         }
       >
       <View style={styles.friendRow}>
-
-        <Text style={styles.friendName1}>{item.parcelId}</Text>
-        <Text style={styles.friendName}>{item.pickup} - {item.drop}</Text>
-        <Text style={styles.friendName1}>{item.date}</Text>
-        <Text style={styles.friendName}>{item.time}</Text>
-
+        <View style={styles.icon}>
+          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
+            <Feather name="gift" size={50} color="#F59E0B" />
+          </View>
+          <View>
+            <Text style={styles.friendName1}>{item.parcelId}</Text>
+            <Text style={styles.friendName}>{item.pickup} - {item.drop}</Text>
+            <Text style={styles.friendName}>{item.date} - {item.time}</Text>
+            <Text style={styles.friendName}>{item.Bnumber}</Text>
+          </View>
+        </View>
+        <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC"  />
+        
       </View>
       </TouchableOpacity>
     );
@@ -159,7 +167,7 @@ const JetLinkInterface: React.FC = () => {
                     onPress={() => setIsactiveTab(true)}
                 >
                     <Text style={[styles.tabButtonText, isactiveTab && styles.activeTabButtonText]}>
-                    Active 
+                    Pending 
                     </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -207,13 +215,14 @@ const JetLinkInterface: React.FC = () => {
         
                     else {
                       router.push({
-                        pathname: "/passenger/index1",
+                        pathname: "/passenger/receipt/index1",
                         params: {
                           Pid: params.Pid,
                           Pid1: params.Pid1,
                           pfirstName: params.pfirstName,
                           plastName:params.plastName,
                           pemail:params.pemail,
+                          pphoneNumber: params.pphoneNumber,
                           
                                       
                         },                    
@@ -330,6 +339,16 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
 
+  iconWrap: {
+    width: 76,
+    height: 76,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    //marginLeft: 20,
+  },
+
   tabContainer: {
     marginLeft: 25,
     marginRight: 25,
@@ -382,6 +401,9 @@ const styles = StyleSheet.create({
 
   friendRow: {
     backgroundColor: '#ffffff',
+    flexDirection: "row",
+    alignItems: "center",
+    //alignSelf: 'center',
     padding: 16,
     borderRadius: 16,
     marginBottom: 12,
@@ -399,7 +421,7 @@ const styles = StyleSheet.create({
   textline0:{
     flex: 1,
     
-    flexDirection: 'row',
+    
 
   },
 
@@ -422,24 +444,22 @@ const styles = StyleSheet.create({
   },
 
   friendName: {
-    //flex: 1,
-    // marginLeft: 10,
     fontSize: 14,
-    color: '#0047AB',
+    color: '#000000',
     fontWeight: '500',
   },
 
   friendName1: {
-    //flex: 1,
-    //marginRight: 100,
-    fontSize: 14,
+    fontSize: 20,
     color: '#0047AB',
     fontWeight: '500',
   },
 
 
-  iconButton: { 
-    marginRight: 10 
+  icon: { 
+    flex: 1,
+    flexDirection: 'row',
+    
   },
 
   bottomNav: {

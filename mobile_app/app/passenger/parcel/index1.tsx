@@ -25,20 +25,38 @@ const ParcelService = () => {
       const router = useRouter();
       const [activeTab, setActiveTab] = useState('');
       const handleSearch = () => {
-      router.push({
-          pathname: "/passenger/parcel/index2",
-          params:{ 
-            Pid: params.Pid,
-            Pid1: params.Pid1,
-            pfirstName: params.pfirstName,
-            plastName:params.plastName,
-            pphoneNumber: params.pphoneNumber,
-            pemail: params.pemail,
+        router.push({
+            pathname: "/passenger/parcel/index2",
+            params:{ 
+              Pid: params.Pid,
+              Pid1: params.Pid1,
+              pfirstName: params.pfirstName,
+              plastName:params.plastName,
+              pphoneNumber: params.pphoneNumber,
+              pemail: params.pemail,
 
-          } 
-          
-      });
-    };
+            } 
+            
+        });
+      };
+
+      const handleSearch1 = () => {
+        router.push({
+            pathname: "/passenger/parcel/pickupParcel",
+            params:{ 
+              Pid: params.Pid,
+              Pid1: params.Pid1,
+              pfirstName: params.pfirstName,
+              plastName:params.plastName,
+              pphoneNumber: params.pphoneNumber,
+              pemail: params.pemail,
+
+            } 
+            
+        });
+      };
+
+
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
@@ -61,7 +79,6 @@ const ParcelService = () => {
       </LinearGradient> 
 
       
-      {/* Content Section */}
       
         
         {/* Action Buttons */}
@@ -76,7 +93,7 @@ const ParcelService = () => {
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card1}>
+        <TouchableOpacity style={styles.card1} onPress={handleSearch1}>
           <View style={[styles.iconWrap, { backgroundColor: "#FF000018" }]}>
               <MaterialCommunityIcons name="map-marker-radius" size={50} color="#FF0000" />
           </View>

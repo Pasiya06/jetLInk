@@ -269,21 +269,21 @@ export default function DriverHome() {
     setSharingActive(true);
     setLoading(false);
 
-    Alert.alert(
-      "Location Sharing Active",
-      "Your location is updating every 5 seconds. Do you want to continue?",
-      [
-        {
-          text: "No",
-          onPress: () => stopSharing(),
-          style: "cancel",
-        },
-        {
-          text: "Yes",
-          onPress: () => console.log("Continue sharing"),
-        },
-      ]
-    );
+    // Alert.alert(
+    //   "Location Sharing Active",
+    //   "Your location is updating every 5 seconds. Do you want to continue?",
+    //   [
+    //     {
+    //       text: "No",
+    //       onPress: () => stopSharing(),
+    //       style: "cancel",
+    //     },
+    //     {
+    //       text: "Yes",
+    //       onPress: () => console.log("Continue sharing"),
+    //     },
+    //   ]
+    // );
       
 
           
@@ -410,6 +410,25 @@ export default function DriverHome() {
       startSharing();
     }
   };
+
+  const handleSearch = () => {
+      router.push({
+        pathname: "/busStaff/manageParcel",
+        params: {
+            Cid: params.Cid,
+            conductorId: params.conductorId,
+            conductorNIC:params.conductorNIC,
+            cfirstName: params.cfirstName,
+            clastName: params.clastName,
+            cphoneNumber:params.cphoneNumber,
+            driverId:params.driverId,
+            dfirstName:params.dfirstName,
+            dlastName:params.dlastName,
+            dphoneNumber:params.dphoneNumber,
+            busNo: params.busNo,
+        },         
+      });
+    };
 
 
   // ────────────────────────────────────────────────────────────────
@@ -546,7 +565,7 @@ export default function DriverHome() {
         <View style={styles.listContainer}>
           <TouchableOpacity
             style={styles.card1}
-            onPress={stopSharing}
+            onPress={handleSearch}
           >
             <View style={[styles.iconContainer, { backgroundColor: "#ffc40018"  }]}>
               <Feather name="gift" size={24} color="#ffc400" />

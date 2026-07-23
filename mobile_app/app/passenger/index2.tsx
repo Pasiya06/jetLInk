@@ -31,6 +31,7 @@ export const FlatmateLogin: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [email1, setEmail1] = useState<string>('');
+  const [Admiemail, setAdmiEmail] = useState<string>('');
   const [password1, setPassword1] = useState<string>('');
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -62,6 +63,15 @@ export const FlatmateLogin: React.FC = () => {
       Alert.alert("Invalid Email", "Please enter a valid email address.");
       return false;
     }
+
+    const adminemai:string = "admin@gmail.com";
+
+  if (adminemai === email) {
+      Alert.alert("This is Admin Email you can't use this.");
+      return false;
+    }
+
+  
 
   const phoneRegex = /^[0-9]{10}$/;
 
@@ -142,7 +152,7 @@ const loginPassenger = async () => {
 
     if (data1.success) {
       const user = data1.passenger;
-
+      
       router.push({
         pathname: "/passenger/index1",
         params: {
@@ -178,7 +188,7 @@ const loginPassenger = async () => {
 
     if (data2.success) {
       const admin = data2.admin;
-
+      setAdmiEmail(admin.email)
       router.push({
         pathname: "/admin/index1",
         params: {

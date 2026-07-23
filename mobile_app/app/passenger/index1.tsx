@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
   Alert,
