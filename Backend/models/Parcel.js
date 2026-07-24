@@ -15,7 +15,6 @@ const parcelSchema = new mongoose.Schema(
     Smobilenumber: {
       type: String,
       required: true,
-      
     },
 
     Semail: {

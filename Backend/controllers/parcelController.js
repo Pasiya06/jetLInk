@@ -210,3 +210,36 @@ export const generateParQR = async (req, res) => {
     });
   }
 };
+
+export const getParcelBybusNumberandStatus = async (req, res) => {
+  try {
+    const { Bnumber, status } = req.params;
+
+    console.log("Search:", Bnumber, status);
+
+    const parcels = await Parcel.find({
+      Bnumber: Bnumber,
+      status: status,
+    });
+
+    console.log("Parcels:", parcels);
+
+    if (parcels.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No parcels found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: parcels,
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};

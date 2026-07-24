@@ -48,7 +48,7 @@ const ParcelService = () => {
 
     const handleSearch1 = () => {
       router.push({
-        pathname: "/busStaff/index1",
+        pathname: "/busStaff/pendingParcel",
         params: {
             Cid: params.Cid,
             conductorId: params.conductorId,
@@ -67,7 +67,7 @@ const ParcelService = () => {
 
     const handleSearch2 = () => {
       router.push({
-        pathname: "/busStaff/index1",
+        pathname: "/busStaff/busBookedParcel",
         params: {
             Cid: params.Cid,
             conductorId: params.conductorId,

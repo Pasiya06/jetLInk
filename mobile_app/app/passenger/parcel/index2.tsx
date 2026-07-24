@@ -177,7 +177,7 @@ const JetLinkInterface: React.FC = () => {
             
           </View>
 
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>Sender Email</Text>
           <View style={styles.inputWrapper}>
             <Text style={styles.input1}>{params.pemail}</Text>
             
@@ -195,7 +195,7 @@ const JetLinkInterface: React.FC = () => {
             
           </View>
 
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>Receiver Email</Text>
           <View style={styles.inputWrapper}>
             <TextInput 
               style={styles.input} 
