@@ -90,7 +90,7 @@ const JetLinkInterface: React.FC = () => {
 
        if (data.success) {
             router.push({
-            pathname: "/passenger/parcel/paymentSuccessful",
+            pathname: "/busStaff/paymentSuccessful",
             params: {
               Cid: params.Cid,
               conductorId: params.conductorId,
@@ -132,7 +132,7 @@ const JetLinkInterface: React.FC = () => {
 
             case "CVC validation failed":
                 router.push({
-                        pathname: "/passenger/parcel/paymentFail",
+                        pathname: "/busStaff/paymentFail",
                         params: {
                           Cid: params.Cid,
                           conductorId: params.conductorId,

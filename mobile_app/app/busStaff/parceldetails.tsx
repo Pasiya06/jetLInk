@@ -110,7 +110,7 @@ const JetLinkInterface: React.FC = () => {
             busNo: params.busNo,
             sendername,
             smobilenumber,
-            semail,
+            semail:params.busNo,
             receivername,
             rmobilenumber,
             remail,
@@ -346,7 +346,7 @@ const JetLinkInterface: React.FC = () => {
         
                     else {
                       router.push({
-                        pathname: "/busStaff/manageParcel",
+                        pathname: "/busStaff/parceldetails",
                         params: {
                           Cid: params.Cid,
                           conductorId: params.conductorId,
@@ -377,7 +377,7 @@ const JetLinkInterface: React.FC = () => {
               </TouchableOpacity>
         
               <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
-                        pathname: "/passenger/index1",
+                        pathname: "/busStaff/index1",
                         params: {
                           Cid: params.Cid,
                           conductorId: params.conductorId,

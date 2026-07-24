@@ -104,40 +104,40 @@ const JetLinkInterface: React.FC = () => {
     
     const renderBusItem = ({item}:{item:parcel}) => (
       <TouchableOpacity
-        onPress={() => 
-          router.push({
-            pathname: "/passenger/parcel/parcelTrack",
-            params: {
-              parId: item._id,
-              parcelId: item.parcelId,
-              sendername: item.sendername,
-              Smobilenumber: item.Smobilenumber || "",
-              Semail: item.Semail || "",
-              receivername: item.receivername || "",
-              Rmobilenumber: item.Rmobilenumber || "",
-              Remail: item.Remail || "",
-              weight: item.weight || "",
-              pickup: item.pickup || "",
-              drop: item.drop || "",
-              date: item.date || "",
-              time: item.time || "",
-              Bnumber: item.Bnumber || "",
-              totalFare: item.totalFare || "",
+        // onPress={() => 
+        //   router.push({
+        //     pathname: "/passenger/parcel/parcelTrack",
+        //     params: {
+        //       parId: item._id,
+        //       parcelId: item.parcelId,
+        //       sendername: item.sendername,
+        //       Smobilenumber: item.Smobilenumber || "",
+        //       Semail: item.Semail || "",
+        //       receivername: item.receivername || "",
+        //       Rmobilenumber: item.Rmobilenumber || "",
+        //       Remail: item.Remail || "",
+        //       weight: item.weight || "",
+        //       pickup: item.pickup || "",
+        //       drop: item.drop || "",
+        //       date: item.date || "",
+        //       time: item.time || "",
+        //       Bnumber: item.Bnumber || "",
+        //       totalFare: item.totalFare || "",
 
-              Cid: params.Cid,
-              conductorId: params.conductorId,
-              conductorNIC:params.conductorNIC,
-              cfirstName: params.cfirstName,
-              clastName: params.clastName,
-              cphoneNumber:params.cphoneNumber,
-              driverId:params.driverId,
-              dfirstName:params.dfirstName,
-              dlastName:params.dlastName,
-              dphoneNumber:params.dphoneNumber,
-              busNo: params.busNo,
-            },
-          })
-        }
+        //       Cid: params.Cid,
+        //       conductorId: params.conductorId,
+        //       conductorNIC:params.conductorNIC,
+        //       cfirstName: params.cfirstName,
+        //       clastName: params.clastName,
+        //       cphoneNumber:params.cphoneNumber,
+        //       driverId:params.driverId,
+        //       dfirstName:params.dfirstName,
+        //       dlastName:params.dlastName,
+        //       dphoneNumber:params.dphoneNumber,
+        //       busNo: params.busNo,
+        //     },
+        //   })
+        // }
       >
       <View style={styles.friendRow}>
         <View style={styles.icon}>
@@ -197,7 +197,7 @@ const JetLinkInterface: React.FC = () => {
               end={{ x: 1, y: 0 }}
               style={styles.submitGradient}
           >
-          <Text style={styles.submitText}>Next</Text>
+          <Text style={styles.submitText}>Book parcel</Text>
           </LinearGradient>
         </TouchableOpacity>
 

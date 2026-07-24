@@ -241,7 +241,7 @@ const ParcelService = () => {
 
                 else {
                   router.push({
-                    pathname: "/passenger/parcel/index3",
+                    pathname: "/busStaff/parceldetails",
                     params: {
                       Pid: params.Pid,
                       Pid1: params.Pid1,
@@ -258,8 +258,8 @@ const ParcelService = () => {
                       weight:params.weight,
                       pickup:params.pickup,
                       drop:params.drop,
-                      //date:params.date,
-                      //time:params.time
+                      date:params.date,
+                      time:params.time
                     },                    
                   });
                 };}}>
@@ -277,14 +277,19 @@ const ParcelService = () => {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
-                    pathname: "/passenger/index1",
+                    pathname: "/busStaff/index1",
                     params: {
-                      Pid: params.Pid,
-                      Pid1: params.Pid1,
-                      pfirstName: params.pfirstName,
-                      plastName:params.plastName,
-                      pphoneNumber: params.pphoneNumber,
-                      pemail: params.pemail,
+                      Cid: params.Cid,
+                      conductorId: params.conductorId,
+                      conductorNIC:params.conductorNIC,
+                      cfirstName: params.cfirstName,
+                      clastName: params.clastName,
+                      cphoneNumber:params.cphoneNumber,
+                      driverId:params.driverId,
+                      dfirstName:params.dfirstName,
+                      dlastName:params.dlastName,
+                      dphoneNumber:params.dphoneNumber,
+                      busNo: params.busNo,
                     },                    
                   });}} > 
             <Ionicons name="home-outline" size={28} color="#fff" />             

@@ -122,7 +122,7 @@ const JetLinkInterface: React.FC = () => {
         </LinearGradient> 
              
         <View style={styles.card}>
-          <Text >Deliver</Text>
+          <Text style={styles.cardtitle}>All pending parcels of this bus</Text>
           <FlatList style={styles.svw}
             data={parcelData}
             renderItem={renderBusItem}
@@ -273,6 +273,8 @@ const styles = StyleSheet.create({
     width: '100%',
     flex: 1,
     maxHeight: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#FFF',
     borderTopLeftRadius: 55,
     borderTopRightRadius: 55,
@@ -283,6 +285,14 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
+  },
+
+  cardtitle:{
+    marginTop:10,
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#999797',
+    letterSpacing: 0.5,
   },
 
   iconWrap: {

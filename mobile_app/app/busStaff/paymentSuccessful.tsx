@@ -104,7 +104,7 @@ export default function PaymentSuccessScreen() {
   
       if (result.success) {
         router.push({
-              pathname: "/busStaff/parceldetails",
+              pathname: "/busStaff/busBookedParcel",
               params: {
                 Cid: params.Cid,
                 conductorId: params.conductorId,

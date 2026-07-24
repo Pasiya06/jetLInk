@@ -507,13 +507,12 @@ export default function DriverHome() {
         </View> */}
 
         {/* ── GPS Toggle Button ────────────────────────────────── */}
-        <TouchableOpacity
+        <View
           style={[
             styles.gpsButton,
             { backgroundColor: sharingActive ? "#FF4444" : "#32CD32" },
           ]}
-          onPress={toggleSharing}
-          disabled={loading}
+          
         >
           <MaterialIcons
             name={sharingActive ? "location-off" : "location-on"}
@@ -527,13 +526,14 @@ export default function DriverHome() {
               ? "Stop Sharing Location"
               : "Start Sharing Location"}
           </Text>
-        </TouchableOpacity>
+        </View>
 
         {/* ── Action Cards Row ─────────────────────────────────── */}
         <View style={styles.listContainer1}>
           <TouchableOpacity
             style={styles.card0}
             onPress={() => router.push("/busStaff/index1")}
+            disabled={loading}
           >
             <View style={[styles.iconContainer, { backgroundColor: "#8B5CF618"  }]}>
               <FontAwesome5 name="bus-alt" size={24} color="#8B5CF6" />
@@ -552,6 +552,7 @@ export default function DriverHome() {
           <TouchableOpacity
             style={styles.card1}
             onPress={handleSearch}
+            disabled={loading}
           >
             <View style={[styles.iconContainer, { backgroundColor: "#ffc40018"  }]}>
               <Feather name="gift" size={24} color="#ffc400" />
@@ -563,6 +564,7 @@ export default function DriverHome() {
           <TouchableOpacity
             style={styles.card2}
             onPress={() => router.push("/busStaff/index1")}
+            disabled={loading}
           >
             <View style={[styles.iconContainer, { backgroundColor: "#EC489918"  }]}>
               <FontAwesome5 name="route" size={24} color="#EC4899" />
@@ -574,6 +576,7 @@ export default function DriverHome() {
           <TouchableOpacity
             style={styles.card1}
             onPress={() => router.push("/busStaff/index1")}
+            disabled={loading}
           >
             <View style={[styles.iconContainer, { backgroundColor: "#ff000018"  }]}>
               <MaterialCommunityIcons name="alarm-light-outline" size={24} color="#ff0000" />
@@ -585,6 +588,7 @@ export default function DriverHome() {
           <TouchableOpacity
             style={styles.card2}
             onPress={() => router.push("/busStaff/index1")}
+            disabled={loading}
           >
             <View style={[styles.iconContainer, { backgroundColor: "#10B98118"  }]}>
                 <FontAwesome5 name="hands-helping" size={24} color="#10B981" />
