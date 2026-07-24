@@ -170,6 +170,7 @@ const JetLinkInterface: React.FC = () => {
               value={sendername} 
               onChangeText={setsendername} 
               placeholder='Pasindu Kelum'
+              placeholderTextColor="#A3A3A3"
             />
             
           </View>
@@ -182,11 +183,13 @@ const JetLinkInterface: React.FC = () => {
               onChangeText={Ssetmobilenumber} 
               placeholder='0771111111'
               keyboardType="phone-pad" 
-              maxLength={10}/>
-            
+              maxLength={10}
+              placeholderTextColor="#A3A3A3"
+            />
+             
           </View>
 
-          <Text style={styles.label}>Sender Email</Text>
+          <Text style={styles.label}>Bus Number</Text>
           <View style={styles.inputWrapper}>
             <Text style={styles.input1}>{params.busNo}</Text>
             
@@ -199,6 +202,7 @@ const JetLinkInterface: React.FC = () => {
               value={receivername} 
               onChangeText={setreceivername} 
               placeholder='Deshith Sandakelum'
+              placeholderTextColor="#A3A3A3"
               />
             
           </View>
@@ -212,6 +216,7 @@ const JetLinkInterface: React.FC = () => {
               keyboardType="phone-pad" 
               maxLength={10}
               placeholder='0711111111'
+              placeholderTextColor="#A3A3A3"
             />
             
           </View>
@@ -225,6 +230,7 @@ const JetLinkInterface: React.FC = () => {
               placeholder='abc@gmail.com or no email' 
               autoCapitalize="none"
               autoCorrect={false}
+              placeholderTextColor="#A3A3A3"
             />
             
           </View>
@@ -238,6 +244,7 @@ const JetLinkInterface: React.FC = () => {
               keyboardType="phone-pad" 
               maxLength={2} 
               placeholder='23'
+              placeholderTextColor="#A3A3A3"
               />           
           </View>
           
@@ -250,6 +257,7 @@ const JetLinkInterface: React.FC = () => {
               autoCapitalize="characters"
               placeholder='MATARA'
               autoCorrect={false}
+              placeholderTextColor="#A3A3A3"
               />
           </View>
           
@@ -262,6 +270,7 @@ const JetLinkInterface: React.FC = () => {
               autoCapitalize="characters"
               autoCorrect={false} 
               placeholder='GALLE'
+              placeholderTextColor="#A3A3A3"
             />
             
           </View>
@@ -295,6 +304,7 @@ const JetLinkInterface: React.FC = () => {
               value={selectedTime}
               placeholder="00:00"
               editable={false}
+              placeholderTextColor="#A3A3A3"
             />
 
             <TouchableOpacity onPress={() => setShowTimePicker(true)}>
@@ -495,12 +505,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#32CD32',
+    backgroundColor: '#F2F4F5',
+    borderColor: '#ECEEF2',
     borderRadius: 10,
     paddingHorizontal: 10,
     height: 45,
     marginBottom: 15,
   },
+  
   input: {
     flex: 1,
     height: '100%',
