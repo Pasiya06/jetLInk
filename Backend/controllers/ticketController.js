@@ -41,10 +41,7 @@ export const generateTicketQRByBusId = async (req, res) => {
     const payload = {
       ticketId: ticket._id,
       busId: ticket.busId,
-      passengerName: ticket.passengerName,
-      price: ticket.price,
-      fromStop: ticket.fromStop,
-      toStop: ticket.toStop,
+      
       issuedAt: Date.now(),
     };
 

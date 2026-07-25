@@ -185,7 +185,7 @@ const ParcelService = () => {
 
         
 
-        <TouchableOpacity style={styles.submitButton} onPress={shareQR}> 
+        {/* <TouchableOpacity style={styles.submitButton} onPress={shareQR}> 
           <LinearGradient
               colors={['#4B6CF5', '#32CD32']}
               start={{ x: 0, y: 0 }}
@@ -194,7 +194,7 @@ const ParcelService = () => {
           >
               <Text style={styles.submitText}>Share QR Code</Text>
           </LinearGradient>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
 
 

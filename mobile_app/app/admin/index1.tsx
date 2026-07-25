@@ -146,7 +146,7 @@ export default function Index() {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card2} onPress={() => router.push({
-                pathname: "/admin/Parcelhistory/parcelFees", 
+                pathname: "/admin/Parcelhistory/parcelDetails", 
                 params: {
                   Aid: params.Aid,
                   firstName: params.firstName,

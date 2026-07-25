@@ -121,23 +121,39 @@ const ParcelService = () => {
       const data = await response.json();
 
       if (data.valid) {
-        if (data.stage === "pickup") {
-          Alert.alert(
-            "Pickup Verified",
-            "Parcel pickup verified successfully."
-          );
-        } else if (data.stage === "delivery") {
+        if (data.stage === "delivery") {
           Alert.alert(
             "Delivered",
             "Parcel delivered successfully."
           );
+
+          router.push({
+              pathname: "/busStaff/busBookedParcel",
+              params: {
+                Cid: params.Cid,
+                conductorId: params.conductorId,
+                conductorNIC:params.conductorNIC,
+                cfirstName: params.cfirstName,
+                clastName: params.clastName,
+                cphoneNumber:params.cphoneNumber,
+                driverId:params.driverId,
+                dfirstName:params.dfirstName,
+                dlastName:params.dlastName,
+                dphoneNumber:params.dphoneNumber,
+                busNo: params.busNo,
+              },
+            })
+
+
         }
 
         console.log("Parcel:", data.parcel);
-      } else {
+      } 
+      else {
         Alert.alert("Failed", data.reason);
       }
-    } catch (error) {
+    } 
+    catch (error) {
       console.log(error);
       Alert.alert("Error", "Unable to connect to the server.");
     }
@@ -186,7 +202,7 @@ const ParcelService = () => {
                 <Text style={styles.errorText}>{error}</Text>
             )}
             
-            <Text style={styles.title}>Your Ticket</Text>
+            
             {qrToken && (
                 <View style={styles.qrWrapper}>
                 <QRCode
@@ -200,41 +216,6 @@ const ParcelService = () => {
             )}
             
           </View>      
-        </View>
-
-        <View style={styles.card1} >
-          <View style={styles.svw1}> 
-            <View  style={styles.detailRow}>
-              <View style={[styles.iconWrap, { backgroundColor: "#FFA50020" }]}>
-                <Fontisto name="bus" size={22} color="#FFA500"  />
-              </View>
-              <View style={styles.detailTextWrap}>
-                <Text style={styles.detailLabel}>Bus Number</Text>
-                <Text style={styles.detailValue}>{params.Bnumber}</Text>
-              </View>
-            </View>
-
-            <View  style={styles.detailRow}>
-              <View style={[styles.iconWrap, { backgroundColor: "#7ED32120" }]}>
-                <Ionicons name="calendar-outline" size={22} color="#7ED321"  />
-              </View>
-              <View style={styles.detailTextWrap}>
-                <Text style={styles.detailLabel}>Date</Text>
-                <Text style={styles.detailValue}>{params.date}</Text>
-              </View>
-            </View>
-
-            <View  style={styles.detailRow}>
-              <View style={[styles.iconWrap, { backgroundColor: "#E74C3C20" }]}>
-                <Ionicons name="time-outline" size={22} color="#E74C3C"  />
-              </View>
-              <View style={styles.detailTextWrap}>
-                <Text style={styles.detailLabel}>Time</Text>
-                <Text style={styles.detailValue}>{params.time}</Text>
-              </View>
-            </View>
-
-          </View>
         </View>
         
         <View style={styles.button}>

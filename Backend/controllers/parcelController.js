@@ -66,7 +66,7 @@ export const getParcelByEmailAndUsed = async (req, res) => {
 
 export const generateParcelQR = async (req, res) => {
   const { parcelId} = req.params;
-    
+   console.log("Searching Bus ID:", parcelId); 
   try {
     const parcel = await Parcel.findOne({parcelId});
     
@@ -299,6 +299,36 @@ export const markParcelDelivered = async (req, res) => {
     return res.status(400).json({
       valid: false,
       reason: "Invalid or expired QR code.",
+    });
+  }
+};
+
+export const getParcel = async (req, res) => {
+  try {
+    const { status } = req.params;
+
+    console.log("Search:", status);
+
+    const parcels = await Parcel.find({status: status});
+
+    console.log("Parcels:", parcels);
+
+    if (parcels.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No parcels found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: parcels,
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
     });
   }
 };

@@ -1,4 +1,3 @@
-// PaymentSuccessScreen.tsx
 import React, { useEffect, useRef } from 'react';
 import {
   View,
@@ -97,50 +96,50 @@ export default function PaymentSuccessScreen() {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
 
-    <LinearGradient
-      colors={['#fff8f8', '#ff0000']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
-      {/* Success Icon */}
-      <Animated.View
-        style={[
-          styles.iconWrapper,
-          { transform: [{ scale: scaleAnim }] },
-        ]}
+      <LinearGradient
+        colors={['#fff8f8', '#ff0000']}
+        style={styles.container}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
       >
-        <View style={styles.iconCircleOuter}>
-          <View style={styles.iconCircleInner}>
-            <Entypo name="cross" size={64} color="#fff" />
-          </View>
-        </View>
-      </Animated.View>
-
-      <Animated.View style={{ opacity: fadeAnim, width: '100%', alignItems: 'center' }}>
-        <Text style={styles.title}>Payment Failed</Text>
-        <Text style={styles.subtitle}>
-          Your account balance is insufficient to complete this payment.
-        </Text>
-
-        {/* Amount */}
-        
-
-        {/* Actions */}
-        <TouchableOpacity style={styles.primaryButton} activeOpacity={0.85} onPress={handleSearch1}>
-          <Text style={styles.primaryButtonText}>Try again with another card</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={handleSearch}
-            activeOpacity={0.85}
+        {/* Success Icon */}
+        <Animated.View
+          style={[
+            styles.iconWrapper,
+            { transform: [{ scale: scaleAnim }] },
+          ]}
         >
-            <Text style={styles.secondaryButtonText}>Back to Home</Text>
-        </TouchableOpacity>
- 
-      </Animated.View>
-    </LinearGradient>
+          <View style={styles.iconCircleOuter}>
+            <View style={styles.iconCircleInner}>
+              <Entypo name="cross" size={64} color="#fff" />
+            </View>
+          </View>
+        </Animated.View>
+
+        <Animated.View style={{ opacity: fadeAnim, width: '100%', alignItems: 'center' }}>
+          <Text style={styles.title}>Payment Failed</Text>
+          <Text style={styles.subtitle}>
+            Your account balance is insufficient to complete this payment.
+          </Text>
+
+          {/* Amount */}
+          
+
+          {/* Actions */}
+          <TouchableOpacity style={styles.primaryButton} activeOpacity={0.85} onPress={handleSearch1}>
+            <Text style={styles.primaryButtonText}>Try again with another card</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+              style={styles.secondaryButton}
+              onPress={handleSearch}
+              activeOpacity={0.85}
+          >
+              <Text style={styles.secondaryButtonText}>Back to Home</Text>
+          </TouchableOpacity>
+  
+        </Animated.View>
+      </LinearGradient>
     </>
   );
 }

@@ -614,7 +614,7 @@ export default function DriverHome() {
         
                   
         
-                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); logout();}} >
+                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); logout();}} disabled={loading}>
                     <Ionicons name="log-out-outline" size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
                     
                     <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>

@@ -292,7 +292,7 @@ const ParcelService = () => {
 
                 else {
                   router.push({
-                    pathname: "/admin/index1",
+                    pathname: "/admin/Parcelhistory/parcelDetails",
                     params: {
                       Aid: params.Aid,
                       firstName: params.firstName,

@@ -1,4 +1,3 @@
-// PaymentSuccessScreen.tsx
 import React, { useEffect, useRef } from 'react';
 import  { useState } from 'react';
 import {
@@ -23,6 +22,7 @@ export default function PaymentSuccessScreen() {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const amount = params.totalFare as string;
   const status : string = "PickedUp";
+  const pickupVerified : boolean = true;
   const [qrToken, setQrToken] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -98,6 +98,7 @@ export default function PaymentSuccessScreen() {
         Bnumber:params.busNo,
         totalFare:params.totalFare,
         status:status,
+        pickupVerified:pickupVerified,
       };
   
       const result = await createParcel(parcelData);
@@ -143,6 +144,7 @@ export default function PaymentSuccessScreen() {
         Bnumber:params.busNo,
         totalFare:params.totalFare,
         status:status,
+        pickupVerified:pickupVerified,
       };
   
       const result = await createParcel(parcelData);
@@ -194,72 +196,72 @@ export default function PaymentSuccessScreen() {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-    <LinearGradient
-      colors={['#fff8f8', '#3DDC84']}
-      style={styles.container}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 1, y: 1 }}
-    >
-      {/* Success Icon */}
-      <Animated.View
-        style={[
-          styles.iconWrapper,
-          { transform: [{ scale: scaleAnim }] },
-        ]}
+      <LinearGradient
+        colors={['#fff8f8', '#3DDC84']}
+        style={styles.container}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
       >
-        <View style={styles.iconCircleOuter}>
-          <View style={styles.iconCircleInner}>
-            <Ionicons name="checkmark" size={64} color="#fff" />
+        {/* Success Icon */}
+        <Animated.View
+          style={[
+            styles.iconWrapper,
+            { transform: [{ scale: scaleAnim }] },
+          ]}
+        >
+          <View style={styles.iconCircleOuter}>
+            <View style={styles.iconCircleInner}>
+              <Ionicons name="checkmark" size={64} color="#fff" />
+            </View>
           </View>
-        </View>
-      </Animated.View>
+        </Animated.View>
 
-      <Animated.View style={{ opacity: fadeAnim, width: '100%', alignItems: 'center' }}>
-        <Text style={styles.title}>Payment Successful</Text>
-        <Text style={styles.subtitle}>
-          Your parcel has been booked successfully
-        </Text>
+        <Animated.View style={{ opacity: fadeAnim, width: '100%', alignItems: 'center' }}>
+          <Text style={styles.title}>Payment Successful</Text>
+          <Text style={styles.subtitle}>
+            Your parcel has been booked successfully
+          </Text>
 
-        {/* Amount */}
-        <Text style={styles.amount}>LKR {amount}</Text>
+          {/* Amount */}
+          <Text style={styles.amount}>LKR {amount}</Text>
 
-        {/* QR code */}
-        <View style={styles.card}>
-            <View style={styles.svw}> 
-            {error && (
-                <Text style={styles.errorText}>{error}</Text>
-            )}
+          {/* QR code */}
+          <View style={styles.card}>
+              <View style={styles.svw}> 
+              {error && (
+                  <Text style={styles.errorText}>{error}</Text>
+              )}
+              
+              
+              {qrToken && (
+                  <View style={styles.qrWrapper}>
+                  <QRCode value={String(qrToken)} size={220} />
+                  </View>
+              )}
+              
+            </View>     
             
-            
-            {qrToken && (
-                <View style={styles.qrWrapper}>
-                <QRCode value={String(qrToken)} size={220} />
-                </View>
-            )}
-            
-          </View>     
-          
-        </View>
+          </View>
 
-        {/* Actions */}
-        <TouchableOpacity
-          style={styles.primaryButton}
-          onPress={handleSaveParcel}
-          activeOpacity={0.85}
-        >
-          
-          <Text style={styles.primaryButtonText}>Book Another</Text>
-        </TouchableOpacity>
+          {/* Actions */}
+          <TouchableOpacity
+            style={styles.primaryButton}
+            onPress={handleSaveParcel}
+            activeOpacity={0.85}
+          >
+            
+            <Text style={styles.primaryButtonText}>Book Another</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.secondaryButton}
-          onPress={handleSearch}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.secondaryButtonText}>Back to Home</Text>
-        </TouchableOpacity>
-      </Animated.View>
-    </LinearGradient>
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={handleSearch}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.secondaryButtonText}>Back to Home</Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </LinearGradient>
     </>
   );
 }
