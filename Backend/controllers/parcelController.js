@@ -243,3 +243,62 @@ export const getParcelBybusNumberandStatus = async (req, res) => {
     });
   }
 };
+
+export const markParcelDelivered = async (req, res) => {
+  try {
+    const { parcelId } = req.params;
+
+    const parcel = await Parcel.findOne({ parcelId});
+
+    if (!parcel) {
+      return res.status(404).json({
+        valid: false,
+        reason: "Parcel not found",
+      });
+    }
+
+    // First Scan -> Pending → PickedUp
+    if (parcel.status === "Pending") {
+      parcel.pickupVerified = true;
+      parcel.pickupVerifiedAt = new Date();
+      parcel.status = "PickedUp";
+
+      await parcel.save();
+
+      return res.json({
+        valid: true,
+        stage: "pickup",
+        message: "Parcel pickup verified successfully.",
+        parcel,
+      });
+    }
+
+    // Second Scan -> PickedUp → Delivered
+    if (parcel.status === "PickedUp") {
+      parcel.delivered = true;
+      parcel.deliveredAt = new Date();
+      parcel.status = "Delivered";
+
+      await parcel.save();
+
+      return res.json({
+        valid: true,
+        stage: "delivery",
+        message: "Parcel delivered successfully.",
+        parcel,
+      });
+    }
+
+    // Already Delivered
+    return res.json({
+      valid: false,
+      reason: "Parcel has already been delivered.",
+    });
+
+  } catch (error) {
+    return res.status(400).json({
+      valid: false,
+      reason: "Invalid or expired QR code.",
+    });
+  }
+};
