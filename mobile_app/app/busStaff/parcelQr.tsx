@@ -106,9 +106,7 @@ const ParcelService = () => {
     }
   };
 
-  
-
-  const deliverParcel = async () => {
+  const markParcelDelivered = async () => {
     try {
       const response = await fetch(
         `${API_URL}/parcel/deliver/${parcelId}`,
@@ -122,13 +120,26 @@ const ParcelService = () => {
 
       const data = await response.json();
 
-      if (data.success) {
-        Alert.alert("Success", "Parcel marked as delivered.");
+      if (data.valid) {
+        if (data.stage === "pickup") {
+          Alert.alert(
+            "Pickup Verified",
+            "Parcel pickup verified successfully."
+          );
+        } else if (data.stage === "delivery") {
+          Alert.alert(
+            "Delivered",
+            "Parcel delivered successfully."
+          );
+        }
+
+        console.log("Parcel:", data.parcel);
       } else {
-        Alert.alert("Error", data.message);
+        Alert.alert("Failed", data.reason);
       }
     } catch (error) {
-      Alert.alert("Error", "Something went wrong.");
+      console.log(error);
+      Alert.alert("Error", "Unable to connect to the server.");
     }
   };
 
@@ -143,7 +154,7 @@ const ParcelService = () => {
         },
         {
           text: "Yes",
-          onPress: () => deliverParcel(),
+          onPress: () => markParcelDelivered(),
         },
       ]
     );
