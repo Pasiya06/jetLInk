@@ -1,13 +1,13 @@
 import express from "express";
 
-import { addDriver, getDrivers, getDriverById, deleteDriver, updateDriver, driverLogin, verifyDriverOTP, checkNIC } from "../controllers/driverController.js";
+import { addDriver, getDrivers, getDriverById, deleteDriver, updateDriver, checkNIC } from "../controllers/driverController.js";
 
 const router = express.Router();
 
 // Authentication routes
 router.get("/check/:nic", checkNIC);
-router.post("/login", driverLogin);
-router.post("/verify-otp", verifyDriverOTP);
+
+
 
 // CRUD routes
 router.post("/", addDriver);

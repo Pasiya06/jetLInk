@@ -18,6 +18,7 @@ import parcelRoutes from "./routes/parcelRoutes.js";
 import parcelFeeRoutes from "./routes/parcelFeeRoutes.js";
 import ticketRoute from "./routes/ticketRoute.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
+import otpRoutes from "./routes/otpRoutes.js";
 
 
 
@@ -75,6 +76,7 @@ app.use("/api/locations", locationRoutes);
 app.use("/api/parcel", parcelRoutes);
 app.use("/api/parcelfee", parcelFeeRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/otp", otpRoutes);
 
 // Invalid Route Handler
 app.use((req, res) => {
