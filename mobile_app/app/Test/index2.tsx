@@ -20,7 +20,7 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 // };
 
 const BusDetailsCard = () => {
-    const params = useLocalSearchParams();
+  const params = useLocalSearchParams();
   const isOnline = params.status === 'online';
 
   return (

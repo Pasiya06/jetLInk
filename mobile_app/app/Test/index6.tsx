@@ -152,7 +152,6 @@ useEffect(() => {
     //     },
     //   });
 
-      //router.replace("/index6"); // swap for your post-verification route
     } catch (err) {
       setError("Something went wrong. Check your connection.");
     } finally {
@@ -520,7 +519,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#1F2937",
     marginBottom: 16,
-    //textAlign: "center",
+    
   },
   otpRow: {
     flexDirection: "row",

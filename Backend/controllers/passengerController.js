@@ -53,7 +53,7 @@ export const loginPassenger = async (req, res) => {
     const { email, password } = req.body;
 
     const passenger = await Passenger.findOne({ email });
-    const passenger1 = await Passenger.findOne({  password });
+    const passenger1 = await Passenger.findOne({ email, password });
     if (!passenger) {
       return res.status(401).json({
         success: false,
@@ -124,6 +124,43 @@ export const deletePassenger = async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message,
+    });
+  }
+};
+
+export const updatePassengerPassword = async (req, res) => {
+  try {
+    const { email } = req.params;
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: "Password is required",
+      });
+    }
+
+    const passenger = await Passenger.findOne({ email });
+
+    if (!passenger) {
+      return res.status(404).json({
+        success: false,
+        message: "Passenger not found",
+      });
+    }
+
+    passenger.password = password;
+    await passenger.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+    });
+  } catch (error) {
+    console.error("Update Password Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server Error",
     });
   }
 };

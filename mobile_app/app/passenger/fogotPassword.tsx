@@ -10,9 +10,9 @@ const RESEND_SECONDS = 30;
 
 export const FlatmateLogin: React.FC = () => {
   const router = useRouter();
+  const [showLogin, setShowOtp] = useState(false);
   const params = useLocalSearchParams();
-//   const email = (Array.isArray(params.cemail) ? params.cemail[0] : params.cemail) ?? "";
-  const [email, setEmail] = useState<string>('');
+  const [email, setEmail] = useState(String(params.email || ""));
   const [digits, setDigits] = useState<string[]>(Array(OTP_LENGTH).fill(""));
   const [verifying, setVerifying] = useState(false);
   const [resending, setResending] = useState(false);
@@ -24,7 +24,7 @@ export const FlatmateLogin: React.FC = () => {
 
   useEffect(() => {
     const backAction = () => {
-      router.replace("/busStaff/loginindex"); // Navigate to a specific path
+      router.replace("/passenger/index2"); // Navigate to a specific path
       return true; // Prevent default back behavior
     };
 
@@ -36,7 +36,7 @@ export const FlatmateLogin: React.FC = () => {
     return () => subscription.remove();
   }, []);
 
-  const sendOTP = async () => {
+ const sendOTP = async () => {
     try {
         const response = await fetch(`${API_URL}/otp/send`, {
         method: "POST",
@@ -58,20 +58,25 @@ export const FlatmateLogin: React.FC = () => {
         Alert.alert("Error", "Unable to connect to server.");
         console.log(error);
     }
-    };
+};
+ 
 
-    useEffect(() => {
-        sendOTP();
-    }, []);
+const verify = async () => {
+  try {
+    setShowOtp(true);
+    sendOTP();
+  } 
+  
+  catch (error) {
+    console.log(error);
+    alert("Server connection failed");
+  }
 
+};
 
-  useEffect(() => {
+useEffect(() => {
     if (timer <= 0) return;
-
-    const id = setInterval(() => {
-        setTimer((prev) => prev - 1);
-    }, 1000);
-
+    const id = setInterval(() => setTimer((t) => t - 1), 1000);
     return () => clearInterval(id);
   }, [timer]);
 
@@ -131,23 +136,14 @@ export const FlatmateLogin: React.FC = () => {
         return;
       }
 
-    //   router.push({
-    //     pathname: "/busStaff/index1",
-    //     params: {
-    //       conductorNIC:params.conductorNIC,
-    //       cfirstName:params.cfirstName,
-    //       clastName:params.clastName,
-    //       cphoneNumber:params.cphoneNumber,
-    //       cemail:params.cemail,
-    //       driverId:params.driverId,
-    //       dfirstName:params.dfirstName,
-    //       dlastName:params.dlastName,
-    //       dphoneNumber:params.dphoneNumber,
-    //       busNo:params.busNo,
-    //     },
-    //   });
+      router.push({
+        pathname: "/passenger/resetPassword",
+        params: {
+          email:email,
+          
+        },
+      });
 
-      //router.replace("/index6"); // swap for your post-verification route
     } catch (err) {
       setError("Something went wrong. Check your connection.");
     } finally {
@@ -176,10 +172,7 @@ export const FlatmateLogin: React.FC = () => {
     }
   };
 
-  
-  
 
- 
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
@@ -203,10 +196,12 @@ export const FlatmateLogin: React.FC = () => {
         
                 
               
-               
+                {!showLogin ? (
 
-                  <View style={styles.otpcard}>
-                    <Text style={styles.inputLabel}>Email Address</Text>
+
+              <>
+              <View style={styles.card}>
+                <Text style={styles.inputLabel}>Email Address</Text>
                     <View style={styles.inputWrapper}>
                     <View style={[styles.iconWrap, { backgroundColor: "#4B6CF51A"  }]}>
                         <Fontisto name="email" size={18} color="#4B6CF5" />
@@ -224,6 +219,75 @@ export const FlatmateLogin: React.FC = () => {
                         />
                     </View>
                     </View>
+                  
+            
+                  <TouchableOpacity
+                    style={styles.primaryButton}
+                    onPress={showLogin ? handleVerify : verify}
+                  >
+                    <LinearGradient
+                        colors={['#4B6CF5', '#32CD32']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.submitGradient}
+                    >
+                    <Text style={styles.primaryButtonText}>
+                     Get OTP
+                    </Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+           
+                                
+              </View>
+            
+                  
+
+                </>
+                ) : (
+                <>
+                <View style={styles.card}>
+                <Text style={styles.inputLabel}>Email Address</Text>
+                    <View style={styles.inputWrapper}>
+                    <View style={[styles.iconWrap, { backgroundColor: "#4B6CF51A"  }]}>
+                        <Fontisto name="email" size={18} color="#4B6CF5" />
+                    </View>
+                    <View style={styles.inputInnerWrapper}>
+                        <TextInput
+                        style={styles.textInput}
+                        value={email}
+                        placeholder="ABC@gmail.com"
+                        placeholderTextColor="#A3A3A3"
+                        keyboardType="email-address"
+                        onChangeText={(text) => setEmail(text.replace(/\s/g, "").toLowerCase())} 
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                        />
+                    </View>
+                    </View>
+                  
+            
+                  <TouchableOpacity
+                    style={styles.primaryButton}
+                    onPress={showLogin ? handleVerify : verify}
+                  >
+                    <LinearGradient
+                        colors={['#4B6CF5', '#32CD32']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.submitGradient}
+                    >
+                    <Text style={styles.primaryButtonText}>
+                     Get OTP
+                    </Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+           
+                                
+              </View>
+
+                  <View style={styles.otpcard}>
+                    
+                    <Text style={styles.otplabel}>Enter verification code</Text>
 
                     <View style={styles.otpRow}>
                       {digits.map((digit, index) => (
@@ -254,7 +318,7 @@ export const FlatmateLogin: React.FC = () => {
 
                     <TouchableOpacity
                       style={[styles.verifyButton, otp.length !== OTP_LENGTH && styles.verifyButtonDisabled]}
-                      onPress={handleVerify}
+                      onPress={showLogin ? handleVerify : verify}
                       disabled={verifying || otp.length !== OTP_LENGTH}
                       activeOpacity={0.85}
                     >
@@ -274,7 +338,8 @@ export const FlatmateLogin: React.FC = () => {
                       </TouchableOpacity>
                     </View>
                   </View>
-                
+                </>
+                )}
               
               
 
@@ -336,9 +401,9 @@ const styles = StyleSheet.create({
 
   card: {
     width: '90%',
-    height: '50%',
+    height: '30%',
     backgroundColor: '#FFF',
-    //padding: 24,
+    paddingTop: 24,
     //alignItems: 'center',
 
     marginTop: -50,   
@@ -354,64 +419,10 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 5,
-  },
-
-  card1: {
-    width: '90%',
-    height: '25%',
-    backgroundColor: '#FFF',
-    //padding: 24,
-    //alignItems: 'center',
-
-    marginTop: -50,   
-    alignSelf: 'center',
-
-    borderRadius: 20,
-    elevation: 10,
-
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-  
-  eyeIcon: {
-    padding: 4,
-  },
- 
-  
-  
-  
-
-  formContainer: {
-    
-    marginTop: 34,
-    //marginBottom:70,
-    //width: '90%',  
-  },
-
-
-  inputWrapper1: {
-    height: '13%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F2F4F5',
-    marginRight: 15,
-    marginLeft: 15,
-    marginBottom: 25,
-    borderLeftWidth: 1,
-    borderWidth: 1,
-    borderColor: '#ECEEF2',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
   },
 
   inputWrapper: {
-    height: '45%',
+    height: '22%',
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F2F4F5',
@@ -433,12 +444,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
-  },
-
-  input3dIcon: {
-    marginRight: 12,
-    width:25,
-    height:25
   },
 
   inputInnerWrapper: {
@@ -463,53 +468,24 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
 
-  footerContainer: {
-    
-    marginTop: 'auto', 
-    paddingBottom: 10,
-    //marginBottom: 10,
-    marginRight: 15,
-    marginLeft: 15,
-  },
+  
 
   primaryButton: {
-    //marginBottom: 60,
-    width: '100%',
-    
-    backgroundColor: '#32CD32',
-    padding: 14,
-    alignItems: 'center',   
-    alignSelf: 'center',
-    marginBottom: 2,
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
+    justifyContent: "space-around",
+    marginLeft: 15,
+    marginRight: 15,  
+    height: 55,
+    overflow: 'hidden',
+    borderRadius: 25,
+    marginTop: 30,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
     shadowOffset: {
       width: 0,
-      height: 5,
+      height: -2,
     },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-
-  primaryButton1: {
-    
-    width: '100%',
-    marginBottom: 10,
-    backgroundColor: '#32CD32',
-    padding: 14,
-    alignItems: 'center',   
-    alignSelf: 'center',
-    //marginTop: 10,
-    borderRadius: 20,
     elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
   },
 
   primaryButtonText: {
@@ -519,7 +495,7 @@ const styles = StyleSheet.create({
   },
 
   otpcard: {
-    marginTop: -28,
+    marginTop: 20,
     marginHorizontal: 20,
     backgroundColor: "#FFFFFF",
     borderRadius: 24,
@@ -535,7 +511,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#1F2937",
     marginBottom: 16,
-    textAlign: "center",
+    
   },
   otpRow: {
     flexDirection: "row",
@@ -588,7 +564,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   verifyButtonDisabled: {
-    backgroundColor: "#70e070",
+    backgroundColor: "#32CD321A",
     shadowOpacity: 0,
     elevation: 0,
   },
