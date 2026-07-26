@@ -285,15 +285,15 @@ const JetLinkInterface: React.FC = () => {
       </View>
 
       <TouchableOpacity style={styles.submitButton} onPress={handlesenderD}>
-                          <LinearGradient
-                              colors={['#4B6CF5', '#32CD32']}
-                              start={{ x: 0, y: 0 }}
-                              end={{ x: 1, y: 0 }}
-                              style={styles.submitGradient}
-                          >
-                          <Text style={styles.submitText}>Next</Text>
-                          </LinearGradient>
-                      </TouchableOpacity>
+        <LinearGradient
+            colors={['#4B6CF5', '#32CD32']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.submitGradient}
+        >
+        <Text style={styles.submitText}>Next</Text>
+        </LinearGradient>
+    </TouchableOpacity>
 
         {isSearching ? (
                   <TextInput
