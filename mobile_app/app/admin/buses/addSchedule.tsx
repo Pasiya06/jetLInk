@@ -29,6 +29,7 @@ const AddBus = () => {
   const [showTimePicker1, setShowTimePicker1] = useState(false);
   const [time, setTime] = useState(new Date());
   const [stops, setstops] = useState("");
+  const [ticketPrice, setticketPrice] = useState("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab, setActiveTab] = useState('');
@@ -86,7 +87,8 @@ const AddBus = () => {
         arrivaltime,
         stops,
         busNo: busNumber,
-        busType:params.busType
+        busType:params.busType,
+        ticketPrice
       }),
     });
 
@@ -222,6 +224,19 @@ const AddBus = () => {
             />
           )}    
 
+          <Text style={styles.label}>Price</Text>
+          <View style={styles.inputWrapper}>
+            <TextInput 
+              style={styles.input} 
+              value={ticketPrice} 
+              onChangeText={setticketPrice} 
+              placeholder='Price'
+              placeholderTextColor="#A3A3A3"
+              keyboardType="phone-pad"
+            />
+          </View>
+
+
           <Text style={styles.label}>Stops</Text>
           <View style={styles.inputWrapper}>
             <TextInput 
@@ -232,8 +247,6 @@ const AddBus = () => {
               autoCorrect={false}
             />
             <Text style={styles.inputIcon}>📍</Text>
-
-          
           </View>
 
           

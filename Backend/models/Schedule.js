@@ -48,6 +48,13 @@ const scheduleSchema = new mongoose.Schema(
       required: true,
     },
 
+    ticketPrice: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0.00,
+    },
+
   },
   {
     timestamps: true,

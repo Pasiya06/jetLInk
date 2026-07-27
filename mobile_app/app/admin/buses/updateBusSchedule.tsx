@@ -38,6 +38,7 @@ const ToursScreen: React.FC = () => {
   const [showTimePicker1, setShowTimePicker1] = useState(false);
   const [time, setTime] = useState(new Date());
   const [stops, setstops] = useState(String(params.stops ||""));
+  const [ticketPrice, setticketPrice] = useState(String(params.arrivaltime ||""));
 
   const onTimeChange = (event: any, selected?: Date) => {
     setShowTimePicker(false);
@@ -81,6 +82,7 @@ const ToursScreen: React.FC = () => {
       dropoffloca,
       depaturetime,
       arrivaltime,
+      ticketPrice,
       stops,
 
     });
@@ -218,6 +220,18 @@ const ToursScreen: React.FC = () => {
                     onChange={onTimeChange1}
                     />
                 )}    
+
+                <Text style={styles.label}>Price</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput 
+                    style={styles.input} 
+                    value={ticketPrice} 
+                    onChangeText={setticketPrice} 
+                    placeholder='Price'
+                    placeholderTextColor="#A3A3A3"
+                    keyboardType="phone-pad"
+                  />
+                </View>
 
                 <Text style={styles.label}>Stops</Text>
                 <View style={styles.inputWrapper}>

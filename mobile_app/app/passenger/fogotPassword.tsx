@@ -325,7 +325,7 @@ useEffect(() => {
                       {verifying ? (
                         <ActivityIndicator color="#FFFFFF" />
                       ) : (
-                        <Text style={styles.verifyButtonText}>Login</Text>
+                        <Text style={styles.verifyButtonText}>Next</Text>
                       )}
                     </TouchableOpacity>
 

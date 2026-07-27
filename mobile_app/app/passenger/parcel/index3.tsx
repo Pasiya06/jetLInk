@@ -106,45 +106,45 @@ const JetLinkInterface: React.FC = () => {
         }
       >
       <View style={styles.friendRow}>
-          <View style={styles.topRow}>
-                          <View style={styles.busNoPill}>
-                            <Ionicons name="bus" size={14} color="#4B7BEC" />
-                            <Text style={styles.busNoText}>{item.busNo}</Text>
-                          </View>
-                          <Text style={styles.dateText}>{item.busdate}</Text>
-                        </View>
-                  
-                        {/* Route visual */}
-                        <View style={styles.routeRow}>
-                          <View style={styles.routeLine}>
-                            <View style={styles.dotFilled} />
-                            <View style={styles.connector} />
-                            <View style={styles.dotOutline} />
-                          </View>
-                  
-                          <View style={styles.routeDetails}>
-                            <View style={styles.routeStop}>
-                              <Text style={styles.locationText}>{item.pickuploca}</Text>
-                              <Text style={styles.timeText}>{item.depaturetime}</Text>
-                            </View>
-                  
-                            <View style={[styles.routeStop, { marginTop: 22 }]}>
-                              <Text style={styles.locationText}>{item.dropoffloca}</Text>
-                              <Text style={styles.timeText}>{item.arrivaltime}</Text>
-                            </View>
-                          </View>
-                        </View>
-                  
-                        {/* Stops row */}
-                        <View style={styles.infoRow}>
-                          <View style={styles.iconWrap}>
-                            <Ionicons name="location-outline" size={16} color="#4B7BEC" />
-                          </View>
-                          <View style={{ flex: 1 }}>
-                            <Text style={styles.infoLabel}>Stops</Text>
-                            <Text style={styles.infoValue}>{item.stops}</Text>
-                          </View>
-                        </View>
+        <View style={styles.topRow}>
+          <View style={styles.busNoPill}>
+            <Ionicons name="bus" size={14} color="#4B7BEC" />
+            <Text style={styles.busNoText}>{item.busNo}</Text>
+          </View>
+          <Text style={styles.dateText}>{item.busdate}</Text>
+        </View>
+  
+        {/* Route visual */}
+        <View style={styles.routeRow}>
+          <View style={styles.routeLine}>
+            <View style={styles.dotFilled} />
+            <View style={styles.connector} />
+            <View style={styles.dotOutline} />
+          </View>
+  
+          <View style={styles.routeDetails}>
+            <View style={styles.routeStop}>
+              <Text style={styles.locationText}>{item.pickuploca}</Text>
+              <Text style={styles.timeText}>{item.depaturetime}</Text>
+            </View>
+  
+            <View style={[styles.routeStop, { marginTop: 22 }]}>
+              <Text style={styles.locationText}>{item.dropoffloca}</Text>
+              <Text style={styles.timeText}>{item.arrivaltime}</Text>
+            </View>
+          </View>
+        </View>
+  
+        {/* Stops row */}
+        <View style={styles.infoRow}>
+          <View style={styles.iconWrap}>
+            <Ionicons name="location-outline" size={16} color="#4B7BEC" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.infoLabel}>Stops</Text>
+            <Text style={styles.infoValue}>{item.stops}</Text>
+          </View>
+        </View>
       </View>
       </TouchableOpacity>
     );
@@ -172,7 +172,7 @@ const JetLinkInterface: React.FC = () => {
                 </LinearGradient> 
              
         <View style={styles.card}>
-          <Text style={styles.cardtitle}>Select a schedule for booking</Text>
+          <Text style={styles.cardtitle}>Select a route for booking</Text>
           <FlatList style={styles.svw}
             data={busschedData}
             renderItem={renderBusItem}
@@ -180,7 +180,7 @@ const JetLinkInterface: React.FC = () => {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingVertical: 10 }}
             />
-  
+
         </View>
 
       {isSearching ? (

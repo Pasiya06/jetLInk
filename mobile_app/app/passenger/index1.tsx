@@ -132,7 +132,7 @@ export default function Index() {
           <TouchableOpacity style={styles.card1} 
             onPress={() =>
             router.push({
-              pathname: "/passenger/dailyBuses/index1",
+              pathname: "/passenger/dailyBuses/searchBus",
               params: {
                 Pid: params.Pid,
                 Pid1: params.Pid1,
