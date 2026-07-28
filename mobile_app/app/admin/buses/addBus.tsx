@@ -22,6 +22,7 @@ const AddBus = () => {
   const [chassisNo, setChassisNo] = useState("");
   const [engineNo, setEngineNo] = useState("");
   const [colour, setColour] = useState("");
+  const [noOfSeats, setnoOfSeats] = useState("");
   const [serviceDate, setServiceDate] = useState("");
   const [licenseDate, setLicenseDate] = useState("");
   const [emissionDate, setEmissionDate] = useState("");
@@ -78,7 +79,8 @@ const AddBus = () => {
             busNumber,
             chassisNo,
             engineNo,
-            colour,
+            noOfSeats,
+            colour, 
             serviceDate,
             licenseDate,
             emissionDate,
@@ -138,7 +140,7 @@ const AddBus = () => {
                 <Text style={styles.label}>Bus Number</Text>
                 <View style={styles.inputWrapper}>
                 <View style={[styles.iconWrap, { backgroundColor: "#f6a60518"  }]}>
-                    <MaterialCommunityIcons name="bus" size={18} color="#f6a605" />
+                    <MaterialCommunityIcons name="bus" size={18} color="#f6ce05" />
                 </View>
                 <TextInput
                     style={styles.input}
@@ -188,6 +190,21 @@ const AddBus = () => {
                 </View>
             </View>
 
+            <View style={styles.fieldContainer}>
+              <Text style={styles.label}>Number of seats</Text>
+              <View style={styles.inputWrapper}>
+                <View style={[styles.iconWrap, { backgroundColor: "#fe880018" }]}>
+                    <MaterialCommunityIcons name ="car-seat" size={18} color="#fe8800" />
+                </View>
+                <TextInput 
+                  style={styles.input} 
+                  value={noOfSeats} 
+                  onChangeText={setnoOfSeats} 
+                  keyboardType="phone-pad" 
+                  maxLength={2} />           
+              </View>
+            </View>
+            
             <View style={styles.fieldContainer}>
                 <Text style={styles.label}>Colour</Text>
                 <View style={styles.inputWrapper}>

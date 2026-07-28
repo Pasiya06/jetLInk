@@ -164,6 +164,16 @@ const AddBus = () => {
         </View>
 
         <View style={styles.row}>
+        <View style={[styles.iconWrap, { backgroundColor: "#fe880018" }]}>
+            <MaterialCommunityIcons name ="car-seat" size={18} color="#fe8800" />
+        </View>
+        <View style={styles.rowText}>
+            <Text style={styles.label}>Number of seats</Text>
+            <Text style={styles.value}>{params.noOfSeats}</Text>
+        </View>
+        </View>
+
+        <View style={styles.row}>
         <View style={[styles.iconWrap, { backgroundColor: "#EC489918" }]}>
             <Ionicons name="color-palette-outline" size={18} color="#EC4899" />
         </View>
@@ -172,6 +182,8 @@ const AddBus = () => {
             <Text style={styles.value}>{params.colour}</Text>
         </View>
         </View>
+
+        
 
         <View style={styles.row}>
         <View style={[styles.iconWrap, { backgroundColor: "#10B98118" }]}>

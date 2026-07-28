@@ -30,6 +30,7 @@ interface Bussched {
   depaturetime?:string;
   stops?:string;
   busNo?:string;
+  ticketPrice:string;
 }
 
 const BusScreen: React.FC = () => {
@@ -138,6 +139,7 @@ const BusScreen: React.FC = () => {
             depaturetime: item.depaturetime ,
             stops: item.stops ,
             busNo: item.busNo ,
+            ticketPrice:item.ticketPrice,
 
             busTypeTopic:params.busTypeTopic,
             busType: params.busType ,
@@ -146,6 +148,7 @@ const BusScreen: React.FC = () => {
             firstName: params.firstName,
             lastName: params.lastName,
             email: params.email,
+
           },
         })
       }

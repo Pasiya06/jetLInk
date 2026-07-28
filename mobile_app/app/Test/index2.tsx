@@ -20,8 +20,12 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 // };
 
 const BusDetailsCard = () => {
-  const params = useLocalSearchParams();
-  const isOnline = params.status === 'online';
+  const { seatCount, seatNumbers } = useLocalSearchParams();
+  
+
+  const selectedSeatNumbers = seatNumbers
+  ? JSON.parse(seatNumbers as string)
+  : [];
 
   return (
     <View style={styles.card}>
@@ -37,29 +41,7 @@ const BusDetailsCard = () => {
                 <MaterialCommunityIcons name="bus" size={32} color="#ffffff" />
             </View>
 
-            <Text style={styles.fullName}>{params.busNumber || 'N/A'}</Text>
-
-            <View
-                style={[
-                styles.badge,
-                { backgroundColor: isOnline ? '#EAFBEF' : '#FDEDED' },
-                ]}
-            >
-                <View
-                style={[
-                    styles.statusDot,
-                    { backgroundColor: isOnline ? '#22C55E' : '#EF4444' },
-                ]}
-                />
-                <Text
-                style={[
-                    styles.badgeText,
-                    { color: isOnline ? '#2F9E44' : '#DC2626' },
-                ]}
-                >
-                {isOnline ? 'Online' : 'Offline'}
-                </Text>
-            </View>
+            
         
       </LinearGradient>
 
@@ -143,7 +125,7 @@ const BusDetailsCard = () => {
         </View>
         <View style={styles.rowText}>
             <Text style={styles.label}>Emission Date</Text>
-            <Text style={styles.value}>not yet</Text>
+            <Text style={styles.value}>{selectedSeatNumbers.join(", ")} {seatCount}</Text>
         </View>
         </View>
 

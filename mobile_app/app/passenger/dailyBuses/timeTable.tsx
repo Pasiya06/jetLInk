@@ -34,6 +34,7 @@ interface Bussched {
   stops?:string;
   busNo?:string;
   busType:string;
+  ticketPrice:string;
 }
 
 
@@ -75,7 +76,7 @@ const JetLinkInterface: React.FC = () => {
                 <TouchableOpacity
                     onPress={() => 
                         router.push({
-                            pathname: "/passenger/parcel/index4",
+                            pathname: "/passenger/dailyBuses/ticketSummary",
                             params: {
                             Sid: item._id,
                             scheduleId: item.scheduleId,
@@ -87,6 +88,7 @@ const JetLinkInterface: React.FC = () => {
                             stops: item.stops || "",
                             bNumber: item.busNo || "",
                             busType:item.busType,
+                            ticketPrice:item.ticketPrice,
 
                             Pid: params.Pid,
                             Pid1: params.Pid1,
@@ -94,13 +96,6 @@ const JetLinkInterface: React.FC = () => {
                             plastName:params.plastName,
                             pphoneNumber: params.pphoneNumber,
                             pemail: params.pemail,
-                            sendername:params.sendername,
-                            smobilenumber:params.smobilenumber,
-                            semail:params.semail,
-                            receivername:params.receivername,
-                            rmobilenumber:params.rmobilenumber,
-                            remail:params.remail,
-                            weight:params.weight,
                             pickup:params.pickup,
                             drop:params.drop,
                             date:params.date,
@@ -162,7 +157,7 @@ const JetLinkInterface: React.FC = () => {
                 <TouchableOpacity
                     onPress={() => 
                         router.push({
-                            pathname: "/passenger/parcel/index4",
+                            pathname: "/passenger/dailyBuses/selectSeat",
                             params: {
                             Sid: item._id,
                             scheduleId: item.scheduleId,
@@ -174,6 +169,7 @@ const JetLinkInterface: React.FC = () => {
                             stops: item.stops || "",
                             bNumber: item.busNo || "",
                             busType:item.busType,
+                            ticketPrice:item.ticketPrice,
 
                             Pid: params.Pid,
                             Pid1: params.Pid1,
@@ -181,13 +177,6 @@ const JetLinkInterface: React.FC = () => {
                             plastName:params.plastName,
                             pphoneNumber: params.pphoneNumber,
                             pemail: params.pemail,
-                            sendername:params.sendername,
-                            smobilenumber:params.smobilenumber,
-                            semail:params.semail,
-                            receivername:params.receivername,
-                            rmobilenumber:params.rmobilenumber,
-                            remail:params.remail,
-                            weight:params.weight,
                             pickup:params.pickup,
                             drop:params.drop,
                             date:params.date,
@@ -264,7 +253,7 @@ const JetLinkInterface: React.FC = () => {
                     
                 
                 <TouchableOpacity >
-                <Text style={styles.title}>JetLink</Text>
+                  <Text style={styles.title}>JetLink</Text>
                 </TouchableOpacity>
                          
             </View>

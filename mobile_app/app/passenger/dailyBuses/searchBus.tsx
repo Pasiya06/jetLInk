@@ -57,7 +57,7 @@ const JetLinkInterface: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const handlesenderD = async () => {
 
-  if (!pickup || !drop || !drop || !drop ) {
+  if (!pickup || !drop || !date) {
     alert("Please fill required fields");
     return;
   }

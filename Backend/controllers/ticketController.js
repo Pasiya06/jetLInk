@@ -2,26 +2,121 @@ import jwt from "jsonwebtoken";
 import Ticket from "../models/Ticket.js";
 
 export const createTicket = async (req, res) => {
-  const { busId, passengerName, price, fromStop, toStop } = req.body;
+  try {
+    let {
+      pickup,
+      drop,
+      date,
+      time,
+      bNumber,
+      busType,
+      seatNumbers,
+      noOfTicket,
+      totalFare,
+    } = req.body;
 
-  if (!busId || !passengerName || price === undefined) {
-    return res.status(400).json({
-      error: "busId, passengerName and price are required",
+    
+
+    const ticket = new Ticket({
+      pickup,
+      drop,
+      date,
+      time,
+      bNumber,
+      busType,
+      seatNumbers,
+      noOfTicket,
+      totalFare,
+    });
+
+    await ticket.save();
+
+    res.status(201).json({
+      success: true,
+      ticket,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
     });
   }
+};
 
+// Get All Tickets
+export const getTickets = async (req, res) => {
   try {
-    const ticket = await Ticket.create({
-      busId,
-      passengerName,
-      price,
-      fromStop,
-      toStop,
+    const tickets = await Ticket.find().sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      tickets,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Get Ticket by Ticket ID
+export const getTicketById = async (req, res) => {
+  try {
+    const ticket = await Ticket.findOne({
+      ticketId: req.params.ticketId,
     });
 
-    res.status(201).json(ticket);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to create ticket" });
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        message: "Ticket not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      ticket,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getBookedSeats = async (req, res) => {
+  try {
+    const { bNumber, busType } = req.query;
+    console.log("Searching Bus ID:", bNumber,busType);
+    const tickets = await Ticket.find(
+      {
+        bNumber,
+        busType,
+      },
+      "seatNumbers"
+    );
+
+    let bookedSeats = [];
+
+    tickets.forEach((ticket) => {
+      const seats = JSON.parse(ticket.seatNumbers);
+      bookedSeats.push(...seats);
+    });
+
+    res.status(200).json({
+      success: true,
+      bookedSeats,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
@@ -63,6 +158,51 @@ export const generateTicketQRByBusId = async (req, res) => {
         price: ticket.price,
         fromStop: ticket.fromStop,
         toStop: ticket.toStop,
+      },
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      error: "Failed to generate QR",
+    });
+  }
+};
+
+export const generateTicketQRByBusNumber = async (req, res) => {
+  const { bNumber } = req.params;
+    console.log("Searching Bus ID:", bNumber);
+  try {
+    // Find ticket using busId
+    const ticket = await Ticket.findOne({ bNumber });
+    console.log("Searching Bus ID:", ticket);
+    if (!ticket) {
+      return res.status(404).json({
+        error: "No ticket found for this bus",
+      });
+    }
+
+    const payload = {
+      ticketId: ticket._id,
+      bNumber: ticket.bNumber,
+      
+      issuedAt: Date.now(),
+    };
+
+    const token = jwt.sign(
+        
+      payload,
+      process.env.QR_SECRET,
+      {
+        expiresIn: "12h",
+      }
+    );
+    console.log("Searching Bus ID:", token);
+
+    res.json({
+      qrToken: token,
+      ticket: {
+        id: ticket._id,
+        bNumber: ticket.bNumber,
       },
     });
 

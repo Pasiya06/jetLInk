@@ -29,6 +29,7 @@ const ToursScreen: React.FC = () => {
   const params = useLocalSearchParams();
   const [chassisNo, setChassisNo] = useState(String(params.chassis || ""));
   const [engineNo, setEngineNo] = useState(String(params.engine || ""));
+  const [noOfSeats, setnoOfSeats] = useState("");
   const [colour, setColour] = useState(String(params.colour || ""));
   const [serviceDate, setServiceDate] = useState(String(params.serviceDate || ""));
   const [licenseDate, setLicenseDate] = useState(String(params.licenseDate || ""));
@@ -47,6 +48,7 @@ const ToursScreen: React.FC = () => {
         await updateBus(params.Bid as string,{
             chassisNo,
             engineNo,
+            noOfSeats,
             colour,
             serviceDate,
             licenseDate,
@@ -135,6 +137,21 @@ const ToursScreen: React.FC = () => {
                     autoCorrect={false}
                 />
                 </View>
+            </View>
+
+            <View style={styles.fieldContainer}>
+              <Text style={styles.label}>Number of seats</Text>
+              <View style={styles.inputWrapper}>
+                <View style={[styles.iconWrap, { backgroundColor: "#fe880018" }]}>
+                    <MaterialCommunityIcons name ="car-seat" size={18} color="#fe8800" />
+                </View>
+                <TextInput 
+                  style={styles.input} 
+                  value={noOfSeats} 
+                  onChangeText={setnoOfSeats} 
+                  keyboardType="phone-pad" 
+                  maxLength={2} />           
+              </View>
             </View>
 
             <View style={styles.fieldContainer}>

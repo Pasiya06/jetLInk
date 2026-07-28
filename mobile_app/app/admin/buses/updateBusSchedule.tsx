@@ -38,7 +38,7 @@ const ToursScreen: React.FC = () => {
   const [showTimePicker1, setShowTimePicker1] = useState(false);
   const [time, setTime] = useState(new Date());
   const [stops, setstops] = useState(String(params.stops ||""));
-  const [ticketPrice, setticketPrice] = useState(String(params.arrivaltime ||""));
+  const [ticketPrice, setticketPrice] = useState(String(params.ticketPrice ||""));
 
   const onTimeChange = (event: any, selected?: Date) => {
     setShowTimePicker(false);

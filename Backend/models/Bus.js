@@ -20,6 +20,8 @@ const busSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+
+  noOfSeats: String,
   
   colour: String,
 
