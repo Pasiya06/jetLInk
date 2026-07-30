@@ -22,7 +22,7 @@ export default function PaymentSuccessScreen() {
   const params = useLocalSearchParams();
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const amount = params.totalFare as string;
-  const bNumber = params.Bnumber as string;
+  const bNumber = params.bNumber as string;
   const [qrToken, setQrToken] = useState("");
   const [error, setError] = useState<string | null>(null);
 

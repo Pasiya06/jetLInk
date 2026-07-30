@@ -158,6 +158,7 @@ export const FlatmateLogin: React.FC = () => {
                         pphoneNumber: params.pphoneNumber,
                         pemail: params.pemail,
                         totalFare:params.totalFare,
+                        bNumber:params.bNumber,
                     },
                 });
             }

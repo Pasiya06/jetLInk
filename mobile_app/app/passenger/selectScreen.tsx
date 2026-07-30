@@ -75,7 +75,7 @@ export default function Index() {
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card1} onPress={() => router.push("/busStaff/loginindex")} >
+          <TouchableOpacity style={styles.card1} onPress={() => router.push("/busStaff/busLogin")} >
               <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
                   <Fontisto name="bus" size={50} color="#8B5CF6" />
               </View>
