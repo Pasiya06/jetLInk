@@ -416,6 +416,27 @@ export default function DriverHome() {
       });
     };
 
+    const handleBusTicket = () => {
+      stopSharing();
+      router.push({
+
+        pathname: "/busStaff/VerifyTicketScreen",
+        params: {
+            Cid: params.Cid,
+            conductorId: params.conductorId,
+            conductorNIC:params.conductorNIC,
+            cfirstName: params.cfirstName,
+            clastName: params.clastName,
+            cphoneNumber:params.cphoneNumber,
+            driverId:params.driverId,
+            dfirstName:params.dfirstName,
+            dlastName:params.dlastName,
+            dphoneNumber:params.dphoneNumber,
+            busNo: params.busNo,
+        },         
+      });
+    };
+
 
   // ────────────────────────────────────────────────────────────────
   // RENDER
@@ -532,7 +553,7 @@ export default function DriverHome() {
         <View style={styles.listContainer1}>
           <TouchableOpacity
             style={styles.card0}
-            onPress={() => router.push("/busStaff/index1")}
+            onPress={handleBusTicket}
             disabled={loading}
           >
             <View style={[styles.iconContainer, { backgroundColor: "#8B5CF618"  }]}>

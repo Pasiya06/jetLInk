@@ -220,7 +220,7 @@ export default function Index() {
             style={styles.card2} 
             onPress={() =>
               router.push({
-                pathname: "/passenger/ticket/index1",
+                pathname: "/passenger/ticket/normalwayAndHighway",
                 params: {
                   Pid: params.Pid,
                   Pid1: params.Pid1,

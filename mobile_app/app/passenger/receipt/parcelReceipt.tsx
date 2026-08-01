@@ -1,6 +1,5 @@
 import React, { useState, useCallback } from 'react';
 import { Stack, useRouter, useFocusEffect, useLocalSearchParams } from "expo-router";
-import { getSchedules,  } from "../../../services/scheduleServices";
 import { 
   StyleSheet, 
   View, 
@@ -18,7 +17,7 @@ import {
   MaterialCommunityIcons
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ScrollView } from 'react-native-reanimated/lib/typescript/Animated';
+
 
 
 

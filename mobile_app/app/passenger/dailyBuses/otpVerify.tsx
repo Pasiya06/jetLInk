@@ -137,6 +137,7 @@ export const FlatmateLogin: React.FC = () => {
                     drop:params.drop,
                     date:params.date,
                     time:params.time,
+                    pemail: params.pemail,
                     bNumber:params.bNumber,
                     busType:params.busType,
                     seatNumbers:params.seatNumbers,

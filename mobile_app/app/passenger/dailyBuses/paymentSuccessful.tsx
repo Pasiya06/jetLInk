@@ -29,41 +29,34 @@ export default function PaymentSuccessScreen() {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const loadQr = async () =>{
-    try {
+  const loadQr = async () => {
+  try {
+    setError(null);
 
-      setError(null);
+    const res = await fetch(`${API_URL}/tickets/generate-qr`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        
+        pemail:params.pemail,
+        
+      }),
+    });
 
-      const url = `${API_URL}/tickets/bus/${bNumber}/qr`;
+    const data = await res.json();
 
-      console.log("Request URL:", url);
-
-      const res = await fetch(url);
-
-      console.log("Status:", res.status);
-
-      const data = await res.json();
-
-      console.log("Backend Data:", data);
-
-
-      if (!res.ok) {
-        throw new Error(data.error);
-      }
-
-
-      setQrToken(data.qrToken);
-
-
-    } catch (error) {
-
-      console.log("QR Error:", error);
-
-      
-      setError("Could not generate QR");
-
+    if (!res.ok) {
+      throw new Error(data.error);
     }
+
+    setQrToken(data.qrToken);
+  } catch (error) {
+    console.log(error);
+    setError("Could not generate QR");
   }
+};
 
   useEffect(() => {
           

@@ -77,10 +77,10 @@ export default function ParcelScanner() {
   // ---- Permission states ----------------------------------------------------
 
   useEffect(() => {
-  if (permission && !permission.granted) {
-    requestPermission();
-  }
-}, [permission]);
+    if (permission && !permission.granted) {
+      requestPermission();
+    }
+  }, [permission]);
 
   // ---- Main render ------------------------------------------------------------
 

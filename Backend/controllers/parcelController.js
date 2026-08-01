@@ -111,10 +111,9 @@ export const verifyParcelQR = async (req, res) => {
   const { qrToken } = req.body;
 
   try {
-    // Verify QR Token
+    
     const decoded = jwt.verify(qrToken, process.env.QR_SECRET);
 
-    // Find parcel using parcelId
     const parcel = await Parcel.findOne({ parcelId: decoded.parcelId });
 
     if (!parcel) {
@@ -124,7 +123,7 @@ export const verifyParcelQR = async (req, res) => {
       });
     }
 
-    // First Scan -> Pending → PickedUp
+    
     if (parcel.status === "Pending") {
       parcel.pickupVerified = true;
       parcel.pickupVerifiedAt = new Date();
@@ -156,7 +155,7 @@ export const verifyParcelQR = async (req, res) => {
       });
     }
 
-    // Already Delivered
+    
     return res.json({
       valid: false,
       reason: "Parcel has already been delivered.",

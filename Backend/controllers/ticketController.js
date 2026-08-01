@@ -8,6 +8,7 @@ export const createTicket = async (req, res) => {
       drop,
       date,
       time,
+      pemail,
       bNumber,
       busType,
       seatNumbers,
@@ -22,6 +23,7 @@ export const createTicket = async (req, res) => {
       drop,
       date,
       time,
+      pemail,
       bNumber,
       busType,
       seatNumbers,
@@ -90,7 +92,7 @@ export const getTicketById = async (req, res) => {
 export const getBookedSeats = async (req, res) => {
   try {
     const { bNumber, busType } = req.query;
-    console.log("Searching Bus ID:", bNumber,busType);
+    
     const tickets = await Ticket.find(
       {
         bNumber,
@@ -120,13 +122,46 @@ export const getBookedSeats = async (req, res) => {
   }
 };
 
-export const generateTicketQRByBusId = async (req, res) => {
-  const { busId } = req.params;
-    console.log("Searching Bus ID:", busId);
+export const getTicketByEmail = async (req, res) => {
   try {
-    // Find ticket using busId
-    const ticket = await Ticket.findOne({ busId });
-    console.log("Searching Bus ID:", ticket);
+    const { pemail, busType, used } = req.params;
+    console.log("Searching Bus ID:", pemail, busType, used);
+    const tickets = await Ticket.find(
+      {
+        pemail: pemail,
+        busType: busType,
+        used: used,
+      }
+    );
+    console.log("Searching Bus ID:", tickets);
+
+    if (tickets.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Ticket not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: tickets,
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const generateTicketQRByticketId = async (req, res) => {
+  const { ticketId } = req.params;
+    
+  try {
+    
+    const ticket = await Ticket.findOne({ ticketId });
+    
     if (!ticket) {
       return res.status(404).json({
         error: "No ticket found for this bus",
@@ -134,9 +169,9 @@ export const generateTicketQRByBusId = async (req, res) => {
     }
 
     const payload = {
-      ticketId: ticket._id,
-      busId: ticket.busId,
-      
+      tId: ticket._id,
+      ticketId: ticket.ticketId,
+      bNumber: ticket.bNumber,
       issuedAt: Date.now(),
     };
 
@@ -168,46 +203,34 @@ export const generateTicketQRByBusId = async (req, res) => {
   }
 };
 
-export const generateTicketQRByBusNumber = async (req, res) => {
-  const { bNumber } = req.params;
-    console.log("Searching Bus ID:", bNumber);
+export const generateTicketQR = async (req, res) => {
   try {
-    // Find ticket using busId
-    const ticket = await Ticket.findOne({ bNumber });
-    console.log("Searching Bus ID:", ticket);
-    if (!ticket) {
-      return res.status(404).json({
-        error: "No ticket found for this bus",
-      });
-    }
+    const {
+      pemail,
+    } = req.body;
 
-    const payload = {
-      ticketId: ticket._id,
-      bNumber: ticket.bNumber,
-      
+    const payload = {      
+      pemail,
       issuedAt: Date.now(),
     };
 
     const token = jwt.sign(
-        
       payload,
       process.env.QR_SECRET,
       {
         expiresIn: "12h",
       }
     );
-    console.log("Searching Bus ID:", token);
 
     res.json({
+      success: true,
       qrToken: token,
-      ticket: {
-        id: ticket._id,
-        bNumber: ticket.bNumber,
-      },
     });
-
   } catch (err) {
+    console.log(err);
+
     res.status(500).json({
+      success: false,
       error: "Failed to generate QR",
     });
   }
@@ -219,7 +242,7 @@ export const verifyTicket = async (req, res) => {
   try {
     const decoded = jwt.verify(qrToken, process.env.QR_SECRET);
 
-    const ticket = await Ticket.findById(decoded.ticketId);
+    const ticket = await Ticket.findOne({ ticketId: decoded.ticketId });
 
     if (!ticket) {
       return res.json({
@@ -241,7 +264,13 @@ export const verifyTicket = async (req, res) => {
 
     res.json({
       valid: true,
-      passengerName: ticket.passengerName,
+      ticket: {
+        ticketId: ticket.ticketId,
+        pickup: ticket.pickup,
+        drop: ticket.drop,
+        noOfTicket: ticket.noOfTicket,
+        totalFare: ticket.totalFare,
+      },
     });
   } catch (err) {
     res.json({

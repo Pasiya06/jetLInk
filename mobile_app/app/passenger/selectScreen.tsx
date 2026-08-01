@@ -75,7 +75,7 @@ export default function Index() {
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card1} onPress={() => router.push("/busStaff/busLogin")} >
+          <TouchableOpacity style={styles.card1} onPress={() => router.push("/busStaff/loginindex")} >
               <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
                   <Fontisto name="bus" size={50} color="#8B5CF6" />
               </View>
@@ -102,13 +102,13 @@ export default function Index() {
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity> */}
 
-          {/* <TouchableOpacity style={styles.card} onPress={() => router.push("/Test/TicketQRScreen")} >
+          <TouchableOpacity style={styles.card} onPress={() => router.push("/Test/VerifyTicketScreen")} >
               <View style={styles.iconContainer}>
                 <MaterialIcons name={"tour"}  size={22} color={"#FF0000" } />
               </View>
               <Text style={styles.cardText}>Admin</Text>
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity> */}
+          </TouchableOpacity>
 
         
 

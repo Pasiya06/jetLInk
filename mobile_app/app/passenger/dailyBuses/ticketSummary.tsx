@@ -24,7 +24,7 @@ const ParcelService = () => {
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const params = useLocalSearchParams();
-    const seatNumbers:string = "Not";
+    const seatNumbers:string = "Can't book seat";
     const [activeTab, setActiveTab] = useState('');
     const router = useRouter();
     const [tikNo, settikNo] = useState(String(1 || ""));

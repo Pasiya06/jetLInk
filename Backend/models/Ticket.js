@@ -28,6 +28,11 @@ const ticketSchema = new mongoose.Schema({
     required: true,
   },
 
+  pemail: {
+    type: String,
+    required: true,
+  },
+
   bNumber: {
     type: String,
     required: true,
