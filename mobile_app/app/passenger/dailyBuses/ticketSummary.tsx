@@ -24,7 +24,7 @@ const ParcelService = () => {
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const params = useLocalSearchParams();
-    const seatNumbers:string = "Can't book seat";
+    const seatNumbers:string = "";
     const [activeTab, setActiveTab] = useState('');
     const router = useRouter();
     const [tikNo, settikNo] = useState(String(1 || ""));
@@ -635,8 +635,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     overflow: 'hidden',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25, 
   },
 
   footerGraphic1: {

@@ -162,7 +162,7 @@ export default function Index() {
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card1} onPress={() => router.push("/admin/buses/index1")} >
+          <TouchableOpacity style={styles.card1} onPress={() => router.push("/admin/index1")} >
               <View style={[styles.iconContainer, { backgroundColor: "#EC489918"  }]}>
                 <FontAwesome5 name="route" size={24} color="#EC4899" />
               </View>
@@ -204,7 +204,7 @@ export default function Index() {
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />             
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card2} onPress={() => router.push("/admin/buses/index1")} >
+          <TouchableOpacity style={styles.card2} onPress={() => router.push("/admin/index1")} >
               <View style={[styles.iconContainer, { backgroundColor: "#ff000018"  }]}>
                 <MaterialCommunityIcons name="alarm-light-outline" size={24} color="#ff0000" />
               </View>
@@ -546,8 +546,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     overflow: 'hidden',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25, 
   },
 
   footerGraphic1: {

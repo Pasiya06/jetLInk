@@ -707,20 +707,20 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
   footerGraphic: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
-    width: "100%",
-    overflow: "hidden",
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
+    width: '100%',
+    overflow: 'hidden',
   },
+
   footerGraphic1: {
-    position: "absolute",
-    bottom: 5,
-    width: "100%",
-    overflow: "hidden",
+
+    position: 'absolute',
+    bottom: 20,
+    width: '100%',
+    overflow: 'hidden',
     borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
+    borderTopRightRadius: 25, 
   },
 });
 

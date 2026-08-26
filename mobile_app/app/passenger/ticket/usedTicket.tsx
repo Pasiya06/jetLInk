@@ -10,20 +10,21 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
-import { Ionicons, 
+import { 
+  Ionicons, 
   MaterialCommunityIcons, 
-  Fontisto, 
   FontAwesome, Feather, 
-  MaterialIcons} from '@expo/vector-icons'; 
+  MaterialIcons} 
+from '@expo/vector-icons'; 
 import { LinearGradient } from 'expo-linear-gradient';
 
 const ParcelService = () => {
-    const [isSearching, setIsSearching] = useState<boolean>(false);
-    const [searchQuery, setSearchQuery] = useState<string>('');
-    const params = useLocalSearchParams();
-    const selectedSeatNumbers = params.seatNumbers ? JSON.parse(params.seatNumbers as string): [];
-    const [activeTab, setActiveTab] = useState('');
-    const router = useRouter();
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const params = useLocalSearchParams();
+  const selectedSeatNumbers = params.seatNumbers ? JSON.parse(params.seatNumbers as string): [];
+  const [activeTab, setActiveTab] = useState('');
+  const router = useRouter();
     
     
   return (
@@ -37,22 +38,22 @@ const ParcelService = () => {
           style={styles.submitGradient1}
         >
        
-        <View style={styles.header}> 
-            <TouchableOpacity>
-                <Text style={styles.title}>{params.ticketId}</Text>
-            </TouchableOpacity>
-        </View>
-      </LinearGradient>
+          <View style={styles.header}> 
+              <TouchableOpacity>
+                  <Text style={styles.title}>{params.ticketId}</Text>
+              </TouchableOpacity>
+          </View>
+        </LinearGradient>
 
         <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
         >
         
 
-        {/* Trip / Parcel info */}
-        <View style={styles.card}>
+          {/* Trip / Parcel info */}
+          <View style={styles.card}>
             <Text style={styles.sectionHeader}>Ticket Details</Text>
 
             <View style={styles.infoRow}>
@@ -131,7 +132,7 @@ const ParcelService = () => {
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Seat Numbers</Text>
-            <Text style={styles.infoValue}>{selectedSeatNumbers.join(", ")}</Text>
+            <Text style={styles.infoValue}>{selectedSeatNumbers.join(", ") || "Can't book seat"}</Text>
             </View>
             </View>
 
@@ -145,42 +146,45 @@ const ParcelService = () => {
             </View>
             </View>
 
-        </View>
+          </View>
         </ScrollView>
 
-      {isSearching ? (
-              <TextInput
-                style={styles.searchBarInput}
-                placeholder="Search..."
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoFocus={true}
-              />
-            ) : null}
+        {isSearching ? (
+          <TextInput
+            style={styles.searchBarInput}
+            placeholder="Search..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoFocus={true}
+          />
+        ) : null}
       
-      <View style={styles.bottomNav}>
+        <View style={styles.bottomNav}>
 
-          
-
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                  setIsSearching(false); 
-                }
-
-                else {
-                  router.push({
-                    pathname: "/passenger/ticket/usedAndActiveTicket",
-                    params: {
-                      Pid: params.Pid,
-                      Pid1: params.Pid1,
-                      pfirstName: params.pfirstName,
-                      plastName:params.plastName,
-                      pemail: params.pemail,
-                      pphoneNumber: params.pphoneNumber,
-                      busType:params.busType, 
-                      busTypeTopic:params.busTypeTopic, 
-                    },                    
-                  });
-                };}}>
+          <TouchableOpacity 
+            style={styles.item} 
+            onPress={() => { 
+              setActiveTab("home"); 
+              if (isSearching) {
+                setIsSearching(false); 
+              }
+              else {
+                router.push({
+                  pathname: "/passenger/ticket/usedAndActiveTicket",
+                  params: {
+                    Pid: params.Pid,
+                    Pid1: params.Pid1,
+                    pfirstName: params.pfirstName,
+                    plastName:params.plastName,
+                    pemail: params.pemail,
+                    pphoneNumber: params.pphoneNumber,
+                    busType:params.busType, 
+                    busTypeTopic:params.busTypeTopic, 
+                  },                    
+                });
+              };
+            }}
+          >
             <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
               Back
@@ -194,17 +198,23 @@ const ParcelService = () => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
-                    pathname: "/passenger/index1",
-                    params: {
-                        Pid: params.Pid,
-                        Pid1: params.Pid1,
-                        pfirstName: params.pfirstName,
-                        plastName:params.plastName,
-                        pemail: params.pemail,
-                        pphoneNumber: params.pphoneNumber,
-                    },                    
-                  });}} > 
+          <TouchableOpacity 
+            style={styles.centerButton} 
+            onPress={() => {
+              setActiveTab("tickets"); 
+              router.push({
+                pathname: "/passenger/index1",
+                params: {
+                  Pid: params.Pid,
+                  Pid1: params.Pid1,
+                  pfirstName: params.pfirstName,
+                  plastName:params.plastName,
+                  pemail: params.pemail,
+                  pphoneNumber: params.pphoneNumber,
+                },                    
+              });
+            }} 
+          > 
             <Ionicons name="home-outline" size={28} color="#fff" />             
           </TouchableOpacity>
 
@@ -243,8 +253,8 @@ const ParcelService = () => {
         </LinearGradient>
       </View>
             
-    </SafeAreaView></>
-    
+    </SafeAreaView>
+    </> 
   );
 };
 
@@ -407,8 +417,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     overflow: 'hidden',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25, 
   },
 
   footerGraphic1: {
