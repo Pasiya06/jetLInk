@@ -85,6 +85,18 @@ export default function Index() {
   );
 };
 
+  const tourinterface = () => {
+    router.push({
+      pathname: "/admin/Tour/Tour", 
+      params: {           
+        Aid: params.Aid,
+        firstName: params.firstName,
+        lastName: params.lastName,
+        email: params.email,
+      },
+    });
+  };
+
   
 
   return (
@@ -162,7 +174,7 @@ export default function Index() {
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card1} onPress={() => router.push("/admin/index1")} >
+          <TouchableOpacity style={styles.card1} onPress={tourinterface} >
               <View style={[styles.iconContainer, { backgroundColor: "#EC489918"  }]}>
                 <FontAwesome5 name="route" size={24} color="#EC4899" />
               </View>

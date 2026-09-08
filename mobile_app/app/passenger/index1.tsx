@@ -86,6 +86,20 @@ export default function Index() {
   );
 };
 
+  const tourinterface = () => {
+    router.push({
+      pathname: "/passenger/tours/index1",
+      params: {
+        Pid: params.Pid,
+        Pid1: params.Pid1,
+        pfirstName: params.pfirstName,
+        plastName:params.plastName,
+        pphoneNumber: params.pphoneNumber,
+        pemail: params.pemail,
+      },
+    });
+  };
+
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
@@ -176,7 +190,7 @@ export default function Index() {
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card1} onPress={() => router.push("/passenger/tours/index1")} >
+          <TouchableOpacity style={styles.card1} onPress={tourinterface} >
               <View style={[styles.iconContainer, { backgroundColor: "#EF444418"  }]}>
                 <FontAwesome5 name="route" size={24} color="#EF4444" />
               </View>

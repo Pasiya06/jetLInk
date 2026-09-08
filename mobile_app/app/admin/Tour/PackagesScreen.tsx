@@ -335,9 +335,13 @@ export default function PackagesScreen() {
       activeOpacity={0.8}
       onPress={() => {
           router.push({
-            pathname: "/Test/PackageDetails1",
+            pathname: "/admin/Tour/PackageDetails",
             params: {
               packageId: item._id,
+              Aid: params.Aid,
+              firstName: params.firstName,
+              lastName: params.lastName,
+              email: params.email,
             },
           });
       }}
@@ -726,7 +730,7 @@ export default function PackagesScreen() {
         
                     else {
                       router.push({
-                        pathname: "/admin/index1",
+                        pathname: "/admin/Tour/Tour",
                         params: {
                           Aid: params.Aid,
                           firstName: params.firstName,
