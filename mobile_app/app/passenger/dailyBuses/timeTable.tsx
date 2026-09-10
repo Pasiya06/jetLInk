@@ -55,7 +55,6 @@ const JetLinkInterface: React.FC = () => {
           (schedule: any) => 
             schedule.pickuploca === params.pickup &&
             schedule.dropoffloca === params.drop &&
-            schedule.busdate === params.date &&
             schedule.busType === params.routeType
         );
   
@@ -113,7 +112,7 @@ const JetLinkInterface: React.FC = () => {
                             <Ionicons name="bus" size={14} color="#4B7BEC" />
                             <Text style={styles.busNoText}>{item.busNo}</Text>
                         </View>
-                        <Text style={styles.dateText}>{item.busdate}</Text>
+                        <Text style={styles.dateText}>{params.date}</Text>
                         </View>
                 
                         {/* Route visual */}
@@ -194,7 +193,7 @@ const JetLinkInterface: React.FC = () => {
                             <Ionicons name="bus" size={14} color="#4B7BEC" />
                             <Text style={styles.busNoText}>{item.busNo}</Text>
                         </View>
-                        <Text style={styles.dateText}>{item.busdate}</Text>
+                        <Text style={styles.dateText}>{params.date}</Text>
                         </View>
                 
                         {/* Route visual */}

@@ -37,7 +37,14 @@ const JetLinkInterface: React.FC = () => {
   
   const router = useRouter();
 
+  const handleDateChange = (event: any, selectedDate?: Date) => {
+    setShowCalendar(false);
 
+    if (selectedDate) {
+      const formattedDate = selectedDate.toLocaleDateString("en-US");
+      setDate(formattedDate);
+    }
+  };
   const onTimeChange = (event: any, selected?: Date) => {
   setShowTimePicker(false);
 
@@ -201,20 +208,21 @@ const JetLinkInterface: React.FC = () => {
             </View> */}
 
           {showCalendar && (
-                  <DateTimePicker
-                    value={date1}
-                    mode="date"
-                    display="default"
-                    onChange={(event, selectedDate) => {
-                      setShowCalendar(false);
-                      if (selectedDate) {
-                        setdate(selectedDate);
-                        setDate(selectedDate.toLocaleDateString());
-                      }
-                    }}
-                  />
-                )}
-          
+            <DateTimePicker
+              value={date1 || new Date()}
+              mode="date"
+              display="default"
+              minimumDate={new Date()}   // Cannot select a date before today
+              onChange={(event, selectedDate) => {
+                setShowCalendar(false);
+
+                if (selectedDate) {
+                  setdate(selectedDate);
+                  setDate(selectedDate.toLocaleDateString());
+                }
+              }}
+            />
+          )}
 
           {/* {showTimePicker && (
             <DateTimePicker

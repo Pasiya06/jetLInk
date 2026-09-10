@@ -108,7 +108,7 @@ const ParcelService = () => {
                     </View>
                     <View style={styles.detailTextWrap}>
                     <Text style={styles.detailLabel}>Date</Text>
-                    <Text style={styles.detailValue}>{params.busdate}</Text>
+                    <Text style={styles.detailValue}>{params.date}</Text>
                     </View>
                     <View style={[styles.iconWrap, { backgroundColor: '#E74C3C20' }]}>
                     <Ionicons name="time-outline" size={18} color='#E74C3C' />

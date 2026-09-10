@@ -6,7 +6,7 @@ import express from "express";
 import mongoose from "mongoose";
 
 import cors from "cors";
-
+import "./jobs/ticketStatusJob.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import busRoutes from "./routes/busRoutes.js";
 import passengerRoutes from "./routes/passengerRoutes.js";
@@ -20,6 +20,7 @@ import ticketRoute from "./routes/ticketRoute.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import otpRoutes from "./routes/otpRoutes.js";
 import packageRoutes from "./routes/packageRoutes.js";
+
 
 
 

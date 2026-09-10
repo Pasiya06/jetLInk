@@ -111,7 +111,7 @@ const JetLinkInterface: React.FC = () => {
             weight,
             pickup,
             drop,
-            //date,
+            date,
             //time:selectedTime
           } 
           
@@ -235,7 +235,7 @@ const JetLinkInterface: React.FC = () => {
             
           </View>
           
-          {/* <Text style={styles.label}>Date</Text>
+           <Text style={styles.label}>Date</Text>
           <View style={styles.inputWrapper}>
             <TextInput style={styles.input} value={date} placeholder="YYYY-MM-DD" onChangeText={setDate} />
             <TouchableOpacity onPress={() => setShowCalendar(true)}>
@@ -244,20 +244,22 @@ const JetLinkInterface: React.FC = () => {
           </View>
 
           {showCalendar && (
-                  <DateTimePicker
-                    value={date1}
-                    mode="date"
-                    display="default"
-                    onChange={(event, selectedDate) => {
-                      setShowCalendar(false);
-                      if (selectedDate) {
-                        setdate(selectedDate);
-                        setDate(selectedDate.toLocaleDateString());
-                      }
-                    }}
-                  />
-                )}
-          <Text style={styles.label}>Time</Text>
+            <DateTimePicker
+              value={date1 || new Date()}
+              mode="date"
+              display="default"
+              minimumDate={new Date()}   // Cannot select a date before today
+              onChange={(event, selectedDate) => {
+                setShowCalendar(false);
+
+                if (selectedDate) {
+                  setdate(selectedDate);
+                  setDate(selectedDate.toLocaleDateString());
+                }
+              }}
+            />
+          )}
+          {/*<Text style={styles.label}>Time</Text>
           <View style={styles.inputWrapper}>
             <TextInput style={styles.input}
               

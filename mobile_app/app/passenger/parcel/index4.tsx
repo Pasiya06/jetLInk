@@ -98,7 +98,7 @@ const ParcelService = () => {
               weight:params.weight,
               pickup:params.pickup,
               drop:params.drop,
-              date:params.busdate,
+              date:params.date,
               time:params.depaturetime,
               totalFare:total,
             } 
@@ -139,7 +139,7 @@ const ParcelService = () => {
     { label: 'Weight', value: `${getParam('weight')} kg`, icon: 'cube-outline', color: '#F5A623' },
     { label: 'Pickup Location', value: getParam('pickup'), icon: 'location-outline', color: '#4A90E2' },
     { label: 'Drop Location', value: getParam('drop'), icon: 'flag-outline', color: '#7ED321' },
-    { label: 'Date', value: getParam('busdate'), icon: 'calendar-outline', color: '#9B59B6' },
+    { label: 'Date', value: getParam('date'), icon: 'calendar-outline', color: '#9B59B6' },
     { label: 'Time', value: getParam('depaturetime'), icon: 'time-outline', color: '#E74C3C' },
   ] as const;
     
@@ -257,7 +257,7 @@ const ParcelService = () => {
                       weight:params.weight,
                       pickup:params.pickup,
                       drop:params.drop,
-                      //date:params.date,
+                      date:params.date,
                       //time:params.time
                     },                    
                   });

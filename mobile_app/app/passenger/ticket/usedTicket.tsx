@@ -25,7 +25,15 @@ const ParcelService = () => {
   const selectedSeatNumbers = params.seatNumbers ? JSON.parse(params.seatNumbers as string): [];
   const [activeTab, setActiveTab] = useState('');
   const router = useRouter();
-    
+  
+  const seatNumber = () => {
+    if (params.busType === "Highway") {
+      return selectedSeatNumbers.join(", ");
+    }
+    else{
+      return "Can't book seat";
+    }
+  };
     
   return (
     <>
@@ -132,7 +140,7 @@ const ParcelService = () => {
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Seat Numbers</Text>
-            <Text style={styles.infoValue}>{selectedSeatNumbers.join(", ") || "Can't book seat"}</Text>
+            <Text style={styles.infoValue}>{seatNumber()}</Text>
             </View>
             </View>
 
