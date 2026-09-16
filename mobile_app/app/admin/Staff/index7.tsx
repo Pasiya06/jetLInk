@@ -19,7 +19,7 @@ import { Ionicons,
   FontAwesome } from '@expo/vector-icons';
 import { updateConductor } from "../../../services/conductorService";
 import DateTimePicker from '@react-native-community/datetimepicker';
-
+import { LinearGradient } from 'expo-linear-gradient';
 const driverScreen: React.FC = () => {
     const params = useLocalSearchParams();
     const [firstName, setFirstName] = useState(String(params.cfirstName || ""));
@@ -81,6 +81,12 @@ const driverScreen: React.FC = () => {
     <>
     <Stack.Screen options={{ title: "", headerShown: false }} />
     <SafeAreaView style={styles.container}>
+      <LinearGradient
+        colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+        style={styles.submitGradient1}
+      >
       <View style={styles.header}>
               
                       
@@ -90,7 +96,7 @@ const driverScreen: React.FC = () => {
                       
     
             </View>
-            
+      </LinearGradient>      
 
       <View style={styles.card}>
         <ScrollView style={styles.svw} >
@@ -202,11 +208,12 @@ const driverScreen: React.FC = () => {
                     <TextInput
                       style={styles.textInput}
                       value={email}
-                      onChangeText={setEmail}
                       placeholder="ABC@gmail.com"
                       placeholderTextColor="#A3A3A3"
                       keyboardType="email-address"
+                      onChangeText={(text) => setEmail(text.replace(/\s/g, "").toLowerCase())} 
                       autoCapitalize="none"
+                      autoCorrect={false}
                     />
                   </View>
                 </View>
@@ -232,11 +239,19 @@ const driverScreen: React.FC = () => {
                
       
         </ScrollView>
-        <TouchableOpacity style={styles.searchButton} onPress={handleConductorUpdate}>
-          <Text style={styles.searchButtonText}>Update Driver</Text>
-        </TouchableOpacity>
+        
       
       </View>
+      <TouchableOpacity style={styles.searchButton} onPress={handleConductorUpdate}>
+        <LinearGradient
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.submitGradient}
+        >
+          <Text style={styles.searchButtonText}>Update Driver</Text>
+        </LinearGradient>
+      </TouchableOpacity>
 
       {isSearching ? (
           <TextInput
@@ -281,7 +296,15 @@ const driverScreen: React.FC = () => {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+      <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                pathname: "/admin/index1",
+                params: {
+                  Aid: params.Aid,
+                  firstName: params.firstName,
+                  lastName: params.lastName,
+                  email: params.email,
+                },                    
+              });}} > 
         <Ionicons name="home-outline" size={28} color="#fff" />             
       </TouchableOpacity>
 
@@ -301,9 +324,23 @@ const driverScreen: React.FC = () => {
     </View>
       
       <View style={styles.footerGraphic}>
-               <View style={styles.blueCurve} />
-               <View style={styles.greenCurve} />
-        </View>
+        <LinearGradient
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
+      </View>
+      <View style={styles.footerGraphic1}>
+        <LinearGradient
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
+      </View>
     </SafeAreaView>
     </>
   );
@@ -322,7 +359,11 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 70,   
-    backgroundColor: '#0047AB',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  submitGradient1: {
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -337,7 +378,7 @@ const styles = StyleSheet.create({
   card: {
     width: '90%',
     flex: 1,
-    maxHeight: '68%',
+    maxHeight: '60%',
     backgroundColor: '#FFF',
     padding: 24,
     alignItems: 'center',
@@ -407,19 +448,13 @@ const styles = StyleSheet.create({
   
    
   searchButton: {
-    position: "absolute",
-    bottom: 15,
-    left: 10,
-    right: 10,
-
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-around",
-      
+    marginLeft: 20,
+    marginRight: 20,  
     height: 55,
-    backgroundColor: "#32CD32",
+    overflow: 'hidden',
     borderRadius: 25,
-
+    marginTop: 15,
     shadowColor: "#000",
     shadowOpacity: 0.08,
     shadowRadius: 10,
@@ -519,34 +554,31 @@ const styles = StyleSheet.create({
 
   svw: {
     width: '100%',
-    marginBottom:70,  
+    
+  },
+
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
   },
 
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '100%',
-    borderRadius: 50,
-    position: 'absolute',  
-  },
+  footerGraphic1: {
 
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 25,
-    position: 'absolute',   
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
-    
-  
 });
 
 export default driverScreen;

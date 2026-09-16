@@ -42,6 +42,19 @@ const scheduleSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
+    busType: {
+      type: String,
+      required: true,
+    },
+
+    ticketPrice: {
+      type: Number,
+      required: true,
+      min: 0,
+      default: 0.00,
+    },
+
   },
   {
     timestamps: true,

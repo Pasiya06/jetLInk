@@ -1,37 +1,169 @@
 import jwt from "jsonwebtoken";
+import cron from "node-cron";
 import Ticket from "../models/Ticket.js";
 
 export const createTicket = async (req, res) => {
-  const { busId, passengerName, price, fromStop, toStop } = req.body;
-
-  if (!busId || !passengerName || price === undefined) {
-    return res.status(400).json({
-      error: "busId, passengerName and price are required",
-    });
-  }
-
   try {
-    const ticket = await Ticket.create({
-      busId,
-      passengerName,
-      price,
-      fromStop,
-      toStop,
+    let {
+      pickup,
+      drop,
+      date,
+      time,
+      pemail,
+      bNumber,
+      busType,
+      seatNumbers,
+      noOfTicket,
+      totalFare,
+    } = req.body;
+
+    
+
+    const ticket = new Ticket({
+      pickup,
+      drop,
+      date,
+      time,
+      pemail,
+      bNumber,
+      busType,
+      seatNumbers,
+      noOfTicket,
+      totalFare,
     });
 
-    res.status(201).json(ticket);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to create ticket" });
+    await ticket.save();
+
+    res.status(201).json({
+      success: true,
+      ticket,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 
-export const generateTicketQRByBusId = async (req, res) => {
-  const { busId } = req.params;
-    console.log("Searching Bus ID:", busId);
+// Get All Tickets
+export const getTickets = async (req, res) => {
   try {
-    // Find ticket using busId
-    const ticket = await Ticket.findOne({ busId });
-    console.log("Searching Bus ID:", ticket);
+    const tickets = await Ticket.find().sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      tickets,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+// Get Ticket by Ticket ID
+export const getTicketById = async (req, res) => {
+  try {
+    const ticket = await Ticket.findOne({
+      ticketId: req.params.ticketId,
+    });
+
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        message: "Ticket not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      ticket,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getBookedSeats = async (req, res) => {
+  try {
+    const { bNumber, busType, date } = req.query;
+    
+    const tickets = await Ticket.find(
+      {
+        bNumber,
+        busType,
+        date
+      },
+      "seatNumbers"
+    );
+
+    let bookedSeats = [];
+
+    tickets.forEach((ticket) => {
+      const seats = JSON.parse(ticket.seatNumbers);
+      bookedSeats.push(...seats);
+    });
+
+    res.status(200).json({
+      success: true,
+      bookedSeats,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const getTicketByEmail = async (req, res) => {
+  try {
+    const { pemail, busType, used } = req.params;
+    console.log("Searching Bus ID:", pemail, busType, used);
+    const tickets = await Ticket.find(
+      {
+        pemail: pemail,
+        busType: busType,
+        used: used,
+      }
+    );
+    console.log("Searching Bus ID:", tickets);
+
+    if (tickets.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Ticket not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: tickets,
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const generateTicketQRByticketId = async (req, res) => {
+  const { ticketId } = req.params;
+    
+  try {
+    
+    const ticket = await Ticket.findOne({ ticketId });
+    
     if (!ticket) {
       return res.status(404).json({
         error: "No ticket found for this bus",
@@ -39,12 +171,9 @@ export const generateTicketQRByBusId = async (req, res) => {
     }
 
     const payload = {
-      ticketId: ticket._id,
-      busId: ticket.busId,
-      passengerName: ticket.passengerName,
-      price: ticket.price,
-      fromStop: ticket.fromStop,
-      toStop: ticket.toStop,
+      tId: ticket._id,
+      ticketId: ticket.ticketId,
+      bNumber: ticket.bNumber,
       issuedAt: Date.now(),
     };
 
@@ -76,13 +205,46 @@ export const generateTicketQRByBusId = async (req, res) => {
   }
 };
 
+export const generateTicketQR = async (req, res) => {
+  try {
+    const {
+      pemail,
+    } = req.body;
+
+    const payload = {      
+      pemail,
+      issuedAt: Date.now(),
+    };
+
+    const token = jwt.sign(
+      payload,
+      process.env.QR_SECRET,
+      {
+        expiresIn: "12h",
+      }
+    );
+
+    res.json({
+      success: true,
+      qrToken: token,
+    });
+  } catch (err) {
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      error: "Failed to generate QR",
+    });
+  }
+};
+
 export const verifyTicket = async (req, res) => {
   const { qrToken } = req.body;
 
   try {
     const decoded = jwt.verify(qrToken, process.env.QR_SECRET);
 
-    const ticket = await Ticket.findById(decoded.ticketId);
+    const ticket = await Ticket.findOne({ ticketId: decoded.ticketId });
 
     if (!ticket) {
       return res.json({
@@ -104,7 +266,13 @@ export const verifyTicket = async (req, res) => {
 
     res.json({
       valid: true,
-      passengerName: ticket.passengerName,
+      ticket: {
+        ticketId: ticket.ticketId,
+        pickup: ticket.pickup,
+        drop: ticket.drop,
+        noOfTicket: ticket.noOfTicket,
+        totalFare: ticket.totalFare,
+      },
     });
   } catch (err) {
     res.json({

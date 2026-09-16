@@ -99,7 +99,7 @@ const ParcelService = () => {
               pickup:params.pickup,
               drop:params.drop,
               date:params.date,
-              time:params.time,
+              time:params.depaturetime,
               totalFare:total,
             } 
             
@@ -140,7 +140,7 @@ const ParcelService = () => {
     { label: 'Pickup Location', value: getParam('pickup'), icon: 'location-outline', color: '#4A90E2' },
     { label: 'Drop Location', value: getParam('drop'), icon: 'flag-outline', color: '#7ED321' },
     { label: 'Date', value: getParam('date'), icon: 'calendar-outline', color: '#9B59B6' },
-    { label: 'Time', value: getParam('time'), icon: 'time-outline', color: '#E74C3C' },
+    { label: 'Time', value: getParam('depaturetime'), icon: 'time-outline', color: '#E74C3C' },
   ] as const;
     
   return (
@@ -149,9 +149,9 @@ const ParcelService = () => {
       <SafeAreaView style={styles.container}>
        
       <LinearGradient
-                      colors={['#4B6CF5', '#32CD32']}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
+                      colors={["#173C79","#155B8A","#159B79",]}
+                      start={{x: 0, y: 0,}}
+                      end={{x: 1, y: 1,}}
                       style={styles.submitGradient1}
                   >
               <View style={styles.header}>
@@ -207,9 +207,9 @@ const ParcelService = () => {
 
         <TouchableOpacity style={styles.submitButton} onPress={handleSearch}>
                     <LinearGradient
-                        colors={['#4B6CF5', '#32CD32']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
+                        colors={["#173C79","#155B8A","#159B79",]}
+                        start={{x: 0, y: 0,}}
+                        end={{x: 1, y: 1,}}
                         style={styles.submitGradient}
                     >
                     <Text style={styles.submitText}>Submit payment</Text>
@@ -258,7 +258,7 @@ const ParcelService = () => {
                       pickup:params.pickup,
                       drop:params.drop,
                       date:params.date,
-                      time:params.time
+                      //time:params.time
                     },                    
                   });
                 };}}>
@@ -307,18 +307,18 @@ const ParcelService = () => {
       
       <View style={styles.footerGraphic}>
         <LinearGradient
-          colors={['#4B6CF5', '#32CD32']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
           style={styles.submitGradient}
         >
         </LinearGradient>
       </View>
       <View style={styles.footerGraphic1}>
         <LinearGradient
-        colors={['#4B6CF5', '#32CD32']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
+        colors={["#173C79","#155B8A","#159B79",]}
+        start={{x: 0, y: 0,}}
+        end={{x: 1, y: 1,}}
         style={styles.submitGradient}
         >
         </LinearGradient>
@@ -678,8 +678,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     overflow: 'hidden',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25, 
   },
 
   footerGraphic1: {

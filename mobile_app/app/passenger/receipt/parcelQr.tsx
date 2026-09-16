@@ -14,109 +14,97 @@ import {
 import {  
   Ionicons, 
   Feather, 
-  FontAwesome,  } from '@expo/vector-icons';
+  FontAwesome,
+  Fontisto,
+  } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import QRCode from 'react-native-qrcode-svg';
 
 const ParcelService = () => {
-    const API_URL = process.env.EXPO_PUBLIC_API_URL;
-    const [isSearching, setIsSearching] = useState<boolean>(false);
-    const [searchQuery, setSearchQuery] = useState<string>('');
-    const params = useLocalSearchParams();
-    const [activeTab, setActiveTab] = useState('');
-    const router = useRouter();
-    const parcelId = params.parcelId as string ;
-    const sendername = params.sendername as string ;
-    const Smobilenumber = params.Smobilenumber as string ;
-    const Semail = params.Semail as string ;
-    const receivername = params.receivername as string ;
-    const Rmobilenumber = params.Rmobilenumber as string ;
-    const Remail = params.Remail as string ;
-    const weight = params.weight as string ;
-    const pickup = params.pickup as string ;
-    const drop = params.drop as string ;
-    const date = params.date as string ;
-    const time = params.time as string ;
-    const Bnumber = params.Bnumber as string ;
-    const totalFare = params.totalFare as string ;
-    const qrRef = useRef<any>(null);
-    const [qrToken, setQrToken] = useState("");
-    const [error, setError] = useState<string | null>(null);
-    const fetchParcelQR = async () => {
+  const API_URL = process.env.EXPO_PUBLIC_API_URL;
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const params = useLocalSearchParams();
+  const [activeTab, setActiveTab] = useState('');
+  const router = useRouter();
+  const parcelId = params.parcelId as string ;
+  const sendername = params.sendername as string ;
+  const Smobilenumber = params.Smobilenumber as string ;
+  const Semail = params.Semail as string ;
+  const receivername = params.receivername as string ;
+  const Rmobilenumber = params.Rmobilenumber as string ;
+  const Remail = params.Remail as string ;
+  const weight = params.weight as string ;
+  const pickup = params.pickup as string ;
+  const drop = params.drop as string ;
+  const date = params.date as string ;
+  const time = params.time as string ;
+  const Bnumber = params.Bnumber as string ;
+  const totalFare = params.totalFare as string ;
+  const qrRef = useRef<any>(null);
+  const [qrToken, setQrToken] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const fetchParcelQR = async () => {
 
-        
+    try {
+      const url = `${API_URL}/parcel/parcel/${parcelId}/qr`;
+      console.log("Request URL:", url);
+      const response = await fetch(url);
+      console.log("Status:", response.status);
+      const data = await response.json();
+      console.log("Backend Data:", data);
 
-        try {
-
-            setError(null);
-
-            const url = `${API_URL}/parcel/parcel/${parcelId}/qr`;
-
-            console.log("Request URL:", url);
-
-            const response = await fetch(url);
-
-            console.log("Status:", response.status);
-
-            const data = await response.json();
-
-            console.log("Backend Data:", data);
-
-            if (!response.ok) {
-            throw new Error(data.error);
-            }
-
-            setQrToken(data.qrToken);
-
-        } catch (error: any) {
-
-            console.log("QR Error:", error);
-
-            
-
-            setError(error.message || "Could not generate QR");
-        }
-        };
-
-        useEffect(() => {
-        
-            fetchParcelQR();
-        
-          }, []);
-
-    const shareQR = async () => {
-      try {
-        if (!qrRef.current) {
-          Alert.alert("Error", "QR Code not available.");
-          return;
-        }
-
-        qrRef.current.toDataURL(async (data: string) => {
-          try {
-            const fileUri = FileSystem.cacheDirectory + "parcelQR.png";
-
-            await FileSystem.writeAsStringAsync(fileUri, data, {
-              encoding: FileSystem.EncodingType.Base64,
-            });
-
-            if (!(await Sharing.isAvailableAsync())) {
-              Alert.alert("Sharing is not available on this device.");
-              return;
-            }
-
-            await Sharing.shareAsync(fileUri, {
-              mimeType: "image/png",
-              dialogTitle: "Share Parcel QR Code",
-            });
-          } catch (err) {
-            console.log(err);
-            Alert.alert("Error", "Unable to share QR Code.");
-          }
-        });
-      } catch (err) {
-        console.log(err);
+      if (!response.ok) {
+        throw new Error(data.error);
       }
-    };
+      setQrToken(data.qrToken);
+
+    } 
+    catch (error: any) {
+
+      console.log("QR Error:", error);
+      setError(error.message || "Could not generate QR");
+    }
+  };
+
+  useEffect(() => {
+    fetchParcelQR();
+  }, []);
+
+  const shareQR = async () => {
+    try {
+      if (!qrRef.current) {
+        Alert.alert("Error", "QR Code not available.");
+        return;
+      }
+
+      qrRef.current.toDataURL(async (data: string) => {
+        try {
+          const fileUri = FileSystem.cacheDirectory + "parcelQR.png";
+
+          await FileSystem.writeAsStringAsync(fileUri, data, {
+            encoding: FileSystem.EncodingType.Base64,
+          });
+
+          if (!(await Sharing.isAvailableAsync())) {
+            Alert.alert("Sharing is not available on this device.");
+            return;
+          }
+
+          await Sharing.shareAsync(fileUri, {
+            mimeType: "image/png",
+            dialogTitle: "Share Parcel QR Code",
+          });
+        } catch (err) {
+          console.log(err);
+          Alert.alert("Error", "Unable to share QR Code.");
+        }
+      });
+    } 
+    catch (err) {
+      console.log(err);
+    }
+  };
 
     
  
@@ -125,21 +113,18 @@ const ParcelService = () => {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
        
-      <LinearGradient
-                      colors={['#4B6CF5', '#32CD32']}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                      style={styles.submitGradient1}
-                  >
-              <View style={styles.header}>
-                  
-              
-                <TouchableOpacity >
-                  <Text style={styles.title}>JetLink</Text>
-                </TouchableOpacity>
-                       
-              </View>
-              </LinearGradient> 
+        <LinearGradient
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.submitGradient1}
+        >
+          <View style={styles.header}>    
+            <TouchableOpacity >
+              <Text style={styles.title}>JetLink</Text>
+            </TouchableOpacity>          
+          </View>
+        </LinearGradient> 
 
         <View style={styles.card} >
           <View style={styles.svw}> 
@@ -163,18 +148,53 @@ const ParcelService = () => {
           </View>      
         </View>
 
+        <View style={styles.card1} >
+          <View style={styles.svw1}> 
+            <View  style={styles.detailRow}>
+              <View style={[styles.iconWrap, { backgroundColor: "#FFA50020" }]}>
+                <Fontisto name="bus" size={22} color="#FFA500"  />
+              </View>
+              <View style={styles.detailTextWrap}>
+                <Text style={styles.detailLabel}>Bus Number</Text>
+                <Text style={styles.detailValue}>{params.Bnumber}</Text>
+              </View>
+            </View>
+
+            <View  style={styles.detailRow}>
+              <View style={[styles.iconWrap, { backgroundColor: "#7ED32120" }]}>
+                <Ionicons name="calendar-outline" size={22} color="#7ED321"  />
+              </View>
+              <View style={styles.detailTextWrap}>
+                <Text style={styles.detailLabel}>Date</Text>
+                <Text style={styles.detailValue}>{params.date}</Text>
+              </View>
+            </View>
+
+            <View  style={styles.detailRow}>
+              <View style={[styles.iconWrap, { backgroundColor: "#E74C3C20" }]}>
+                <Ionicons name="time-outline" size={22} color="#E74C3C"  />
+              </View>
+              <View style={styles.detailTextWrap}>
+                <Text style={styles.detailLabel}>Time</Text>
+                <Text style={styles.detailValue}>{params.time}</Text>
+              </View>
+            </View>
+
+          </View>
+        </View>
+
         
 
         <TouchableOpacity style={styles.submitButton} onPress={shareQR}> 
-            <LinearGradient
-                colors={['#4B6CF5', '#32CD32']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.submitGradient}
-            >
-                <Text style={styles.submitText}>Share QR Code</Text>
-            </LinearGradient>
-        </TouchableOpacity>
+          <LinearGradient
+              colors={["#173C79","#155B8A","#159B79",]}
+              start={{x: 0, y: 0,}}
+              end={{x: 1, y: 1,}}
+              style={styles.submitGradient}
+          >
+              <Text style={styles.submitText}>Share QR Code</Text>
+          </LinearGradient>
+        </TouchableOpacity> 
 
 
 
@@ -206,7 +226,8 @@ const ParcelService = () => {
                       Pid1: params.Pid1,
                       pfirstName: params.pfirstName,
                       plastName:params.plastName,
-                      pemail:params.pemail,                     
+                      pemail:params.pemail, 
+                      pphoneNumber: params.pphoneNumber,                    
                     },                    
                   });
                 };}}>
@@ -255,18 +276,18 @@ const ParcelService = () => {
       
       <View style={styles.footerGraphic}>
         <LinearGradient
-          colors={['#4B6CF5', '#32CD32']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
           style={styles.submitGradient}
         >
         </LinearGradient>
       </View>
       <View style={styles.footerGraphic1}>
         <LinearGradient
-        colors={['#4B6CF5', '#32CD32']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
+        colors={["#173C79","#155B8A","#159B79",]}
+        start={{x: 0, y: 0,}}
+        end={{x: 1, y: 1,}}
         style={styles.submitGradient}
         >
         </LinearGradient>
@@ -327,16 +348,16 @@ const styles = StyleSheet.create({
   },
 
   card1: {
+    paddingTop:10,
     marginLeft: 20,
     marginRight: 20,
-    
     flex: 1,
     maxHeight: '25%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-    marginTop: 15,   
+    marginTop: 10,   
     alignSelf: 'center',
     borderRadius: 20,
     elevation: 10,
@@ -428,6 +449,11 @@ const styles = StyleSheet.create({
   svw: {
     width: '100%',
     padding: 50,
+      
+  },
+
+  svw1: {
+    width: '100%',
       
   },
 
@@ -639,8 +665,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     overflow: 'hidden',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25, 
   },
 
   footerGraphic1: {

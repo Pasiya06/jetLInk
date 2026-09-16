@@ -147,3 +147,95 @@ export const logoutBus = async (req, res) => {
     });
   }
 };
+
+export const getBusesByBusType = async (req, res) => {
+  try {
+    const { busType } = req.query; // Get busType from query params
+    console.log(busType);
+    let filter = {};
+
+    if (busType) {
+      filter.busType = busType;
+    }
+
+    const buses = await Bus.find(filter).sort({ busId: 1 });
+
+    res.status(200).json({
+      success: true,
+      data: buses,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const checkDriver = async (req, res) => {
+  try {
+    const bus = await Bus.findOne({
+      driverNIC: req.params.driverNIC,
+    });
+
+    if (!bus) {
+      return res.status(404).json({
+        success: false,
+        exists: false,
+        message: "Driver not found",
+      });
+    }
+
+    res.status(200).json({
+      
+      success: true,
+      exists: true,
+      data: {
+        _id: bus._id,
+        busId: bus.busId,
+        driverNIC: bus.driverNIC,
+        
+      },
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const checkConductor = async (req, res) => {
+  try {
+    const bus = await Bus.findOne({
+      conductorNIC: req.params.conductorNIC,
+    });
+
+    if (!bus) {
+      return res.status(404).json({
+        success: false,
+        exists: false,
+        message: "Conductor not found",
+      });
+    }
+
+    res.status(200).json({
+      
+      success: true,
+      exists: true,
+      data: {
+        _id: bus._id,
+        busId: bus.busId,
+        conductorNIC: bus.conductorNIC,
+        
+      },
+    });
+    
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

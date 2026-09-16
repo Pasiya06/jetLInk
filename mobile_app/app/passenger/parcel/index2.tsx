@@ -61,7 +61,7 @@ const JetLinkInterface: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const handlesenderD = async () => {
 
-  if (!sendername || !smobilenumber  || !receivername || !remail || !rmobilenumber || !weight || !pickup || !drop || !date || !time) {
+  if (!sendername || !smobilenumber  || !receivername || !remail || !rmobilenumber || !weight || !pickup || !drop ) {
     alert("Please fill required fields");
     return;
   }
@@ -112,7 +112,7 @@ const JetLinkInterface: React.FC = () => {
             pickup,
             drop,
             date,
-            time:selectedTime
+            //time:selectedTime
           } 
           
       });
@@ -135,16 +135,16 @@ const JetLinkInterface: React.FC = () => {
       
       {/* Header Section */}
       <LinearGradient
-                      colors={['#4B6CF5', '#32CD32']}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                      style={styles.submitGradient1}
-                  >
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.submitGradient1}
+        >
               <View style={styles.header}>
                   
               
                 <TouchableOpacity >
-                  <Text style={styles.title}>JetLink</Text>
+                  <Text style={styles.title}>Book Parcel</Text>
                 </TouchableOpacity>
                        
               </View>
@@ -168,11 +168,16 @@ const JetLinkInterface: React.FC = () => {
 
           <Text style={styles.label}>Sender Mobile Number</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={smobilenumber} onChangeText={Ssetmobilenumber} keyboardType="phone-pad" maxLength={10}/>
+            <TextInput 
+              style={styles.input} 
+              value={smobilenumber} 
+              onChangeText={Ssetmobilenumber} 
+              keyboardType="phone-pad" 
+              maxLength={10}/>
             
           </View>
 
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>Sender Email</Text>
           <View style={styles.inputWrapper}>
             <Text style={styles.input1}>{params.pemail}</Text>
             
@@ -190,9 +195,15 @@ const JetLinkInterface: React.FC = () => {
             
           </View>
 
-          <Text style={styles.label}>Email</Text>
+          <Text style={styles.label}>Receiver Email</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={remail} onChangeText={RsetEmail} />
+            <TextInput 
+              style={styles.input} 
+              value={remail} 
+              onChangeText={(text) => RsetEmail(text.replace(/\s/g, "").toLowerCase())} 
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
             
           </View>
 
@@ -203,17 +214,28 @@ const JetLinkInterface: React.FC = () => {
           
           <Text style={styles.label}>Pick up Location</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={pickup}  onChangeText={(text) => setPickup(text.replace(/\s/g, ""))}/>
-            
+            <TextInput 
+              style={styles.input} 
+              value={pickup}  
+              onChangeText={(text) => setPickup(text.replace(/\s/g, "").toUpperCase())}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              />
           </View>
           
           <Text style={styles.label}>Delivery Location</Text>
           <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={drop} onChangeText={(text) => setDrop(text.replace(/\s/g, ""))}/>
+            <TextInput 
+              style={styles.input} 
+              value={drop} 
+              onChangeText={(text) => setDrop(text.replace(/\s/g, "").toUpperCase())}
+              autoCapitalize="characters"
+              autoCorrect={false} 
+            />
             
           </View>
           
-          <Text style={styles.label}>Date</Text>
+           <Text style={styles.label}>Date</Text>
           <View style={styles.inputWrapper}>
             <TextInput style={styles.input} value={date} placeholder="YYYY-MM-DD" onChangeText={setDate} />
             <TouchableOpacity onPress={() => setShowCalendar(true)}>
@@ -222,20 +244,22 @@ const JetLinkInterface: React.FC = () => {
           </View>
 
           {showCalendar && (
-                  <DateTimePicker
-                    value={date1}
-                    mode="date"
-                    display="default"
-                    onChange={(event, selectedDate) => {
-                      setShowCalendar(false);
-                      if (selectedDate) {
-                        setdate(selectedDate);
-                        setDate(selectedDate.toLocaleDateString());
-                      }
-                    }}
-                  />
-                )}
-          <Text style={styles.label}>Time</Text>
+            <DateTimePicker
+              value={date1 || new Date()}
+              mode="date"
+              display="default"
+              minimumDate={new Date()}   // Cannot select a date before today
+              onChange={(event, selectedDate) => {
+                setShowCalendar(false);
+
+                if (selectedDate) {
+                  setdate(selectedDate);
+                  setDate(selectedDate.toLocaleDateString());
+                }
+              }}
+            />
+          )}
+          {/*<Text style={styles.label}>Time</Text>
           <View style={styles.inputWrapper}>
             <TextInput style={styles.input}
               
@@ -256,22 +280,22 @@ const JetLinkInterface: React.FC = () => {
               display="default"
               onChange={onTimeChange}
             />
-          )}                   
+          )}                    */}
  
         </ScrollView>
         
       </View>
 
       <TouchableOpacity style={styles.submitButton} onPress={handlesenderD}>
-                          <LinearGradient
-                              colors={['#4B6CF5', '#32CD32']}
-                              start={{ x: 0, y: 0 }}
-                              end={{ x: 1, y: 0 }}
-                              style={styles.submitGradient}
-                          >
-                          <Text style={styles.submitText}>Next</Text>
-                          </LinearGradient>
-                      </TouchableOpacity>
+        <LinearGradient
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
+            style={styles.submitGradient}
+        >
+        <Text style={styles.submitText}>Next</Text>
+        </LinearGradient>
+    </TouchableOpacity>
 
         {isSearching ? (
                   <TextInput
@@ -350,18 +374,18 @@ const JetLinkInterface: React.FC = () => {
       {/* Bottom Graphic Design Element */}
       <View style={styles.footerGraphic}>
         <LinearGradient
-          colors={['#4B6CF5', '#32CD32']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
           style={styles.submitGradient}
         >
         </LinearGradient>
       </View>
       <View style={styles.footerGraphic1}>
         <LinearGradient
-          colors={['#4B6CF5', '#32CD32']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
           style={styles.submitGradient}
         >
         </LinearGradient>
@@ -423,7 +447,7 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    color: '#0052cc',
+    color: '#000000',
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 5,
@@ -432,7 +456,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#32CD32',
+    backgroundColor: '#F2F4F5',
+    borderColor: '#ECEEF2',
     borderRadius: 10,
     paddingHorizontal: 10,
     height: 45,
@@ -567,8 +592,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     overflow: 'hidden',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25, 
   },
 
   footerGraphic1: {

@@ -11,6 +11,7 @@ import {
   Alert,
 } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome, Feather, Entypo } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { getDrivers } from "../../../services/driverService";
 
 interface Driver {
@@ -21,6 +22,7 @@ interface Driver {
   phoneNumber: string;
   address: string;
   NIC: string;
+  drivingLicense:string;
   Birthday: string;
   email: string;
   password: string;
@@ -110,7 +112,7 @@ useFocusEffect(
     <TouchableOpacity style={styles.friendRow}
       onPress={() =>
         router.push({
-          pathname: "/admin/Staff/index4",
+          pathname: "/admin/Staff/driverProfile",
           params: {
             Did: item._id, 
             driverId: String(item.driverId),
@@ -119,6 +121,7 @@ useFocusEffect(
             phoneNumber: item.phoneNumber || "",
             address: item.address || "",
             NIC: item.NIC || "",
+            drivingLicense:item.drivingLicense,
             Birthday: item.Birthday || "",
             demail: item.email || "",
             password: item.password || "",
@@ -153,14 +156,21 @@ useFocusEffect(
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
+        <LinearGradient
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.submitGradient1}
+        >
         
-        <View style={styles.header}>          
-          <TouchableOpacity><Text style={styles.title}>Drivers</Text></TouchableOpacity>          
-        </View>
+          <View style={styles.header}>          
+            <TouchableOpacity><Text style={styles.title}>Drivers</Text></TouchableOpacity>          
+          </View>
+        </LinearGradient>
               
         
         <View style={styles.card}>
-
+          <Text style={styles.cardtitle}>Manage all Drivers</Text>
           <FlatList style={styles.svw}
             data={filtereddriversData}
             renderItem={renderBusItem}
@@ -169,11 +179,20 @@ useFocusEffect(
             contentContainerStyle={{ paddingVertical: 10 }}
           />
 
-          <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-            <Text style={styles.searchButtonText}>Add Driver</Text>
-          </TouchableOpacity>
+          
 
         </View>
+
+        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
+          <LinearGradient
+            colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+            style={styles.submitGradient}
+          >
+            <Text style={styles.searchButtonText}>Add Driver</Text>
+          </LinearGradient>
+        </TouchableOpacity>
 
         {isSearching ? (
               <TextInput
@@ -218,7 +237,15 @@ useFocusEffect(
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+          <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                    pathname: "/admin/index1",
+                    params: {
+                      Aid: params.Aid,
+                      firstName: params.firstName,
+                      lastName: params.lastName,
+                      email: params.email,
+                    },                    
+                  });}} > 
             <Ionicons name="home-outline" size={28} color="#fff" />             
           </TouchableOpacity>
 
@@ -238,8 +265,22 @@ useFocusEffect(
         </View>
               
         <View style={styles.footerGraphic}>
-          <View style={styles.blueCurve} />
-          <View style={styles.greenCurve} />
+          <LinearGradient
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
+        </View>
+        <View style={styles.footerGraphic1}>
+          <LinearGradient
+            colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
         </View>
       </SafeAreaView>
     </>
@@ -259,7 +300,11 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 70,   
-    backgroundColor: '#0047AB',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  submitGradient1: {
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -272,32 +317,38 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    width: '90%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
     flex: 1,
-    maxHeight: '68%',
+    maxHeight: '60%',
     backgroundColor: '#FFF',
-   
+    borderTopLeftRadius: 55,
+    borderTopRightRadius: 55,
     marginTop: -50,   
-    alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    alignSelf: 'center', 
+  },
+
+  cardtitle:{
+    marginTop:10,
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#999797',
+    letterSpacing: 0.5,
   },
 
   svw: {
     width: '100%',
-    marginBottom:80,
-    marginTop: 3, 
+    marginTop: 10, 
+    borderTopLeftRadius: 50,
+    borderTopRightRadius: 50,
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25, 
   },
  
   friendRow: {
-    marginLeft: 10,
-    marginRight: 10,
+    marginLeft: 15,
+    marginRight: 15,
     
     backgroundColor: '#ffffff',
     flexDirection: 'row',
@@ -338,19 +389,13 @@ const styles = StyleSheet.create({
   },
 
   searchButton: {
-    position: "absolute",
-    bottom: 15,
-    left: 10,
-    right: 10,
-
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-around",
-      
+    marginLeft: 20,
+    marginRight: 20,  
     height: 55,
-    backgroundColor: "#32CD32",
+    overflow: 'hidden',
     borderRadius: 25,
-
+    marginTop: 15,
     shadowColor: "#000",
     shadowOpacity: 0.08,
     shadowRadius: 10,
@@ -447,30 +492,28 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
 
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
   },
 
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '100%',
-    borderRadius: 50,
-    position: 'absolute',  
-  },
+  footerGraphic1: {
 
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 25,
-    position: 'absolute',   
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
-  
 });
 
 export default BusScreen;

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Image, TextInput } from 'react-native';
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
@@ -9,7 +9,7 @@ import {
   View,
   TouchableOpacity,
   SafeAreaView,
-  StatusBar,
+  BackHandler,
 } from "react-native";
 
 // Icons
@@ -17,10 +17,14 @@ import {
   Ionicons, 
   MaterialIcons, 
   FontAwesome, 
-  Feather 
+  Feather,
+  FontAwesome5,
+  MaterialCommunityIcons,
+  SimpleLineIcons 
 } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { LinearGradient } from 'expo-linear-gradient';
+import { BiTrip } from "react-icons/bi";
 
 
 
@@ -31,6 +35,34 @@ export default function Index() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState('');
   const params = useLocalSearchParams();
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+
+    if (hour >= 5 && hour < 12) {
+      return "Good Morning ";
+    } else if (hour >= 12 && hour < 17) {
+      return "Good Afternoon ";
+    } else if (hour >= 17 && hour < 21) {
+      return "Good Evening ";
+    } else {
+      return "Good Night 🌙";
+    }
+  };
+
+  useEffect(() => {
+    const backAction = () => {
+      handleLogout(); // Navigate to a specific path
+      return true; // Prevent default back behavior
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => subscription.remove();
+  }, []);
 
   const handleLogout = () => {
   Alert.alert(
@@ -46,12 +78,24 @@ export default function Index() {
         style: "destructive",
         onPress: async () => {
           await AsyncStorage.clear(); // or remove specific keys
-          router.replace("/");
+          router.replace("/passenger/selectScreen");
         },
       },
     ]
   );
 };
+
+  const tourinterface = () => {
+    router.push({
+      pathname: "/admin/Tour/Tour", 
+      params: {           
+        Aid: params.Aid,
+        firstName: params.firstName,
+        lastName: params.lastName,
+        email: params.email,
+      },
+    });
+  };
 
   
 
@@ -59,22 +103,28 @@ export default function Index() {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
+        <LinearGradient
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.submitGradient1}
+        >
         
-        <View style={styles.header}>
-          
-          
-          <TouchableOpacity >
-            <Text style={styles.title}>Jetlink</Text>
-          </TouchableOpacity>
-          
-          
-        </View>
-
+          <View style={styles.header}>
+            
+            
+            <TouchableOpacity >
+              <Text style={styles.title}>Jetlink</Text>
+            </TouchableOpacity>
+            
+            
+          </View>
+        </LinearGradient>
         
        
         <View style={styles.card}>
           <View>
-            <Text style={styles.title1}>Good Morning</Text>                    
+            <Text style={styles.title1}>{getGreeting()}</Text>                    
           </View> 
         
           <View style={styles.iconContainer1}>
@@ -91,7 +141,7 @@ export default function Index() {
         <View style={styles.listContainer}>
           
           <TouchableOpacity style={styles.card1} onPress={() => router.push({
-                pathname: "/admin/buses/index1", 
+                pathname: "/admin/buses/busAndSchedule", 
                 params: {
                   Aid: params.Aid,
                   firstName: params.firstName,
@@ -99,14 +149,16 @@ export default function Index() {
                   email: params.email,
                 },
               })} >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-bus-94.png")} style={styles.input3dIcon1} />
+                
+              <View style={[styles.iconContainer, { backgroundColor: "#8B5CF618"  }]}>
+                <FontAwesome5 name="bus-alt" size={24} color="#8B5CF6" />
               </View>
-              <Text style={styles.cardText}>Busses</Text>
+              <Text style={styles.cardText}>Buses</Text>
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card2} onPress={() => router.push({
-                pathname: "/admin/Parcelhistory/parcelFees", 
+                pathname: "/admin/Parcelhistory/parcelDetails", 
                 params: {
                   Aid: params.Aid,
                   firstName: params.firstName,
@@ -114,17 +166,20 @@ export default function Index() {
                   email: params.email,
                 },
               })} >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-package-94.png")} style={styles.input3dIcon} />
+          
+              <View style={[styles.iconContainer, { backgroundColor: "#ffc40018"  }]}>
+                <Feather name="gift" size={24} color="#ffc400" />
               </View>
               <Text style={styles.cardText}>Parcel</Text>
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card1} onPress={() => router.push("/admin/buses/index1")} >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-beach-94.png")} style={styles.input3dIcon} />
+          <TouchableOpacity style={styles.card1} onPress={tourinterface} >
+              <View style={[styles.iconContainer, { backgroundColor: "#EC489918"  }]}>
+                <FontAwesome5 name="route" size={24} color="#EC4899" />
               </View>
-              <Text style={styles.cardText}>Tours</Text>              
+              <Text style={styles.cardText}>Tours</Text>  
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />            
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card2} onPress={() => router.push({
@@ -137,10 +192,12 @@ export default function Index() {
                 },
               })} >
                 
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-users-94.png")} style={styles.input3dIcon} />
+              <View style={[styles.iconContainer, { backgroundColor: "#10B98118"  }]}>
+                <SimpleLineIcons name="people" size={24} color="#10B981" />
               </View>
-              <Text style={styles.cardText}>Passengers</Text>              
+              
+              <Text style={styles.cardText}>Passengers</Text>
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />              
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card1} onPress={() => router.push({
@@ -152,17 +209,19 @@ export default function Index() {
                   email: params.email,
                 },
               })} >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-administrator-94.png")} style={styles.input3dIcon} />
+              <View style={[styles.iconContainer, { backgroundColor: "#84CC1618"  }]}>
+                <SimpleLineIcons name="people" size={24} color="#84CC16" />
               </View>
-              <Text style={styles.cardText}>Staff</Text>              
+              <Text style={styles.cardText}>Staff</Text> 
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />             
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card2} onPress={() => router.push("/admin/buses/index1")} >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-hospital-94.png")} style={styles.input3dIcon} />
+          <TouchableOpacity style={styles.card2} onPress={() => router.push("/admin/index1")} >
+              <View style={[styles.iconContainer, { backgroundColor: "#ff000018"  }]}>
+                <MaterialCommunityIcons name="alarm-light-outline" size={24} color="#ff0000" />
               </View>
               <Text style={styles.cardText}>Emergency</Text>
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
         </View>
 
@@ -197,7 +256,17 @@ export default function Index() {
                     </Text>
                   </TouchableOpacity>
         
-                  <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+                  <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                            pathname: "/busStaff/index1",
+                            params: {
+                              Pid: params.Pid,
+                              Pid1: params.Pid1,
+                              pfirstName: params.pfirstName,
+                              plastName:params.plastName,
+                              pphoneNumber: params.pphoneNumber,
+                              pemail: params.pemail,
+                            },                    
+                          });}} > 
                     <Ionicons name="home-outline" size={28} color="#fff" />             
                   </TouchableOpacity>
         
@@ -217,8 +286,22 @@ export default function Index() {
                 </View>
 
         <View style={styles.footerGraphic}>
-          <View style={styles.blueCurve} />
-          <View style={styles.greenCurve} />
+          <LinearGradient
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
+        </View>
+        <View style={styles.footerGraphic1}>
+          <LinearGradient
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
         </View>
       </SafeAreaView>
     </>
@@ -238,7 +321,11 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 70,   
-    backgroundColor: '#0047AB',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  submitGradient1: {
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -312,6 +399,8 @@ const styles = StyleSheet.create({
   },
 
   card1: {
+    paddingLeft:10,
+    flexDirection: 'row',
     backgroundColor: '#ffffff',
     width: '48%',
     height: 100,
@@ -319,10 +408,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderRadius: 16,
     marginBottom: 15,
-    borderLeftWidth: 6,
-    borderTopColor: '#32CD32',
-    borderTopWidth: 2,
-    borderLeftColor: '#32CD32',
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -331,6 +416,8 @@ const styles = StyleSheet.create({
   },
 
   card2: {
+    paddingLeft:10,
+    flexDirection: 'row',
     backgroundColor: '#ffffff',
     width: '48%',
     height: 100,
@@ -338,10 +425,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderRadius: 16,
     marginBottom: 15,
-    borderTopColor: '#32CD32',
-    borderTopWidth: 2,
-    borderRightWidth: 6,
-    borderRightColor: '#32CD32',
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
@@ -374,14 +457,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 15,
+    marginRight: 9,
   },
 
   cardText: {
     flex: 1,
-    fontSize: 17,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#0047AB',
+    color: '#000000',
   },
  
   bottomNav: {
@@ -464,27 +547,26 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
 
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
   },
 
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '100%',
-    borderRadius: 50,
-    position: 'absolute',  
-  },
+  footerGraphic1: {
 
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 25,
-    position: 'absolute',   
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 });

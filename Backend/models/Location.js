@@ -18,6 +18,7 @@ const locationSchema = new mongoose.Schema(
       required: true,
       default: 0,
     },
+    
     speed: {
       type: Number,
       default: 0,

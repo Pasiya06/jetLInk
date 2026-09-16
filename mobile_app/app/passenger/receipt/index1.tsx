@@ -9,10 +9,13 @@ import {
   SafeAreaView, 
   Image 
 } from 'react-native';
-import { Ionicons, 
+import { 
+  Ionicons, 
   MaterialCommunityIcons, 
   Feather, 
-  FontAwesome } from '@expo/vector-icons';
+  FontAwesome,
+  FontAwesome5,
+} from '@expo/vector-icons';
   import { LinearGradient } from 'expo-linear-gradient';
 
 
@@ -29,9 +32,9 @@ const ToursScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       {/* Navbar Section */}
       <LinearGradient
-        colors={['#4B6CF5', '#32CD32']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
+        colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
         style={styles.submitGradient1}
       >
         <View style={styles.header}>
@@ -43,8 +46,7 @@ const ToursScreen: React.FC = () => {
         </View>
       </LinearGradient>
        
-      {/* Main Content Area */}
-      <View style={styles.content}>
+      
         
 
         {/* Option 1: Tour Packages */}
@@ -61,18 +63,28 @@ const ToursScreen: React.FC = () => {
               },
           })
       }>
-          <MaterialCommunityIcons name="highway" size={33} color="#32CD32" />     
-          <Text style={styles.cardText}>Parcel</Text>
+          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
+            <Feather name="gift" size={50} color="#F59E0B" />
+          </View>
+          <View style={styles.cardText}>
+            <Text style={styles.text1}>Parcel</Text>
+            <Text style={styles.text2}>Receipt for parcel booking</Text>
+          </View>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
 
         {/* Option 2: Additional Payment */}
-        <TouchableOpacity style={styles.card}>
-          <FontAwesome name="road" size={33} color="#FFA500" />
-          <Text style={styles.cardText}>Tour</Text>
+        <TouchableOpacity style={styles.card1}>
+          <View style={[styles.iconWrap, { backgroundColor: "#EF444418" }]}>
+            <FontAwesome5 name="route" size={50} color="#EF4444" />
+          </View>
+          <View style={styles.cardText}>
+            <Text style={styles.text1}>Tours</Text>
+            <Text style={styles.text2}>Receipt for tour booking</Text>
+          </View>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
-      </View>
+      
 
       {isSearching ? (
                   <TextInput
@@ -150,18 +162,18 @@ const ToursScreen: React.FC = () => {
       {/* Bottom Graphic Design Element */}
       <View style={styles.footerGraphic}>
         <LinearGradient
-          colors={['#4B6CF5', '#32CD32']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
           style={styles.submitGradient}
         >
         </LinearGradient>
       </View>
       <View style={styles.footerGraphic1}>
         <LinearGradient
-          colors={['#4B6CF5', '#32CD32']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
           style={styles.submitGradient}
         >
         </LinearGradient>
@@ -225,25 +237,53 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   card: {
-    backgroundColor: '#ffffff',
-    width: "100%" ,
-    // height: "30%",
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 22,
-    borderWidth: 0.5,
-    borderColor: '#32CD32',
-     //justifyContent: 'space-between',
-    
-    // Shadow
-    elevation: 3,
+    marginLeft: 20,
+    marginRight: 20,
+    flex: 1,
+    maxHeight: '15%',
+    backgroundColor: '#FFF',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginTop: -50,   
+    alignSelf: 'center',
+    borderRadius: 20,
+    elevation: 10,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
   },
+
+  card1: {
+    marginLeft: 20,
+    marginRight: 20,
+    flex: 1,
+    maxHeight: '15%',
+    backgroundColor: '#FFF',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginTop: 30,   
+    alignSelf: 'center',
+    borderRadius: 20,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+
+  iconWrap: {
+    width: 76,
+    height: 76,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+    marginLeft: 20,
+  },
+
   cardText: {
     paddingHorizontal: 10,
     flex: 1,
@@ -251,6 +291,21 @@ const styles = StyleSheet.create({
     color: '#0047AB',
     fontWeight: '600',
   },
+
+  text1:{
+    fontSize: 24,
+    color: '#000000',
+    fontWeight: '600',
+  
+  },
+
+  text2:{
+    fontSize: 14,
+    color: '#7b7b7b',
+    fontWeight: '600',
+  
+  },
+
   footer: {
     height: 250,
     alignItems: 'center',
@@ -361,8 +416,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     overflow: 'hidden',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25, 
   },
 
   footerGraphic1: {

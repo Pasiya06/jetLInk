@@ -25,6 +25,12 @@ const driverSchema = new mongoose.Schema({
       unique: true,
     },
 
+    drivingLicense: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+
     Birthday: String,
 
     email: {

@@ -13,7 +13,7 @@ import {
 import {  } from "react-native-safe-area-context";
 import { Stack,useRouter,useLocalSearchParams } from "expo-router";
 import { Ionicons, FontAwesome, FontAwesome5, Feather, Feather as Icon } from '@expo/vector-icons';
-
+import { LinearGradient } from 'expo-linear-gradient';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addDriver } from "../../../services/driverService";
 
@@ -29,6 +29,7 @@ const AddBus = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [address, setAdress] = useState("");
   const [NIC, setNIC] = useState("");
+  const [drivingLicense, setdrivingLicense] = useState("");
   const [Birthday, setBirthday] = useState<string>('');
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [date, setDate] = useState(new Date());
@@ -55,6 +56,7 @@ const AddBus = () => {
       phoneNumber,
       address,
       NIC,
+      drivingLicense,
       Birthday,
       email,
       password,
@@ -92,12 +94,19 @@ const AddBus = () => {
     <>
     <Stack.Screen options={{ title: "", headerShown: false }} />
     <SafeAreaView style={styles.container}>
+      <LinearGradient
+        colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+        style={styles.submitGradient1}
+      >
       
       <View style={styles.header}> 
           <TouchableOpacity>
             <Text style={styles.title}>Drivers</Text>
             </TouchableOpacity>
       </View>
+      </LinearGradient>
     
       <View style={styles.card}>
 
@@ -174,6 +183,20 @@ const AddBus = () => {
                   </View>
                 </View>
 
+                <Text style={styles.inputLabel}>Driving License</Text>  
+                <View style={styles.inputWrapper}>
+                  
+                  <View style={styles.inputInnerWrapper}>
+                    <TextInput
+                      style={styles.textInput}
+                      value={drivingLicense}
+                      onChangeText={setdrivingLicense}
+                      placeholder="123456789012"
+                      placeholderTextColor="#A3A3A3"
+                    />
+                  </View>
+                </View>
+
                 <Text style={styles.inputLabel}>Birth Day</Text>                
                 <View style={styles.inputWrapper}>
                   
@@ -209,11 +232,12 @@ const AddBus = () => {
                     <TextInput
                       style={styles.textInput}
                       value={email}
-                      onChangeText={setEmail}
                       placeholder="ABC@gmail.com"
                       placeholderTextColor="#A3A3A3"
                       keyboardType="email-address"
+                      onChangeText={(text) => setEmail(text.replace(/\s/g, "").toLowerCase())} 
                       autoCapitalize="none"
+                      autoCorrect={false}
                     />
                   </View>
                 </View>
@@ -239,11 +263,19 @@ const AddBus = () => {
       
         </ScrollView>
 
-      <TouchableOpacity style={styles.searchButton} onPress={handleAddBus }>
+    </View>
+
+    <TouchableOpacity style={styles.searchButton} onPress={handleAddBus }>
+        <LinearGradient
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.submitGradient}
+        >
         <Text style={styles.searchButtonText}>Add Driver</Text>
+        </LinearGradient>
       </TouchableOpacity>
            
-    </View>
 
       {isSearching ? (
           <TextInput
@@ -287,7 +319,15 @@ const AddBus = () => {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+      <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                pathname: "/admin/index1",
+                params: {
+                  Aid: params.Aid,
+                  firstName: params.firstName,
+                  lastName: params.lastName,
+                  email: params.email,
+                },                    
+              });}} > 
         <Ionicons name="home-outline" size={28} color="#fff" />             
       </TouchableOpacity>
 
@@ -307,9 +347,23 @@ const AddBus = () => {
     </View>
       
 
-    <View style={styles.footerGraphic}>          
-      <View style={styles.blueCurve} />
-      <View style={styles.greenCurve} />
+    <View style={styles.footerGraphic}>
+      <LinearGradient
+        colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+        style={styles.submitGradient}
+      >
+      </LinearGradient>
+    </View>
+    <View style={styles.footerGraphic1}>
+      <LinearGradient
+        colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+        style={styles.submitGradient}
+      >
+      </LinearGradient>
     </View>
 
     </SafeAreaView>
@@ -332,7 +386,11 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 70,   
-    backgroundColor: '#0047AB',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  submitGradient1: {
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -347,7 +405,7 @@ const styles = StyleSheet.create({
   card: {
     width: '90%',
     flex: 1,
-    maxHeight: '68%',
+    maxHeight: '60%',
     backgroundColor: '#FFF',
     padding: 24,
     alignItems: 'center',
@@ -363,7 +421,7 @@ const styles = StyleSheet.create({
 
   svw: {
     width: '100%',
-    marginBottom:70,  
+     
   },
 
   
@@ -437,19 +495,13 @@ const styles = StyleSheet.create({
   },
 
   searchButton: {
-    position: "absolute",
-    bottom: 15,
-    left: 10,
-    right: 10,
-
-    flexDirection: "row",
-    alignItems: "center",
     justifyContent: "space-around",
-      
+    marginLeft: 20,
+    marginRight: 20,  
     height: 55,
-    backgroundColor: "#32CD32",
+    overflow: 'hidden',
     borderRadius: 25,
-
+    marginTop: 15,
     shadowColor: "#000",
     shadowOpacity: 0.08,
     shadowRadius: 10,
@@ -547,32 +599,28 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
 
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
   },
 
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
+  footerGraphic1: {
+
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 50,
-    position: 'absolute',  
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
-
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
-    width: '100%',
-    borderRadius: 25,
-    position: 'absolute',   
-  },
-    
-
-
 });
 
 

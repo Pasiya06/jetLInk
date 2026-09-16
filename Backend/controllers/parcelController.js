@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import Parcel from "../models/Parcel.js";
+import Bus from "../models/Bus.js"; // adjust path to match your project
 
 export const createParcel = async (req, res) => {
   try {
@@ -32,13 +33,13 @@ export const createParcel = async (req, res) => {
 
 export const getParcelByEmailAndUsed = async (req, res) => {
   try {
-    const { Semail, pickupVerified } = req.params;
+    const { Semail, status } = req.params;
 
-    console.log("Search:", Semail, pickupVerified);
+    console.log("Search:", Semail, status);
 
     const parcels = await Parcel.find({
       Semail: Semail,
-      pickupVerified: pickupVerified === "true"
+      status: status,
     });
 
     console.log("Parcels:", parcels);
@@ -65,7 +66,7 @@ export const getParcelByEmailAndUsed = async (req, res) => {
 
 export const generateParcelQR = async (req, res) => {
   const { parcelId} = req.params;
-    
+   console.log("Searching Bus ID:", parcelId); 
   try {
     const parcel = await Parcel.findOne({parcelId});
     
@@ -84,6 +85,8 @@ export const generateParcelQR = async (req, res) => {
       drop: parcel.drop,
       weight: parcel.weight,
       totalFare: parcel.totalFare,
+      pickupVerified:parcel.pickupVerified,
+      status:parcel.status,
       issuedAt: Date.now(),
     };
 
@@ -108,22 +111,23 @@ export const verifyParcelQR = async (req, res) => {
   const { qrToken } = req.body;
 
   try {
+    
     const decoded = jwt.verify(qrToken, process.env.QR_SECRET);
 
-    const parcel = await Parcel.findById(decoded.parcelId);
+    const parcel = await Parcel.findOne({ parcelId: decoded.parcelId });
 
     if (!parcel) {
-      return res.json({
+      return res.status(404).json({
         valid: false,
         reason: "Parcel not found",
       });
     }
 
-    // First Scan - Pickup
-    if (!parcel.pickupVerified) {
+    
+    if (parcel.status === "Pending") {
       parcel.pickupVerified = true;
       parcel.pickupVerifiedAt = new Date();
-      parcel.status = "Picked Up";
+      parcel.status = "PickedUp";
 
       await parcel.save();
 
@@ -135,8 +139,8 @@ export const verifyParcelQR = async (req, res) => {
       });
     }
 
-    // Second Scan - Delivery
-    if (!parcel.delivered) {
+    // Second Scan -> PickedUp → Delivered
+    if (parcel.status === "PickedUp") {
       parcel.delivered = true;
       parcel.deliveredAt = new Date();
       parcel.status = "Delivered";
@@ -151,16 +155,16 @@ export const verifyParcelQR = async (req, res) => {
       });
     }
 
-    // Already Delivered
+    
     return res.json({
       valid: false,
-      reason: "Parcel already delivered.",
+      reason: "Parcel has already been delivered.",
     });
 
   } catch (error) {
-    return res.json({
+    return res.status(400).json({
       valid: false,
-      reason: "Invalid or expired QR",
+      reason: "Invalid or expired QR code.",
     });
   }
 };
@@ -202,6 +206,128 @@ export const generateParQR = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to generate Parcel QR",
+    });
+  }
+};
+
+export const getParcelBybusNumberandStatus = async (req, res) => {
+  try {
+    const { Bnumber, status } = req.params;
+
+    console.log("Search:", Bnumber, status);
+
+    const parcels = await Parcel.find({
+      Bnumber: Bnumber,
+      status: status,
+    });
+
+    console.log("Parcels:", parcels);
+
+    if (parcels.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No parcels found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: parcels,
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
+    });
+  }
+};
+
+export const markParcelDelivered = async (req, res) => {
+  try {
+    const { parcelId } = req.params;
+
+    const parcel = await Parcel.findOne({ parcelId});
+
+    if (!parcel) {
+      return res.status(404).json({
+        valid: false,
+        reason: "Parcel not found",
+      });
+    }
+
+    // First Scan -> Pending → PickedUp
+    if (parcel.status === "Pending") {
+      parcel.pickupVerified = true;
+      parcel.pickupVerifiedAt = new Date();
+      parcel.status = "PickedUp";
+
+      await parcel.save();
+
+      return res.json({
+        valid: true,
+        stage: "pickup",
+        message: "Parcel pickup verified successfully.",
+        parcel,
+      });
+    }
+
+    // Second Scan -> PickedUp → Delivered
+    if (parcel.status === "PickedUp") {
+      parcel.delivered = true;
+      parcel.deliveredAt = new Date();
+      parcel.status = "Delivered";
+
+      await parcel.save();
+
+      return res.json({
+        valid: true,
+        stage: "delivery",
+        message: "Parcel delivered successfully.",
+        parcel,
+      });
+    }
+
+    // Already Delivered
+    return res.json({
+      valid: false,
+      reason: "Parcel has already been delivered.",
+    });
+
+  } catch (error) {
+    return res.status(400).json({
+      valid: false,
+      reason: "Invalid or expired QR code.",
+    });
+  }
+};
+
+export const getParcel = async (req, res) => {
+  try {
+    const { status } = req.params;
+
+    console.log("Search:", status);
+
+    const parcels = await Parcel.find({status: status});
+
+    console.log("Parcels:", parcels);
+
+    if (parcels.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No parcels found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: parcels,
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      message: err.message,
     });
   }
 };

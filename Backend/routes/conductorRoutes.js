@@ -7,7 +7,6 @@ import {
     deleteConductor,
     updateConductor,
     conductorLogin,
-    verifyConductorOTP,
     checkNIC,
     loginConductor
 } from "../controllers/conductorController.js";
@@ -19,7 +18,7 @@ router.get("/check/:nic", checkNIC);
 
 // Authentication routes
 router.post("/login", loginConductor);
-router.post("/verify-otp", verifyConductorOTP);
+
 
 // CRUD routes
 router.post("/", addConductor);

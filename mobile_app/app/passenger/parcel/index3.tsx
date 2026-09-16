@@ -73,7 +73,6 @@ const JetLinkInterface: React.FC = () => {
             params: {
               Sid: item._id,
               scheduleId: item.scheduleId,
-              busdate: item.busdate,
               pickuploca: item.pickuploca || "",
               dropoffloca: item.dropoffloca || "",
               arrivaltime: item.arrivaltime || "",
@@ -97,7 +96,7 @@ const JetLinkInterface: React.FC = () => {
               pickup:params.pickup,
               drop:params.drop,
               date:params.date,
-              time:params.time
+              //time:params.time
 
 
 
@@ -106,27 +105,45 @@ const JetLinkInterface: React.FC = () => {
         }
       >
       <View style={styles.friendRow}>
-          <View style={styles.textline10}>
-          <View style={styles.textline0}>  
-                  <View style={styles.textline1}>
-                      <Text style={styles.friendName1}>{item.pickuploca} -  {item.dropoffloca}</Text>
-                      <Text style={styles.friendName}>{item.depaturetime}</Text>
-                      <Text style={styles.friendName1}>{item.pickuploca}</Text>
-                  </View>
+        <View style={styles.topRow}>
+          <View style={styles.busNoPill}>
+            <Ionicons name="bus" size={14} color="#4B7BEC" />
+            <Text style={styles.busNoText}>{item.busNo}</Text>
+          </View>
+          <Text style={styles.dateText}>{params.date}</Text>
+        </View>
   
-                  <View style={styles.textline2}>
-                      <Text style={styles.friendName1}>{item.busdate}</Text>
-                      <Text style={styles.friendName}>{item.arrivaltime}</Text>
-                      <Text style={styles.friendName1}>{item.dropoffloca}</Text>
-                  </View>
-              </View>
-              
-              
-              </View>  
-              <Text style={styles.friendName}>Stops:</Text>
-              <Text style={styles.friendName}>{item.stops}</Text>
-              
-          
+        {/* Route visual */}
+        <View style={styles.routeRow}>
+          <View style={styles.routeLine}>
+            <View style={styles.dotFilled} />
+            <View style={styles.connector} />
+            <View style={styles.dotOutline} />
+          </View>
+  
+          <View style={styles.routeDetails}>
+            <View style={styles.routeStop}>
+              <Text style={styles.locationText}>{item.pickuploca}</Text>
+              <Text style={styles.timeText}>{item.depaturetime}</Text>
+            </View>
+  
+            <View style={[styles.routeStop, { marginTop: 22 }]}>
+              <Text style={styles.locationText}>{item.dropoffloca}</Text>
+              <Text style={styles.timeText}>{item.arrivaltime}</Text>
+            </View>
+          </View>
+        </View>
+  
+        {/* Stops row */}
+        <View style={styles.infoRow}>
+          <View style={styles.iconWrap}>
+            <Ionicons name="location-outline" size={16} color="#4B7BEC" />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.infoLabel}>Stops</Text>
+            <Text style={styles.infoValue}>{item.stops}</Text>
+          </View>
+        </View>
       </View>
       </TouchableOpacity>
     );
@@ -138,9 +155,9 @@ const JetLinkInterface: React.FC = () => {
       <SafeAreaView style={styles.container}>
         
         <LinearGradient
-                        colors={['#4B6CF5', '#32CD32']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
+                        colors={["#173C79","#155B8A","#159B79",]}
+                        start={{x: 0, y: 0,}}
+                        end={{x: 1, y: 1,}}
                         style={styles.submitGradient1}
                     >
                 <View style={styles.header}>
@@ -154,6 +171,7 @@ const JetLinkInterface: React.FC = () => {
                 </LinearGradient> 
              
         <View style={styles.card}>
+          <Text style={styles.cardtitle}>Select a route for booking</Text>
           <FlatList style={styles.svw}
             data={busschedData}
             renderItem={renderBusItem}
@@ -161,7 +179,7 @@ const JetLinkInterface: React.FC = () => {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingVertical: 10 }}
             />
-  
+
         </View>
 
       {isSearching ? (
@@ -252,18 +270,18 @@ const JetLinkInterface: React.FC = () => {
       {/* Bottom Graphic Design Element */}
       <View style={styles.footerGraphic}>
         <LinearGradient
-          colors={['#4B6CF5', '#32CD32']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
           style={styles.submitGradient}
         >
         </LinearGradient>
       </View>
       <View style={styles.footerGraphic1}>
         <LinearGradient
-          colors={['#4B6CF5', '#32CD32']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
           style={styles.submitGradient}
         >
         </LinearGradient>
@@ -303,20 +321,26 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    width: '90%',
+    borderTopLeftRadius: 55,
+    borderTopRightRadius: 55,
+    width: '100%',
     flex: 1,
-    maxHeight: '68%',
+    maxHeight: '70%',
     backgroundColor: '#FFF',
-   
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: -50,   
     alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
   },
+
+  cardtitle:{
+    marginTop:10,
+    fontSize: 20,
+    fontWeight: '800',
+    color: '#999797',
+    letterSpacing: 0.5,
+  },
+
 
   svw: {
     width: '100%',
@@ -327,19 +351,120 @@ const styles = StyleSheet.create({
   },
 
   friendRow: {
-    backgroundColor: '#ffffff',
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
-    borderWidth: 0.5,
-    borderColor: '#32CD32',
-    marginLeft:10,
-    marginRight:10,
-    elevation: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
+    padding: 18,
+    marginVertical: 8,
+    marginHorizontal: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4, },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
-    shadowRadius: 8,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  busNoPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#EAF1FF',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
+    gap: 6,
+  },
+  busNoText: {
+    color: '#4B7BEC',
+    fontWeight: '700',
+    fontSize: 13,
+  },
+  dateText: {
+    color: '#8A94A6',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  routeRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
+  },
+  routeLine: {
+    alignItems: 'center',
+    width: 20,
+    marginRight: 12,
+  },
+  dotFilled: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#4B7BEC',
+  },
+  connector: {
+    width: 2,
+    flex: 1,
+    minHeight: 30,
+    backgroundColor: '#D8E2F5',
+    marginVertical: 4,
+  },
+  dotOutline: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    borderWidth: 2,
+    borderColor: '#4B7BEC',
+    backgroundColor: '#FFFFFF',
+  },
+  routeDetails: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  routeStop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  locationText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1A1F36',
+    flex: 1,
+    marginRight: 8,
+  },
+  timeText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#4B7BEC',
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F7F9FC',
+    borderRadius: 12,
+    padding: 10,
+    marginTop: 4,
+  },
+  iconWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#EAF1FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  infoLabel: {
+    fontSize: 11,
+    color: '#8A94A6',
+    fontWeight: '600',
+  },
+  infoValue: {
+    fontSize: 13,
+    color: '#1A1F36',
+    fontWeight: '500',
   },
 
   textline0:{
@@ -479,8 +604,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     overflow: 'hidden',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25, 
   },
 
   footerGraphic1: {

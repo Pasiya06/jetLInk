@@ -1,5 +1,4 @@
-import React, { useState, useCallback } from 'react';
-import { Image, TextInput } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
   Alert,
@@ -10,16 +9,20 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
+  Image, 
+  TextInput,
+  BackHandler 
 } from "react-native";
 
 // Icons
 import { 
   Ionicons, 
   Feather, 
-  Fontisto, 
+  MaterialCommunityIcons, 
   FontAwesome, 
   MaterialIcons, 
-  FontAwesome5 
+  FontAwesome5,
+  SimpleLineIcons 
 } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -33,6 +36,34 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState('');
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+
+    if (hour >= 5 && hour < 12) {
+      return "Good Morning ";
+    } else if (hour >= 12 && hour < 17) {
+      return "Good Afternoon ";
+    } else if (hour >= 17 && hour < 21) {
+      return "Good Evening ";
+    } else {
+      return "Good Night 🌙";
+    }
+  };
+
+  useEffect(() => {
+    const backAction = () => {
+      handleLogout(); // Navigate to a specific path
+      return true; // Prevent default back behavior
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+
+    return () => subscription.remove();
+  }, []);
 
   const handleLogout = () => {
   Alert.alert(
@@ -48,12 +79,26 @@ export default function Index() {
         style: "destructive",
         onPress: async () => {
           await AsyncStorage.clear(); // or remove specific keys
-          router.replace("/");
+          router.replace("/passenger/selectScreen");
         },
       },
     ]
   );
 };
+
+  const tourinterface = () => {
+    router.push({
+      pathname: "/passenger/tours/index1",
+      params: {
+        Pid: params.Pid,
+        Pid1: params.Pid1,
+        pfirstName: params.pfirstName,
+        plastName:params.plastName,
+        pphoneNumber: params.pphoneNumber,
+        pemail: params.pemail,
+      },
+    });
+  };
 
   return (
     <>
@@ -62,9 +107,9 @@ export default function Index() {
       <SafeAreaView style={styles.container}>
         {/* Header Section */}
         <LinearGradient
-                        colors={['#4B6CF5', '#32CD32']}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
+        colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
                         style={styles.submitGradient1}
                     >
                 <View style={styles.header}>
@@ -82,7 +127,7 @@ export default function Index() {
         
         <View style={styles.card}>
           <View>
-            <Text style={styles.title1}>Good Morning</Text>
+            <Text style={styles.title1}>{getGreeting()}</Text>
           </View>  
           <View style={styles.iconContainer1}>
             <Text style={styles.title2}>{params.pfirstName} {params.plastName}</Text>
@@ -101,7 +146,7 @@ export default function Index() {
           <TouchableOpacity style={styles.card1} 
             onPress={() =>
             router.push({
-              pathname: "/passenger/dailyBuses/index1",
+              pathname: "/passenger/dailyBuses/searchBus",
               params: {
                 Pid: params.Pid,
                 Pid1: params.Pid1,
@@ -116,11 +161,11 @@ export default function Index() {
       }
           
       >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-bus-94.png")} style={styles.input3dIcon} />
+              <View style={[styles.iconContainer, { backgroundColor: "#8B5CF618"  }]}>
+                <FontAwesome5 name="bus-alt" size={24} color="#8B5CF6" />
               </View>
-              <Text style={styles.cardText}>Daily Busses</Text>
-              {/* <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" /> */}
+              <Text style={styles.cardText}>Buses</Text>
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card2} 
@@ -138,53 +183,74 @@ export default function Index() {
           })
       } 
             >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-package-94.png")} style={styles.input3dIcon} />
+              <View style={[styles.iconContainer, { backgroundColor: "#ffc40018"  }]}>
+                <Feather name="gift" size={24} color="#ffc400" />
               </View>
               <Text style={styles.cardText}>Parcel</Text>
-              {/* <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" /> */}
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card1} onPress={() => router.push("/passenger/tours/index1")} >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-beach-94.png")} style={styles.input3dIcon} />
+          <TouchableOpacity style={styles.card1} onPress={tourinterface} >
+              <View style={[styles.iconContainer, { backgroundColor: "#EF444418"  }]}>
+                <FontAwesome5 name="route" size={24} color="#EF4444" />
               </View>
-              <Text style={styles.cardText}>Tours</Text>
-              {/* <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" /> */}
+              <Text style={styles.cardText}>Tours</Text>  
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card2} onPress={() => router.push("/passenger/friend/index1")} >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-users-94.png")} style={styles.input3dIcon} />
+              <View style={[styles.iconContainer, { backgroundColor: "#10B98118"  }]}>
+                <SimpleLineIcons name="people" size={24} color="#10B981" />
               </View>
-              <Text style={styles.cardText}>Friends</Text>
-              {/* <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" /> */}
+              
+              <Text style={styles.cardText}>Friend</Text>
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card1} onPress={() => router.push("/passenger/ticket/index1")} >
-              <Image source ={require("../../assets/images/icons8-train-ticket-94.png")} style={styles.input3dIcon1} />
+          <TouchableOpacity 
+            style={styles.card2} 
+            onPress={() =>
+              router.push({
+                pathname: "/passenger/receipt/index1",
+                params: {
+                  Pid: params.Pid,
+                  Pid1: params.Pid1,
+                  pfirstName: params.pfirstName,
+                  plastName:params.plastName,
+                  pphoneNumber: params.pphoneNumber,
+                  pemail: params.pemail,
+                },
+              })
+            } 
+          > 
+            <View style={[styles.iconContainer, { backgroundColor: "#84CC1618"  }]}>
+              <FontAwesome5 name="receipt" size={24} color="#84CC16" />
+            </View>
+            <Text style={styles.cardText}>Receipt</Text> 
+            <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={styles.card2} 
+            onPress={() =>
+              router.push({
+                pathname: "/passenger/ticket/normalwayAndHighway",
+                params: {
+                  Pid: params.Pid,
+                  Pid1: params.Pid1,
+                  pfirstName: params.pfirstName,
+                  plastName:params.plastName,
+                  pphoneNumber: params.pphoneNumber,
+                  pemail: params.pemail,
+                },
+              })
+            } 
+          >
+              <View style={[styles.iconContainer, { backgroundColor: "#EC489918"  }]}>
+                <Ionicons name="ticket-outline" size={24} color="#EC4899" />
+              </View>
               <Text style={styles.cardText}>Tickets</Text>
-              {/* <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" /> */}
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.card2} onPress={() =>
-            router.push({
-              pathname: "/passenger/receipt/index1",
-              params: {
-                Pid: params.Pid,
-                Pid1: params.Pid1,
-                pfirstName: params.pfirstName,
-                plastName:params.plastName,
-                pphoneNumber: params.pphoneNumber,
-                pemail: params.pemail,
-              },
-          })
-      } >
-              <View style={styles.iconContainer}>
-                <Image source ={require("../../assets/images/icons8-bill-94.png")} style={styles.input3dIcon} />
-              </View>
-              <Text style={styles.cardText}>Receipts</Text>
-              {/* <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" /> */}
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
         </View>
 
@@ -242,18 +308,18 @@ export default function Index() {
 
         <View style={styles.footerGraphic}>
                 <LinearGradient
-                  colors={['#4B6CF5', '#32CD32']}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
+                  colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
                   style={styles.submitGradient}
                 >
                 </LinearGradient>
               </View>
               <View style={styles.footerGraphic1}>
                 <LinearGradient
-                colors={['#4B6CF5', '#32CD32']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+                colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
                 style={styles.submitGradient}
                 >
                 </LinearGradient>
@@ -351,97 +417,37 @@ const styles = StyleSheet.create({
   },
 
   card1: {
+    paddingLeft:10,
+    flexDirection: 'row',
     backgroundColor: '#ffffff',
     width: '48%',
     height: 100,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     borderRadius: 16,
     marginBottom: 15,
-    borderLeftWidth: 6,
-    borderTopColor: '#32CD32',
-    borderTopWidth: 2,
-    borderLeftColor: '#32CD32',
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
   },
-  
+
   card2: {
+    paddingLeft:10,
+    flexDirection: 'row',
     backgroundColor: '#ffffff',
     width: '48%',
     height: 100,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     borderRadius: 16,
     marginBottom: 15,
-    borderTopColor: '#32CD32',
-    borderTopWidth: 2,
-    borderRightWidth: 6,
-    borderRightColor: '#32CD32',
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
-  },
-
-  card3: {
-    backgroundColor: '#ffffff',
-    width: '48%',
-    height: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 16,
-    marginBottom: 15,
-    borderLeftWidth: 6,
-    borderLeftColor: '#32CD32',
-    borderBottomColor: '#32CD32',
-    borderBottomWidth: 2,
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-  },
-
-  card4: {
-    backgroundColor: '#ffffff',
-    width: '48%',
-    height: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 16,
-    marginBottom: 15,
-    borderRightWidth: 6,
-    borderBottomWidth: 2,
-    borderRightColor: '#32CD32',
-    borderBottomColor: '#32CD32',
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-  },
-
-  input3dIcon1: {
-    marginRight: 12,
-    width:35,
-    justifyContent: 'center',
-    height:35,
-    marginTop: 15,
-  },
-
-   input3dIcon: {
-    marginRight: 12,
-    marginLeft: 19,
-    width:35,
-    justifyContent: 'center',
-    marginTop: 25,
-    height:35,
-    marginBottom: 15,
   },
 
   iconContainer: {
@@ -457,7 +463,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 17,
     fontWeight: '600',
-    color: '#0047AB',
+    color: '#000000',
   },
 
   bottomNav: {
@@ -551,8 +557,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     overflow: 'hidden',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25, 
   },
 
   footerGraphic1: {

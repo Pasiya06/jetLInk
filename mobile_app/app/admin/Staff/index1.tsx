@@ -13,6 +13,7 @@ import { Ionicons,
   MaterialCommunityIcons, 
   Fontisto, 
   FontAwesome, Feather } from '@expo/vector-icons'; 
+import { LinearGradient } from 'expo-linear-gradient';
 
 const ParcelService = () => {
     const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -49,23 +50,40 @@ const ParcelService = () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
+        <LinearGradient
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.submitGradient1}
+        >
        
-      <View style={styles.header}> 
-          <TouchableOpacity><Text style={styles.title}>Buses</Text></TouchableOpacity>
-      </View>
+        <View style={styles.header}> 
+            <TouchableOpacity><Text style={styles.title}>Staff</Text></TouchableOpacity>
+        </View>
+      </LinearGradient>
       
       
         
         
         <TouchableOpacity style={styles.card} onPress={handleSearch}>
-          <Fontisto name={"bus"}  size={55} color={"#32CD32" } style={styles.mmr}/>
-          <Text style={styles.cardText}>Drivers</Text>
+          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
+              <MaterialCommunityIcons name="steering" size={58} color="#F59E0B" />
+          </View>
+          <View style={styles.cardText}>
+            <Text style={styles.text1}>Drivers</Text>
+            <Text style={styles.text2}>Manage drivers accounts</Text>
+          </View>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.card1} onPress={handleSearch1}>
-          <Fontisto name={"bus"} size={55} color="#32CD32" style={styles.mmr}/>
-          <Text style={styles.cardText}>Conductors</Text>
+          <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
+              <Ionicons name="person-circle-outline" size={58} color="#8B5CF6" />
+          </View>
+          <View style={styles.cardText}>
+            <Text style={styles.text1}>Conductors</Text>
+            <Text style={styles.text2}>Manage conductor accounts</Text>
+          </View>
           <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
         </TouchableOpacity>
 
@@ -113,7 +131,15 @@ const ParcelService = () => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/admin/index1");}} > 
+          <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                    pathname: "/admin/index1",
+                    params: {
+                      Aid: params.Aid,
+                        firstName: params.firstName,
+                        lastName: params.lastName,
+                        email: params.email,
+                    },                    
+                  });}} > 
             <Ionicons name="home-outline" size={28} color="#fff" />             
           </TouchableOpacity>
 
@@ -134,9 +160,22 @@ const ParcelService = () => {
 
       
       <View style={styles.footerGraphic}>
-        
-        <View style={styles.blueCurve} />
-        <View style={styles.greenCurve} />
+        <LinearGradient
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
+      </View>
+      <View style={styles.footerGraphic1}>
+        <LinearGradient
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.submitGradient}
+        >
+        </LinearGradient>
       </View>
             
     </SafeAreaView></>
@@ -157,7 +196,11 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 70,   
-    backgroundColor: '#0047AB',
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
+  submitGradient1: {
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -173,7 +216,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     flex: 1,
-    maxHeight: '20%',
+    maxHeight: '15%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
@@ -192,7 +235,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     flex: 1,
-    maxHeight: '20%',
+    maxHeight: '15%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
@@ -207,34 +250,13 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
 
-  card2: {
-    marginLeft: 20,
-    marginRight: 20,
-    flex: 1,
-    maxHeight: '20%',
-    backgroundColor: '#FFF',
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    marginTop: 30,   
-    alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-
-  content: {
-    flex: 1,
-    paddingHorizontal: 30,
-    paddingTop: 20,
+  iconWrap: {
+    width: 76,
+    height: 76,
+    borderRadius: 10,
+    justifyContent: 'center',
     alignItems: 'center',
-  },
-
-  mmr:{
-    marginRight: 10,
+    marginRight: 12,
     marginLeft: 20,
   },
 
@@ -244,6 +266,27 @@ const styles = StyleSheet.create({
     fontSize: 24,
     color: '#0047AB',
     fontWeight: '600',
+  },
+
+  text1:{
+    fontSize: 24,
+    color: '#000000',
+    fontWeight: '600',
+  
+  },
+
+  text2:{
+    fontSize: 14,
+    color: '#7b7b7b',
+    fontWeight: '600',
+  
+  },
+
+  content: {
+    flex: 1,
+    paddingHorizontal: 30,
+    paddingTop: 20,
+    alignItems: 'center',
   },
    
   bottomNav: {
@@ -326,31 +369,28 @@ const styles = StyleSheet.create({
     elevation: 12,
   },
 
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   footerGraphic: {
     position: 'absolute',
     bottom: 0,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
   },
 
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '100%',
-    borderRadius: 50,
-    position: 'absolute',  
-  },
+  footerGraphic1: {
 
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 100,
+    position: 'absolute',
+    bottom: 20,
     width: '100%',
-    borderRadius: 25,
-    position: 'absolute',   
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
-  
-  
 });
 
 export default ParcelService;

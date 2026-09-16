@@ -1,14 +1,14 @@
 // backend/controllers/locationController.js
-import Location from "../models/Location.js";
+import Location from "../models/Bus.js";
 
 // ─── Update Bus Location ───────────────────────────────────────────
 // POST /api/locations/update
 export const updateLocation = async (req, res) => {
   try {
-    const { busNama, latitude, longitude, speed, heading } = req.body;
+    const { busNumber, latitude, longitude, speed, driverNIC, conductorNIC, driverD, conductorD, heading, } = req.body;
 
     // Validate required fields
-    if (!busNama) {
+    if (!busNumber) {
       return res.status(400).json({
         success: false,
         message: "busNama is required",
@@ -24,11 +24,15 @@ export const updateLocation = async (req, res) => {
 
     // Update or create location record
     const location = await Location.findOneAndUpdate(
-      { busNama },
+      { busNumber },
       {
         latitude,
         longitude,
         speed: speed || 0,
+        driverNIC,
+        conductorNIC,
+        driverD,
+        conductorD,
         heading: heading || 0,
         isOnline: true,
       },
@@ -56,7 +60,7 @@ export const updateLocation = async (req, res) => {
 export const getBusLocation = async (req, res) => {
   try {
     const location = await Location.findOne({
-      busNama: req.params.busNama,
+      busNumber: req.params.busNumber,
     });
 
     if (!location) {
@@ -102,17 +106,17 @@ export const getAllLocations = async (req, res) => {
 // POST /api/locations/offline
 export const setOffline = async (req, res) => {
   try {
-    const { busNama } = req.body;
+    const { busNumber } = req.body;
 
-    if (!busNama) {
+    if (!busNumber) {
       return res.status(400).json({
         success: false,
-        message: "busNama is required",
+        message: "busNumber is required",
       });
     }
 
     await Location.findOneAndUpdate(
-      { busNama },
+      { busNumber },
       { isOnline: false }
     );
 
@@ -122,6 +126,49 @@ export const setOffline = async (req, res) => {
     });
   } catch (error) {
     console.error("setOffline error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export const updateLocation1 = async (req, res) => {
+  try {
+    const { busNumber, latitude, longitude, speed, driverNIC, conductorNIC, driverD, conductorD, heading } = req.body;
+
+    // Validate required fields
+    if (!busNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "busNama is required",
+      });
+    }
+
+    
+    // Update or create location record
+    const location = await Location.findOneAndUpdate(
+      { busNumber },
+      {
+        latitude,
+        longitude,
+        speed: speed || 0,
+        driverNIC,
+        conductorNIC,
+        driverD,
+        conductorD,
+        heading: heading || 0,
+        isOnline: false,
+      },
+      
+    );
+
+    res.json({
+      success: true,
+      data: location,
+    });
+  } catch (error) {
+    console.error("updateLocation error:", error);
     res.status(500).json({
       success: false,
       message: error.message,

@@ -72,7 +72,7 @@ const JetLinkInterface: React.FC = () => {
       { name: 'UPAY', icon: 'credit-card-wireless-outline' },
     ];
 
-    const handlePayment = async () => {
+    const processPayment = async () => {
       try {
         const response = await fetch(`${API_URL}/payment/pay`, {
           method: "POST",
@@ -168,6 +168,24 @@ const JetLinkInterface: React.FC = () => {
         Alert.alert("Error", "Unable to connect to the server.");
       }
     };
+
+    const handlePayment = () => {
+      Alert.alert(
+        "Confirm Payment",
+        "Are you sure you want to proceed with this payment?",
+        [
+          {
+            text: "Cancel",
+            style: "cancel",
+          },
+          {
+            text: "Pay Now",
+            onPress: processPayment,
+          },
+        ],
+        { cancelable: true }
+      );
+    };
  
     return (
   
@@ -175,9 +193,9 @@ const JetLinkInterface: React.FC = () => {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
         <LinearGradient
-                colors={['#4B6CF5', '#32CD32']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+                colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
                 style={styles.submitGradient1}
             >
         <View style={styles.header}>
@@ -311,9 +329,9 @@ const JetLinkInterface: React.FC = () => {
           </View>
         <TouchableOpacity style={styles.submitButton} onPress={handlePayment}>
             <LinearGradient
-                colors={['#4B6CF5', '#32CD32']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+                colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
                 style={styles.submitGradient}
             >
             <Text style={styles.submitText}>Pay</Text>
@@ -409,18 +427,18 @@ const JetLinkInterface: React.FC = () => {
       
       <View style={styles.footerGraphic}>
         <LinearGradient
-                colors={['#4B6CF5', '#32CD32']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+                colors={["#173C79","#155B8A","#159B79",]}
+                start={{x: 0, y: 0,}}
+                end={{x: 1, y: 1,}}
                 style={styles.submitGradient}
                >
          </LinearGradient>
       </View>
       <View style={styles.footerGraphic1}>
         <LinearGradient
-                colors={['#4B6CF5', '#32CD32']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
+                colors={["#173C79","#155B8A","#159B79",]}
+                start={{x: 0, y: 0,}}
+                end={{x: 1, y: 1,}}
                 style={styles.submitGradient}
                >
          </LinearGradient>
@@ -708,8 +726,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     overflow: 'hidden',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25, 
   },
 
   footerGraphic1: {
