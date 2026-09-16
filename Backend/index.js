@@ -1,12 +1,12 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-
 import express from "express";
 import mongoose from "mongoose";
 
 import cors from "cors";
 import "./jobs/ticketStatusJob.js";
+import "./jobs/parcelStatusJob.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import busRoutes from "./routes/busRoutes.js";
 import passengerRoutes from "./routes/passengerRoutes.js";

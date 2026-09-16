@@ -68,7 +68,7 @@ const updateExpiredTickets = async () => {
   }
 };
 
-//updateExpiredTickets();
+updateExpiredTickets();
 
 // Run every day at 12:01 AM
 cron.schedule("1 0 * * *", () => {

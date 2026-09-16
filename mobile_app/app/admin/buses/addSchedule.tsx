@@ -18,7 +18,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const AddBus = () => {
  
-  const [busdate, setBusDate] = useState("");
+  const [busdate, setBusDate] = useState("ANY DATE");
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [date, setDate] = useState(new Date());
   const [pickuploca, setpickuploca] = useState("");
@@ -125,9 +125,9 @@ const AddBus = () => {
     <SafeAreaView style={styles.container}>
       
       <LinearGradient
-        colors={['#4B6CF5', '#32CD32']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
+        colors={["#173C79","#155B8A","#159B79",]}
+        start={{x: 0, y: 0,}}
+        end={{x: 1, y: 1,}}
         style={styles.submitGradient1}
       >
         <View style={styles.header}>
@@ -147,7 +147,7 @@ const AddBus = () => {
           <View style={styles.inputWrapper}>
             <TextInput style={styles.input} value={busdate} onChangeText={setBusDate} />
             <TouchableOpacity onPress={() => setShowCalendar(true)}>
-                <FontAwesome5 name="calendar-alt" size={24} color="#A0A5B1" />  
+                {/* <FontAwesome5 name="calendar-alt" size={24} color="#A0A5B1" />   */}
             </TouchableOpacity>
           </View>
 
@@ -259,9 +259,9 @@ const AddBus = () => {
 
       <TouchableOpacity style={styles.searchButton} onPress={handleAddBus }>
         <LinearGradient
-          colors={['#4B6CF5', '#32CD32']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
           style={styles.submitGradient}
         >
           <Text style={styles.searchButtonText}>Add Schedule</Text>
@@ -356,18 +356,18 @@ const AddBus = () => {
 
     <View style={styles.footerGraphic}>
       <LinearGradient
-        colors={['#4B6CF5', '#32CD32']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
+        colors={["#173C79","#155B8A","#159B79",]}
+        start={{x: 0, y: 0,}}
+        end={{x: 1, y: 1,}}
         style={styles.submitGradient}
       >
       </LinearGradient>
     </View>
     <View style={styles.footerGraphic1}>
       <LinearGradient
-        colors={['#4B6CF5', '#32CD32']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
+        colors={["#173C79","#155B8A","#159B79",]}
+        start={{x: 0, y: 0,}}
+        end={{x: 1, y: 1,}}
         style={styles.submitGradient}
       >
       </LinearGradient>

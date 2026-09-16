@@ -44,7 +44,7 @@ export default function SeatSelectionScreen() {
     const getBookedSeats = async () => {
       try {
         const response = await fetch(
-          `${API_URL}/tickets/booked-seats?bNumber=${params.bNumber}&busType=${params.busType}`
+          `${API_URL}/tickets/booked-seats?bNumber=${params.bNumber}&busType=${params.busType}&date=${params.date}`
         );
 
         const data = await response.json();
@@ -142,9 +142,9 @@ export default function SeatSelectionScreen() {
       <SafeAreaView style={styles.container}>
        {/* Header Section */}
       <LinearGradient
-        colors={['#4B6CF5', '#32CD32']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
+        colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
         style={styles.submitGradient1}
       >
         <View style={styles.header}>
@@ -304,18 +304,18 @@ export default function SeatSelectionScreen() {
       {/* Bottom Graphic Design Element */}
       <View style={styles.footerGraphic}>
         <LinearGradient
-          colors={['#4B6CF5', '#32CD32']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
           style={styles.submitGradient}
         >
         </LinearGradient>
       </View>
       <View style={styles.footerGraphic1}>
         <LinearGradient
-          colors={['#4B6CF5', '#32CD32']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
           style={styles.submitGradient}
         >
         </LinearGradient>

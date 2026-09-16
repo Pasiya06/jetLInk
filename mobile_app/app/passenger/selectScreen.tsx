@@ -49,11 +49,11 @@ export default function Index() {
       <StatusBar barStyle="light-content" backgroundColor="#0056b3" />
       <SafeAreaView style={styles.container}>
       <LinearGradient
-                colors={['#4B6CF5', '#32CD32']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.submitGradient1}
-            >
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.submitGradient1}
+        >
         <View style={styles.header}>
             
         
@@ -65,8 +65,8 @@ export default function Index() {
         </LinearGradient>
 
           <TouchableOpacity style={styles.card} onPress={() => router.push("/passenger/index2")} >
-              <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-                  <Ionicons name="person-circle-outline" size={50} color="#F59E0B" />
+              <View style={[styles.iconWrap, { backgroundColor: "#32CD3218" }]}>
+                  <Ionicons name="person-circle-outline" size={50} color="#32CD32" />
               </View>
               <View style={styles.cardText}>
                 <Text style={styles.text1}>Passenger</Text>
@@ -76,8 +76,8 @@ export default function Index() {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.card1} onPress={() => router.push("/busStaff/loginindex")} >
-              <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
-                  <Fontisto name="bus" size={40} color="#8B5CF6" />
+              <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
+                  <Fontisto name="bus" size={40} color="#F59E0B" />
               </View>
               <View style={styles.cardText}>
                 <Text style={styles.text1}>Bus</Text>
@@ -115,18 +115,18 @@ export default function Index() {
         {/* Footer */}
         <View style={styles.footerGraphic}>
           <LinearGradient
-            colors={['#4B6CF5', '#32CD32']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
             style={styles.submitGradient}
           >
           </LinearGradient>
         </View>
         <View style={styles.footerGraphic1}>
           <LinearGradient
-            colors={['#4B6CF5', '#32CD32']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
             style={styles.submitGradient}
           >
           </LinearGradient>

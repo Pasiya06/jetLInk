@@ -220,11 +220,11 @@ const loginPassenger = async () => {
       <StatusBar barStyle="light-content" backgroundColor="#7db300" />
       <SafeAreaView style={styles.container}>
         <LinearGradient
-                colors={['#4B6CF5', '#32CD32']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.submitGradient1}
-            >
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.submitGradient1}
+        >
         <View style={styles.header}>
             
         
@@ -263,8 +263,8 @@ const loginPassenger = async () => {
                
                 <Text style={styles.inputLabel}>First Name</Text>  
                 <View style={styles.inputWrapper}>
-                  <View style={[styles.iconWrap, { backgroundColor: "#4361EE1A"  }]}>
-                    <Ionicons name="person" size={18} color="#4361EE" />
+                  <View style={[styles.iconWrap, ]}>
+                    <Ionicons name="person" size={18} color="#000000" />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -279,8 +279,8 @@ const loginPassenger = async () => {
 
                 <Text style={styles.inputLabel}>Last Name</Text>  
                 <View style={styles.inputWrapper}>
-                  <View style={[styles.iconWrap, { backgroundColor: "#2EC4B61A"  }]}>
-                      <Ionicons name="person" size={18} color="#2EC4B6" />
+                  <View style={[styles.iconWrap, ]}>
+                      <Ionicons name="person" size={18} color="#000000" />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -295,8 +295,8 @@ const loginPassenger = async () => {
 
                 <Text style={styles.inputLabel}>Phone Number</Text>  
                 <View style={styles.inputWrapper}>
-                  <View style={[styles.iconWrap, { backgroundColor: "#7209B71A"  }]}>
-                      <Feather name="phone" size={18} color="#7209B7" />
+                  <View style={[styles.iconWrap, ]}>
+                      <Feather name="phone" size={18} color="#000000" />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -314,8 +314,8 @@ const loginPassenger = async () => {
                 <Text style={styles.inputLabel}>Address</Text>  
                 <View style={styles.inputWrapper}>
                   
-                  <View style={[styles.iconWrap, { backgroundColor: "#ff00001A"  }]}>
-                      <Entypo name="location" size={18} color="#ff0000" />
+                  <View style={[styles.iconWrap, ]}>
+                      <Entypo name="location" size={18} color="#000000" />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -330,8 +330,8 @@ const loginPassenger = async () => {
 
                 <Text style={styles.inputLabel}>NIC</Text>  
                 <View style={styles.inputWrapper}>
-                  <View style={[styles.iconWrap, { backgroundColor: "#38B0001A"  }]}>
-                      <AntDesign name="idcard" size={18} color="#38B000" />
+                  <View style={[styles.iconWrap, ]}>
+                      <AntDesign name="idcard" size={18} color="#000000" />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -348,8 +348,8 @@ const loginPassenger = async () => {
 
                 <Text style={styles.inputLabel}>Email Address</Text>
                 <View style={styles.inputWrapper}>
-                  <View style={[styles.iconWrap, { backgroundColor: "#F725851A"  }]}>
-                    <Fontisto name="email" size={18} color="#F72585" />
+                  <View style={[styles.iconWrap, ]}>
+                    <Fontisto name="email" size={18} color="#000000" />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -367,8 +367,8 @@ const loginPassenger = async () => {
 
                 <Text style={styles.inputLabel}>Password</Text>
                 <View style={styles.inputWrapper}>
-                  <View style={[styles.iconWrap, { backgroundColor: "#FF9F1C1A"  }]}>
-                    <EvilIcons name="lock" size={28} color="#FF9F1C" />
+                  <View style={[styles.iconWrap, ]}>
+                    <EvilIcons name="lock" size={28} color="#000000" />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -426,8 +426,8 @@ const loginPassenger = async () => {
             <View style={styles.formContainer}>
               <Text style={styles.inputLabel}>Email Address</Text>
               <View style={styles.inputWrapper}>
-                <View style={[styles.iconWrap, { backgroundColor: "#4B6CF51A"  }]}>
-                    <Fontisto name="email" size={18} color="#4B6CF5" />
+                <View style={[styles.iconWrap, ]}>
+                    <Fontisto name="email" size={18} color="#000000" />
                 </View>
                 <View style={styles.inputInnerWrapper}>
                   <TextInput
@@ -445,8 +445,8 @@ const loginPassenger = async () => {
 
               <Text style={styles.inputLabel}>Password</Text>
               <View style={styles.inputWrapper}>
-                <View style={[styles.iconWrap, { backgroundColor: "#FF9F1C1A"  }]}>
-                  <EvilIcons name="lock" size={28} color="#FF9F1C" />
+                <View style={[styles.iconWrap, ]}>
+                  <EvilIcons name="lock" size={28} color="#000000" />
                 </View>
                 <View style={styles.inputInnerWrapper}>
                   <TextInput
@@ -486,18 +486,18 @@ const loginPassenger = async () => {
 
         <View style={styles.footerGraphic}>
           <LinearGradient
-            colors={['#4B6CF5', '#32CD32']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
             style={styles.submitGradient}
           >
           </LinearGradient>
         </View>
         <View style={styles.footerGraphic1}>
           <LinearGradient
-            colors={['#4B6CF5', '#32CD32']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
             style={styles.submitGradient}
           >
           </LinearGradient>
@@ -598,7 +598,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   activeTabButton: {
-    backgroundColor: '#32CD32',
+    backgroundColor: '#4B6CF5',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -639,7 +639,7 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: 16,
-    color: '#000000',
+    color: '#4B6CF5',
     fontWeight: '500',
     marginBottom: 10,
   },
@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
   
   forgotPasswordText: {
     fontSize: 12,
-    color: '#32CD32',
+    color: '#4B6CF5',
     fontWeight: '500',
   },
   footerContainer: {
@@ -675,7 +675,7 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     width: '100%',
-    backgroundColor: '#32CD32',
+    backgroundColor: '#4B6CF5',
     padding: 14,
     alignItems: 'center',   
     alignSelf: 'center',
@@ -690,7 +690,7 @@ const styles = StyleSheet.create({
 
   primaryButton1: {
     width: '100%',
-    backgroundColor: '#32CD32',
+    backgroundColor: '#4B6CF5',
     padding: 14,
     alignItems: 'center',   
     alignSelf: 'center',

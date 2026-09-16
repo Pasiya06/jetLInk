@@ -144,9 +144,9 @@ const verify = async () => {
       <StatusBar barStyle="light-content" backgroundColor="#7db300" />
       <SafeAreaView style={styles.container}>
         <LinearGradient
-          colors={['#4B6CF5', '#32CD32']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
           style={styles.submitGradient1}
         >
           <View style={styles.header}>
@@ -162,8 +162,8 @@ const verify = async () => {
           <View style={styles.formContainer}>
             <Text style={styles.inputLabel}>Bus Number</Text>
             <View style={styles.inputWrapper1}>
-              <View style={[styles.iconWrap, { backgroundColor: "#FF9F1C1A"  }]}>
-                <Fontisto name="bus" size={18} color="#FF9F1C" />
+              <View style={[styles.iconWrap, ]}>
+                <Fontisto name="bus" size={18} color="#000000" />
               </View>
               <View style={styles.inputInnerWrapper}>
                 <TextInput 
@@ -181,8 +181,8 @@ const verify = async () => {
 
             <Text style={styles.inputLabel}>Driver NIC</Text>  
             <View style={styles.inputWrapper1}>
-              <View style={[styles.iconWrap, { backgroundColor: "#38B0001A"  }]}>
-              <AntDesign name="idcard" size={18} color="#38B000" />
+              <View style={[styles.iconWrap, ]}>
+              <AntDesign name="idcard" size={18} color="#000000" />
               </View>
               <View style={styles.inputInnerWrapper}>
                 <TextInput
@@ -197,8 +197,8 @@ const verify = async () => {
 
             <Text style={styles.inputLabel}>Conductor NIC</Text>  
             <View style={styles.inputWrapper1}>
-              <View style={[styles.iconWrap, { backgroundColor: "#F725851A"  }]}>
-                <AntDesign name="idcard" size={18} color="#F72585" />
+              <View style={[styles.iconWrap, ]}>
+                <AntDesign name="idcard" size={18} color="#000000" />
               </View>
               <View style={styles.inputInnerWrapper}>
                 <TextInput
@@ -228,18 +228,18 @@ const verify = async () => {
 
         <View style={styles.footerGraphic}>
           <LinearGradient
-            colors={['#4B6CF5', '#32CD32']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
             style={styles.submitGradient}
           >
           </LinearGradient>
         </View>
         <View style={styles.footerGraphic1}>
           <LinearGradient
-            colors={['#4B6CF5', '#32CD32']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
+            colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
             style={styles.submitGradient}
           >
           </LinearGradient>
@@ -393,7 +393,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
     marginLeft: 15,
     fontSize: 16,
-    color: '#000000',
+    color: '#4B6CF5',
     fontWeight: '500',
     marginBottom: 10,
   },
@@ -420,7 +420,7 @@ const styles = StyleSheet.create({
     //marginBottom: 60,
     width: '100%',
     
-    backgroundColor: '#32CD32',
+    backgroundColor: '#4B6CF5',
     padding: 14,
     alignItems: 'center',   
     alignSelf: 'center',
