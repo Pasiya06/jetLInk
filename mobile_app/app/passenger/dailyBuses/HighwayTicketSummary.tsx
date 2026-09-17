@@ -92,6 +92,11 @@ const ParcelService = () => {
                     <Text style={styles.detailLabel}>Pickup Location</Text>
                     <Text style={styles.detailValue}>{params.pickup}</Text>
                     </View>
+                    
+                </View>
+
+                <View style={styles.detailRow}>
+                    
                     <View style={[styles.iconWrap, { backgroundColor: '#22C55E20' }]}>
                     <Ionicons name="flag-outline" size={18} color='#22C55E' />
                     </View>
@@ -109,6 +114,12 @@ const ParcelService = () => {
                     <Text style={styles.detailLabel}>Date</Text>
                     <Text style={styles.detailValue}>{params.date}</Text>
                     </View>
+                    
+                    
+                </View>
+
+                <View style={styles.detailRow}>
+                  
                     <View style={[styles.iconWrap, { backgroundColor: '#8B5CF620' }]}>
                     <Ionicons name="time-outline" size={18} color='#8B5CF6' />
                     </View>
@@ -323,7 +334,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     flex: 1,
-    maxHeight: '25%',
+    maxHeight: '38%',
     backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",

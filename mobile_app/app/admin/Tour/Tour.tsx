@@ -12,7 +12,8 @@ import {
 import { Ionicons, 
   MaterialCommunityIcons, 
   Fontisto, 
-  FontAwesome, Feather } from '@expo/vector-icons'; 
+  FontAwesome, Feather, 
+  FontAwesome5} from '@expo/vector-icons'; 
 import { LinearGradient } from 'expo-linear-gradient';
 
 const ParcelService = () => {
@@ -62,12 +63,9 @@ const ParcelService = () => {
         </View>
       </LinearGradient>
       
-      
-        
-        
         <TouchableOpacity style={styles.card} onPress={handleSearch}>
           <View style={[styles.iconWrap, { backgroundColor: "#32CD3218" }]}>
-              <MaterialCommunityIcons name="steering" size={58} color="#32CD32" />
+              <MaterialCommunityIcons name="currency-usd" size={58} color="#32CD32" />
           </View>
           <View style={styles.cardText}>
             <Text style={styles.text1}>Package</Text>
@@ -78,7 +76,7 @@ const ParcelService = () => {
 
         <TouchableOpacity style={styles.card1} onPress={handleSearch1}>
           <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-              <Ionicons name="person-circle-outline" size={58} color="#F59E0B" />
+              <FontAwesome5 name="route" size={58} color="#F59E0B" />
           </View>
           <View style={styles.cardText}>
             <Text style={styles.text1}>History</Text>
@@ -90,14 +88,14 @@ const ParcelService = () => {
         
         
       {isSearching ? (
-              <TextInput
-                style={styles.searchBarInput}
-                placeholder="Search..."
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoFocus={true}
-              />
-            ) : null}
+        <TextInput
+          style={styles.searchBarInput}
+          placeholder="Search..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          autoFocus={true}
+        />
+      ) : null}
       
       <View style={styles.bottomNav}>
 

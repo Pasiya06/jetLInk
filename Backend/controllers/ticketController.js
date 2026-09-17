@@ -92,13 +92,14 @@ export const getTicketById = async (req, res) => {
 
 export const getBookedSeats = async (req, res) => {
   try {
-    const { bNumber, busType, date } = req.query;
+    const { bNumber, busType, date, time } = req.query;
     
     const tickets = await Ticket.find(
       {
         bNumber,
         busType,
-        date
+        date,
+        time
       },
       "seatNumbers"
     );

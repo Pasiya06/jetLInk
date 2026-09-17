@@ -447,7 +447,7 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    color: '#000000',
+    color: '#4B6CF5',
     fontSize: 16,
     fontWeight: '500',
     marginBottom: 5,

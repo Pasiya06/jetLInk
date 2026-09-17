@@ -44,7 +44,7 @@ export default function SeatSelectionScreen() {
     const getBookedSeats = async () => {
       try {
         const response = await fetch(
-          `${API_URL}/tickets/booked-seats?bNumber=${params.bNumber}&busType=${params.busType}&date=${params.date}`
+          `${API_URL}/tickets/booked-seats?bNumber=${params.bNumber}&busType=${params.busType}&date=${params.date}&time=${params.depaturetime}`
         );
 
         const data = await response.json();

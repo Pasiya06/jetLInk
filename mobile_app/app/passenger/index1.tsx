@@ -283,22 +283,22 @@ export default function Index() {
                   <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
                     <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
                     <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-                      Routes
+                      Search
                     </Text>
                   </TouchableOpacity>
         
-                  <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push("/passenger/index1");}} > 
+                  <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); }} > 
                     <Ionicons name="home-outline" size={28} color="#fff" />             
                   </TouchableOpacity>
         
-                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); ;}}>
                     <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
                     <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
                       Alerts
                     </Text>
                   </TouchableOpacity>
         
-                  <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+                  <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); }}>
                     <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
                     <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
                       Profile
