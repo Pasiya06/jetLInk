@@ -112,6 +112,23 @@ const JetLinkInterface: React.FC = () => {
             return;
         }
 
+        switch (data.message) {
+          case "Invalid card number":
+              Alert.alert("Invalid Card Number");
+              break;
+
+          case "Card expired":
+              Alert.alert("Card Expired");
+              break;
+
+          case "CVC validation failed":
+              Alert.alert("Invalid CVC");
+              break;
+
+          default:
+              Alert.alert("Payment Failed", data.message);
+        }
+
       } 
       catch (error) {
         console.log(error);

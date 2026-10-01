@@ -72,26 +72,10 @@ const JetLinkInterface: React.FC = () => {
       { name: 'UPAY', icon: 'credit-card-wireless-outline' },
     ];
 
-    const processPayment = async () => {
-      try {
-        const response = await fetch(`${API_URL}/payment/pay`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            cardNumber,
-            expiry,
-            cvc,
-          }),
-        });
-
-        const data = await response.json();
-
-       if (data.success) {
-            router.push({
-            pathname: "/passenger/parcel/paymentSuccessful",
-            params: {
+    const handleSearch = () => {
+        router.push({
+            pathname: "/passenger/parcel/otpVerify",
+            params:{ 
               Sid: params.Sid,
               scheduleId: params.scheduleId,
               bNumber: params.bNumber,
@@ -112,10 +96,56 @@ const JetLinkInterface: React.FC = () => {
               pickup:params.pickup,
               drop:params.drop,
               date:params.date,
-              time:params.time,
+              time:params.depaturetime,
               totalFare:params.totalFare,
-              
-            },
+            } 
+            
+        });
+      };
+
+    const processPayment = async () => {
+      try {
+        const response = await fetch(`${API_URL}/payment/pay`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            cardNumber,
+            expiry,
+            cvc,
+          }),
+        });
+
+        const data = await response.json();
+
+       if (data.success) {
+            router.push({
+              pathname: "/passenger/parcel/otpVerify",
+              params:{ 
+                Sid: params.Sid,
+                scheduleId: params.scheduleId,
+                bNumber: params.bNumber,
+
+                Pid: params.Pid,
+                Pid1: params.Pid1,
+                pfirstName: params.pfirstName,
+                plastName:params.plastName,
+                pphoneNumber: params.pphoneNumber,
+                pemail: params.pemail,
+                sendername:params.sendername,
+                smobilenumber:params.smobilenumber,
+                semail:params.semail,
+                receivername:params.receivername,
+                rmobilenumber:params.rmobilenumber,
+                remail:params.remail,
+                weight:params.weight,
+                pickup:params.pickup,
+                drop:params.drop,
+                date:params.date,
+                time:params.time,
+                totalFare:params.totalFare,
+              } 
           });
             return;
         }
@@ -130,34 +160,7 @@ const JetLinkInterface: React.FC = () => {
                 break;
 
             case "CVC validation failed":
-                router.push({
-                        pathname: "/passenger/parcel/paymentFail",
-                        params: {
-                          Sid: params.Sid,
-                          scheduleId: params.scheduleId,
-                          bNumber: params.bNumber,
-
-                          Pid: params.Pid,
-                          Pid1: params.Pid1,
-                          pfirstName: params.pfirstName,
-                          plastName:params.plastName,
-                          pphoneNumber: params.pphoneNumber,
-                          pemail: params.pemail,
-                          sendername:params.sendername,
-                          smobilenumber:params.smobilenumber,
-                          semail:params.semail,
-                          receivername:params.receivername,
-                          rmobilenumber:params.rmobilenumber,
-                          remail:params.remail,
-                          weight:params.weight,
-                          pickup:params.pickup,
-                          drop:params.drop,
-                          date:params.date,
-                          time:params.time,
-                          totalFare:params.totalFare,
-                          
-                        },                    
-                      });
+                Alert.alert("Invalid CVC");
                 break;
 
             default:

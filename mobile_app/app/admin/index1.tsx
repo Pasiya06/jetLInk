@@ -20,7 +20,8 @@ import {
   Feather,
   FontAwesome5,
   MaterialCommunityIcons,
-  SimpleLineIcons 
+  SimpleLineIcons, 
+  Foundation
 } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -139,6 +140,23 @@ export default function Index() {
 
         
         <View style={styles.listContainer}>
+
+          <TouchableOpacity style={styles.card3} onPress={() => router.push({
+                pathname: "/admin/PaymentHistory/paymentHistory", 
+                params: {
+                  Aid: params.Aid,
+                  firstName: params.firstName,
+                  lastName: params.lastName,
+                  email: params.email,
+                },
+              })} >
+                
+              <View style={[styles.iconContainer, { backgroundColor: "#32CD3218"  }]}>
+                <Foundation name="dollar" size={34} color="#32CD32" />
+              </View>
+              <Text style={styles.cardText}>Payment History</Text>
+              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
+          </TouchableOpacity>
           
           <TouchableOpacity style={styles.card1} onPress={() => router.push({
                 pathname: "/admin/buses/busAndSchedule", 
@@ -363,6 +381,28 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
   },
 
+  card3: {
+    width: '100%',
+    height: '20%',
+    backgroundColor: '#FFF',
+    padding: 14,
+    marginTop: 20, 
+    marginBottom: 15,  
+    alignSelf: 'center',
+    borderRadius: 20,
+    elevation: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 5,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+
   iconContainer1: { 
     borderRadius: 12,
     flexDirection: 'row',
@@ -403,7 +443,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#ffffff',
     width: '48%',
-    height: 100,
+    height: 80,
     alignItems: 'center',
     justifyContent: 'space-between',
     borderRadius: 16,
@@ -420,7 +460,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#ffffff',
     width: '48%',
-    height: 100,
+    height: 80,
     alignItems: 'center',
     justifyContent: 'space-between',
     borderRadius: 16,

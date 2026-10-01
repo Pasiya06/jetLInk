@@ -16,7 +16,8 @@ import {
   Feather, 
   FontAwesome,
   Fontisto,
-  } from '@expo/vector-icons';
+  MaterialCommunityIcons
+} from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import QRCode from 'react-native-qrcode-svg';
 
@@ -25,6 +26,7 @@ const ParcelService = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const params = useLocalSearchParams();
+  const selectedSeatNumbers = params.seatNumbers ? JSON.parse(params.seatNumbers as string): [];
   const [activeTab, setActiveTab] = useState('');
   const router = useRouter();
   const ticketId = params.ticketId as string ;
@@ -44,6 +46,15 @@ const ParcelService = () => {
   const qrRef = useRef<any>(null);
   const [qrToken, setQrToken] = useState("");
   const [error, setError] = useState<string | null>(null);
+
+  const seatNumber = () => {
+    if (params.busType === "Highway") {
+      return selectedSeatNumbers.join(", ");
+    }
+    else{
+      return "Can't book seat";
+    }
+  };
   
   const fetchQR = async () => {
 
@@ -186,13 +197,23 @@ const ParcelService = () => {
             </View>
 
             <View  style={styles.detailRow}>
-              <View style={[styles.iconWrap, { backgroundColor: "#E74C3C20" }]}>
-                <Ionicons name="time-outline" size={22} color="#E74C3C"  />
+              <View style={[styles.iconWrap, { backgroundColor: "#8B5CF620" }]}>
+                <Ionicons name="time-outline" size={22} color="#8B5CF6"  />
               </View>
               <View style={styles.detailTextWrap}>
                 <Text style={styles.detailLabel}>Time</Text>
                 <Text style={styles.detailValue}>{params.time}</Text>
               </View>
+            </View>
+
+            <View style={styles.detailRow}>
+            <View style={[styles.iconWrap, { backgroundColor: "#ea580c20" }]}>
+            <MaterialCommunityIcons name="car-seat" size={18} color="#ea580c" />
+            </View>
+            <View style={styles.detailTextWrap}>
+            <Text style={styles.detailLabel}>Seat Numbers</Text>
+            <Text style={styles.detailValue}>{seatNumber()}</Text>
+            </View>
             </View>
 
           </View>
