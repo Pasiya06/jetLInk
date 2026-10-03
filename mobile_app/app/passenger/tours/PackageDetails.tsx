@@ -119,13 +119,13 @@ export default function PackageDetails() {
     router.push({
       pathname: "/passenger/tours/selectBus",
       params: {
-        packageid: packageData?._id,
-        description: packageData?.description,
-        packageType: packageData?.packageType,
-        totalDistance: packageData?.totalDistance,
-        tripDuration: packageData?.tripDuration,
-        maxPassengers: packageData?.maxPassengers,
-        maxPrice: packageData?.maxPrice,
+        packageId: params.packageId,
+        description: params.description,
+        packageType: params.packageType,
+        totalDistance: params.totalDistance,
+        tripDuration: params.tripDuration,
+        maxPassengers: params.maxPassengers,
+        maxPrice: params.maxPrice,
         Pid: params.Pid,
         Pid1: params.Pid1,
         pfirstName: params.pfirstName,
@@ -308,7 +308,7 @@ export default function PackageDetails() {
           </View>
         </ScrollView>
 
-        <TouchableOpacity style={styles.submitButton} >
+        <TouchableOpacity style={styles.submitButton} onPress={tourinterface} >
           <LinearGradient
             colors={["#173C79","#155B8A","#159B79",]}
             start={{x: 0, y: 0,}}

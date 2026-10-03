@@ -101,6 +101,12 @@ export default function PackagesScreen() {
             pathname: "/passenger/tours/PackageDetails",
             params: {
               packageId: item._id,
+              description: item.description,
+              packageType: item.packageType,
+              totalDistance: item.totalDistance,
+              tripDuration: item.tripDuration,
+              maxPassengers: item.maxPassengers,
+              maxPrice: item.maxPrice,
               Pid: params.Pid,
               Pid1: params.Pid1,
               pfirstName: params.pfirstName,

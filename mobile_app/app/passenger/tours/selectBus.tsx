@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Stack, useRouter, useLocalSearchParams } from "expo-router";
+import React, { useState, useCallback } from 'react';
+import { Stack, useRouter, useFocusEffect, useLocalSearchParams } from "expo-router";
 import {
   View,
   Text,
@@ -11,126 +11,134 @@ import {
   Modal,
   Alert,
   ActivityIndicator,
+  FlatList,
 } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
-
+import DateTimePicker from '@react-native-community/datetimepicker';
 import {
   Ionicons,
-  MaterialCommunityIcons,
+  Fontisto,
   Feather ,  
-  FontAwesome, 
+  FontAwesome,
+  FontAwesome5, 
 } from "@expo/vector-icons";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-type Place = {
-  _id: string;
-  name: string;
-  description: string;
-  icon: string;
-  iconType: string;
-  color: string;
-  order: number;
-};
-
-type PackageData = {
-  _id: string;
-  description: string;
-  packageType: string;
-  totalDistance: string;
-  tripDuration: string;
-  maxPassengers: number;
-  maxPrice: number;
-  places: Place[];
-};
+interface Bus {
+  _id: string; 
+  busId: number; 
+  driverNIC: string;
+  conductorNIC: string;
+  driverD: string;
+  conductorD: string;
+  busNumber: string;
+  chassisNo?: string;
+  engineNo?: string;
+  colour?: string;
+  fuelType?: string;
+  serviceDate?: string;
+  licenseDate?: string;
+  emissionDate?: string;
+  busType?: string;
+  isOnline:string;
+}
 
 export default function PackageDetails() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const PACKAGE_ID = params.packageId as string;
-  const [packageData, setPackageData] = useState<PackageData | null>(null);
-  const [places, setPlaces] = useState<Place[]>([]);
+  const [date, setDate] = useState(String(params.date || ""));
+  const [date1, setdate] = useState(new Date());
+  const [showCalendar, setShowCalendar] = useState<boolean>(false);
+  const busType3: string = "tour";
   const [loading, setLoading] = useState(true);
-  
+  const [busData, setBusData] = useState<Bus[]>([]);
   const [activeTab, setActiveTab] = useState(''); 
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  const loadBuses = async () => {
+  try {
+    const response = await fetch(`${API_URL}/buses?busType=${busType3}`);
 
-  /* LOAD PACKAGE */
-
-  const loadPackage = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${API_URL}/packages/${PACKAGE_ID}`);
-      const data = await response.json();
-      if (!response.ok || !data.success) {
-        throw new Error(
-          data.message ||
-          "Failed to load package"
-        );
-      }
-      setPackageData(data.data);
-      setPlaces(data.data.places || []);
-    } 
-
-    catch (error: any) {
-      console.log(
-        "Load Package Error:",
-        error
-      );
-
-      Alert.alert(
-        "Error",
-        error.message ||
-        "Could not load package"
-      );
-
-    } 
-
-    finally {
-      setLoading(false);
-    }
-  };
-
-
-  /* LOAD ON SCREEN OPEN */
-
-  useEffect(() => {
-    loadPackage();
-  }, []);
-
-  /* RENDER ICON */
-
-  const renderIcon = (item: Place) => {
-    if (item.iconType === "material") {
-      return (
-        <MaterialCommunityIcons name={item.icon as any} size={20} color={item.color}/>
-      );
+    if (!response.ok) {
+      throw new Error("Network issues encountered");
     }
 
-    return (
-      <Ionicons name={item.icon as any} size={20} color={item.color}/>
+    const data = await response.json();
+
+    const typeOfBuses = data.filter(
+      (bus: any) => bus.busType === busType3
     );
-  };
 
+    setBusData(typeOfBuses);
 
-  /*  LOADING SCREEN */
+    
 
-  if (loading) {
-    return (
-      <>
-      <Stack.Screen options={{ title: "", headerShown: false }} />
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#12966F"/>
-          <Text style={styles.loadingText}>
-            Loading package...
-          </Text>
-        </View>
-      </>
+  } catch (error) {
+    console.log("Error details:", error);
+    Alert.alert(
+      "Network Error",
+      "Unable to load data elements from database server context."
     );
   }
+};
+
+  useFocusEffect(
+    useCallback(() => {
+      loadBuses();
+    }, [])
+  );
+
+
+  
+  
+  const renderBusItem = ({ item }: { item: Bus }) => (
+    <TouchableOpacity style={styles.friendRow}
+      onPress={() =>
+        router.push({
+          pathname: "/passenger/tours/tourSummary",
+          params: {
+            Bid: item._id, 
+            busId: String(item.busId),
+            busNumber: item.busNumber,
+            driverNIC: item.driverNIC,
+            conductorNIC: item.conductorNIC,
+            driverD: item.driverD,
+            conductorD: item.conductorD,
+            isOnline: item.isOnline,
+
+            packageId: params.packageId,
+            description: params.description,
+            packageType: params.packageType,
+            totalDistance: params.totalDistance,
+            tripDuration: params.tripDuration,
+            maxPassengers: params.maxPassengers,
+            maxPrice: params.maxPrice,
+            Pid: params.Pid,
+            Pid1: params.Pid1,
+            pfirstName: params.pfirstName,
+            plastName:params.plastName,
+            pphoneNumber: params.pphoneNumber,
+            pemail: params.pemail,
+          },
+        })
+      }
+    >
+      
+      <View style={styles.profileCircle}>
+        <Fontisto name={"bus"} size={25} color="#32CD32" />
+      </View>
+      <Text style={styles.friendName}>{item.busNumber}</Text>
+      
+    </TouchableOpacity>
+  );
+
+  const filteredBusData = busData.filter(bus => 
+    bus.busNumber.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
 
   return (
     <>
@@ -146,10 +154,6 @@ export default function PackageDetails() {
           end={{x: 1, y: 1,}}
           style={styles.header}
         >
-          {/* <View style={styles.decorCircle}/> */}
-
-          {/* BRAND */}
-
           <View style={styles.brandContainer}>
             <View style={styles.brandDot}/>
             <Text style={styles.brandText}>
@@ -157,147 +161,55 @@ export default function PackageDetails() {
             </Text>
           </View>
 
-          <Text style={styles.title}>
-           Rs {packageData?.maxPrice}
-          </Text>
+          <Text style={styles.label}>Date</Text>
+            <View style={styles.inputWrapper}>
+                <TextInput 
+                    style={styles.input1} 
+                    value={date} 
+                    placeholder="MM/DD/YYYY" 
+                    placeholderTextColor="#99999a"
+                    onChangeText={setDate} />
+                <TouchableOpacity onPress={() => setShowCalendar(true)}>
+                  <FontAwesome5 name="calendar-alt" size={24} color="#99999a" />  
+                </TouchableOpacity>
+            </View>
+
+          {showCalendar && (
+            <DateTimePicker
+              value={date1 || new Date()}
+              mode="date"
+              display="default"
+              minimumDate={new Date()}   // Cannot select a date before today
+              onChange={(event, selectedDate) => {
+                setShowCalendar(false);
+
+                if (selectedDate) {
+                  setdate(selectedDate);
+                  setDate(selectedDate.toLocaleDateString());
+                }
+              }}
+            />
+          )}
 
           {/* PACKAGE TYPE */}
 
           <View style={styles.goldenBadge}>
             <View style={styles.badgeDot}/>
             <Text style={styles.goldenText}>
-              {packageData?.packageType || "PACKAGE"}
+              {params.packageType || "PACKAGE"}
             </Text>
-          </View>
-
-          {/* DESCRIPTION */}
-
-          <Text style={styles.description}>
-            {packageData?.description}
-          </Text>
-
-          {/*  STATS  */}
-
-          <View style={styles.statsRow}>
-            <StatCard
-              value={places.length.toString()}
-              label="PLACES INCLUDED"
-            />
-
-            <StatCard
-              value={packageData?.totalDistance || "0 km"}
-              label="TOTAL DISTANCE"
-            />
-
-            <StatCard
-              value={ packageData?.tripDuration || "0h"}
-              label="TRIP DURATION"
-            />
-
-            <StatCard
-              value={packageData?.maxPassengers ?.toString() || "0"}
-              label="MAX PASSENGERS"
-            />
           </View>
         </LinearGradient>
 
-
-        {/*  SECTION HEADER  */}
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>
-            Places Included
-          </Text>
-        </View>
-
-        {/*  PLACES  */}
-
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-
-          <View style={styles.placesSection}>
-            <View style={styles.timelineContainer}>
-              {places.length > 1 && (
-                <View style={styles.timelineLine}/>
-              )}
-
-              {/*  PLACE ITEMS  */}
-
-              {places.map((item, index) => (
-                <View
-                  key={item._id || `${item.name}-${index}`}
-                  style={styles.placeRow}
-                >
-                  {/* ICON */}
-
-                  <View style={[styles.timelineIcon, {borderColor:(item.color || "#12966F") + "30",},]}>
-                    {renderIcon(item)}
-                  </View>
-
-                  {/* CARD */}
-
-                  <TouchableOpacity style={ styles.placeCard}>
-                    <View style={styles.placeTextContainer}>
-                      <Text style={styles.placeName}>
-                        {item.name}
-                      </Text>
-
-                      <Text style={styles.placeDescription} numberOfLines={2}>
-                        {item.description}
-                      </Text>
-                    </View>
-
-                    {/* NUMBER */}
-
-                    <View style={styles.numberCircle}>
-                      <Text style={styles.numberText}>
-                        {index + 1}
-                      </Text>
-                    </View>
-                  </TouchableOpacity>
-
-
-                  {/* DELETE */}
-
-                  
-                </View>
-              )
-            )}
-
-
-            {/* EMPTY STATE */}
-
-            {places.length === 0 && (
-
-              <View style={styles.emptyContainer}>
-                <Ionicons name="location-outline" size={45} color="#98A2B3"/>
-                <Text style={styles.emptyTitle}>
-                  No places added yet
-                </Text>
-
-                <Text style={styles.emptyText}>
-                  Tap Add Place to add your
-                  first destination.
-                </Text>
-              </View>
-            )}
-            </View>
-          </View>
-        </ScrollView>
-
-        <TouchableOpacity style={styles.submitButton} >
-          <LinearGradient
-            colors={["#173C79","#155B8A","#159B79",]}
-            start={{x: 0, y: 0,}}
-            end={{x: 1, y: 1,}}
-            style={styles.submitGradient}
-          >
-          <Text style={styles.submitText}>Select Bus</Text>
-          </LinearGradient>
-        </TouchableOpacity>
-
+          <FlatList 
+            style={styles.svw}
+            data={filteredBusData}
+            renderItem={renderBusItem}
+            keyExtractor={(item) => item._id}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingVertical: 10 }}
+          />
+        
         {isSearching ? (
           <TextInput
             style={styles.searchBarInput}
@@ -470,6 +382,50 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 15,
     fontWeight: "700",
+  },
+
+  friendRow: {
+    marginLeft: 15,
+    marginRight: 15,
+    
+    backgroundColor: '#ffffff',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 12,
+    borderWidth: 0.5,
+    borderColor: '#32CD32',
+   
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4, },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+  },
+
+  profileCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: '#32CD32',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  friendName: {
+    flex: 1,
+    marginLeft: 10,
+    fontSize: 18,
+    color: '#0047AB',
+    fontWeight: '500',
+  },
+
+  svw: {
+    width: '100%',
+    marginBottom:140,
+    
   },
 
   goldenBadge: {
@@ -745,6 +701,29 @@ const styles = StyleSheet.create({
     color: "#344054",
     marginTop: 10,
     marginBottom: 8,
+  },
+
+  label: {
+    marginTop: 40,
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '500',
+    marginBottom: 5,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 2,
+    backgroundColor: '#F2F4F5',
+    borderColor: '#ECEEF2',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    height: 45,
+  },
+  input1: {
+    flex: 1,
+    height: '100%',
+    color: '#333',
   },
 
   input: {

@@ -149,20 +149,19 @@ const ParcelService = () => {
       <SafeAreaView style={styles.container}>
        
       <LinearGradient
-                      colors={["#173C79","#155B8A","#159B79",]}
-                      start={{x: 0, y: 0,}}
-                      end={{x: 1, y: 1,}}
-                      style={styles.submitGradient1}
-                  >
-              <View style={styles.header}>
-                  
-              
-                <TouchableOpacity >
-                  <Text style={styles.title}>JetLink</Text>
-                </TouchableOpacity>
+        colors={["#173C79","#155B8A","#159B79",]}
+        start={{x: 0, y: 0,}}
+        end={{x: 1, y: 1,}}
+        style={styles.submitGradient1}
+      >
+        <View style={styles.header}>
+                      
+          <TouchableOpacity >
+            <Text style={styles.title}>JetLink</Text>
+          </TouchableOpacity>
                        
-              </View>
-              </LinearGradient> 
+        </View>
+      </LinearGradient> 
 
         <View style={styles.card} >
           <View style={styles.svw}> 
