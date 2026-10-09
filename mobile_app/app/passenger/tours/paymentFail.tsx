@@ -19,46 +19,53 @@ export default function PaymentSuccessScreen() {
   const params = useLocalSearchParams();
 
   const handleSearch1 = () => {
-    router.push({
-      pathname: "/passenger/dailyBuses/paymentGateway",
-      params:{ 
-        Pid: params.Pid,
-        Pid1: params.Pid1,
-        pfirstName: params.pfirstName,
-        plastName:params.plastName,
-        pphoneNumber: params.pphoneNumber,
-        pemail: params.pemail,
-        pickup:params.pickup,
-        drop:params.drop,
-        date:params.date,
-        time:params.time,
-        bNumber:params.bNumber,
-        busType:params.busType,
-        seatNumbers:params.seatNumbers,
-        noOfTicket:params.noOfTicket,
-        totalFare:params.totalFare,
-      } 
+        router.push({
+            pathname: "/passenger/tours/paymentGateway",
+            params:{ 
+              busNumber: params.busNumber,
+              driverNIC: params.driverNIC,
+              conductorNIC: params.conductorNIC,
+              driverD: params.driverD,
+              conductorD: params.conductorD,
+              isOnline: params.isOnline,
+              date: params.date,
+              pickup: params.pickup,
+              time: params.selectedTime,
+              packageId: params.packageId,
+              description: params.description,
+              packageType: params.packageType,
+              totalDistance: params.totalDistance,
+              tripDuration: params.tripDuration,
+              maxPassengers: params.maxPassengers,
+              maxPrice: params.maxPrice,
+              Pid: params.Pid,
+              Pid1: params.Pid1,
+              pfirstName: params.pfirstName,
+              plastName:params.plastName,
+              pphoneNumber: params.pphoneNumber,
+              pemail: params.pemail,
+            } 
             
-    });
-  };
+        });
+      };
 
   const handleSearch = () => {
-    router.push({
-      pathname: "/passenger/index1",
-      params:{ 
-        
+        router.push({
+            pathname: "/passenger/index1",
+            params:{ 
+              
 
-        Pid: params.Pid,
-        Pid1: params.Pid1,
-        pfirstName: params.pfirstName,
-        plastName:params.plastName,
-        pphoneNumber: params.pphoneNumber,
-        pemail: params.pemail,
-        
-      } 
-        
-    });
-  };
+              Pid: params.Pid,
+              Pid1: params.Pid1,
+              pfirstName: params.pfirstName,
+              plastName:params.plastName,
+              pphoneNumber: params.pphoneNumber,
+              pemail: params.pemail,
+              
+            } 
+            
+        });
+      };
   
 
   const scaleAnim = useRef(new Animated.Value(0)).current;

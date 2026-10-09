@@ -27,6 +27,7 @@ const JetLinkInterface: React.FC = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab1, setActiveTab1] = useState<'card' | 'qr'>('card');
+  const card:string = "card"
   const [nameOnCard, setNameOnCard] = useState('Visa');
   const [cardNumber, setCardNumber] = useState('');
   const [expiry, setExpiry] = useState('');
@@ -71,6 +72,37 @@ const JetLinkInterface: React.FC = () => {
       { name: 'UPAY', icon: 'credit-card-wireless-outline' },
     ];
 
+    const handleSearch = () => {
+        router.push({
+            pathname: "/passenger/parcel/otpVerify",
+            params:{ 
+              Sid: params.Sid,
+              scheduleId: params.scheduleId,
+              bNumber: params.bNumber,
+
+              Pid: params.Pid,
+              Pid1: params.Pid1,
+              pfirstName: params.pfirstName,
+              plastName:params.plastName,
+              pphoneNumber: params.pphoneNumber,
+              pemail: params.pemail,
+              sendername:params.sendername,
+              smobilenumber:params.smobilenumber,
+              semail:params.semail,
+              receivername:params.receivername,
+              rmobilenumber:params.rmobilenumber,
+              remail:params.remail,
+              weight:params.weight,
+              pickup:params.pickup,
+              drop:params.drop,
+              date:params.date,
+              time:params.depaturetime,
+              totalFare:params.totalFare,
+            } 
+            
+        });
+      };
+
     const processPayment = async () => {
       try {
         const response = await fetch(`${API_URL}/payment/pay`, {
@@ -89,31 +121,52 @@ const JetLinkInterface: React.FC = () => {
 
        if (data.success) {
             router.push({
-            pathname: "/passenger/dailyBuses/otpVerify",
-            params: {
-              Pid: params.Pid,
-              Pid1: params.Pid1,
-              pfirstName: params.pfirstName,
-              plastName:params.plastName,
-              pphoneNumber: params.pphoneNumber,
-              pemail: params.pemail,
-              pickup:params.pickup,
-              drop:params.drop,
-              date:params.date,
-              time:params.time,
-              bNumber:params.bNumber,
-              busType:params.busType,
-              seatNumbers:params.seatNumbers,
-              noOfTicket:params.noOfTicket,
-              totalFare:params.totalFare,
-              
-            },
+              pathname: "/passenger/tours/otpVerify",
+              params:{ 
+                busNumber: params.busNumber,
+                driverNIC: params.driverNIC,
+                conductorNIC: params.conductorNIC,
+                driverD: params.driverD,
+                conductorD: params.conductorD,
+                isOnline: params.isOnline,
+                date: params.date,
+                pickup: params.pickup,
+                time: params.time,
+                packageId: params.packageId,
+                description: params.description,
+                packageType: params.packageType,
+                totalDistance: params.totalDistance,
+                tripDuration: params.tripDuration,
+                maxPassengers: params.maxPassengers,
+                maxPrice: params.maxPrice,
+                Pid: params.Pid,
+                Pid1: params.Pid1,
+                pfirstName: params.pfirstName,
+                plastName:params.plastName,
+                pphoneNumber: params.pphoneNumber,
+                pemail: params.pemail,
+              } 
           });
             return;
         }
 
-      } 
-      catch (error) {
+        switch (data.message) {
+            case "Invalid card number":
+                Alert.alert("Invalid Card Number");
+                break;
+
+            case "Card expired":
+                Alert.alert("Card Expired");
+                break;
+
+            case "CVC validation failed":
+                Alert.alert("Invalid CVC");
+                break;
+
+            default:
+                Alert.alert("Payment Failed", data.message);
+        }
+      } catch (error) {
         console.log(error);
         Alert.alert("Error", "Unable to connect to the server.");
       }
@@ -143,18 +196,19 @@ const JetLinkInterface: React.FC = () => {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
         <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
+                colors={["#173C79","#155B8A","#159B79",]}
           start={{x: 0, y: 0,}}
           end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-          <View style={styles.header}>
-
-            <TouchableOpacity >
-              <Text style={styles.title}>JetLink</Text>
-            </TouchableOpacity>
-                  
-          </View>
+                style={styles.submitGradient1}
+            >
+        <View style={styles.header}>
+            
+        
+          <TouchableOpacity >
+            <Text style={styles.title}>JetLink</Text>
+          </TouchableOpacity>
+                 
+        </View>
         </LinearGradient> 
              
         <View style={styles.card}>
@@ -275,13 +329,12 @@ const JetLinkInterface: React.FC = () => {
                 <Text style={styles.qrText}>Scan to pay with your banking app</Text>
               </View>
             )}
-        </View>
-     
+          </View>
         <TouchableOpacity style={styles.submitButton} onPress={handlePayment}>
             <LinearGradient
                 colors={["#173C79","#155B8A","#159B79",]}
-                start={{x: 0, y: 0,}}
-                end={{x: 1, y: 1,}}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
                 style={styles.submitGradient}
             >
             <Text style={styles.submitText}>Pay</Text>
@@ -289,100 +342,114 @@ const JetLinkInterface: React.FC = () => {
         </TouchableOpacity>
 
       {isSearching ? (
-        <TextInput
-          style={styles.searchBarInput}
-          placeholder="Search..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          autoFocus={true}
-        />
-      ) : null}
+                  <TextInput
+                    style={styles.searchBarInput}
+                    placeholder="Search..."
+                    value={searchQuery}
+                    onChangeText={setSearchQuery}
+                    autoFocus={true}
+                  />
+                ) : null}
           
         
-      <View style={styles.bottomNav}>
-  
+            <View style={styles.bottomNav}>
         
-        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                setIsSearching(false); 
-              }
-  
-              else {
-                router.push({
-                  pathname: "/passenger/dailyBuses/searchBus",
-                  params: {
-                    Pid: params.Pid,
-                    Pid1: params.Pid1,
-                    pfirstName: params.pfirstName,
-                    plastName:params.plastName,
-                    pphoneNumber: params.pphoneNumber,
-                    pemail: params.pemail,
-                    pickup:params.pickup,
-                    drop:params.drop,
-                    date:params.date                  
-                  },                    
-                });
-              };}}>
-          <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
-          <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
-            Back
-          </Text>
-        </TouchableOpacity>
-  
-        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
-          <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
-          <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-            Routes
-          </Text>
-        </TouchableOpacity>
-  
-        <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
-                  pathname: "/passenger/index1",
-                  params: {
-                    Pid: params.Pid,
-                    Pid1: params.Pid1,
-                    pfirstName: params.pfirstName,
-                    plastName:params.plastName,
-                    pphoneNumber: params.pphoneNumber,
-                    pemail: params.pemail,
-                  },                    
-                });}} > 
-          <Ionicons name="home-outline" size={28} color="#fff" />             
-        </TouchableOpacity>
-  
-        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-          <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
-          <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
-            Alerts
-          </Text>
-        </TouchableOpacity>
-  
-        <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-          <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-          <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-            Profile
-          </Text>
-        </TouchableOpacity>
-      </View>
+              
+              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
+                      setIsSearching(false); 
+                    }
+        
+                    else {
+                      router.push({
+                        pathname: "/passenger/tours/tourSummary",
+                        params: {
+                          busNumber: params.busNumber,
+                          driverNIC: params.driverNIC,
+                          conductorNIC: params.conductorNIC,
+                          driverD: params.driverD,
+                          conductorD: params.conductorD,
+                          isOnline: params.isOnline,
+                          date: params.date,
+                          pickup: params.pickup,
+                          time: params.time,
+                          packageId: params.packageId,
+                          description: params.description,
+                          packageType: params.packageType,
+                          totalDistance: params.totalDistance,
+                          tripDuration: params.tripDuration,
+                          maxPassengers: params.maxPassengers,
+                          maxPrice: params.maxPrice,
+                          Pid: params.Pid,
+                          Pid1: params.Pid1,
+                          pfirstName: params.pfirstName,
+                          plastName:params.plastName,
+                          pphoneNumber: params.pphoneNumber,
+                          pemail: params.pemail,
+                                      
+                        },                    
+                      });
+                    };}}>
+                <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
+                <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
+                  Back
+                </Text>
+              </TouchableOpacity>
+        
+              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+                <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
+                <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
+                  Routes
+                </Text>
+              </TouchableOpacity>
+        
+              <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                        pathname: "/passenger/index1",
+                        params: {
+                          Pid: params.Pid,
+                          Pid1: params.Pid1,
+                          pfirstName: params.pfirstName,
+                          plastName:params.plastName,
+                          pphoneNumber: params.pphoneNumber,
+                          pemail: params.pemail,
+                        },                    
+                      });}} > 
+                <Ionicons name="home-outline" size={28} color="#fff" />             
+              </TouchableOpacity>
+        
+              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+                <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+                <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
+                  Alerts
+                </Text>
+              </TouchableOpacity>
+        
+              <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+                <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                  Profile
+                </Text>
+              </TouchableOpacity>
+            </View>
 
       {/* Bottom Graphic Design Element */}
       
       <View style={styles.footerGraphic}>
         <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient}
-        >
-        </LinearGradient>
+                colors={["#173C79","#155B8A","#159B79",]}
+                start={{x: 0, y: 0,}}
+                end={{x: 1, y: 1,}}
+                style={styles.submitGradient}
+               >
+         </LinearGradient>
       </View>
       <View style={styles.footerGraphic1}>
         <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient}
-        >
-        </LinearGradient>
+                colors={["#173C79","#155B8A","#159B79",]}
+                start={{x: 0, y: 0,}}
+                end={{x: 1, y: 1,}}
+                style={styles.submitGradient}
+               >
+         </LinearGradient>
       </View>
       
     </SafeAreaView>
@@ -679,6 +746,9 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 25, 
   },
 
+  
+
+  
 });
 
 export default JetLinkInterface;

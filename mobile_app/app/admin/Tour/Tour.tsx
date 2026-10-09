@@ -36,7 +36,7 @@ const ParcelService = () => {
     };
     const handleSearch1 = () => {
       router.push({
-          pathname: "/admin/Tour/tourHistory", 
+          pathname: "/admin/Tour/AllReceipts", 
            params: {
                   
                   Aid: params.Aid,
@@ -99,62 +99,72 @@ const ParcelService = () => {
       
       <View style={styles.bottomNav}>
 
-          
+        <TouchableOpacity 
+          style={styles.item} 
+          onPress={() => { 
+            setActiveTab("home"); 
+            if (isSearching) {
+              setIsSearching(false); 
+            }
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                  setIsSearching(false); 
-                }
+            else {
+              router.push({
+                pathname: "/admin/index1",
+                params: {
+                  Aid: params.Aid,
+                  firstName: params.firstName,
+                  lastName: params.lastName,
+                  email: params.email,
+                },                    
+              });
+            };
+          }}
+        >
+          <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
+          <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
+            Back
+          </Text>
+        </TouchableOpacity>
 
-                else {
-                  router.push({
-                    pathname: "/admin/index1",
-                    params: {
-                      Aid: params.Aid,
-                      firstName: params.firstName,
-                      lastName: params.lastName,
-                      email: params.email,
-                    },                    
-                  });
-                };}}>
-            <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
-            <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
-              Back
-            </Text>
-          </TouchableOpacity>
+        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+          <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
+          <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
+            Routes
+          </Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
-            <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
-            <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-              Routes
-            </Text>
-          </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.centerButton} 
+          onPress={() => {
+            setActiveTab("tickets"); 
+            router.push({
+              pathname: "/admin/index1",
+              params: {
+                Aid: params.Aid,
+                firstName: params.firstName,
+                lastName: params.lastName,
+                email: params.email,
+              },                    
+            });
+          }} 
+        > 
+          <Ionicons name="home-outline" size={28} color="#fff" />             
+        </TouchableOpacity>
 
-          <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
-                    pathname: "/admin/index1",
-                    params: {
-                      Aid: params.Aid,
-                        firstName: params.firstName,
-                        lastName: params.lastName,
-                        email: params.email,
-                    },                    
-                  });}} > 
-            <Ionicons name="home-outline" size={28} color="#fff" />             
-          </TouchableOpacity>
+        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+          <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+          <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
+            Alerts
+          </Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
-            <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
-              Alerts
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-            <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-            <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-              Profile
-            </Text>
-          </TouchableOpacity>
-        </View>  
+        <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+          <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+          <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+            Profile
+          </Text>
+        </TouchableOpacity>
+      </View>  
 
       
       <View style={styles.footerGraphic}>

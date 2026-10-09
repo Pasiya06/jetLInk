@@ -202,87 +202,91 @@ const JetLinkInterface: React.FC = () => {
         </TouchableOpacity>
 
       {isSearching ? (
-                  <TextInput
-                    style={styles.searchBarInput}
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                    autoFocus={true}
-                  />
-                ) : null}
-          
-        
-            <View style={styles.bottomNav}>
-        
-              
-              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                      setIsSearching(false); 
-                    }
-        
-                    else {
-                      router.push({
-                        pathname: "/busStaff/manageParcel",
-                        params: {
-                            Cid: params.Cid,
-                            conductorId: params.conductorId,
-                            conductorNIC:params.conductorNIC,
-                            cfirstName: params.cfirstName,
-                            clastName: params.clastName,
-                            cphoneNumber:params.cphoneNumber,
-                            driverId:params.driverId,
-                            dfirstName:params.dfirstName,
-                            dlastName:params.dlastName,
-                            dphoneNumber:params.dphoneNumber,
-                            busNo: params.busNo,
-                        },                       
-                      });
-                    };}}>
-                <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
-                <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
-                  Back
-                </Text>
-              </TouchableOpacity>
-        
-              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
-                <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
-                <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-                  Routes
-                </Text>
-              </TouchableOpacity>
-        
-              <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
-                        pathname: "/busStaff/index1",
-                        params: {
-                            Cid: params.Cid,
-                            conductorId: params.conductorId,
-                            conductorNIC:params.conductorNIC,
-                            cfirstName: params.cfirstName,
-                            clastName: params.clastName,
-                            cphoneNumber:params.cphoneNumber,
-                            driverId:params.driverId,
-                            dfirstName:params.dfirstName,
-                            dlastName:params.dlastName,
-                            dphoneNumber:params.dphoneNumber,
-                            busNo: params.busNo,
-                        },                               
-                      });}} > 
-                <Ionicons name="home-outline" size={28} color="#fff" />             
-              </TouchableOpacity>
-        
-              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-                <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
-                <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
-                  Alerts
-                </Text>
-              </TouchableOpacity>
-        
-              <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-                <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-                <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-                  Profile
-                </Text>
-              </TouchableOpacity>
-            </View>
+        <TextInput
+          style={styles.searchBarInput}
+          placeholder="Search..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          autoFocus={true}
+        />
+      ) : null}
+  
+      <View style={styles.bottomNav}>
+    
+        <TouchableOpacity style={styles.item} onPress={() => { 
+          setActiveTab("home"); 
+          if (isSearching) {
+            setIsSearching(false); 
+          }
+  
+          else {
+            router.push({
+              pathname: "/busStaff/manageParcel",
+              params: {
+                Cid: params.Cid,
+                conductorId: params.conductorId,
+                conductorNIC:params.conductorNIC,
+                cfirstName: params.cfirstName,
+                clastName: params.clastName,
+                cphoneNumber:params.cphoneNumber,
+                driverId:params.driverId,
+                dfirstName:params.dfirstName,
+                dlastName:params.dlastName,
+                dphoneNumber:params.dphoneNumber,
+                busNo: params.busNo,
+              },                       
+            });
+          };
+        }}>
+          <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
+          <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
+            Back
+          </Text>
+        </TouchableOpacity>
+  
+        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+          <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
+          <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
+            Routes
+          </Text>
+        </TouchableOpacity>
+  
+        <TouchableOpacity style={styles.centerButton} onPress={() => {
+          setActiveTab("tickets"); 
+          router.push({
+            pathname: "/busStaff/index1",
+            params: {
+              Cid: params.Cid,
+              conductorId: params.conductorId,
+              conductorNIC:params.conductorNIC,
+              cfirstName: params.cfirstName,
+              clastName: params.clastName,
+              cphoneNumber:params.cphoneNumber,
+              driverId:params.driverId,
+              dfirstName:params.dfirstName,
+              dlastName:params.dlastName,
+              dphoneNumber:params.dphoneNumber,
+              busNo: params.busNo,
+            },                               
+          });
+        }}> 
+          <Ionicons name="home-outline" size={28} color="#fff" />             
+        </TouchableOpacity>
+  
+        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+          <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+          <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
+            Alerts
+          </Text>
+        </TouchableOpacity>
+  
+        <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+          <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+          <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+            Profile
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Bottom Graphic Design Element */}
       <View style={styles.footerGraphic}>

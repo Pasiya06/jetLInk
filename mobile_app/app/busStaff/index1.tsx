@@ -437,6 +437,27 @@ export default function DriverHome() {
       });
     };
 
+    const handleTour = () => {
+      stopSharing();
+      router.push({
+
+        pathname: "/busStaff/ReceiptList",
+        params: {
+            Cid: params.Cid,
+            conductorId: params.conductorId,
+            conductorNIC:params.conductorNIC,
+            cfirstName: params.cfirstName,
+            clastName: params.clastName,
+            cphoneNumber:params.cphoneNumber,
+            driverId:params.driverId,
+            dfirstName:params.dfirstName,
+            dlastName:params.dlastName,
+            dphoneNumber:params.dphoneNumber,
+            busNo: params.busNo,
+        },         
+      });
+    };
+
 
   // ────────────────────────────────────────────────────────────────
   // RENDER
@@ -584,7 +605,7 @@ export default function DriverHome() {
 
           <TouchableOpacity
             style={styles.card2}
-            onPress={() => router.push("/busStaff/index1")}
+            onPress={handleTour}
             disabled={loading}
           >
             <View style={[styles.iconContainer, { backgroundColor: "#EC489918"  }]}>

@@ -19,8 +19,11 @@ import {
   Ionicons,
   MaterialCommunityIcons,
   Feather ,  
-  FontAwesome, 
+  FontAwesome,
+  Fontisto, 
 } from "@expo/vector-icons";
+
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -48,6 +51,10 @@ type PackageData = {
 export default function PackageDetails() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const [pickup, setPickup] = useState(String(params.pickup || ""));
+  const [time, setTime] = useState(new Date());
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [selectedTime, setSelectedTime] = useState("");
   const PACKAGE_ID = params.packageId as string;
   const [packageData, setPackageData] = useState<PackageData | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
@@ -57,13 +64,34 @@ export default function PackageDetails() {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  const onTimeChange = (event: any, selected?: Date) => {
+    setShowTimePicker(false);
 
-  
+    if (selected) {
+      setTime(selected);
+
+      const formatted = selected.toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+
+      setSelectedTime(formatted);
+    }
+  };
 
   const tourinterface = () => {
     router.push({
-      pathname: "/passenger/tours/selectBus",
+      pathname: "/passenger/tours/paymentGateway",
       params: {
+        busNumber: params.busNumber,
+        driverNIC: params.driverNIC,
+        conductorNIC: params.conductorNIC,
+        driverD: params.driverD,
+        conductorD: params.conductorD,
+        isOnline: params.isOnline,
+        date: params.date,
+        pickup: pickup,
+        time: selectedTime,
         packageId: params.packageId,
         description: params.description,
         packageType: params.packageType,
@@ -101,7 +129,7 @@ export default function PackageDetails() {
             <View style={styles.header}>
                             
                 <TouchableOpacity >
-                    <Text style={styles.headertitle}>JetLink</Text>
+                    <Text style={styles.headertitle}>Tour Summary</Text>
                 </TouchableOpacity>
                             
             </View>
@@ -156,15 +184,71 @@ export default function PackageDetails() {
             </View>
         </View>
 
-        {/*  PLACES  */}
+        <View style={styles.card1} >
+          <View style={styles.svw1}>          
+            <View style={styles.detailRow}>        
+              <View style={[styles.iconWrap, { backgroundColor: '#F5A62320' }]}>
+                <Ionicons name="calendar-outline" size={18} color='#F5A623' />
+              </View>
+              <View style={styles.detailTextWrap}>
+                <Text style={styles.detailLabel}>Date</Text>
+                <Text style={styles.detailValue}>{params.date}</Text>
+              </View>
+            </View>
+          </View>      
+      </View>
 
-        <ScrollView
+      <View style={styles.card2} >
+        <View style={styles.svw}>
+          <Text style={styles.inputLabel}>Pick up Location</Text>  
+          <View style={styles.inputWrapper}>                
+            <View style={styles.inputInnerWrapper}>
+             <TextInput 
+              style={styles.input} 
+              value={pickup}  
+              placeholder="GALLE"
+              onChangeText={(text) => setPickup(text.replace(/\s/g, "").toUpperCase())}
+              autoCapitalize="characters"
+              autoCorrect={false}
+              />
+            </View>
+          </View>
+
+          <Text style={styles.inputLabel}>Time</Text>
+          <View style={styles.inputWrapper}>
+            <TextInput style={styles.input}
+              
+              value={selectedTime}
+              placeholder="00:00"
+              editable={false}
+            />
+
+            <TouchableOpacity onPress={() => setShowTimePicker(true)}>
+              <Ionicons name="time-outline" size={24} color="black" />
+            </TouchableOpacity>
+          </View> 
+
+          {showTimePicker && (
+            <DateTimePicker
+              value={time}
+              mode="time"
+              display="default"
+              onChange={onTimeChange}
+            />
+          )}                
+
+          
+
+        </View>
+      </View>
+
+        {/* <ScrollView
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
 
           
-        </ScrollView>
+        </ScrollView> */}
 
         <TouchableOpacity style={styles.submitButton} onPress={tourinterface} >
           <LinearGradient
@@ -298,19 +382,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F3F5F8",
   },
 
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#F3F5F8",
-  },
-
-  loadingText: {
-    marginTop: 12,
-    color: "#667085",
-    fontSize: 14,
-  },
-
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -335,23 +406,21 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    paddingTop:10,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 16,
+    padding: 16,
+    marginTop: -50,
     marginLeft: 20,
     marginRight: 20,
-    flex: 1,
-    maxHeight: '33%',
-    backgroundColor: '#FFF',
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    marginTop: -50,   
-    alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    marginBottom: 14,
+    elevation: 3,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
   },
 
   cardHeader: {
@@ -378,18 +447,6 @@ const styles = StyleSheet.create({
     fontSize: 19,
     fontWeight: "800",
     color: "#344054",
-  },
-
-  icons: {
-    flexDirection: "row",
-  },
-
-  category1: {
-    marginTop: 5,
-    fontSize: 11,
-    fontWeight: "700",
-    color: "#667085",
-    letterSpacing: 1,
   },
 
   description1: {
@@ -420,95 +477,113 @@ const styles = StyleSheet.create({
     color: "#475467",
   },
 
-
-  decorCircle: {
-    position: "absolute",
-    width: 180,
-    height: 180,
-    borderRadius: 90,
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.15)",
-    right: -70,
-    top: -40,
-  },
-
-  brandContainer: {
+  card1: {
+    marginLeft: 20,
+    marginRight: 20,
+    flex: 1,
+    maxHeight: '10%',
+    backgroundColor: '#FFF',
     flexDirection: "row",
     alignItems: "center",
-  },
-
-  brandDot: {
-    width: 7,
-    height: 7,
-    borderRadius: 10,
-    backgroundColor: "#FFFFFF",
-    marginRight: 6,
-  },
-
-  brandText: {
-    color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "700",
-  },
-
-  goldenBadge: {
-    position: "absolute",
-    right: 25,
-    top: 55,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    justifyContent: "space-around",
+    marginTop: 10,   
+    alignSelf: 'center',
     borderRadius: 20,
-    backgroundColor:
-      "rgba(255,255,255,0.15)",
-    borderWidth: 1,
-    borderColor:
-      "rgba(255,255,255,0.15)",
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
   },
 
-  badgeDot: {
-    width: 5,
-    height: 5,
+  svw1: {
+    width: '100%',  
+    alignItems: 'center', 
+  },
+
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+    marginLeft: 20,
+  },
+
+  detailTextWrap: {
+    marginLeft: 12,
+    flex: 1,
+  },
+
+  detailLabel: {
+    fontSize: 12,
+    color: '#8A8A8A',
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+
+  detailValue: {
+    fontSize: 15,
+    color: '#1A1A1A',
+    fontWeight: '600',
+  },
+
+  iconWrap: {
+    width: 34,
+    height: 34,
     borderRadius: 10,
-    backgroundColor: "#D8E2A5",
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 5,
   },
 
-  goldenText: {
-    fontSize: 7,
-    fontWeight: "800",
-    color: "#DCE8B0",
-    letterSpacing: 0.5,
-  },
-
-  category: {
-    marginTop: 32,
-    color: "#B7C8D8",
-    fontSize: 8,
-    fontWeight: "800",
-    letterSpacing: 2,
-  },
-
-  title: {
-    color: "#FFFFFF",
-    fontSize: 28,
-    fontWeight: "800",
-    marginTop: 8,
-  },
-
-  description: {
-    color: "#D5E1EA",
-    fontSize: 10,
-    lineHeight: 16,
-    marginTop: 12,
-    maxWidth: "90%",
-  },
-
-  statsRow: {
+  card2: {
+    marginLeft: 20,
+    marginRight: 20,
+    flex: 1,
+    maxHeight: '25%',
+    backgroundColor: '#FFF',
     flexDirection: "row",
-    marginTop: 18,
-    gap: 8,
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginTop: 20,   
+    alignSelf: 'center',
+    borderRadius: 20,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+  },
+
+  svw: {
+    width: '100%',
+      
+  },
+
+  inputWrapper: {
+    marginLeft: 20,
+    marginRight: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFC',
+    borderWidth: 2,
+    borderColor: '#ECEEF2',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    height: 45,
+    marginBottom: 15,
+  },
+
+  inputInnerWrapper: {
+    flex: 1,
+  },
+
+  inputLabel: {
+    marginLeft: 20,
+    marginRight: 20,
+    fontSize: 16,
+    color: '#000000',
+    fontWeight: '500',
+    marginBottom: 10,
   },
 
   statCard: {
@@ -536,254 +611,17 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
   },
 
-  sectionHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent:
-      "space-between",
-    marginBottom: 10,
-    marginTop: 20,
-    marginHorizontal: 24,
-  },
-
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "#344054",
-  },
-
-  addPlaceButton: {
-    height: 34,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: "#12966F",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 5,
-  },
-
-  addPlaceButtonText: {
-    color: "#FFFFFF",
-    fontSize: 11,
-    fontWeight: "700",
-  },
-
   scrollContent: {
     paddingBottom: 100,
   },
 
-  placesSection: {
-    backgroundColor: "#F4F6F8",
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 25,
-  },
-
-  timelineContainer: {
-    position: "relative",
-  },
-
-  timelineLine: {
-    position: "absolute",
-    width: 2,
-    backgroundColor: "#D7DEE5",
-    left: 14,
-    top: 15,
-    bottom: 20,
-  },
-
-  placeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 13,
-  },
-
-  timelineIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: "#EAF0F4",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 10,
-    zIndex: 2,
-    borderWidth: 1,
-  },
-
-  placeCard: {
-    flex: 1,
-    minHeight: 57,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    paddingHorizontal: 13,
-    paddingVertical: 10,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent:
-      "space-between",
-    shadowColor: "#000",
-    shadowOpacity: 0.06,
-    shadowRadius: 7,
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
-    elevation: 2,
-  },
-
-  placeTextContainer: {
-    flex: 1,
-    paddingRight: 8,
-  },
-
-  placeName: {
-    fontSize: 10,
-    fontWeight: "800",
-    color: "#344054",
-  },
-
-  placeDescription: {
-    marginTop: 4,
-    fontSize: 7,
-    color: "#8A96A3",
-  },
-
-  numberCircle: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: "#23384A",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  numberText: {
-    color: "#FFFFFF",
-    fontSize: 8,
-    fontWeight: "800",
-  },
-
-  deleteButton: {
-    marginLeft: 8,
-    padding: 6,
-  },
-
-  emptyContainer: {
-    paddingVertical: 70,
-    alignItems: "center",
-  },
-
-  emptyTitle: {
-    marginTop: 12,
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#344054",
-  },
-
-  emptyText: {
-    marginTop: 6,
-    fontSize: 12,
-    color: "#98A2B3",
-    textAlign: "center",
-  },
-
-  modalOverlay: {
-    flex: 1,
-    backgroundColor:
-      "rgba(0,0,0,0.45)",
-    justifyContent: "flex-end",
-  },
-
-  modalContainer: {
-    backgroundColor: "#FFFFFF",
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
-    paddingHorizontal: 24,
-    paddingTop: 22,
-    paddingBottom: 35,
-  },
-
-  modalHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent:
-      "space-between",
-    marginBottom: 20,
-  },
-
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "800",
-    color: "#344054",
-  },
-
-  inputLabel: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#344054",
-    marginTop: 10,
-    marginBottom: 8,
-  },
-
   input: {
-    backgroundColor: "#F5F7FA",
-    borderWidth: 1,
-    borderColor: "#E4E7EC",
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    height: 48,
-    fontSize: 14,
-    color: "#344054",
-  },
-
-  descriptionInput: {
-    height: 90,
-    paddingTop: 12,
-    textAlignVertical: "top",
-  },
-
-  modalButtons: {
-    flexDirection: "row",
-    marginTop: 25,
-    gap: 12,
-  },
-
-  cancelButton: {
     flex: 1,
-    height: 48,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#D0D5DD",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-
-  cancelButtonText: {
-    fontSize: 14,
-    fontWeight: "700",
-    color: "#667085",
-  },
-
-  saveButton: {
-    flex: 1,
-    height: 48,
-    borderRadius: 10,
-    backgroundColor: "#12966F",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-  },
-
-  saveButtonText: {
-    color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "700",
+    height: '100%',
+    color: '#333',
   },
 
   submitButton: {
-    bottom: 180,
     justifyContent: "space-around",
     marginLeft: 20,
     marginRight: 20,  

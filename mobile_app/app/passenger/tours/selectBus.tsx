@@ -45,6 +45,30 @@ interface Bus {
   isOnline:string;
 }
 
+// Accept only real dates in MM/DD/YYYY format.
+function isValidDateString(value: string): boolean {
+  const match = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(value.trim());
+  if (!match) return false;
+
+  const month = Number(match[1]);
+  const day = Number(match[2]);
+  const year = Number(match[3]);
+  const parsed = new Date(year, month - 1, day);
+
+  return (
+    parsed.getFullYear() === year &&
+    parsed.getMonth() === month - 1 &&
+    parsed.getDate() === day
+  );
+}
+
+function formatDateMMDDYYYY(value: Date): string {
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  const year = value.getFullYear();
+  return `${month}/${day}/${year}`;
+}
+
 export default function PackageDetails() {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -52,45 +76,65 @@ export default function PackageDetails() {
   const [date1, setdate] = useState(new Date());
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const busType3: string = "tour";
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [busData, setBusData] = useState<Bus[]>([]);
   const [activeTab, setActiveTab] = useState(''); 
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const loadBuses = async () => {
-  try {
-    const response = await fetch(`${API_URL}/buses?busType=${busType3}`);
-
-    if (!response.ok) {
-      throw new Error("Network issues encountered");
+    // Never load or display buses until a valid date has been entered.
+    if (!isValidDateString(date)) {
+      setBusData([]);
+      setLoading(false);
+      return;
     }
 
-    const data = await response.json();
+    if (!API_URL) {
+      setBusData([]);
+      setLoading(false);
+      Alert.alert("Configuration Error", "API URL is not configured.");
+      return;
+    }
 
-    const typeOfBuses = data.filter(
-      (bus: any) => bus.busType === busType3
-    );
+    try {
+      setLoading(true);
 
-    setBusData(typeOfBuses);
+      const response = await fetch(`${API_URL}/buses?busType=${busType3}`);
 
-    
+      if (!response.ok) {
+        throw new Error("Network issues encountered");
+      }
 
-  } catch (error) {
-    console.log("Error details:", error);
-    Alert.alert(
-      "Network Error",
-      "Unable to load data elements from database server context."
-    );
-  }
-};
+      const data = await response.json();
+      const typeOfBuses = Array.isArray(data)
+        ? data.filter((bus: Bus) => bus.busType === busType3)
+        : [];
+
+      setBusData(typeOfBuses);
+    } catch (error) {
+      console.log("Error details:", error);
+      setBusData([]);
+      Alert.alert(
+        "Network Error",
+        "Unable to load buses from the server. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useFocusEffect(
     useCallback(() => {
-      loadBuses();
-    }, [])
-  );
+      if (!isValidDateString(date)) {
+        setBusData([]);
+        setLoading(false);
+        return;
+      }
 
+      loadBuses();
+    }, [date])
+  );
 
   
   
@@ -108,7 +152,7 @@ export default function PackageDetails() {
             driverD: item.driverD,
             conductorD: item.conductorD,
             isOnline: item.isOnline,
-
+            date: date,
             packageId: params.packageId,
             description: params.description,
             packageType: params.packageType,
@@ -168,7 +212,7 @@ export default function PackageDetails() {
                     value={date} 
                     placeholder="MM/DD/YYYY" 
                     placeholderTextColor="#99999a"
-                    onChangeText={setDate} />
+                    onChangeText={(value) => setDate(value)} />
                 <TouchableOpacity onPress={() => setShowCalendar(true)}>
                   <FontAwesome5 name="calendar-alt" size={24} color="#99999a" />  
                 </TouchableOpacity>
@@ -185,7 +229,7 @@ export default function PackageDetails() {
 
                 if (selectedDate) {
                   setdate(selectedDate);
-                  setDate(selectedDate.toLocaleDateString());
+                  setDate(formatDateMMDDYYYY(selectedDate));
                 }
               }}
             />
@@ -201,14 +245,46 @@ export default function PackageDetails() {
           </View>
         </LinearGradient>
 
-          <FlatList 
-            style={styles.svw}
-            data={filteredBusData}
-            renderItem={renderBusItem}
-            keyExtractor={(item) => item._id}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingVertical: 10 }}
-          />
+          {!date.trim() ? (
+            <View style={styles.dateMessageContainer}>
+              <Fontisto name="calendar" size={40} color="#159B79" />
+              <Text style={styles.dateMessageTitle}>Select a Date</Text>
+              <Text style={styles.dateMessageText}>
+                Please select or enter a valid tour date to view buses.
+              </Text>
+            </View>
+          ) : !isValidDateString(date) ? (
+            <View style={styles.dateMessageContainer}>
+              <Fontisto name="calendar" size={40} color="#D97706" />
+              <Text style={styles.dateMessageTitle}>Invalid Date</Text>
+              <Text style={styles.dateMessageText}>
+                Enter a real date in MM/DD/YYYY format.
+              </Text>
+            </View>
+          ) : loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#159B79" />
+              <Text style={styles.loadingText}>Loading buses...</Text>
+            </View>
+          ) : (
+            <FlatList
+              style={styles.svw}
+              data={filteredBusData}
+              renderItem={renderBusItem}
+              keyExtractor={(item) => item._id}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={{ paddingVertical: 10, flexGrow: 1 }}
+              ListEmptyComponent={
+                <View style={styles.dateMessageContainer}>
+                  <Fontisto name="bus" size={40} color="#98A2B3" />
+                  <Text style={styles.dateMessageTitle}>No Buses Found</Text>
+                  <Text style={styles.dateMessageText}>
+                    No tour buses are currently available.
+                  </Text>
+                </View>
+              }
+            />
+          )}
         
         {isSearching ? (
           <TextInput
@@ -902,6 +978,31 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25, 
+  },
+
+
+  dateMessageContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 30,
+    paddingVertical: 35,
+  },
+
+  dateMessageTitle: {
+    marginTop: 15,
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#344054",
+    textAlign: "center",
+  },
+
+  dateMessageText: {
+    marginTop: 8,
+    fontSize: 13,
+    color: "#98A2B3",
+    textAlign: "center",
+    lineHeight: 19,
   },
 
 });
