@@ -51,8 +51,8 @@ export default function PackageReceipt() {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const router = useRouter();
   const params = useLocalSearchParams();
-  // const receiptId = params.receiptId as string;
-  const receiptId:string = "REC-50942272";
+  const receiptId = params.receiptId as string;
+  
   const maxPrice:string = "50942272";
 
   const [receipt, setReceipt] = useState<any>(null);
