@@ -142,7 +142,21 @@ export default function PackageReceipt() {
     `${receipt.pfirstName || ""} ${receipt.plastName || ""}`.trim() || "-";
 
   const handleDone = () => router.push({
-    pathname: "/passenger/parcel/index2",
+    pathname: "/passenger/tours/selectPackeges",
+    params: {
+      
+      Pid: params.Pid,
+      Pid1: params.Pid1,
+      pfirstName: params.pfirstName,
+      plastName:params.plastName,
+      pphoneNumber: params.pphoneNumber,
+      pemail: params.pemail,
+      
+    },
+  })
+
+  const handleHome = () => router.push({
+    pathname: "/passenger/index1",
     params: {
       
       Pid: params.Pid,
@@ -324,11 +338,10 @@ export default function PackageReceipt() {
         <View style={styles.bottomBar1}>
           <TouchableOpacity
             style={styles.shareBtn}
-            onPress={handleShare}
+            onPress={handleHome}
             activeOpacity={0.8}
           >
-            <Ionicons name="share-outline" size={20} color={C.blue} />
-            <Text style={styles.shareBtnText}>Share</Text>
+            <Text style={styles.shareBtnText}>Home</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -336,7 +349,7 @@ export default function PackageReceipt() {
             onPress={handleDone}
             activeOpacity={0.85}
           >
-            <Text style={styles.doneBtnText}>Done</Text>
+            <Text style={styles.doneBtnText}>Book Another</Text>
           </TouchableOpacity>
         </View>
       
