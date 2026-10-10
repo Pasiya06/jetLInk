@@ -257,7 +257,7 @@ export default function PackageDetails() {
             end={{x: 1, y: 1,}}
             style={styles.submitGradient}
           >
-          <Text style={styles.submitText}>Select Bus</Text>
+          <Text style={styles.submitText}>Pay</Text>
           </LinearGradient>
         </TouchableOpacity>
 

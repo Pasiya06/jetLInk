@@ -311,6 +311,28 @@ export const FlatmateLogin: React.FC = () => {
             
                     params: {
                       receiptId: receiptId,
+                      busNumber: params.busNumber,
+                      driverNIC: params.driverNIC,
+                      conductorNIC: params.conductorNIC,
+                      driverD: params.driverD,
+                      conductorD: params.conductorD,
+                      isOnline: params.isOnline,
+                      date: params.date,
+                      pickup: params.pickup,
+                      time: params.time,
+                      packageId: params.packageId,
+                      description: params.description,
+                      packageType: params.packageType,
+                      totalDistance: params.totalDistance,
+                      tripDuration: params.tripDuration,
+                      maxPassengers: params.maxPassengers,
+                      maxPrice: params.maxPrice,
+                      Pid: params.Pid,
+                      Pid1: params.Pid1,
+                      pfirstName: params.pfirstName,
+                      plastName:params.plastName,
+                      pphoneNumber: params.pphoneNumber,
+                      pemail: params.pemail,
                     },
                   });
                 } catch (error: any) {

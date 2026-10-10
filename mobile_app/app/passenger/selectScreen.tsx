@@ -86,13 +86,13 @@ export default function Index() {
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
-            {/* <TouchableOpacity style={styles.card} onPress={() => router.push("/passenger/dailyBuses/selectSeat")} >
+            <TouchableOpacity style={styles.card} onPress={() => router.push("/passenger/tours/PackageReceipt")} >
               <View style={styles.iconContainer}>
                 <MaterialIcons name={"tour"}  size={22} color={"#FF0000" } />
               </View>
               <Text style={styles.cardText}>Admin</Text>
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity> */}
+          </TouchableOpacity>
 
           {/* <TouchableOpacity style={styles.card} onPress={() => router.push("/Test/AllReceipts")} >
               <View style={styles.iconContainer}>
