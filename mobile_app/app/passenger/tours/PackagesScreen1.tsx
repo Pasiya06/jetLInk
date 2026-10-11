@@ -360,22 +360,6 @@ export default function PackagesScreen() {
             <Feather name="clock" size={17} color="#12966F" />
             <Text style={styles.detailText}>{getDurationLabel(item.tripDuration)}</Text>
           </View>
-          <View style={styles.actions}>
-            <TouchableOpacity
-              style={styles.iconButton}
-              accessibilityLabel="Edit package"
-              onPress={() => openEditPackage(item) }
-            >
-              <Octicons name="pencil" size={20} color="#F59E0B" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.iconButton}
-              accessibilityLabel="Delete package"
-              onPress={() => deletePackage(item._id)}
-            >
-              <MaterialIcons name="delete-outline" size={23} color="#EF4444" />
-            </TouchableOpacity>
-          </View>
         </View>
       </View>
     );
@@ -604,20 +588,6 @@ export default function PackagesScreen() {
             </View>
           }
         />
-
-        
-          <TouchableOpacity style={styles.addButton} onPress={openCreateModal}>
-            <LinearGradient
-              colors={["#1D477F", "#117F83", "#109B7D"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.addGradient}
-            >
-              <Ionicons name="add" size={25} color="#FFFFFF" />
-              <Text style={styles.addButtonText}>Add package</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        
 
           {isSearching ? (
             <TextInput
