@@ -18,7 +18,8 @@ import {
   MaterialCommunityIcons,
   MaterialIcons,
   Feather ,  
-  FontAwesome, 
+  FontAwesome,
+  Octicons, 
 } from "@expo/vector-icons";
 
 import { LinearGradient } from "expo-linear-gradient";
@@ -352,15 +353,19 @@ export default function PackagesScreen() {
             {item.packageType ||"PACKAGE"}
           </Text>
         </View>
+        
         {/* <MaterialCommunityIcons name="update" size={24} color="black" /> */}
         <TouchableOpacity style={styles.icons} onPress={() => openEditPackage(item) }>
-            <MaterialCommunityIcons name="update" size={24} color="#ffb700"/>
+          <Octicons name="pencil" size={24} color="#ffb700"/>
         </TouchableOpacity>
         
       </View>
+      <Text style={styles.packageTypeText1}>
+        {item.packageType ||"PACKAGE"} PACKAGE
+      </Text>
 
       <Text style={styles.packageName}>
-        Rs {item.maxPrice}
+        Rs {item.maxPrice.toLocaleString()}
       </Text>
 
       {!!item.description && (
@@ -371,27 +376,27 @@ export default function PackagesScreen() {
 
       <View style={styles.detailsRow}>
         <View style={styles.detailItem}>
-          <Ionicons name="navigate-outline" size={16} color="#12966F"/>
+          <Ionicons name="navigate-outline" size={20} color="#12966F"/>
           <Text style={styles.detailText}>
             {item.totalDistance || "No distance"}
           </Text>
         </View>
 
         <View style={styles.detailItem}>
-          <Ionicons name="time-outline" size={16} color="#12966F" />
+          <Ionicons name="time-outline" size={20} color="#12966F" />
           <Text style={styles.detailText}>
             {item.tripDuration || "No duration"}
           </Text>
         </View>
 
         <View style={styles.detailItem}>
-          <Ionicons name="people-outline" size={16} color="#12966F"/>
+          <Ionicons name="people-outline" size={20} color="#12966F"/>
           <Text style={styles.detailText}>
             {item.maxPassengers || 0}
           </Text>
         </View>
         <TouchableOpacity onPress={() => deletePackage( item._id ) }>
-            <MaterialIcons name="delete-forever" size={24} color="#ff0000"/>
+            <MaterialIcons name="delete-forever" size={28} color="#ff0000"/>
         </TouchableOpacity>
       </View>
 
@@ -418,385 +423,385 @@ export default function PackagesScreen() {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <View style={styles.container}>
-      <StatusBar barStyle="light-content"/>
+        <StatusBar barStyle="light-content"/>
 
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-        start={{x: 0, y: 0,}}
-        end={{x: 1, y: 1,}}
-        style={styles.header}
-      >
-          <View>
-            <Text style={styles.headerTitle}>
-                Tour Packages
-            </Text>
-          </View>
-      </LinearGradient>
+        <LinearGradient
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.header}
+        >
+            <View>
+              <Text style={styles.headerTitle}>
+                  Tour Packages
+              </Text>
+            </View>
+        </LinearGradient>
     
 
-      <FlatList
-        style={styles.svw}
-        data={packages}
-        keyExtractor={(item) =>item._id}
-        renderItem={renderPackage}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={packages.length === 0 ? styles.emptyList : styles.listContent}
-        refreshing={loading}
-        onRefresh={getPackages}
+        <FlatList
+          style={styles.svw}
+          data={packages}
+          keyExtractor={(item) =>item._id}
+          renderItem={renderPackage}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={packages.length === 0 ? styles.emptyList : styles.listContent}
+          refreshing={loading}
+          onRefresh={getPackages}
 
-        /* EMPTY */
+          /* EMPTY */
 
-        ListEmptyComponent={
-        <View style={styles.emptyContainer}>
-            <Ionicons name="cube-outline" size={60} color="#98A2B3"/>
-            <Text style={styles.emptyTitle}>
-            No packages yet
-            </Text>
-            <Text style={styles.emptyText}>
-            Create your first tour package
-            </Text>
-        </View>
-        }
-      />
+          ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+              <Ionicons name="cube-outline" size={60} color="#98A2B3"/>
+              <Text style={styles.emptyTitle}>
+              No packages yet
+              </Text>
+              <Text style={styles.emptyText}>
+              Create your first tour package
+              </Text>
+          </View>
+          }
+        />
 
-      {/*CREATE PACKAGE MODAL*/}
+        {/*CREATE PACKAGE MODAL*/}
 
-      <Modal
-        visible={modalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => {
-        resetForm();
-        setModalVisible(false);
-        }}
-      >
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => {
+          resetForm();
+          setModalVisible(false);
+          }}
+        >
 
+            <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+
+              {/* MODAL HEADER */}
+
+              <View style={styles.modalHeader}>
+              <Text style={ styles.modalTitle}>
+                  Create Package
+              </Text>
+
+              <TouchableOpacity
+                  onPress={() => {
+                  resetForm();
+                  setModalVisible(false);
+                  }}
+              >
+                  <Ionicons name="close" size={26} color="#344054"/>
+              </TouchableOpacity>
+              </View>
+
+              {/* FORM */}
+
+              <TextInput
+              style={[styles.input,styles.descriptionInput,]}
+              placeholder="Description"
+              placeholderTextColor= "#98A2B3"
+              value={description}
+              onChangeText={setDescription}
+              multiline={true}
+              textAlignVertical="top"
+              />
+
+              <TextInput
+              style={styles.input}
+              placeholder="Package Type (GOLDEN PACKAGE)"
+              placeholderTextColor= "#98A2B3"
+              value={packageType}
+              onChangeText={setPackageType}
+              />
+
+              <TextInput
+              style={styles.input}
+              placeholder="Total Distance (Ex: 180 km)"
+              placeholderTextColor="#98A2B3"
+              value={totalDistance}
+              onChangeText={setTotalDistance}
+              />
+
+              <TextInput
+              style={styles.input}
+              placeholder="Trip Duration (Ex: 8h 30m)"
+              placeholderTextColor="#98A2B3"
+              value={tripDuration}
+              onChangeText={setTripDuration}
+              />
+
+              <TextInput
+              style={styles.input}
+              placeholder="Max Passengers"
+              placeholderTextColor="#98A2B3"
+              value={maxPassengers}
+              onChangeText={setMaxPassengers}
+              keyboardType="numeric"
+              />
+
+              <TextInput
+              style={styles.input}
+              placeholder="Price"
+              placeholderTextColor="#98A2B3"
+              value={maxPrice}
+              onChangeText={setMaxPrice}
+              keyboardType="numeric"
+              />
+
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={styles.cancelButton}
+                  onPress={() => {resetForm(); setModalVisible(false); }}
+                >
+                  <Text style={styles.cancelButtonText}>
+                    Cancel
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.saveButton} onPress={createPackage} disabled={saving}>
+                  {saving ? (
+                  <ActivityIndicator color="#FFFFFF"/>
+                  ) : (
+                  <>
+                    <Ionicons name="checkmark-circle-outline" size={19} color="#FFFFFF"/>
+                    <Text style={styles.saveButtonText}>
+                      Create
+                    </Text>
+                  </>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          visible={editModalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() =>setEditModalVisible(false)}
+        >
           <View style={styles.modalOverlay}>
           <View style={styles.modalContainer}>
 
-            {/* MODAL HEADER */}
+          {/* HEADER */}
 
-            <View style={styles.modalHeader}>
-            <Text style={ styles.modalTitle}>
-                Create Package
+          <View style={styles.modalHeader}>
+            <Text style={styles.modalTitle}>
+              Update Package
             </Text>
 
             <TouchableOpacity
-                onPress={() => {
-                resetForm();
-                setModalVisible(false);
-                }}
+              onPress={() => {
+                setEditModalVisible(false);
+                setSelectedPackage(null);
+              }}
             >
-                <Ionicons name="close" size={26} color="#344054"/>
+              <Ionicons name="close" size={26} color="#344054"/>
             </TouchableOpacity>
-            </View>
+          </View>
 
-            {/* FORM */}
+          {/* DESCRIPTION */}
 
-            <TextInput
-            style={[styles.input,styles.descriptionInput,]}
+          <TextInput
+            style={[styles.input, styles.descriptionInput,]}
             placeholder="Description"
-            placeholderTextColor= "#98A2B3"
+            placeholderTextColor="#98A2B3"
             value={description}
-            onChangeText={setDescription}
+            onChangeText={ setDescription}
             multiline={true}
             textAlignVertical="top"
-            />
+          />
 
-            <TextInput
+          {/* PACKAGE TYPE */}
+
+          <TextInput
             style={styles.input}
-            placeholder="Package Type (GOLDEN PACKAGE)"
-            placeholderTextColor= "#98A2B3"
+            placeholder="Package Type"
+            placeholderTextColor="#98A2B3"
             value={packageType}
-            onChangeText={setPackageType}
-            />
+            onChangeText={ setPackageType}
+          />
 
-            <TextInput
+          {/* DISTANCE */}
+
+          <TextInput
             style={styles.input}
-            placeholder="Total Distance (Ex: 180 km)"
+            placeholder="Total Distance"
             placeholderTextColor="#98A2B3"
             value={totalDistance}
             onChangeText={setTotalDistance}
-            />
+          />
 
-            <TextInput
+          {/* DURATION */}
+
+          <TextInput
             style={styles.input}
-            placeholder="Trip Duration (Ex: 8h 30m)"
+            placeholder="Trip Duration"
             placeholderTextColor="#98A2B3"
             value={tripDuration}
             onChangeText={setTripDuration}
-            />
+          />
 
-            <TextInput
+          {/* MAX PASSENGERS */}
+
+          <TextInput
             style={styles.input}
             placeholder="Max Passengers"
             placeholderTextColor="#98A2B3"
             value={maxPassengers}
-            onChangeText={setMaxPassengers}
+            onChangeText={ setMaxPassengers}
             keyboardType="numeric"
-            />
+          />
 
-            <TextInput
+          {/* MAX PRICE */}
+
+          <TextInput
             style={styles.input}
-            placeholder="Price"
+            placeholder="Maximum Price"
             placeholderTextColor="#98A2B3"
             value={maxPrice}
-            onChangeText={setMaxPrice}
+            onChangeText={ setMaxPrice}
             keyboardType="numeric"
-            />
+          />
 
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={styles.cancelButton}
-                onPress={() => {resetForm(); setModalVisible(false); }}
-              >
-                <Text style={styles.cancelButtonText}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
+          {/* BUTTONS */}
 
-              <TouchableOpacity
-                style={styles.saveButton} onPress={createPackage} disabled={saving}>
-                {saving ? (
+          <View style={styles.modalButtons}>
+            <TouchableOpacity
+              style={ styles.cancelButton}
+              onPress={() => {
+                setEditModalVisible(false);
+                setSelectedPackage(null);
+              }}
+            >
+              <Text style={ styles.cancelButtonText}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.saveButton}
+              onPress={updatePackage}
+              disabled={updating}
+            >
+              {updating ? (
                 <ActivityIndicator color="#FFFFFF"/>
-                ) : (
+              ) : (
                 <>
-                  <Ionicons name="checkmark-circle-outline" size={19} color="#FFFFFF"/>
+                  <Ionicons name="save-outline" size={19} color="#FFFFFF"/>
                   <Text style={styles.saveButtonText}>
-                    Create
+                    Update
                   </Text>
                 </>
-                )}
-              </TouchableOpacity>
-            </View>
+              )}
+            </TouchableOpacity>
           </View>
         </View>
-      </Modal>
-
-      <Modal
-        visible={editModalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() =>setEditModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-        <View style={styles.modalContainer}>
-
-        {/* HEADER */}
-
-        <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>
-            Update Package
-          </Text>
-
-          <TouchableOpacity
-            onPress={() => {
-              setEditModalVisible(false);
-              setSelectedPackage(null);
-            }}
-          >
-            <Ionicons name="close" size={26} color="#344054"/>
-          </TouchableOpacity>
         </View>
+        </Modal>
 
-        {/* DESCRIPTION */}
-
-        <TextInput
-          style={[styles.input, styles.descriptionInput,]}
-          placeholder="Description"
-          placeholderTextColor="#98A2B3"
-          value={description}
-          onChangeText={ setDescription}
-          multiline={true}
-          textAlignVertical="top"
-        />
-
-        {/* PACKAGE TYPE */}
-
-        <TextInput
-          style={styles.input}
-          placeholder="Package Type"
-          placeholderTextColor="#98A2B3"
-          value={packageType}
-          onChangeText={ setPackageType}
-        />
-
-        {/* DISTANCE */}
-
-        <TextInput
-          style={styles.input}
-          placeholder="Total Distance"
-          placeholderTextColor="#98A2B3"
-          value={totalDistance}
-          onChangeText={setTotalDistance}
-        />
-
-        {/* DURATION */}
-
-        <TextInput
-          style={styles.input}
-          placeholder="Trip Duration"
-          placeholderTextColor="#98A2B3"
-          value={tripDuration}
-          onChangeText={setTripDuration}
-        />
-
-        {/* MAX PASSENGERS */}
-
-        <TextInput
-          style={styles.input}
-          placeholder="Max Passengers"
-          placeholderTextColor="#98A2B3"
-          value={maxPassengers}
-          onChangeText={ setMaxPassengers}
-          keyboardType="numeric"
-        />
-
-        {/* MAX PRICE */}
-
-        <TextInput
-          style={styles.input}
-          placeholder="Maximum Price"
-          placeholderTextColor="#98A2B3"
-          value={maxPrice}
-          onChangeText={ setMaxPrice}
-          keyboardType="numeric"
-        />
-
-        {/* BUTTONS */}
-
-        <View style={styles.modalButtons}>
-          <TouchableOpacity
-            style={ styles.cancelButton}
-            onPress={() => {
-              setEditModalVisible(false);
-              setSelectedPackage(null);
-            }}
+        <TouchableOpacity style={styles.submitButton} onPress={() => setModalVisible(true)}>
+          <LinearGradient
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
+            style={styles.submitGradient}
           >
-            <Text style={ styles.cancelButtonText}>
-              Cancel
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.saveButton}
-            onPress={updatePackage}
-            disabled={updating}
-          >
-            {updating ? (
-              <ActivityIndicator color="#FFFFFF"/>
-            ) : (
-              <>
-                <Ionicons name="save-outline" size={19} color="#FFFFFF"/>
-                <Text style={styles.saveButtonText}>
-                  Update
-                </Text>
-              </>
-            )}
-          </TouchableOpacity>
-        </View>
-      </View>
-      </View>
-      </Modal>
-
-      <TouchableOpacity style={styles.submitButton} onPress={() => setModalVisible(true)}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient}
-        >
-        <Text style={styles.submitText}>Add package</Text>
-        </LinearGradient>
-    </TouchableOpacity>
+          <Text style={styles.submitText}>Add package</Text>
+          </LinearGradient>
+        </TouchableOpacity>
 
         {isSearching ? (
-                  <TextInput
-                    style={styles.searchBarInput}
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                    autoFocus={true}
-                  />
-                ) : null}
+          <TextInput
+            style={styles.searchBarInput}
+            placeholder="Search..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoFocus={true}
+          />
+        ) : null}
+    
+  
+        <View style={styles.bottomNav}>
+    
           
-        
-            <View style={styles.bottomNav}>
-        
-              
-              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                      setIsSearching(false); 
-                    }
-        
-                    else {
-                      router.push({
-                        pathname: "/admin/Tour/Tour",
-                        params: {
-                          Aid: params.Aid,
-                          firstName: params.firstName,
-                          lastName: params.lastName,
-                          email: params.email,
-                        },                      
-                      });
-                    };}}>
-                <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
-                <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
-                  Back
-                </Text>
-              </TouchableOpacity>
-        
-              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
-                <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
-                <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-                  Routes
-                </Text>
-              </TouchableOpacity>
-        
-              <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
-                        pathname: "/admin/index1",
-                        params: {
-                          Aid: params.Aid,
-                          firstName: params.firstName,
-                          lastName: params.lastName,
-                          email: params.email,
-                        },                   
-                      });}} > 
-                <Ionicons name="home-outline" size={28} color="#fff" />             
-              </TouchableOpacity>
-        
-              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-                <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
-                <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
-                  Alerts
-                </Text>
-              </TouchableOpacity>
-        
-              <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-                <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-                <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-                  Profile
-                </Text>
-              </TouchableOpacity>
-            </View>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
+                  setIsSearching(false); 
+                }
+    
+                else {
+                  router.push({
+                    pathname: "/admin/Tour/Tour",
+                    params: {
+                      Aid: params.Aid,
+                      firstName: params.firstName,
+                      lastName: params.lastName,
+                      email: params.email,
+                    },                      
+                  });
+                };}}>
+            <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
+            <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
+              Back
+            </Text>
+          </TouchableOpacity>
+    
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+            <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
+            <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
+              Routes
+            </Text>
+          </TouchableOpacity>
+    
+          <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                    pathname: "/admin/index1",
+                    params: {
+                      Aid: params.Aid,
+                      firstName: params.firstName,
+                      lastName: params.lastName,
+                      email: params.email,
+                    },                   
+                  });}} > 
+            <Ionicons name="home-outline" size={28} color="#fff" />             
+          </TouchableOpacity>
+    
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+            <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
+              Alerts
+            </Text>
+          </TouchableOpacity>
+    
+          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+            <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+            <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+              Profile
+            </Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Bottom Graphic Design Element */}
-      <View style={styles.footerGraphic}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient}
-        >
-        </LinearGradient>
-      </View>
-      <View style={styles.footerGraphic1}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient}
-        >
-        </LinearGradient>
+        {/* Bottom Graphic Design Element */}
+        <View style={styles.footerGraphic}>
+          <LinearGradient
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
+        </View>
+        <View style={styles.footerGraphic1}>
+          <LinearGradient
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
         </View>
       </View>
     </>
@@ -895,11 +900,18 @@ const styles = StyleSheet.create({
     color: "#12966F",
   },
 
-  packageName: {
+  packageTypeText1: {
     marginTop: 12,
-    fontSize: 19,
+    fontSize: 14,
     fontWeight: "800",
-    color: "#344054",
+    color: "#020202",
+  },
+
+  packageName: {
+    marginTop: 6,
+    fontSize: 32,
+    fontWeight: "800",
+    color: "#1f53ad",
   },
 
   icons: {
@@ -938,7 +950,7 @@ const styles = StyleSheet.create({
 
   detailText: {
     marginLeft: 5,
-    fontSize: 10,
+    fontSize: 14,
     color: "#475467",
   },
 

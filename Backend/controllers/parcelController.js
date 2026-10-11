@@ -331,3 +331,24 @@ export const getParcel = async (req, res) => {
     });
   }
 };
+
+// Get all parcel details
+export const getAllParcels = async (req, res) => {
+  try {
+    const parcels = await Parcel.find().sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: parcels.length,
+      parcels: parcels,
+    });
+  } catch (error) {
+    console.error("Error fetching all parcels:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch parcel details",
+      error: error.message,
+    });
+  }
+};

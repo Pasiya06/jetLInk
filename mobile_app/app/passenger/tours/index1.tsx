@@ -56,7 +56,7 @@ const ToursScreen: React.FC = () => {
           style={styles.card } 
           onPress={() =>
             router.push({
-              pathname: "/passenger/tours/selectPackeges",
+              pathname: "/passenger/tours/PackagesScreen1",
               params: {
                 Pid: params.Pid,
                 Pid1: params.Pid1,

@@ -20,9 +20,8 @@ import {
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient'; 
 
-const ParcelService = () => {
-    const [isSearching, setIsSearching] = useState<boolean>(false);
-    const [searchQuery, setSearchQuery] = useState<string>('');
+const ParcelService = () => { 
+    const router = useRouter();
     const params = useLocalSearchParams();
     const busType1: string = "NormalWay";
     const busType2: string = "Highway";
@@ -30,52 +29,50 @@ const ParcelService = () => {
     const busTypeTopic1: string = "Normal Way";
     const busTypeTopic2: string = "High Way";
     const busTypeTopic3: string = "Tour";
-
+    const [isSearching, setIsSearching] = useState<boolean>(false);
+    const [searchQuery, setSearchQuery] = useState<string>('');
     const [activeTab, setActiveTab] = useState('');
-    const router = useRouter();
+    
     const handleSearch = () => {
-    //   router.push({
-    //       pathname: "/admin/buses/showBuses", 
-    //        params: {
-                  
-    //               Aid: params.Aid,
-    //               firstName: params.firstName,
-    //               lastName: params.lastName,
-    //               email: params.email,
-    //               busType:busType1,
-    //               busTypeTopic:busTypeTopic1
-    //             },
-    //   });
+      router.push({
+        pathname: "/admin/PaymentHistory/AllParcelsScreen", 
+        params: {        
+          Aid: params.Aid,
+          firstName: params.firstName,
+          lastName: params.lastName,
+          email: params.email,
+          busType:busType1,
+          busTypeTopic:busTypeTopic1
+        },
+      });
     };
 
     const handleSearch1 = () => {
-    //   router.push({
-    //       pathname: "/admin/buses/showBuses", 
-    //        params: {
-                  
-    //               Aid: params.Aid,
-    //               firstName: params.firstName,
-    //               lastName: params.lastName,
-    //               email: params.email,
-    //               busType:busType2,
-    //               busTypeTopic:busTypeTopic2
-    //             },
-    //   });
+      router.push({
+        pathname: "/admin/PaymentHistory/AllReceipts", 
+        params: {             
+          Aid: params.Aid,
+          firstName: params.firstName,
+          lastName: params.lastName,
+          email: params.email,
+          busType:busType2,
+          busTypeTopic:busTypeTopic2
+        },
+      });
     };
 
     const handleSearch2 = () => {
-    //   router.push({
-    //       pathname: "/admin/buses/showBuses", 
-    //        params: {
-                  
-    //               Aid: params.Aid,
-    //               firstName: params.firstName,
-    //               lastName: params.lastName,
-    //               email: params.email,
-    //               busType:busType3,
-    //               busTypeTopic:busTypeTopic3
-    //             },
-    //   });
+      router.push({
+        pathname: "/admin/PaymentHistory/AllTicketsScreen", 
+        params: {      
+          Aid: params.Aid,
+          firstName: params.firstName,
+          lastName: params.lastName,
+          email: params.email,
+          busType:busType3,
+          busTypeTopic:busTypeTopic3
+        },
+      });
     };
   return (
     <>
@@ -127,73 +124,82 @@ const ParcelService = () => {
         </TouchableOpacity>
         
       {isSearching ? (
-              <TextInput
-                style={styles.searchBarInput}
-                placeholder="Search..."
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoFocus={true}
-              />
-            ) : null}
+        <TextInput
+          style={styles.searchBarInput}
+          placeholder="Search..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          autoFocus={true}
+        />
+      ) : null}
       
       <View style={styles.bottomNav}>
+        <TouchableOpacity 
+          style={styles.item} 
+          onPress={() => { 
+            setActiveTab("home"); 
+            if (isSearching) {
+              setIsSearching(false); 
+            }
 
-          
+            else {
+              router.push({
+                pathname: "/admin/index1",
+                params: {
+                  Aid: params.Aid,
+                  firstName: params.firstName,
+                  lastName: params.lastName,
+                  email: params.email,
+                },                    
+              });
+            };
+          }}
+        >
+          <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
+          <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
+            Back
+          </Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                  setIsSearching(false); 
-                }
+        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+          <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
+          <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
+            Routes
+          </Text>
+        </TouchableOpacity>
 
-                else {
-                  router.push({
-                    pathname: "/admin/index1",
-                    params: {
-                        Aid: params.Aid,
-                        firstName: params.firstName,
-                        lastName: params.lastName,
-                        email: params.email,
-                    },                    
-                  });
-                };}}>
-            <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
-            <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
-              Back
-            </Text>
-          </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.centerButton} 
+          onPress={() => {
+            setActiveTab("tickets"); 
+            router.push({
+              pathname: "/admin/index1",
+              params: {
+                Aid: params.Aid,
+                firstName: params.firstName,
+                lastName: params.lastName,
+                email: params.email,
+              },                    
+            });
+          }} 
+        > 
+          <Ionicons name="home-outline" size={28} color="#fff" />             
+        </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
-            <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
-            <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-              Routes
-            </Text>
-          </TouchableOpacity>
+        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+          <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+          <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
+            Alerts
+          </Text>
+        </TouchableOpacity>
 
-          <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
-                        pathname: "/admin/index1",
-                        params: {
-                          Aid: params.Aid,
-                          firstName: params.firstName,
-                          lastName: params.lastName,
-                          email: params.email,
-                        },                    
-                    });}} > 
-                <Ionicons name="home-outline" size={28} color="#fff" />             
-            </TouchableOpacity>
-
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
-            <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
-              Alerts
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-            <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-            <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-              Profile
-            </Text>
-          </TouchableOpacity>
-        </View>  
+        <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+          <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+          <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+            Profile
+          </Text>
+        </TouchableOpacity>
+      </View>  
 
       
       <View style={styles.footerGraphic}>
@@ -215,7 +221,8 @@ const ParcelService = () => {
         </LinearGradient>
       </View>
             
-    </SafeAreaView></>
+    </SafeAreaView>
+    </>
     
   );
 };
@@ -446,7 +453,6 @@ const styles = StyleSheet.create({
   },
 
   footerGraphic1: {
-
     position: 'absolute',
     bottom: 20,
     width: '100%',

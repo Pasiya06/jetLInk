@@ -744,7 +744,7 @@ export default function PackageDetails() {
     
                 else {
                   router.push({
-                    pathname: "/admin/Tour/PackagesScreen",
+                    pathname: "/admin/Tour/PackagesScreen1",
                     params: {
                       Aid: params.Aid,
                       firstName: params.firstName,

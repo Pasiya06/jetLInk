@@ -164,3 +164,40 @@ export const updatePassengerPassword = async (req, res) => {
     });
   }
 };
+
+export const Getname = async (req, res) => {
+  try {
+    const passenger = await Passenger.findOne({
+      email: req.params.email,
+    });
+
+    if (!passenger) {
+      return res.status(404).json({
+        success: false,
+        exists: false,
+        message: "Passenger  not found",
+      });
+    }
+
+    res.status(200).json({
+      
+      success: true,
+      exists: true,
+      data: {
+        _id: passenger._id,
+        passengerId: passenger.passengerId,
+        firstName: passenger.firstName,
+        lastName:passenger.lastName,
+        phoneNumber:passenger.phoneNumber,
+        email:passenger.email,
+        
+        
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

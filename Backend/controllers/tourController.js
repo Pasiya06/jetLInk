@@ -1,3 +1,4 @@
+import jwt from "jsonwebtoken";
 import Receipt from "../models/Tour.js";
 
 export const createReceipt = async (req, res) => {
@@ -185,4 +186,46 @@ export const getReceiptsByBusNumber = async (req, res) => {
       error: error.message, 
     }); 
   } 
+};
+
+export const generateTourQR = async (req, res) => {
+  const { receiptId} = req.params;
+   console.log("Searching Bus ID:", receiptId); 
+  try {
+    const tour = await Receipt.findOne({receiptId});
+    
+    if (!tour) {
+      return res.status(404).json({
+        error: "Receipt not found",
+      });
+    }
+
+    const payload = {
+      tourId: tour._id,
+      receiptId: tour.receiptId,
+      busNumber: tour.busNumber,
+      date: tour.date,
+      pickup: tour.pickup,
+      time: tour.time,
+      packageId: tour.packageId,
+      pphoneNumber: tour.pphoneNumber,
+      pemail:tour.pemail,
+      issuedAt: Date.now(),
+    };
+
+    const token = jwt.sign(payload, process.env.QR_SECRET, {
+      expiresIn: "12h",
+    });
+
+    res.json({
+      qrToken: token,
+      tour,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      error: "Failed to generate tour QR",
+    });
+  }
 };

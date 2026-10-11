@@ -24,7 +24,7 @@ const ParcelService = () => {
     const router = useRouter();
     const handleSearch = () => {
       router.push({
-          pathname: "/admin/Tour/PackagesScreen", 
+          pathname: "/admin/Tour/PackagesScreen1", 
            params: {
                   
                   Aid: params.Aid,

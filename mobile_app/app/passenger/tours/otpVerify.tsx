@@ -104,249 +104,252 @@ export const FlatmateLogin: React.FC = () => {
             });
             const data = await res.json();
 
+            if (!data.success) {
+              router.push({
+                pathname: "/passenger/tours/paymentFail",
+                params: {
+                  busNumber: params.busNumber,
+                  driverNIC: params.driverNIC,
+                  conductorNIC: params.conductorNIC,
+                  driverD: params.driverD,
+                  conductorD: params.conductorD,
+                  isOnline: params.isOnline,
+                  date: params.date,
+                  pickup: params.pickup,
+                  time: params.time,
+                  packageId: params.packageId,
+                  description: params.description,
+                  packageType: params.packageType,
+                  totalDistance: params.totalDistance,
+                  tripDuration: params.tripDuration,
+                  maxPassengers: params.maxPassengers,
+                  maxPrice: params.maxPrice,
+                  Pid: params.Pid,
+                  Pid1: params.Pid1,
+                  pfirstName: params.pfirstName,
+                  plastName:params.plastName,
+                  pphoneNumber: params.pphoneNumber,
+                  pemail: params.pemail,
+                },
+              });
+            }
             
-                try {
-                  
-            
-                  const API_URL = process.env.EXPO_PUBLIC_API_URL;
-            
-                  if (!API_URL) {
-                    throw new Error(
-                      "EXPO_PUBLIC_API_URL is not configured."
-                    );
-                  }
-            
-                  // ------------------------------------------------------
-                  // Prepare receipt data
-                  // ------------------------------------------------------
-            
-                  const receiptData = {
-                    busNumber: params.busNumber,
-            
-                    driverNIC: params.driverNIC,
-            
-                    conductorNIC: params.conductorNIC,
-            
-                    driverD: params.driverD,
-            
-                    conductorD: params.conductorD,
-            
-                    isOnline:
-                      params.isOnline === "true",
-            
-                    date: params.date,
-            
-                    pickup: params.pickup,
-            
-                    time: params.time,
-            
-                    packageId: params.packageId,
-            
-                    description: params.description,
-            
-                    packageType: params.packageType,
-            
-                    totalDistance:
-                      Number(params.totalDistance) || 0,
-            
-                    tripDuration: params.tripDuration,
-            
-                    maxPassengers:
-                      Number(params.maxPassengers) || 0,
-            
-                    maxPrice:
-                      Number(params.maxPrice) || 0,
-            
-                    Pid: params.Pid,
-            
-                    Pid1: params.Pid1 || "",
-            
-                    pfirstName: params.pfirstName,
-            
-                    plastName: params.plastName,
-            
-                    pphoneNumber: params.pphoneNumber,
-            
-                    pemail: params.pemail,
-                  };
-            
-                  console.log(
-                    "================================"
-                  );
-            
-                  console.log(
-                    "CREATING RECEIPT"
-                  );
-            
-                  console.log(
-                    "Receipt Data:",
+            try {
+              
+              const API_URL = process.env.EXPO_PUBLIC_API_URL;
+        
+              if (!API_URL) {
+                throw new Error(
+                  "EXPO_PUBLIC_API_URL is not configured."
+                );
+              }
+        
+              // ------------------------------------------------------
+              // Prepare receipt data
+              // ------------------------------------------------------
+        
+              const receiptData = {
+                busNumber: params.busNumber,
+                driverNIC: params.driverNIC,
+                conductorNIC: params.conductorNIC,
+                driverD: params.driverD,
+                conductorD: params.conductorD,      
+                isOnline: params.isOnline === "true",
+                date: params.date,
+                pickup: params.pickup,
+                time: params.time,
+                packageId: params.packageId,        
+                description: params.description,        
+                packageType: params.packageType,        
+                totalDistance: Number(params.totalDistance) || 0,    
+                tripDuration: params.tripDuration,    
+                maxPassengers: Number(params.maxPassengers) || 0,     
+                maxPrice: Number(params.maxPrice) || 0,      
+                Pid: params.Pid,     
+                Pid1: params.Pid1 || "",       
+                pfirstName: params.pfirstName,       
+                plastName: params.plastName,       
+                pphoneNumber: params.pphoneNumber,        
+                pemail: params.pemail,
+              };
+        
+              console.log(
+                "================================"
+              );
+        
+              console.log(
+                "CREATING RECEIPT"
+              );
+        
+              console.log(
+                "Receipt Data:",
+                receiptData
+              );
+        
+              console.log(
+                "================================"
+              );
+        
+              // ------------------------------------------------------
+              // Validate required fields
+              // ------------------------------------------------------
+        
+              const requiredFields = [
+                "busNumber",
+                "driverNIC",
+                "conductorNIC",
+                "driverD",
+                "conductorD",
+                "date",
+                "pickup",
+                "time",
+                "packageId",
+                "description",
+                "packageType",
+                "tripDuration",
+                "Pid",
+                "pfirstName",
+                "plastName",
+                "pphoneNumber",
+                "pemail",
+              ];
+        
+              const missingFields =
+                requiredFields.filter(
+                  (field) =>
+                    !receiptData[
+                      field as keyof typeof receiptData
+                    ]
+                );
+        
+              if (missingFields.length > 0) {
+                console.log(
+                  "Missing fields:",
+                  missingFields
+                );
+        
+                Alert.alert(
+                  "Missing Information",
+                  `Please provide:\n\n${missingFields.join(
+                    "\n"
+                  )}`
+                );
+        
+                return;
+              }
+        
+              // ------------------------------------------------------
+              // SEND TO BACKEND
+              // ------------------------------------------------------
+        
+              const response = await fetch(
+                `${API_URL}/receipts`,
+                {
+                  method: "POST",
+        
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+        
+                  body: JSON.stringify(
                     receiptData
-                  );
+                  ),
+                }
+              );
+        
+              // ------------------------------------------------------
+              // READ RESPONSE
+              // ------------------------------------------------------
+        
+              const data = await response.json();
+        
+              console.log(
+                "Backend response:",
+                data
+              );
+        
+              // ------------------------------------------------------
+              // ERROR
+              // ------------------------------------------------------
+        
+              if (!response.ok) {
+                throw new Error(
+                  data.message ||
+                    "Failed to create receipt."
+                );
+              }
+        
+              // ------------------------------------------------------
+              // CHECK RECEIPT
+              // ------------------------------------------------------
+        
+              if (
+                !data.receipt ||
+                !data.receipt.receiptId
+              ) {
+                throw new Error(
+                  "Receipt was created but receipt ID was not returned."
+                );
+              }
+        
+              const receiptId =
+                data.receipt.receiptId;
+        
+              console.log(
+                "Receipt created successfully:"
+              );
+        
+              console.log(
+                "Receipt ID:",
+                receiptId
+              );
+        
+              // ------------------------------------------------------
+              // OPEN RECEIPT SCREEN
+              // ------------------------------------------------------
+        
+              router.push({
+                pathname: "/passenger/tours/paymentSuccessful",
+                params: {
+                  receiptId: receiptId,
+                  busNumber: params.busNumber,
+                  driverNIC: params.driverNIC,
+                  conductorNIC: params.conductorNIC,
+                  driverD: params.driverD,
+                  conductorD: params.conductorD,
+                  isOnline: params.isOnline,
+                  date: params.date,
+                  pickup: params.pickup,
+                  time: params.time,
+                  packageId: params.packageId,
+                  description: params.description,
+                  packageType: params.packageType,
+                  totalDistance: params.totalDistance,
+                  tripDuration: params.tripDuration,
+                  maxPassengers: params.maxPassengers,
+                  maxPrice: params.maxPrice,
+                  Pid: params.Pid,
+                  Pid1: params.Pid1,
+                  pfirstName: params.pfirstName,
+                  plastName:params.plastName,
+                  pphoneNumber: params.pphoneNumber,
+                  pemail: params.pemail,
+                },
+              });
+            } 
             
-                  console.log(
-                    "================================"
-                  );
-            
-                  // ------------------------------------------------------
-                  // Validate required fields
-                  // ------------------------------------------------------
-            
-                  const requiredFields = [
-                    "busNumber",
-                    "driverNIC",
-                    "conductorNIC",
-                    "driverD",
-                    "conductorD",
-                    "date",
-                    "pickup",
-                    "time",
-                    "packageId",
-                    "description",
-                    "packageType",
-                    "tripDuration",
-                    "Pid",
-                    "pfirstName",
-                    "plastName",
-                    "pphoneNumber",
-                    "pemail",
-                  ];
-            
-                  const missingFields =
-                    requiredFields.filter(
-                      (field) =>
-                        !receiptData[
-                          field as keyof typeof receiptData
-                        ]
-                    );
-            
-                  if (missingFields.length > 0) {
-                    console.log(
-                      "Missing fields:",
-                      missingFields
-                    );
-            
-                    Alert.alert(
-                      "Missing Information",
-                      `Please provide:\n\n${missingFields.join(
-                        "\n"
-                      )}`
-                    );
-            
-                    return;
-                  }
-            
-                  // ------------------------------------------------------
-                  // SEND TO BACKEND
-                  // ------------------------------------------------------
-            
-                  const response = await fetch(
-                    `${API_URL}/receipts`,
-                    {
-                      method: "POST",
-            
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-            
-                      body: JSON.stringify(
-                        receiptData
-                      ),
-                    }
-                  );
-            
-                  // ------------------------------------------------------
-                  // READ RESPONSE
-                  // ------------------------------------------------------
-            
-                  const data = await response.json();
-            
-                  console.log(
-                    "Backend response:",
-                    data
-                  );
-            
-                  // ------------------------------------------------------
-                  // ERROR
-                  // ------------------------------------------------------
-            
-                  if (!response.ok) {
-                    throw new Error(
-                      data.message ||
-                        "Failed to create receipt."
-                    );
-                  }
-            
-                  // ------------------------------------------------------
-                  // CHECK RECEIPT
-                  // ------------------------------------------------------
-            
-                  if (
-                    !data.receipt ||
-                    !data.receipt.receiptId
-                  ) {
-                    throw new Error(
-                      "Receipt was created but receipt ID was not returned."
-                    );
-                  }
-            
-                  const receiptId =
-                    data.receipt.receiptId;
-            
-                  console.log(
-                    "Receipt created successfully:"
-                  );
-            
-                  console.log(
-                    "Receipt ID:",
-                    receiptId
-                  );
-            
-                  // ------------------------------------------------------
-                  // OPEN RECEIPT SCREEN
-                  // ------------------------------------------------------
-            
-                  router.push({
-                    pathname:
-                      "/passenger/tours/PackageReceipt",
-            
-                    params: {
-                      receiptId: receiptId,
-                      busNumber: params.busNumber,
-                      driverNIC: params.driverNIC,
-                      conductorNIC: params.conductorNIC,
-                      driverD: params.driverD,
-                      conductorD: params.conductorD,
-                      isOnline: params.isOnline,
-                      date: params.date,
-                      pickup: params.pickup,
-                      time: params.time,
-                      packageId: params.packageId,
-                      description: params.description,
-                      packageType: params.packageType,
-                      totalDistance: params.totalDistance,
-                      tripDuration: params.tripDuration,
-                      maxPassengers: params.maxPassengers,
-                      maxPrice: params.maxPrice,
-                      Pid: params.Pid,
-                      Pid1: params.Pid1,
-                      pfirstName: params.pfirstName,
-                      plastName:params.plastName,
-                      pphoneNumber: params.pphoneNumber,
-                      pemail: params.pemail,
-                    },
-                  });
-                } catch (error: any) {
-                  console.error(
-                    "Create receipt error:",
-                    error
-                  );
-            
-                  Alert.alert(
-                    "Receipt Error",
-                    error.message ||
-                      "Unable to create receipt."
-                  );
-                } 
+            catch (error: any) {
+              console.error(
+                "Create receipt error:",
+                error
+              );
+        
+              Alert.alert(
+                "Receipt Error",
+                error.message ||
+                  "Unable to create receipt."
+              );
+            } 
               
 
             // if (data.success) {

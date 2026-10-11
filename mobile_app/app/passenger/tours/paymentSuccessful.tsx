@@ -21,48 +21,75 @@ export default function PaymentSuccessScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
-  const amount = params.totalFare as string;
+  const amount = params.maxPrice as string;
   const bNumber = params.bNumber as string;
   const [qrToken, setQrToken] = useState("");
   const [error, setError] = useState<string | null>(null);
-
+  const receiptId: string = "REC-50942272";
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  //const receiptId = params.receiptId as string;
+  const fetchParcelQR = async () => {
+  
+      try {
+        const url = `${API_URL}/receipts/receiptId/${receiptId}/qr`;
+        console.log("Request URL:", url);
+        const response = await fetch(url);
+        console.log("Status:", response.status);
+        const data = await response.json();
+        console.log("Backend Data:", data);
+  
+        if (!response.ok) {
+          throw new Error(data.error);
+        }
+        setQrToken(data.qrToken);
+  
+      } 
+      catch (error: any) {
+  
+        console.log("QR Error:", error);
+        setError(error.message || "Could not generate QR");
+      }
+    };
+  
+    useEffect(() => {
+      fetchParcelQR();
+    }, []);
 
-  const loadQr = async () => {
-  try {
-    setError(null);
+//   const loadQr = async () => {
+//   try {
+//     setError(null);
 
-    const res = await fetch(`${API_URL}/tickets/generate-qr`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+//     const res = await fetch(`${API_URL}/tickets/generate-qr`, {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
         
-        pemail:params.pemail,
+//         pemail:params.pemail,
         
-      }),
-    });
+//       }),
+//     });
 
-    const data = await res.json();
+//     const data = await res.json();
 
-    if (!res.ok) {
-      throw new Error(data.error);
-    }
+//     if (!res.ok) {
+//       throw new Error(data.error);
+//     }
 
-    setQrToken(data.qrToken);
-  } catch (error) {
-    console.log(error);
-    setError("Could not generate QR");
-  }
-};
+//     setQrToken(data.qrToken);
+//   } catch (error) {
+//     console.log(error);
+//     setError("Could not generate QR");
+//   }
+// };
 
-  useEffect(() => {
+//   useEffect(() => {
           
-    loadQr();
+//     loadQr();
 
-  }, []);
+//   }, []);
 
   const handleTour = async () => {
     router.push({

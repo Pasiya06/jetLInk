@@ -6,6 +6,7 @@ import {
   getReceiptById,
   getReceiptsByEmail,
   getReceiptsByBusNumber,
+  generateTourQR,
 } from "../controllers/tourController.js";
 
 const router = express.Router();
@@ -24,5 +25,8 @@ router.get("/email/:pemail", getReceiptsByEmail);
 
 // GET all receipts by passenger bus number 
 router.get("/busNumber/:busNumber", getReceiptsByBusNumber);
+
+// Generate QR code for a receipt
+router.get("/receiptId/:receiptId/qr", generateTourQR);
 
 export default router;
