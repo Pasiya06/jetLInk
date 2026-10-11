@@ -42,7 +42,8 @@ interface Ticket {
   _id: string;
   ticketId?: string;
   pemail?: string;
-  passengerName?: string;
+  pfirstName?: string;
+  plastName?: string;
   busNumber?: string;
   from?: string;
   to?: string;
@@ -118,14 +119,14 @@ export default function AllTicketsScreen() {
 
   const visible = useMemo(() => {
     return tickets.filter((t) => {
-      return [t.ticketId, t.passengerName, t.busNumber, t.from, t.to]
+      return [t.ticketId, t.pfirstName, t.plastName, t.busNumber, t.from, t.to]
     });
   }, [tickets]);
 
   const renderItem = ({ item }: { item: Ticket }) => {
     
 
-    const passenger = `${firstname} ${lastname}`.trim() || "N/A";
+    const passenger = `${item.pfirstName} ${item.plastName}`.trim() || "N/A";
     return (
       <View style={styles.card}>
         {/* Top: bus + status */}

@@ -28,6 +28,16 @@ const ticketSchema = new mongoose.Schema({
     required: true,
   },
 
+  pfirstName: {
+    type: String,
+    required: true,
+  },
+
+  plastName: {
+    type: String,
+    required: true,
+  },
+
   pemail: {
     type: String,
     required: true,
