@@ -362,3 +362,26 @@ export const getBusEmergency = async (req, res) => {
     });
   }
 };
+
+// Get all buses where emergency is true
+export const getAllEmergencyBuses = async (req, res) => {
+  try {
+    const buses = await Bus.find({ emergency: true }).sort({
+      busId: 1,
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: buses.length,
+      buses,
+    });
+  } catch (error) {
+    console.error("Error fetching emergency buses:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch emergency buses",
+      error: error.message,
+    });
+  }
+};

@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
 
   bottomNav: {
     position: "absolute",
-    bottom: 15,
+    bottom: 30,
     left: 10,
     right: 10,
     flexDirection: "row",

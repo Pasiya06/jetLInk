@@ -297,14 +297,6 @@ const styles = StyleSheet.create({
   
   },
 
-  menuLabel: {
-    paddingHorizontal: 25,
-    fontSize: 21,
-    color: '#0047AB',
-    fontWeight: '500',
-    flex: 1,
-  },
-
   bottomNav: {
     position: "absolute",
     bottom: 15,
