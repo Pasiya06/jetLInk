@@ -234,7 +234,15 @@ export default function Index() {
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />             
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card2} onPress={() => router.push("/admin/index1")} >
+          <TouchableOpacity style={styles.card2} onPress={() => router.push({
+                pathname: "/admin/emergency/emergencyState", 
+                params: {
+                  Aid: params.Aid,
+                  firstName: params.firstName,
+                  lastName: params.lastName,
+                  email: params.email,
+                },
+              })} >
               <View style={[styles.iconContainer, { backgroundColor: "#ff000018"  }]}>
                 <MaterialCommunityIcons name="alarm-light-outline" size={24} color="#ff0000" />
               </View>

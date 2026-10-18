@@ -193,7 +193,7 @@ return (
           >
           </LinearGradient>
         </View>
-      </SafeAreaView>
+    </SafeAreaView>
     </>
   );
 };

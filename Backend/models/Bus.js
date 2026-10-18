@@ -31,6 +31,17 @@ const busSchema = new mongoose.Schema({
 
   emissionDate: String,
 
+  emergency: {
+    type: Boolean,
+    default: false,
+  },
+
+  status: {
+    type: String,
+    enum: ["normal", "accident", "breakdown"],
+    default: "normal",
+  },
+
   busType: {
     type: String,
     enum: ["NormalWay", "Highway", "tour"],

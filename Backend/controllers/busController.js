@@ -239,3 +239,126 @@ export const checkConductor = async (req, res) => {
     });
   }
 };
+
+// Report an emergency
+export const reportEmergency = async (req, res) => {
+  try {
+    const { busNumber } = req.params;
+    const { status } = req.body;
+
+    if (!["accident", "breakdown"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Status must be accident or breakdown",
+      });
+    }
+
+    const bus = await Bus.findOneAndUpdate(
+      { busNumber: busNumber.trim().toUpperCase() },
+      {
+        $set: {
+          emergency: true,
+          status,
+        },
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!bus) {
+      return res.status(404).json({
+        success: false,
+        message: "Bus not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `Emergency reported: ${status}`,
+      bus,
+    });
+  } catch (error) {
+    console.error("Report emergency error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to report emergency",
+      error: error.message,
+    });
+  }
+};
+
+// Resolve an emergency
+export const resolveEmergency = async (req, res) => {
+  try {
+    const { busNumber } = req.params;
+
+    const bus = await Bus.findOneAndUpdate(
+      { busNumber: busNumber.trim().toUpperCase() },
+      {
+        $set: {
+          emergency: false,
+          status: "normal",
+        },
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
+
+    if (!bus) {
+      return res.status(404).json({
+        success: false,
+        message: "Bus not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Emergency resolved successfully",
+      bus,
+    });
+  } catch (error) {
+    console.error("Resolve emergency error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to resolve emergency",
+      error: error.message,
+    });
+  }
+};
+
+// Get the current emergency status of a bus
+export const getBusEmergency = async (req, res) => {
+  try {
+    const { busNumber } = req.params;
+
+    const bus = await Bus.findOne({
+      busNumber: busNumber.trim().toUpperCase(),
+    }).select("busNumber emergency status");
+
+    if (!bus) {
+      return res.status(404).json({
+        success: false,
+        message: "Bus not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      bus,
+    });
+  } catch (error) {
+    console.error("Get emergency error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to get emergency status",
+      error: error.message,
+    });
+  }
+};
