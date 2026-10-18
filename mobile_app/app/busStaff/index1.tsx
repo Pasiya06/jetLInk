@@ -462,7 +462,7 @@ export default function DriverHome() {
       stopSharing();
       router.push({
 
-        pathname: "/busStaff/EmergencyButton",
+        pathname: "/busStaff/emergencyState",
         params: {
             Cid: params.Cid,
             conductorId: params.conductorId,
