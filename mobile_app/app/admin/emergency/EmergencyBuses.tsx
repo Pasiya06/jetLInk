@@ -9,7 +9,7 @@ import {
   SafeAreaView,
   StatusBar,
   Pressable,
-  Linking,
+  TextInput,
   Animated,
   Platform,
   LayoutAnimation,
@@ -17,7 +17,12 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { router, useFocusEffect, Stack,useRouter,useLocalSearchParams } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import { 
+  Ionicons,
+  Feather, 
+  FontAwesome
+ } from "@expo/vector-icons";
+import { LinearGradient } from 'expo-linear-gradient';
 
 if (
   Platform.OS === "android" &&
@@ -322,6 +327,10 @@ export default function EmergencyBuses() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [activeTab, setActiveTab] = useState('');
+  const params = useLocalSearchParams();
 
   const fetchEmergencyBuses = useCallback(async () => {
     try {
@@ -378,91 +387,200 @@ export default function EmergencyBuses() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.center}>
-        <ActivityIndicator size="large" color={C.brand} />
-        <Text style={styles.loadingText}>Checking for emergencies…</Text>
-      </SafeAreaView>
+      <>
+        <Stack.Screen options={{ title: "", headerShown: false }} />
+        <SafeAreaView style={styles.center}>
+          <ActivityIndicator size="large" color={C.brand} />
+          <Text style={styles.loadingText}>Checking for emergencies…</Text>
+        </SafeAreaView>
+      </>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={C.ink} />
+    <>
+    <Stack.Screen options={{ title: "", headerShown: false }} />
+      <SafeAreaView style={styles.container}>
+        <StatusBar barStyle="light-content" backgroundColor={C.ink} />
 
-      {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerTop}>
-          <Text style={styles.title}>Emergency buses</Text>
-          
-        </View>
-        <Text style={styles.subtitle}>
-          {time ? `Updated at ${time}. Pull down to refresh.` : "Pull down to refresh."}
-        </Text>
-      </View>
-
-      {/* Summary overlapping the header */}
-      <View style={styles.summary}>
-        <View style={styles.summaryCell}>
-          <Text style={[styles.summaryNum, { color: C.alert }]}>
-            {buses.length}
-          </Text>
-          <Text style={styles.summaryLabel}>Active</Text>
-        </View>
-        <View style={styles.summaryDivider} />
-        <View style={styles.summaryCell}>
-          <Text style={styles.summaryNum}>{accidents}</Text>
-          <Text style={styles.summaryLabel}>Accidents</Text>
-        </View>
-        <View style={styles.summaryDivider} />
-        <View style={styles.summaryCell}>
-          <Text style={styles.summaryNum}>{breakdowns}</Text>
-          <Text style={styles.summaryLabel}>Breakdowns</Text>
-        </View>
-      </View>
-
-      {error !== "" && (
-        <View style={styles.errorBox}>
-          <Ionicons name="cloud-offline-outline" size={20} color={C.alert} />
-          <View style={{ flex: 1 }}>
-            <Text style={styles.errorTitle}>Couldn't load buses</Text>
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-          <Pressable onPress={retry} hitSlop={10}>
-            <Text style={styles.retry}>Retry</Text>
-          </Pressable>
-        </View>
-      )}
-
-      <FlatList
-        data={buses}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => <BusCard bus={item} />}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={C.brand}
-            colors={[C.brand]}
-          />
-        }
-        ListEmptyComponent={
-          !error ? (
-            <View style={styles.empty}>
-              <View style={styles.emptyIcon}>
-                <Ionicons name="shield-checkmark" size={40} color={C.ok} />
-              </View>
-              <Text style={styles.emptyTitle}>All buses are clear</Text>
-              <Text style={styles.emptyText}>
-                No bus has an active emergency. New alerts will appear here
-                as soon as they are reported.
-              </Text>
+        {/* Header */}
+        <LinearGradient
+          colors={["#173C79","#155B8A","#159B79",]}
+          start={{x: 0, y: 0,}}
+          end={{x: 1, y: 1,}}
+          style={styles.submitGradient1}
+        >
+          <View style={styles.header}>
+            <View style={styles.headerTop}>
+              <Text style={styles.title}>Emergency buses</Text>
+              
             </View>
-          ) : null
-        }
-      />
-    </SafeAreaView>
+            <Text style={styles.subtitle}>
+              {time ? `Updated at ${time}. Pull down to refresh.` : "Pull down to refresh."}
+            </Text>
+          </View>
+        </LinearGradient>
+
+        {/* Summary overlapping the header */}
+        <View style={styles.summary}>
+          <View style={styles.summaryCell}>
+            <Text style={[styles.summaryNum, { color: C.alert }]}>
+              {buses.length}
+            </Text>
+            <Text style={styles.summaryLabel}>Active</Text>
+          </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryCell}>
+            <Text style={styles.summaryNum}>{accidents}</Text>
+            <Text style={styles.summaryLabel}>Accidents</Text>
+          </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryCell}>
+            <Text style={styles.summaryNum}>{breakdowns}</Text>
+            <Text style={styles.summaryLabel}>Breakdowns</Text>
+          </View>
+        </View>
+
+        {error !== "" && (
+          <View style={styles.errorBox}>
+            <Ionicons name="cloud-offline-outline" size={20} color={C.alert} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.errorTitle}>Couldn't load buses</Text>
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+            <Pressable onPress={retry} hitSlop={10}>
+              <Text style={styles.retry}>Retry</Text>
+            </Pressable>
+          </View>
+        )}
+
+        <FlatList
+          data={buses}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => <BusCard bus={item} />}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor={C.brand}
+              colors={[C.brand]}
+            />
+          }
+          ListEmptyComponent={
+            !error ? (
+              <View style={styles.empty}>
+                <View style={styles.emptyIcon}>
+                  <Ionicons name="shield-checkmark" size={40} color={C.ok} />
+                </View>
+                <Text style={styles.emptyTitle}>All buses are clear</Text>
+                <Text style={styles.emptyText}>
+                  No bus has an active emergency. New alerts will appear here
+                  as soon as they are reported.
+                </Text>
+              </View>
+            ) : null
+          }
+        />
+
+        {isSearching ? (
+          <TextInput
+            style={styles.searchBarInput}
+            placeholder="Search..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoFocus={true}
+          />
+        ) : null}
+        
+
+        <View style={styles.bottomNav}>
+
+          <TouchableOpacity 
+            style={styles.item} 
+            onPress={() => { 
+              setActiveTab("home"); 
+              if (isSearching) {
+                setIsSearching(false); 
+              }
+
+              else {
+                router.push({
+                  pathname: "/admin/index1",
+                  params: {
+                    Aid: params.Aid,
+                    firstName: params.firstName,
+                    lastName: params.lastName,
+                    email: params.email,
+                  },                    
+                });
+              };
+            }}
+          >
+            <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"}/>
+            <Text style={[styles.label1,activeTab === "home" && styles.activeLabel,]}>
+              Back
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+            <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
+            <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
+              Routes
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({
+                        pathname: "/admin/index1",
+                        params: {
+                          Aid: params.Aid,
+                          firstName: params.firstName,
+                          lastName: params.lastName,
+                          email: params.email,
+                        },                    
+                    });}} > 
+                <Ionicons name="home-outline" size={28} color="#fff" />             
+            </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+            <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
+              Alerts
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+            <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+            <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+              Profile
+            </Text>
+          </TouchableOpacity>
+        </View>
+        
+        
+        
+        <View style={styles.footerGraphic}>
+          <LinearGradient
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
+        </View>
+        <View style={styles.footerGraphic1}>
+          <LinearGradient
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
+        </View>
+
+      </SafeAreaView>
+    </>
   );
 }
 
@@ -470,6 +588,12 @@ export default function EmergencyBuses() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: C.paper },
+
+  submitGradient1: {
+    borderBottomLeftRadius: 25,
+    borderBottomRightRadius: 25,
+  },
+
   center: {
     flex: 1,
     justifyContent: "center",
@@ -480,7 +604,6 @@ const styles = StyleSheet.create({
 
   /* Header */
   header: {
-    backgroundColor: C.ink,
     paddingHorizontal: 20,
     paddingTop: Platform.OS === "android" ? (StatusBar.currentHeight ?? 0) + 16 : 16,
     paddingBottom: 56,
@@ -704,5 +827,102 @@ const styles = StyleSheet.create({
     lineHeight: 21,
     color: C.muted,
     textAlign: "center",
+  },
+  bottomNav: {
+    position: "absolute",
+    bottom: 15,
+    left: 10,
+    right: 10,
+    
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginBottom: 60,
+    height: 75,
+    backgroundColor: "#fff",
+    borderRadius: 25,
+
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: {
+      width: 0,
+      height: -2,
+    },
+    elevation: 10,
+  },
+
+  searchBarInput: {
+    position: "absolute",
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    marginLeft: 15,
+    marginTop: 45,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: '#333',
+    width:'90%' 
+  },
+
+
+  item: {
+    alignItems: "center",
+    justifyContent: "center",
+    flex: 1,
+  },
+
+  label1: {
+    marginTop: 4,
+    fontSize: 13,
+    color: "#8A8A8A",
+  },
+
+  activeLabel: {
+    color: "#0057D9",
+    fontWeight: "600",
+  },
+
+  centerButton: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: "#2F80ED",
+
+    justifyContent: "center",
+    alignItems: "center",
+
+    marginTop: -28,
+
+    shadowColor: "#2F80ED",
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    elevation: 12,
+  },
+
+  submitGradient: {
+    paddingVertical: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  footerGraphic: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    overflow: 'hidden',
+  },
+
+  footerGraphic1: {
+
+    position: 'absolute',
+    bottom: 20,
+    width: '100%',
+    overflow: 'hidden',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25, 
   },
 });

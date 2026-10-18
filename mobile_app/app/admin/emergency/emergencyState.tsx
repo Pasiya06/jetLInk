@@ -19,7 +19,8 @@ import {
   MaterialIcons, 
   FontAwesome5,
   Feather, 
-  FontAwesome } from '@expo/vector-icons';
+  FontAwesome 
+} from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 
 type EmergencyStatus = "normal" | "accident" | "breakdown";
@@ -293,7 +294,7 @@ export default function EmergencyButton() {
 
               else {
                 router.push({
-                  pathname: "/admin/index1",
+                  pathname: "/admin/emergency/EmergencyBuses",
                   params: {
                     Aid: params.Aid,
                     firstName: params.firstName,
