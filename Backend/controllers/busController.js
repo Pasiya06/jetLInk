@@ -385,3 +385,28 @@ export const getAllEmergencyBuses = async (req, res) => {
     });
   }
 };
+
+// Get emergency buses except the specified bus number
+export const getOtherEmergencyBuses = async (req, res) => {
+  try {
+    const { busNumber } = req.params;
+
+    const buses = await Bus.find({
+      emergency: true,
+      busNumber: { $ne: busNumber },
+    }).sort({ busId: 1 });
+
+    return res.status(200).json({
+      success: true,
+      count: buses.length,
+      buses,
+    });
+  } catch (error) {
+    console.error("Error fetching emergency buses:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch emergency buses",
+    });
+  }
+};

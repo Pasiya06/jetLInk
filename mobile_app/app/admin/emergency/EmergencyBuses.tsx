@@ -331,6 +331,7 @@ export default function EmergencyBuses() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab, setActiveTab] = useState('');
   const params = useLocalSearchParams();
+  
 
   const fetchEmergencyBuses = useCallback(async () => {
     try {
@@ -646,6 +647,7 @@ const styles = StyleSheet.create({
     backgroundColor: C.surface,
     marginHorizontal: 16,
     marginTop: -34,
+    marginBottom: 10,
     borderRadius: 18,
     paddingVertical: 16,
     elevation: 4,

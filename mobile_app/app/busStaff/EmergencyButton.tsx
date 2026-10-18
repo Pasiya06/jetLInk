@@ -33,7 +33,7 @@ export default function EmergencyButton() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const params = useLocalSearchParams();
   const router = useRouter();
-  const busNumber = params.busNo as string;
+  const busNumber = params.busNumber as string;
   const [activeTab, setActiveTab] = useState('');
   const fetchEmergency = useCallback(async () => {
     if (!API_URL || !busNumber) return;
@@ -313,7 +313,7 @@ export default function EmergencyButton() {
   
                 else {
                   router.push({
-                    pathname: "/busStaff/index1",
+                    pathname: "/busStaff/help",
                     params: {
                         Cid: params.Cid,
                         conductorId: params.conductorId,

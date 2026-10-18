@@ -458,6 +458,48 @@ export default function DriverHome() {
       });
     };
 
+    const handleEmergency = () => {
+      stopSharing();
+      router.push({
+
+        pathname: "/busStaff/EmergencyButton",
+        params: {
+            Cid: params.Cid,
+            conductorId: params.conductorId,
+            conductorNIC:params.conductorNIC,
+            cfirstName: params.cfirstName,
+            clastName: params.clastName,
+            cphoneNumber:params.cphoneNumber,
+            driverId:params.driverId,
+            dfirstName:params.dfirstName,
+            dlastName:params.dlastName,
+            dphoneNumber:params.dphoneNumber,
+            busNo: params.busNo,
+        },         
+      });
+    };
+
+    const handleHelp = () => {
+      stopSharing();
+      router.push({
+
+        pathname: "/busStaff/help",
+        params: {
+            Cid: params.Cid,
+            conductorId: params.conductorId,
+            conductorNIC:params.conductorNIC,
+            cfirstName: params.cfirstName,
+            clastName: params.clastName,
+            cphoneNumber:params.cphoneNumber,
+            driverId:params.driverId,
+            dfirstName:params.dfirstName,
+            dlastName:params.dlastName,
+            dphoneNumber:params.dphoneNumber,
+            busNo: params.busNo,
+        },         
+      });
+    };
+
 
   // ────────────────────────────────────────────────────────────────
   // RENDER
@@ -617,7 +659,7 @@ export default function DriverHome() {
 
           <TouchableOpacity
             style={styles.card1}
-            onPress={() => router.push("/busStaff/index1")}
+            onPress={handleEmergency}
             disabled={loading}
           >
             <View style={[styles.iconContainer, { backgroundColor: "#ff000018"  }]}>
@@ -629,7 +671,7 @@ export default function DriverHome() {
 
           <TouchableOpacity
             style={styles.card2}
-            onPress={() => router.push("/busStaff/index1")}
+            onPress={handleHelp}
             disabled={loading}
           >
             <View style={[styles.iconContainer, { backgroundColor: "#10B98118"  }]}>

@@ -36,6 +36,7 @@ export default function Index() {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState('');
   const params = useLocalSearchParams();
+  const busNo:string = "HH-7788";
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -241,6 +242,7 @@ export default function Index() {
                   firstName: params.firstName,
                   lastName: params.lastName,
                   email: params.email,
+                  busNo:busNo,
                 },
               })} >
               <View style={[styles.iconContainer, { backgroundColor: "#ff000018"  }]}>

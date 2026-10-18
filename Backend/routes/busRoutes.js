@@ -13,6 +13,7 @@ import {
   resolveEmergency,
   getBusEmergency,
   getAllEmergencyBuses,
+  getOtherEmergencyBuses,
 } from "../controllers/busController.js";
 
 const router = express.Router();
@@ -32,6 +33,8 @@ router.get("/check2/:conductorNIC", checkConductor);
 router.patch("/:busNumber/emergency", reportEmergency);
 router.patch("/:busNumber/emergency/resolve", resolveEmergency);
 router.get("/:busNumber/emergency", getBusEmergency);
+// Get all other emergency buses, excluding the current bus
+router.get("/emergency/except/:busNumber", getOtherEmergencyBuses);
 
 router
   .route("/")
