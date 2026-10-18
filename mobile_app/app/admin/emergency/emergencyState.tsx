@@ -36,7 +36,7 @@ export default function EmergencyButton() {
   const [emergency, setEmergency] = useState(false);
   const [status, setStatus] = useState<EmergencyStatus>("normal");
   const [loading, setLoading] = useState(false);
-  const busNumber:string = "HH-7788";
+  const busNumber= params.busNumber as string;
   const fetchEmergency = useCallback(async () => {
     if (!API_URL || !busNumber) return;
 

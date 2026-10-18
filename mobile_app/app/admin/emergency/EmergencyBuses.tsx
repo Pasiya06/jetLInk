@@ -660,7 +660,7 @@ const styles = StyleSheet.create({
   summaryDivider: { width: 1, backgroundColor: C.line, marginVertical: 4 },
 
   /* List + card */
-  list: { padding: 16, paddingBottom: 32, flexGrow: 1 },
+  list: { padding: 16, paddingBottom: 172, flexGrow: 1 },
   card: {
     backgroundColor: C.surface,
     borderRadius: 20,
