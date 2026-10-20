@@ -922,7 +922,7 @@ const styles = StyleSheet.create({
   goldenText: {
     fontSize: 7,
     fontWeight: "800",
-    color: "#DCE8B0",
+    color: "#f3e763",
     letterSpacing: 0.5,
   },
 
@@ -1021,7 +1021,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F4F6F8",
     paddingHorizontal: 24,
     paddingTop: 8,
-    paddingBottom: 25,
+    paddingBottom: 70,
   },
 
   timelineContainer: {
@@ -1082,14 +1082,14 @@ const styles = StyleSheet.create({
   },
 
   placeName: {
-    fontSize: 10,
+    fontSize: 16,
     fontWeight: "800",
     color: "#344054",
   },
 
   placeDescription: {
     marginTop: 4,
-    fontSize: 7,
+    fontSize: 10,
     color: "#8A96A3",
   },
 
