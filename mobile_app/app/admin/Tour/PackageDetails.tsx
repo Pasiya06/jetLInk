@@ -920,7 +920,7 @@ const styles = StyleSheet.create({
   },
 
   goldenText: {
-    fontSize: 7,
+    fontSize: 14,
     fontWeight: "800",
     color: "#f3e763",
     letterSpacing: 0.5,
