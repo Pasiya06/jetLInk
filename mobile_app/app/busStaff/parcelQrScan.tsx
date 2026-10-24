@@ -109,7 +109,7 @@ export default function ParcelScanner() {
         {scanState === "idle" || scanState === "loading" ? (
           <View style={styles.cameraWrap}>
             <CameraView
-              style={StyleSheet.absoluteFillObject}
+              style={StyleSheet.absoluteFill}
               barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
               onBarcodeScanned={scanState === "idle" ? handleBarcodeScanned : undefined}
             />
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
   },
 
   frameOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -435,7 +435,7 @@ const styles = StyleSheet.create({
   },
 
   loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: "rgba(0,0,0,0.55)",
     alignItems: "center",
     justifyContent: "center",

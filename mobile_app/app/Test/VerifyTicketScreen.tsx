@@ -178,7 +178,7 @@ export default function VerifyTicketScreen() {
       {/* Camera */}
       <View style={styles.cameraWrap}>
         <CameraView
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
           facing="back"
           barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
           onBarcodeScanned={scanned ? undefined : handleBarcodeScanned}
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
 
 cameraWrap: { flex: 1,marginLeft:20, marginRight:20, marginTop:-70, borderRadius: 24, overflow: "hidden", maxHeight: "65%", },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "rgba(0,0,0,0.35)",

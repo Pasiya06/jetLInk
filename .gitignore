@@ -43,3 +43,5 @@ Thumbs.db
 *.key
 *.mobileprovision
 backend/.env
+Backend/.env
+mobile_app/.env
