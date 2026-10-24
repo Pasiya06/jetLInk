@@ -352,19 +352,6 @@ export default function NotificationsScreen() {
               end={{ x: 1, y: 0 }}
               style={styles.scheduleGradient}
             >
-              <View style={styles.scheduleLeft}>
-                <Ionicons name="timer-outline" size={28} color="#ffffff" />
-                <View style={{ marginLeft: 12 }}>
-                  <Text style={styles.scheduleTitle}>
-                    {scheduledCountdown
-                      ? `Firing in ${scheduledCountdown}s...`
-                      : "Schedule Alert in 5 Seconds"}
-                  </Text>
-                  <Text style={styles.scheduleDesc}>
-                    Press and minimize/lock phone to test background notification
-                  </Text>
-                </View>
-              </View>
               <Ionicons name="chevron-forward" size={20} color="#ffffff" />
             </LinearGradient>
           </TouchableOpacity>
