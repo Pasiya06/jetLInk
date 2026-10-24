@@ -732,7 +732,7 @@ export default function DriverHome() {
                     <Ionicons name="home-outline" size={28} color="#fff" />             
                   </TouchableOpacity>
         
-                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "staff" } });}}>
                     <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
                     <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
                       Alerts

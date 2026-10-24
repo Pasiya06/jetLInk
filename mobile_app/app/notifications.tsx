@@ -10,47 +10,48 @@ import {
   Alert,
   Platform,
 } from "react-native";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import * as Notifications from "expo-notifications";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { initNotifications } from "../services/notificationService";
+import {
+  initNotifications,
+  getNotificationHistory,
+  clearNotificationHistory,
+  subscribeToNotificationHistory,
+  NotificationAudience,
+  NotificationRecord,
+} from "../services/notificationService";
 
-interface NotificationItem {
-  id: string;
-  title: string;
-  body: string;
-  time: string;
-  type: "ticket" | "emergency" | "parcel" | "general";
+function formatTime(timestamp: number) {
+  const date = new Date(timestamp);
+  const now = new Date();
+  const time = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  if (date.toDateString() === now.toDateString()) return time;
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (date.toDateString() === yesterday.toDateString()) return `Yesterday, ${time}`;
+  return `${date.toLocaleDateString()}, ${time}`;
 }
-
-const STORAGE_KEY = "@jetlink_notifications_history";
 
 export default function NotificationsScreen() {
   const router = useRouter();
+  const { role } = useLocalSearchParams<{ role?: string }>();
+  const audience: NotificationAudience = role === "staff" ? "staff" : "passenger";
   const [permissionGranted, setPermissionGranted] = useState<boolean | null>(null);
-  const [notificationsList, setNotificationsList] = useState<NotificationItem[]>([]);
+  const [notificationsList, setNotificationsList] = useState<NotificationRecord[]>([]);
 
   useEffect(() => {
+    const loadHistory = () => {
+      getNotificationHistory(audience).then(setNotificationsList);
+    };
+
     checkPermission();
     loadHistory();
 
-    // Listen for new notifications received while this screen is open
-    const sub = Notifications.addNotificationReceivedListener((notification) => {
-      const { title, body } = notification.request.content;
-      const type = (notification.request.content.data?.type as any) || "general";
-      addNotificationRecord({
-        id: notification.request.identifier,
-        title: title || "New Notification",
-        body: body || "",
-        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        type,
-      });
-    });
-
-    return () => sub.remove();
-  }, []);
+    // Refresh when a new notification is saved while this screen is open
+    return subscribeToNotificationHistory(loadHistory);
+  }, [audience]);
 
   const checkPermission = async () => {
     const { status } = await Notifications.getPermissionsAsync();
@@ -70,28 +71,8 @@ export default function NotificationsScreen() {
     }
   };
 
-  const loadHistory = async () => {
-    try {
-      const saved = await AsyncStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        setNotificationsList(JSON.parse(saved));
-      }
-    } catch (e) {
-      console.warn("Could not load notification history", e);
-    }
-  };
-
-  const addNotificationRecord = async (item: NotificationItem) => {
-    setNotificationsList((prev) => {
-      const updated = [item, ...prev].slice(0, 30);
-      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated)).catch(() => {});
-      return updated;
-    });
-  };
-
   const clearHistory = async () => {
-    await AsyncStorage.removeItem(STORAGE_KEY);
-    setNotificationsList([]);
+    await clearNotificationHistory(audience);
   };
 
   return (
@@ -112,49 +93,16 @@ export default function NotificationsScreen() {
             </TouchableOpacity>
             <View>
               <Text style={styles.headerTitle}>Notification Center</Text>
-              <Text style={styles.headerSubtitle}>System & phone status bar alerts</Text>
+              <Text style={styles.headerSubtitle}>
+                {audience === "staff" ? "Bus staff alerts" : "Passenger alerts"}
+              </Text>
             </View>
           </View>
         </LinearGradient>
 
         <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
           {/* Permission Status Banner */}
-          <View
-            style={[
-              styles.permissionCard,
-              permissionGranted
-                ? styles.permissionCardGranted
-                : styles.permissionCardDenied,
-            ]}
-          >
-            <View style={styles.permissionIconWrap}>
-              <Ionicons
-                name={permissionGranted ? "checkmark-circle" : "alert-circle"}
-                size={28}
-                color={permissionGranted ? "#10B981" : "#EF4444"}
-              />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.permissionTitle}>
-                {permissionGranted
-                  ? "Notification Bar Enabled"
-                  : "Notifications Not Enabled"}
-              </Text>
-              <Text style={styles.permissionDesc}>
-                {permissionGranted
-                  ? "JetLink alerts will appear directly in your device's notification bar."
-                  : "Allow notification permission so alerts can appear in your phone's notification bar."}
-              </Text>
-            </View>
-            {!permissionGranted && (
-              <TouchableOpacity
-                style={styles.enableButton}
-                onPress={handleRequestPermission}
-              >
-                <Text style={styles.enableButtonText}>Enable</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+
 
           {/* Recent Notifications List */}
           <View style={[styles.sectionHeader, { marginTop: 8, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }]}>
@@ -214,7 +162,7 @@ export default function NotificationsScreen() {
                 <View style={{ flex: 1, marginLeft: 12 }}>
                   <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
                     <Text style={styles.historyTitle}>{item.title}</Text>
-                    <Text style={styles.historyTime}>{item.time}</Text>
+                    <Text style={styles.historyTime}>{formatTime(item.receivedAt)}</Text>
                   </View>
                   <Text style={styles.historyBody}>{item.body}</Text>
                 </View>

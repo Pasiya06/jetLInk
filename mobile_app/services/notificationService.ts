@@ -1,5 +1,6 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // ─── Configure Global Notification Behavior ─────────────────────────────
 // This ensures notifications appear as a heads-up banner / in the notification bar
@@ -99,22 +100,33 @@ export async function sendLocalNotification({
   body,
   data = {},
   channelId = "default",
+  audience,
 }: {
   title: string;
   body: string;
   data?: Record<string, any>;
   channelId?: "default" | "emergency" | "bookings" | "parcels";
+  audience?: NotificationAudience;
 }): Promise<string | null> {
   try {
+    const content: Record<string, any> = { ...data, ...(audience ? { audience } : {}) };
     const id = await Notifications.scheduleNotificationAsync({
       content: {
         title,
         body,
-        data,
+        data: content,
         sound: true,
         ...(Platform.OS === "android" ? { channelId } : {}),
       },
       trigger: null, // null delivers immediately
+    });
+    await addToNotificationHistory({
+      id,
+      title,
+      body,
+      type: toHistoryType(content.type),
+      audience,
+      receivedAt: Date.now(),
     });
     return id;
   } catch (err) {
@@ -181,6 +193,7 @@ export async function notifyTicketBooked({
     } is confirmed${fare ? `. Fare: LKR ${fare}` : ""}.`,
     channelId: "bookings",
     data: { type: "ticket_booked", busNumber },
+    audience: "passenger",
   });
 }
 
@@ -199,6 +212,7 @@ export async function notifyParcelUpdate({
     body: `Parcel #${parcelId || ""} status: ${status}`,
     channelId: "parcels",
     data: { type: "parcel_update", parcelId, status },
+    audience: "passenger",
   });
 }
 
@@ -217,6 +231,7 @@ export async function notifyEmergencyAlert({
     body: `Emergency reported for Bus ${busNumber}: ${reason.toUpperCase()}`,
     channelId: "emergency",
     data: { type: "emergency", busNumber, reason },
+    audience: "staff",
   });
 }
 
@@ -235,5 +250,113 @@ export async function notifyPaymentSuccess({
     body: `Payment of LKR ${amount} for ${service || "your booking"} was processed successfully.`,
     channelId: "bookings",
     data: { type: "payment_success", amount },
+    audience: "passenger",
   });
+}
+
+// ─── Notification History ───────────────────────────────────────────────
+
+/** Which side of the app a notification belongs to. */
+export type NotificationAudience = "passenger" | "staff";
+
+export type NotificationHistoryType = "ticket" | "emergency" | "parcel" | "general";
+
+export interface NotificationRecord {
+  id: string;
+  title: string;
+  body: string;
+  type: NotificationHistoryType;
+  /** Undefined for notifications not tied to one side; those show for everyone. */
+  audience?: NotificationAudience;
+  receivedAt: number;
+}
+
+// v2: the previous key also held entries from the removed test screen.
+const HISTORY_KEY = "@jetlink_notification_history_v2";
+const HISTORY_LIMIT = 50;
+
+const historyListeners = new Set<() => void>();
+let writeQueue: Promise<unknown> = Promise.resolve();
+
+function toHistoryType(type: unknown): NotificationHistoryType {
+  switch (type) {
+    case "ticket":
+    case "ticket_booked":
+    case "payment_success":
+      return "ticket";
+    case "parcel":
+    case "parcel_update":
+      return "parcel";
+    case "emergency":
+      return "emergency";
+    default:
+      return "general";
+  }
+}
+
+async function readHistory(): Promise<NotificationRecord[]> {
+  try {
+    const saved = await AsyncStorage.getItem(HISTORY_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch (err) {
+    console.warn("Could not read notification history:", err);
+    return [];
+  }
+}
+
+// Serialize writes so two notifications arriving together don't overwrite each other.
+function updateHistory(update: (items: NotificationRecord[]) => NotificationRecord[]) {
+  writeQueue = writeQueue
+    .then(async () => {
+      const next = update(await readHistory());
+      await AsyncStorage.setItem(HISTORY_KEY, JSON.stringify(next));
+      historyListeners.forEach((listener) => listener());
+    })
+    .catch((err) => console.warn("Could not save notification history:", err));
+  return writeQueue;
+}
+
+/** Notifications for the given side, newest first. */
+export async function getNotificationHistory(
+  audience?: NotificationAudience
+): Promise<NotificationRecord[]> {
+  await writeQueue;
+  const items = await readHistory();
+  return audience ? items.filter((item) => !item.audience || item.audience === audience) : items;
+}
+
+export async function addToNotificationHistory(record: NotificationRecord) {
+  await updateHistory((items) =>
+    items.some((item) => item.id === record.id)
+      ? items
+      : [record, ...items].slice(0, HISTORY_LIMIT)
+  );
+}
+
+/** Save a notification delivered by the OS (push, scheduled, or local). */
+export async function recordReceivedNotification(notification: Notifications.Notification) {
+  const { title, body, data } = notification.request.content;
+  await addToNotificationHistory({
+    id: notification.request.identifier,
+    title: title || "New Notification",
+    body: body || "",
+    type: toHistoryType(data?.type),
+    audience: data?.audience as NotificationAudience | undefined,
+    receivedAt: notification.date || Date.now(),
+  });
+}
+
+/** Removes only the given side's notifications. */
+export async function clearNotificationHistory(audience?: NotificationAudience) {
+  await updateHistory((items) =>
+    audience ? items.filter((item) => item.audience && item.audience !== audience) : []
+  );
+}
+
+/** Called whenever the stored history changes; returns an unsubscribe function. */
+export function subscribeToNotificationHistory(listener: () => void) {
+  historyListeners.add(listener);
+  return () => {
+    historyListeners.delete(listener);
+  };
 }

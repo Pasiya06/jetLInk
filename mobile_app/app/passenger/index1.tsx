@@ -291,7 +291,7 @@ export default function Index() {
                     <Ionicons name="home-outline" size={28} color="#fff" />             
                   </TouchableOpacity>
         
-                  <TouchableOpacity style={styles.item} onPress={() => { router.push("/notifications"); }}>
+                  <TouchableOpacity style={styles.item} onPress={() => { router.push({ pathname: "/notifications", params: { role: "passenger" } }); }}>
                     <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
                     <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
                       Alerts
