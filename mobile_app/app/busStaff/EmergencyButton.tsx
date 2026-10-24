@@ -19,6 +19,7 @@ import {
   AntDesign 
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { notifyEmergencyAlert } from "../../services/notificationService";
 
 type EmergencyStatus = "normal" | "accident" | "breakdown";
 
@@ -112,6 +113,11 @@ export default function EmergencyButton() {
 
               setEmergency(data.bus.emergency);
               setStatus(data.bus.status);
+
+              notifyEmergencyAlert({
+                busNumber: busNumber || "Bus",
+                reason: emergencyType,
+              }).catch(() => {});
 
               Alert.alert(
                 "Emergency Reported",

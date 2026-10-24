@@ -55,12 +55,15 @@ export default function Index() {
           style={styles.submitGradient1}
         >
         <View style={styles.header}>
-            
-        
-          <TouchableOpacity >
+          <TouchableOpacity>
             <Text style={styles.title}>JetLink</Text>
           </TouchableOpacity>
-                  
+          <TouchableOpacity
+            style={styles.notifIconBtn}
+            onPress={() => router.push("/notifications")}
+          >
+            <Ionicons name="notifications-outline" size={24} color="#ffffff" />
+          </TouchableOpacity>
         </View>
         </LinearGradient>
 
@@ -144,12 +147,20 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     paddingTop: 50,
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingBottom: 70,   
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
+  },
+  notifIconBtn: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   submitGradient1: {
