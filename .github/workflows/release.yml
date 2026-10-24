@@ -1,0 +1,41 @@
+name: Release Android APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: 📱 Build Release APK
+    uses: ./.github/workflows/build-apk.yml
+    with:
+      build_type: release
+    secrets: inherit
+
+  release:
+    name: 🏷️ Publish GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Download APK Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: JetLink-Android-APK
+          path: build-artifacts
+
+      - name: ✏️ Rename APK
+        run: |
+          mv build-artifacts/app-release.apk "build-artifacts/JetLink-${GITHUB_REF_NAME}.apk"
+          ls -la build-artifacts/
+
+      - name: 🚀 Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: JetLink ${{ github.ref_name }}
+          files: build-artifacts/*.apk
+          generate_release_notes: true
