@@ -21,6 +21,7 @@
     "axios": "^1.18.1",
     "bcryptjs": "^3.0.3",
     "expo": "^57.0.6",
+    "expo-build-properties": "~57.0.22",
     "expo-camera": "~57.0.5",
     "expo-constants": "^57.0.5",
     "expo-file-system": "~57.0.7",

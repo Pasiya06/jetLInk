@@ -51,6 +51,14 @@
           "icon": "./assets/images/JetLink.png",
           "color": "#0057D9"
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
       ]
     ],
     "experiments": {
