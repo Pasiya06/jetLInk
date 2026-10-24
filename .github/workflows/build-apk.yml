@@ -90,6 +90,9 @@ jobs:
         run: |
           cd mobile_app/android
           sed -i '/^org.gradle.jvmargs=/d;/^kotlin.daemon.jvmargs=/d;/^org.gradle.workers.max=/d;/^reactNativeArchitectures=/d' gradle.properties
+          # The generated file has no trailing newline; without this the first
+          # appended line gets glued onto expo.inlineModules.watchedDirectories.
+          printf '\n' >> gradle.properties
           cat >> gradle.properties <<'EOF'
           org.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=1g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8
           kotlin.daemon.jvmargs=-Xmx2g
