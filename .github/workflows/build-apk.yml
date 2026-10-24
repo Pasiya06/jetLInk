@@ -99,9 +99,31 @@ jobs:
           echo "=== gradle.properties ==="
           cat gradle.properties
 
+      - name: 🧪 Verify JS Bundle
+        # Same bundling Gradle runs for release; surfaces the real Metro error
+        # instead of Gradle's generic "Process 'command 'node'' finished with non-zero exit value 1".
+        env:
+          NODE_ENV: production
+          NODE_OPTIONS: --max-old-space-size=4096
+          EXPO_PUBLIC_API_URL: ${{ inputs.api_url || secrets.EXPO_PUBLIC_API_URL || vars.EXPO_PUBLIC_API_URL || 'https://caffeinic-maximiliano-incidentless.ngrok-free.dev/api' }}
+          EXPO_PUBLIC_OPENWEATHER_API_KEY: ${{ secrets.EXPO_PUBLIC_OPENWEATHER_API_KEY || '75bef07e0055444197216e732279c66e' }}
+        run: |
+          cd mobile_app
+          mkdir -p /tmp/bundle-check/res
+          set -o pipefail
+          if ! npx expo export:embed --platform android --dev false \
+              --entry-file node_modules/expo-router/entry.js \
+              --bundle-output /tmp/bundle-check/index.android.bundle \
+              --assets-dest /tmp/bundle-check/res 2>&1 | tee /tmp/bundle.log; then
+            msg=$(tail -n 60 /tmp/bundle.log | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=JS bundle failed::$msg"
+            exit 1
+          fi
+
       - name: 🔨 Build APK with Gradle
         env:
           BUILD_TYPE: ${{ inputs.build_type || 'release' }}
+          NODE_OPTIONS: --max-old-space-size=4096
           EXPO_PUBLIC_API_URL: ${{ inputs.api_url || secrets.EXPO_PUBLIC_API_URL || vars.EXPO_PUBLIC_API_URL || 'https://caffeinic-maximiliano-incidentless.ngrok-free.dev/api' }}
           EXPO_PUBLIC_OPENWEATHER_API_KEY: ${{ secrets.EXPO_PUBLIC_OPENWEATHER_API_KEY || '75bef07e0055444197216e732279c66e' }}
         run: |
@@ -110,13 +132,20 @@ jobs:
 
           if [ "$BUILD_TYPE" = "debug" ]; then
             echo "Building Debug APK (requires Metro dev server; will stay on splash otherwise)..."
-            ./gradlew assembleDebug --no-daemon --stacktrace
+            TASKS="assembleDebug"
           elif [ "$BUILD_TYPE" = "release" ]; then
             echo "Building Release APK (standalone, JS bundle embedded, signed with debug keystore)..."
-            ./gradlew assembleRelease --no-daemon --stacktrace
+            TASKS="assembleRelease"
           else
             echo "Building both Debug and Release APKs..."
-            ./gradlew assembleDebug assembleRelease --no-daemon --stacktrace
+            TASKS="assembleDebug assembleRelease"
+          fi
+
+          set -o pipefail
+          if ! ./gradlew $TASKS --no-daemon --stacktrace 2>&1 | tee /tmp/gradle.log; then
+            msg=$( { grep -iE "error|exception|failed" /tmp/gradle.log | grep -v "^\s*at " | head -n 40; echo "-----"; grep -A 15 "What went wrong" /tmp/gradle.log | head -n 40; } | sed 's/%/%25/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error title=Gradle build failed::$msg"
+            exit 1
           fi
 
       - name: 📂 Collect Generated APKs
