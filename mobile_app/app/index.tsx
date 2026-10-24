@@ -1,57 +1,66 @@
-import React from 'react';
-
+import React, { useEffect } from 'react';
 import { Stack, useRouter } from "expo-router";
 import {
   Image,
   StyleSheet,
-  ScrollView,
   Text,
   View,
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
 } from "react-native";
-
-import {FontAwesome6} from '@expo/vector-icons';
-
+import { FontAwesome6 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-
-
-
-
+import * as SplashScreen from 'expo-splash-screen';
 
 export default function Index() {
   const router = useRouter();
-  const handleSearch = () => {
-        router.push({
-            pathname: "/passenger/selectScreen",
-            
-            
-        });
-      };
-  
+
+  useEffect(() => {
+    // Ensure splash screen is hidden once this screen is ready
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
+
+  const handleStart = () => {
+    router.push("/passenger/selectScreen");
+  };
+
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <StatusBar barStyle="light-content" backgroundColor="#0056b3" />
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       <SafeAreaView style={styles.container}>
-        <View style={styles.iconContainer}>
-          <Image source ={require("../assets/images/JetLink.png")} style={styles.imageSize} />
-        </View>
+        <View style={styles.contentWrap}>
+          {/* Logo and Branding */}
+          <View style={styles.logoSection}>
+            <Image
+              source={require("../assets/images/JetLink.png")}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+            <Text style={styles.appTitle}>JetLink</Text>
+            <Text style={styles.appSubtitle}>Smart Transit & Logistics</Text>
+          </View>
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSearch}>
-            <LinearGradient
-                colors={['#4B6CF5', '#32CD32']}
+          {/* Action Button */}
+          <View style={styles.actionSection}>
+            <TouchableOpacity
+              style={styles.submitButton}
+              activeOpacity={0.85}
+              onPress={handleStart}
+            >
+              <LinearGradient
+                colors={['#173C79', '#155B8A', '#159B79']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.submitGradient}
-            >
-            <Text style={styles.submitText}>Get Start</Text>
-            <FontAwesome6 name="arrow-right-long" size={24} color="#ffffff" />
-            </LinearGradient>
-        </TouchableOpacity>
-
-        
+              >
+                <Text style={styles.submitText}>Get Started</Text>
+                <FontAwesome6 name="arrow-right-long" size={20} color="#ffffff" />
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
+        </View>
       </SafeAreaView>
     </>
   );
@@ -61,55 +70,64 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#ffffff',
-    
-    paddingTop:"100%",
   },
-  imageSize:{
-    marginLeft:"700%",
-    width:500,
-    height:500,
-
-  },
-  
-  iconContainer: {
-    width: 45,
-    height: 45,
-    borderRadius: 12,
-    justifyContent: 'center',
+  contentWrap: {
+    flex: 1,
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginRight: 15,
+    paddingHorizontal: 28,
+    paddingTop: 80,
+    paddingBottom: 48,
   },
-  
+  logoSection: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 60,
+  },
+  logoImage: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+  appTitle: {
+    fontSize: 34,
+    fontWeight: '800',
+    color: '#173C79',
+    letterSpacing: 1,
+  },
+  appSubtitle: {
+    fontSize: 15,
+    color: '#64748B',
+    marginTop: 6,
+    fontWeight: '500',
+  },
+  actionSection: {
+    width: '100%',
+  },
   submitButton: {
-    marginLeft: 20,
-    marginRight: 20,
-    justifyContent: "space-around",
-      
-    height: 55,
+    width: '100%',
+    height: 56,
+    borderRadius: 28,
     overflow: 'hidden',
-    borderRadius: 25,
-    marginTop: 200,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
+    shadowColor: "#173C79",
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
     shadowOffset: {
       width: 0,
-      height: -2,
+      height: 6,
     },
-    elevation: 10,
+    elevation: 8,
   },
-
   submitGradient: {
+    flex: 1,
     flexDirection: 'row',
-    paddingVertical: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
-
-   submitText: {
-    marginRight: 20,
-    color: '#fff',
-    fontSize: 16,
+  submitText: {
+    color: '#ffffff',
+    fontSize: 17,
     fontWeight: '700',
+    marginRight: 12,
   },
 });
