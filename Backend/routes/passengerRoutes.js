@@ -7,7 +7,8 @@ import {
   updatePassengerPassword,
   Getname,
   getPassengerByNIC,
-  updatePassenger
+  updatePassenger,
+  getOtherPassengers
 } from "../controllers/passengerController.js";
 
 const router = express.Router();
@@ -15,6 +16,7 @@ const router = express.Router();
 router.post("/register", registerPassenger);
 router.post("/login", loginPassenger);
 router.get("/", getPassengers);
+router.get("/others/:id", getOtherPassengers); // everyone except the logged-in passenger
 router.delete("/:id",deletePassenger)
 router.get("/NIC/:NIC", getPassengerByNIC);
 router.get("/get/:email", Getname);

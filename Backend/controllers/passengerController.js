@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Passenger from "../models/Passenger.js";
 
 export const registerPassenger = async (req, res) => {
@@ -344,6 +345,37 @@ export const updatePassenger = async (req, res) => {
       success: true,
       message: "Profile updated successfully",
       data,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
+// GET /api/passengers/others/:id
+// All passengers except the logged-in one (id = their Mongo _id).
+// Only public details are returned - never passwords, NIC or address.
+export const getOtherPassengers = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid passenger ID",
+      });
+    }
+
+    const passengers = await Passenger.find({ _id: { $ne: id } })
+      .select("passengerId firstName lastName email")
+      .sort({ firstName: 1, lastName: 1 });
+
+    res.status(200).json({
+      success: true,
+      count: passengers.length,
+      data: passengers,
     });
   } catch (error) {
     res.status(500).json({

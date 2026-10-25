@@ -1,140 +1,218 @@
-import React, { useState } from 'react';
-import { Stack,useRouter} from "expo-router";
+import React, { useCallback, useMemo, useState } from 'react';
+import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import {
-  StyleSheet,
-  View,
-  Text,
-  TextInput, 
-  TouchableOpacity,
-  SafeAreaView,
+  ActivityIndicator,
   FlatList,
+  Linking,
+  RefreshControl,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import {Ionicons, 
-  MaterialCommunityIcons, 
-  Fontisto, 
-  FontAwesome6, 
-  MaterialIcons, 
-  FontAwesome5, 
-  FontAwesome} from '@expo/vector-icons';
+import { Feather, FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 
-// Define the shape of a friend object
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
+// Public details of another passenger
 interface Friend {
-  id: string;
-  name: string;
+  _id: string;
+  passengerId?: number;
+  firstName: string;
+  lastName: string;
+  email: string;
 }
 
 const FriendsScreen: React.FC = () => {
-  const router = useRouter(); 
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const myId = String(params.Pid ?? "");
+
+  const [friends, setFriends] = useState<Friend[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Mock data based on your screenshot
-  const friendsData: Friend[] = Array(6).fill({ id: '', name: 'Pasindu Sandakelum' }).map((item, index) => ({
-    ...item,
-    id: index.toString(),
-  }));
+  // All passengers except the one who is logged in
+  const loadFriends = useCallback(async () => {
+    if (!myId) {
+      setError("Your login details are missing. Please sign in again.");
+      setLoading(false);
+      setRefreshing(false);
+      return;
+    }
+    try {
+      setError("");
+      const res = await fetch(`${API_URL}/passengers/others/${encodeURIComponent(myId)}`);
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.message || "Could not load passengers");
+      setFriends(Array.isArray(data.data) ? data.data : []);
+    } catch (e: any) {
+      setError(e?.message || "Unable to connect to server");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  }, [myId]);
 
-  const renderFriendItem = ({ item }: { item: Friend }) => (
-    <TouchableOpacity>
-    <View style={styles.friendRow}>
-      {/* Profile Icon */}
-      <View style={styles.profileCircle}>
-        <FontAwesome name="user-o" size={20} color="#32CD32" />
-      </View>
-
-      {/* Name */}
-      <Text style={styles.friendName}>{item.name}</Text>
-
-      {/* Action Icons */}
-      <View style={styles.actionGroup}>
-        <TouchableOpacity style={styles.iconButton}>
-          <MaterialCommunityIcons name="email-outline" size={24} color="#FFA500" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton}>
-          <Ionicons name="trash" size={24} color="red" />
-        </TouchableOpacity>
-      </View>
-    </View></TouchableOpacity>
+  useFocusEffect(
+    useCallback(() => {
+      loadFriends();
+    }, [loadFriends])
   );
 
-  return (
+  const shown = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    if (!q) return friends;
+    return friends.filter((f) =>
+      `${f.firstName} ${f.lastName} ${f.email}`.toLowerCase().includes(q)
+    );
+  }, [friends, searchQuery]);
 
-    <>
-    <Stack.Screen options={{ title: "", headerShown: false }} />
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-                <TouchableOpacity>
-                  <Ionicons name="menu" size={30} color="#ffffff" />
-                </TouchableOpacity>
-                
-                <TouchableOpacity><Text style={styles.title}>Jetlink</Text></TouchableOpacity>
-                
-                <TouchableOpacity>
-                  <Ionicons name="notifications" size={24} color="#ffffff" />
-                </TouchableOpacity>
-              </View>
-      
-            {/* Sub-Header */}
-            <View style={styles.subHeader}>
-              <TouchableOpacity 
-                onPress={() => {
-                  if (isSearching) {
-                    setIsSearching(false); // Close search bar if open
-                  } else {
-                    
-      
-                  
-                    router.back() 
-                  }
-                }}
-              >
-                <Ionicons 
-                  name={isSearching ? "arrow-back" : "arrow-back-outline"} 
-                  size={24} 
-                  color="#0047AB" 
-                />
-              </TouchableOpacity>
-              
-              {isSearching ? (
-                <TextInput
-                  style={styles.searchBarInput}
-                  placeholder="Search routes..."
-                  value={searchQuery}
-                  onChangeText={setSearchQuery}
-                  autoFocus={true}
-                />
-              ) : (
-                <Text style={styles.subHeaderTitle}>Friends</Text>
-              )}
-              
-              <TouchableOpacity onPress={() => setIsSearching(!isSearching)}>
-                <FontAwesome 
-                  name={isSearching ? "close" : "search"} 
-                  size={24} 
-                  color="#0047AB" 
-                />
-              </TouchableOpacity>
-            </View>
-
-        {/* Outer Green Border Container */}
-        <View style={styles.listContainer}>
-          <FlatList
-            data={friendsData}
-            renderItem={renderFriendItem}
-            keyExtractor={(item) => item.id}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingVertical: 10 }}
-          />
+  const renderFriendItem = ({ item }: { item: Friend }) => {
+    const initials = `${item.firstName?.charAt(0) ?? ""}${item.lastName?.charAt(0) ?? ""}`.toUpperCase();
+    return (
+      <View style={styles.friendRow}>
+        <View style={styles.profileCircle}>
+          <Text style={styles.initials}>{initials || "?"}</Text>
         </View>
-      
 
-      {/* Footer Branding */}
-      <View style={styles.footerGraphic}>
-        <View style={styles.blueCurve} />
-        <View style={styles.greenCurve} />
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <Text style={styles.friendName} numberOfLines={1}>
+            {item.firstName} {item.lastName}
+          </Text>
+          <Text style={styles.friendEmail} numberOfLines={1}>{item.email}</Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.iconButton}
+          accessibilityLabel={`Email ${item.firstName}`}
+          onPress={() => Linking.openURL(`mailto:${item.email}`)}
+        >
+          <MaterialCommunityIcons name="email-outline" size={24} color="#FFA500" />
+        </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    );
+  };
+
+  const navParams = {
+    Pid: params.Pid,
+    Pid1: params.Pid1,
+    pfirstName: params.pfirstName,
+    plastName: params.plastName,
+    pphoneNumber: params.pphoneNumber,
+    pemail: params.pemail,
+    NIC: params.NIC,
+  };
+
+  return (
+    <>
+      <Stack.Screen options={{ title: "", headerShown: false }} />
+      <SafeAreaView style={styles.container}>
+        <LinearGradient
+          colors={["#173C79", "#155B8A", "#159B79"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.header}
+        >
+          <Text style={styles.title}>Jetlink</Text>
+        </LinearGradient>
+
+        {/* Sub-header: title or search */}
+        <View style={styles.subHeader}>
+          {isSearching ? (
+            <TextInput
+              style={styles.searchBarInput}
+              placeholder="Search passengers..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              autoFocus={true}
+            />
+          ) : (
+            <Text style={styles.subHeaderTitle}>
+              Friends{!loading && !error ? `  ·  ${friends.length}` : ""}
+            </Text>
+          )}
+          <TouchableOpacity
+            onPress={() => {
+              if (isSearching) setSearchQuery("");
+              setIsSearching(!isSearching);
+            }}
+          >
+            <FontAwesome name={isSearching ? "close" : "search"} size={22} color="#173C79" />
+          </TouchableOpacity>
+        </View>
+
+        {loading ? (
+          <View style={styles.center}>
+            <ActivityIndicator size="large" color="#159B79" />
+            <Text style={styles.muted}>Loading passengers…</Text>
+          </View>
+        ) : error ? (
+          <View style={styles.center}>
+            <Ionicons name="alert-circle-outline" size={44} color="#E5484D" />
+            <Text style={styles.errorText}>{error}</Text>
+            <TouchableOpacity style={styles.retry} onPress={() => { setLoading(true); loadFriends(); }}>
+              <Text style={styles.retryText}>Try again</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <FlatList
+            style={styles.list}
+            data={shown}
+            renderItem={renderFriendItem}
+            keyExtractor={(item) => item._id}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingVertical: 6, paddingBottom: 200, flexGrow: 1 }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadFriends(); }} />
+            }
+            ListEmptyComponent={
+              <View style={styles.center}>
+                <Ionicons name="people-outline" size={48} color="#98A2B3" />
+                <Text style={styles.muted}>
+                  {searchQuery ? "No passengers match your search." : "No other passengers yet."}
+                </Text>
+              </View>
+            }
+          />
+        )}
+
+        {/* Bottom nav */}
+        <View style={styles.bottomNav}>
+          <TouchableOpacity style={styles.item} onPress={() => router.back()}>
+            <Ionicons name="arrow-back-outline" size={24} color="#8A8A8A" />
+            <Text style={styles.label1}>Back</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={() => setIsSearching(true)}>
+            <FontAwesome name="search" size={22} color="#8A8A8A" />
+            <Text style={styles.label1}>Search</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.centerButton} onPress={() => router.push({ pathname: "/passenger/index1", params: navParams })}>
+            <Ionicons name="home-outline" size={28} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={() => router.push({ pathname: "/notifications", params: { role: "passenger" } })}>
+            <Ionicons name="notifications-outline" size={24} color="#8A8A8A" />
+            <Text style={styles.label1}>Alerts</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={() => router.push({ pathname: "/passenger/passengerProfile", params: { role: "passenger", NIC: params.NIC } })}>
+            <Feather name="user" size={24} color="#8A8A8A" />
+            <Text style={styles.label1}>Profile</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.footerGraphic}>
+          <LinearGradient colors={["#173C79", "#155B8A", "#159B79"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.submitGradient} />
+        </View>
+        <View style={styles.footerGraphic1}>
+          <LinearGradient colors={["#173C79", "#155B8A", "#159B79"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.submitGradient} />
+        </View>
+      </SafeAreaView>
     </>
   );
 };
@@ -142,115 +220,113 @@ const FriendsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#FFF' },
   header: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', // Spaced items
-    paddingTop: 50, // Added padding for top status bar area
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    backgroundColor: '#0047AB',
+    justifyContent: 'center',
+    paddingTop: 50,
+    paddingBottom: 24,
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#ffffff',
-    letterSpacing: 0.5,
-  },
+  title: { fontSize: 28, fontWeight: '800', color: '#ffffff', letterSpacing: 0.5 },
   subHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
     justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    gap: 12,
   },
-  subHeaderTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#0047AB',
+  subHeaderTitle: { fontSize: 18, fontWeight: '700', color: '#173C79' },
+  searchBarInput: {
+    flex: 1,
+    height: 42,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 10,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    color: '#333',
   },
 
-  
-  body: { flex: 1, paddingHorizontal: 20, alignItems: 'center' },
-  
-  
-  listContainer: {
-    width: '100%',
-    flex: 0.85,
-    borderWidth: 0,
-    borderColor: '#39FF14',
-    borderRadius: 15,
-    paddingHorizontal: 15,
-    // Add this to ensure shadows on the edges aren't clipped
-    paddingTop: 5, 
-  },
+  list: { flex: 1, paddingHorizontal: 15 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 10 },
+  muted: { color: '#64748B', fontSize: 14, textAlign: 'center' },
+  errorText: { color: '#B4232A', textAlign: 'center' },
+  retry: { backgroundColor: '#159B79', paddingHorizontal: 18, paddingVertical: 10, borderRadius: 20 },
+  retryText: { color: '#fff', fontWeight: '700' },
+
   friendRow: {
     backgroundColor: '#ffffff',
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    padding: 14,
     borderRadius: 16,
     marginBottom: 12,
     borderWidth: 0.5,
     borderColor: '#32CD32',
-    elevation: 3, 
+    elevation: 3,
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
   },
   profileCircle: {
-    width: 35,
-    height: 35,
-    borderRadius: 18,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     borderWidth: 2,
     borderColor: '#32CD32',
+    backgroundColor: '#F0FBF2',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  friendName: {
-    flex: 1,
-    marginLeft: 10,
-    fontSize: 18,
-    color: '#0047AB',
-    fontWeight: '500',
+  initials: { color: '#159B79', fontWeight: '800', fontSize: 15 },
+  friendName: { fontSize: 16.5, color: '#0047AB', fontWeight: '600' },
+  friendEmail: { fontSize: 12.5, color: '#64748B', marginTop: 2 },
+  iconButton: { marginLeft: 10, padding: 4 },
+
+  bottomNav: {
+    position: "absolute",
+    bottom: 15,
+    left: 10,
+    right: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginBottom: 60,
+    height: 75,
+    backgroundColor: "#fff",
+    borderRadius: 25,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: -2 },
+    elevation: 10,
   },
-  actionGroup: { flexDirection: 'row', alignItems: 'center' },
-  iconButton: { marginLeft: 10 },
-  footerGraphic: {
+  item: { alignItems: "center", justifyContent: "center", flex: 1 },
+  label1: { marginTop: 4, fontSize: 13, color: "#8A8A8A" },
+  centerButton: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: "#2F80ED",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: -28,
+    shadowColor: "#2F80ED",
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 12,
+  },
+  submitGradient: { paddingVertical: 16 },
+  footerGraphic: { position: 'absolute', bottom: 0, width: '100%', overflow: 'hidden' },
+  footerGraphic1: {
     position: 'absolute',
-    bottom: 0,
+    bottom: 20,
     width: '100%',
-    height: 60,
     overflow: 'hidden',
-  },
-  blueCurve: {
-    backgroundColor: '#ffffff',
-    height: 90,
-    width: '120%',
-    borderRadius: 100,
-    position: 'absolute',
-    bottom: -40,
-    left: '-10%',
-  },
-  greenCurve: {
-    backgroundColor: '#0052cc',
-    height: 120,
-    width: '100%',
-    borderRadius: 30,
-    position: 'absolute',
-    // bottom: -60,
-    // left: '-10%',
-  },
-  searchBarInput: {
-  flex: 1,
-  height: 40,
-  backgroundColor: '#f0f0f0',
-  borderRadius: 10,
-  marginHorizontal: 15,
-  paddingHorizontal: 15,
-  fontSize: 16,
-  color: '#333',
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
   },
 });
 
