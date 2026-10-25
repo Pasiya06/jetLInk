@@ -198,7 +198,23 @@ export default function Index() {
               <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card2} onPress={() => router.push("/passenger/friend/index1")} >
+          <TouchableOpacity 
+            style={styles.card2} 
+            onPress={() => 
+              router.push({ 
+                pathname: "/passenger/friend/index1", 
+                params: { 
+                  Pid: params.Pid, 
+                  Pid1: params.Pid1, 
+                  pfirstName: params.pfirstName, 
+                  plastName: params.plastName, 
+                  pphoneNumber: params.pphoneNumber, 
+                  pemail: params.pemail, 
+                  NIC: params.NIC 
+                } 
+              })
+            } 
+          >
               <View style={[styles.iconContainer, { backgroundColor: "#10B98118"  }]}>
                 <SimpleLineIcons name="people" size={24} color="#10B981" />
               </View>
