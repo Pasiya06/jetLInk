@@ -79,7 +79,22 @@ const ToursScreen: React.FC = () => {
         </TouchableOpacity>
 
         {/* Option 2: Additional Payment */}
-        <TouchableOpacity style={styles.card1}>
+        <TouchableOpacity 
+          style={styles.card1}
+          onPress={() =>
+            router.push({
+              pathname: "/passenger/tours/additionalPay",
+              params: {
+                Pid: params.Pid,
+                Pid1: params.Pid1,
+                pfirstName: params.pfirstName,
+                plastName:params.plastName,
+                pphoneNumber: params.pphoneNumber,
+                pemail: params.pemail,
+              },
+            })
+          }
+        >
           <View style={[styles.iconWrap, { backgroundColor: "#EF444418" }]}>
             <MaterialIcons name="payment" size={40} color="#EF4444" />
           </View>

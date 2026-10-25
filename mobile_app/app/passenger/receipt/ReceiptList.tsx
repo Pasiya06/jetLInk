@@ -470,39 +470,7 @@ function ReceiptCard({ item }: { item: Receipt }) {
         </View>
       </View>
 
-      {/* Extra kilometers */}
-      <View style={styles.extraRow}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.fieldLabel}>Extra km</Text>
-          <Text style={styles.extraText}>
-            {item.extraKm
-              ? `${item.extraKm} km · Rs. ${Number(item.extraKmAmount || 0).toLocaleString()} paid`
-              : "None added"}
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={styles.extraButton}
-          activeOpacity={0.85}
-          onPress={() =>
-            router.push({
-              pathname: "/passenger/tours/extraKm",
-              params: {
-                receiptId: item.receiptId,
-                Pid: params.Pid,
-                Pid1: params.Pid1,
-                pfirstName: params.pfirstName,
-                plastName: params.plastName,
-                pphoneNumber: params.pphoneNumber,
-                pemail: params.pemail,
-                NIC: params.NIC,
-              },
-            })
-          }
-        >
-          <Ionicons name="add-circle-outline" size={16} color="#fff" />
-          <Text style={styles.extraButtonText}>Add extra km</Text>
-        </TouchableOpacity>
-      </View>
+      
 
       {/* Expandable details */}
       {open && (
