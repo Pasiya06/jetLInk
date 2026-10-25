@@ -19,10 +19,13 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 
 
+import FieldError from "../../../components/FieldError";
+import { useFieldErrors } from "../../../utils/validation";
 const JetLinkInterface: React.FC = () => {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const params = useLocalSearchParams();
   const router = useRouter();
+  const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
   const [activeTab, setActiveTab] = useState('');
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -173,6 +176,13 @@ const JetLinkInterface: React.FC = () => {
     };
 
     const handlePayment = () => {
+      if (!validateFields([
+        { key: "nameOnCard", label: "Name on card", value: nameOnCard },
+        { key: "cardNumber", label: "Card number", value: cardNumber, type: "card" },
+        { key: "expiry", label: "Expiry date", value: expiry, type: "expiry" },
+        { key: "cvc", label: "CVC", value: cvc, type: "cvc" },
+      ])) return;
+
       Alert.alert(
         "Confirm Payment",
         "Are you sure you want to proceed with this payment?",
@@ -267,6 +277,7 @@ const JetLinkInterface: React.FC = () => {
                     placeholderTextColor="#B0B0B0"
                   />
                 </View>
+                <FieldError message={fieldError("nameOnCard", nameOnCard)} />
 
                 {/* Card number */}
                 <Text style={styles.inputLabel}>Card number</Text>
@@ -281,6 +292,7 @@ const JetLinkInterface: React.FC = () => {
                     maxLength={19} 
                   />
                 </View>
+                <FieldError message={fieldError("cardNumber", cardNumber)} />
 
                 {/* Expiry / CVC row */}
                 <View style={styles.row}>
@@ -297,6 +309,7 @@ const JetLinkInterface: React.FC = () => {
                         maxLength={5}
                       />
                     </View>
+                    <FieldError message={fieldError("expiry", expiry)} />
                   </View>
 
                   <View style={styles.halfInput}>
@@ -313,6 +326,7 @@ const JetLinkInterface: React.FC = () => {
                         maxLength={3}
                       />
                     </View>
+                    <FieldError message={fieldError("cvc", cvc)} />
                   </View>
                 </View>
 
@@ -411,14 +425,14 @@ const JetLinkInterface: React.FC = () => {
                 <Ionicons name="home-outline" size={28} color="#fff" />             
               </TouchableOpacity>
         
-              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push({ pathname: "/notifications", params: { role: "passenger" } });}}>
                 <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
                 <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
                   Alerts
                 </Text>
               </TouchableOpacity>
         
-              <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+              <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({ pathname: "/passenger/passengerProfile", params: { role: "passenger",NIC: params.NIC } });}}>
                 <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
                 <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
                   Profile

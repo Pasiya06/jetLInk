@@ -20,6 +20,8 @@ import {
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
 
+import FieldError from "../../../components/FieldError";
+import { useFieldErrors } from "../../../utils/validation";
 type RouteType = 'Highway' | 'NormalWay';
 
 const JetLinkInterface: React.FC = () => {
@@ -36,6 +38,7 @@ const JetLinkInterface: React.FC = () => {
   const [activeTab, setActiveTab] = useState('');
   
   const router = useRouter();
+  const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
     setShowCalendar(false);
@@ -63,6 +66,13 @@ const JetLinkInterface: React.FC = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const handlesenderD = async () => {
+    if (!validateFields([
+      { key: "pickup", label: "Pickup location", value: pickup },
+      { key: "drop", label: "Drop location", value: drop },
+      { key: "date", label: "Date", value: date },
+      { key: "selectedTime", label: "Time", value: selectedTime },
+    ])) return;
+
 
   if (!pickup || !drop || !date) {
     alert("Please fill required fields");
@@ -82,6 +92,7 @@ const JetLinkInterface: React.FC = () => {
             plastName:params.plastName,
             pphoneNumber: params.pphoneNumber,
             pemail: params.pemail,
+            NIC: params.NIC,
             routeType,
             pickup,
             drop,
@@ -162,6 +173,7 @@ const JetLinkInterface: React.FC = () => {
                 autoCorrect={false}
                 />
             </View>
+            <FieldError message={fieldError("pickup", pickup)} />
           
           
             <Text style={styles.label}>Drop off Location</Text>
@@ -177,6 +189,7 @@ const JetLinkInterface: React.FC = () => {
                 />
                 
             </View>
+            <FieldError message={fieldError("drop", drop)} />
             
             <Text style={styles.label}>Date</Text>
             <View style={styles.inputWrapper}>
@@ -190,6 +203,7 @@ const JetLinkInterface: React.FC = () => {
                 <FontAwesome5 name="calendar-alt" size={24} color="#99999a" />  
                 </TouchableOpacity>
             </View>
+            <FieldError message={fieldError("date", date)} />
 
             {/* <Text style={styles.label}>Time</Text>
             <View style={styles.inputWrapper}>
@@ -205,7 +219,8 @@ const JetLinkInterface: React.FC = () => {
                 <Ionicons name="time-outline" size={24} color="#99999a" />
                 </TouchableOpacity>
                 
-            </View> */}
+            </View>
+            <FieldError message={fieldError("selectedTime", selectedTime)} /> */}
 
           {showCalendar && (
             <DateTimePicker
@@ -276,6 +291,8 @@ const JetLinkInterface: React.FC = () => {
                           plastName:params.plastName,
                           pphoneNumber: params.pphoneNumber,
                           pemail: params.pemail,
+                          NIC: params.NIC,
+                          role: "passenger"
                           
                         },                    
                       });
@@ -302,19 +319,20 @@ const JetLinkInterface: React.FC = () => {
                           plastName:params.plastName,
                           pphoneNumber: params.pphoneNumber,
                           pemail: params.pemail,
+                          NIC: params.NIC,
                         },                    
                       });}} > 
                 <Ionicons name="home-outline" size={28} color="#fff" />             
               </TouchableOpacity>
         
-              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+              <TouchableOpacity style={styles.item} onPress={() => { router.push({ pathname: "/notifications", params: { role: "passenger" } }); }}>
                 <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
                 <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
                   Alerts
                 </Text>
               </TouchableOpacity>
         
-              <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+              <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({ pathname: "/passenger/passengerProfile", params: { role: "passenger",NIC: params.NIC } });}}>
                 <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
                 <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
                   Profile

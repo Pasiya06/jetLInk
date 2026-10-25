@@ -7,6 +7,10 @@ import {
   getReceiptsByEmail,
   getReceiptsByBusNumber,
   generateTourQR,
+  getBookedBuses,
+  checkBusAvailable,
+  getExtraKm,
+  payExtraKm,
 } from "../controllers/tourController.js";
 
 const router = express.Router();
@@ -16,6 +20,16 @@ router.post("/", createReceipt);
 
 // GET all receipts
 router.get("/all", getAllReceipts);
+
+// Buses already booked on any day of a trip (must be above "/:receiptId")
+router.get("/booked-buses", getBookedBuses);
+
+// Is one bus still free for a trip? (checked before payment)
+router.get("/check-bus", checkBusAvailable);
+
+// Extra kilometers for a booked tour (passenger pays per km)
+router.get("/:receiptId/extra-km", getExtraKm);
+router.post("/:receiptId/extra-km", payExtraKm);
 
 // Get receipt by receiptId
 router.get("/:receiptId", getReceiptById);

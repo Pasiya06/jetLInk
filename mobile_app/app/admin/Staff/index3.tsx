@@ -16,11 +16,14 @@ import { Ionicons, FontAwesome, FontAwesome5, Feather, Feather as Icon } from '@
 import { LinearGradient } from 'expo-linear-gradient';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { addDriver } from "../../../services/driverService";
+import AlertBadge from "../../../components/AlertBadge";
 
 
 
 
 
+import FieldError from "../../../components/FieldError";
+import { useFieldErrors } from "../../../utils/validation";
 const AddBus = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -39,9 +42,21 @@ const AddBus = () => {
   const [activeTab, setActiveTab] = useState('');
   const params = useLocalSearchParams();
   const router = useRouter();
+  const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
   
 
   const handleAddBus = async () => {
+    if (!validateFields([
+      { key: "firstName", label: "First name", value: firstName },
+      { key: "lastName", label: "Last name", value: lastName },
+      { key: "phoneNumber", label: "Phone number", value: phoneNumber, type: "phone" },
+      { key: "address", label: "Address", value: address },
+      { key: "NIC", label: "NIC", value: NIC, type: "nic" },
+      { key: "drivingLicense", label: "Driving license", value: drivingLicense },
+      { key: "email", label: "Email", value: email, type: "email" },
+      { key: "password", label: "Password", value: password, type: "password" },
+    ])) return;
+
 
   if (!firstName || !lastName || !phoneNumber) {
     alert("Please fill required fields");
@@ -125,6 +140,7 @@ const AddBus = () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("firstName", firstName)} />
 
                 <Text style={styles.inputLabel}>Last Name</Text>  
                 <View style={styles.inputWrapper}>
@@ -139,6 +155,7 @@ const AddBus = () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("lastName", lastName)} />
 
                 <Text style={styles.inputLabel}>Phone Number</Text>  
                 <View style={styles.inputWrapper}>
@@ -154,6 +171,7 @@ const AddBus = () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("phoneNumber", phoneNumber)} />
 
                 <Text style={styles.inputLabel}>Address</Text>  
                 <View style={styles.inputWrapper}>
@@ -168,6 +186,7 @@ const AddBus = () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("address", address)} />
 
                 <Text style={styles.inputLabel}>NIC</Text>  
                 <View style={styles.inputWrapper}>
@@ -182,6 +201,7 @@ const AddBus = () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("NIC", NIC)} />
 
                 <Text style={styles.inputLabel}>Driving License</Text>  
                 <View style={styles.inputWrapper}>
@@ -196,6 +216,7 @@ const AddBus = () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("drivingLicense", drivingLicense)} />
 
                 <Text style={styles.inputLabel}>Birth Day</Text>                
                 <View style={styles.inputWrapper}>
@@ -241,6 +262,7 @@ const AddBus = () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("email", email)} />
 
                 <Text style={styles.inputLabel}>Password</Text>
                 <View style={styles.inputWrapper}>
@@ -259,7 +281,8 @@ const AddBus = () => {
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
                     <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color="#000000" />
                   </TouchableOpacity>
-                </View> 
+                </View>
+                <FieldError message={fieldError("password", password)} /> 
       
         </ScrollView>
 
@@ -331,19 +354,27 @@ const AddBus = () => {
         <Ionicons name="home-outline" size={28} color="#fff" />             
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-        <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+      <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "admin" } }); }}>
+        <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="admin" /></View>
         <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
           Alerts
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-        <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-        <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-          Profile
-        </Text>
-      </TouchableOpacity>
+      <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({
+                      pathname: "/admin/Profile/adminProfile",
+                      params: {
+                        Aid: params.Aid,
+                        firstName: params.firstName,
+                        lastName: params.lastName,
+                        email: params.email,
+                      },
+                    });}}>
+                    <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                      Profile
+                    </Text>
+                  </TouchableOpacity>
     </View>
       
 

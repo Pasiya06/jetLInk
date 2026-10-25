@@ -20,7 +20,10 @@ import { Ionicons,
 import { updateConductor } from "../../../services/conductorService";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
-const driverScreen: React.FC = () => {
+import AlertBadge from "../../../components/AlertBadge";
+import FieldError from "../../../components/FieldError";
+import { useFieldErrors } from "../../../utils/validation";
+const DriverScreen: React.FC = () => {
     const params = useLocalSearchParams();
     const [firstName, setFirstName] = useState(String(params.cfirstName || ""));
     const [lastName, setLastName] = useState(String(params.clastName || ""));
@@ -35,12 +38,23 @@ const driverScreen: React.FC = () => {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const [activeTab, setActiveTab] = useState(''); 
     const router = useRouter();
+    const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     
     
   
     const handleConductorUpdate = async () => {
+      if (!validateFields([
+        { key: "firstName", label: "First name", value: firstName },
+        { key: "lastName", label: "Last name", value: lastName },
+        { key: "phoneNumber", label: "Phone number", value: phoneNumber, type: "phone" },
+        { key: "address", label: "Address", value: address },
+        { key: "NIC", label: "NIC", value: NIC, type: "nic" },
+        { key: "email", label: "Email", value: email, type: "email" },
+        { key: "password", label: "Password", value: password },
+      ])) return;
+
 
     try{
 
@@ -115,6 +129,7 @@ const driverScreen: React.FC = () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("firstName", firstName)} />
 
                 <Text style={styles.inputLabel}>Last Name</Text>  
                 <View style={styles.inputWrapper}>
@@ -129,6 +144,7 @@ const driverScreen: React.FC = () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("lastName", lastName)} />
 
                 <Text style={styles.inputLabel}>Phone Number</Text>  
                 <View style={styles.inputWrapper}>
@@ -144,6 +160,7 @@ const driverScreen: React.FC = () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("phoneNumber", phoneNumber)} />
 
                 <Text style={styles.inputLabel}>Address</Text>  
                 <View style={styles.inputWrapper}>
@@ -158,6 +175,7 @@ const driverScreen: React.FC = () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("address", address)} />
 
                 <Text style={styles.inputLabel}>NIC</Text>  
                 <View style={styles.inputWrapper}>
@@ -172,6 +190,7 @@ const driverScreen: React.FC = () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("NIC", NIC)} />
 
                 <Text style={styles.inputLabel}>Birth Day</Text>                
                 <View style={styles.inputWrapper}>
@@ -217,6 +236,7 @@ const driverScreen: React.FC = () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("email", email)} />
 
                 <Text style={styles.inputLabel}>Password</Text>
                 <View style={styles.inputWrapper}>
@@ -235,7 +255,8 @@ const driverScreen: React.FC = () => {
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
                     <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color="#000000" />
                   </TouchableOpacity>
-                </View> 
+                </View>
+                <FieldError message={fieldError("password", password)} /> 
                
       
         </ScrollView>
@@ -308,19 +329,27 @@ const driverScreen: React.FC = () => {
         <Ionicons name="home-outline" size={28} color="#fff" />             
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-        <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+      <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "admin" } }); }}>
+        <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="admin" /></View>
         <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
           Alerts
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-        <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-        <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-          Profile
-        </Text>
-      </TouchableOpacity>
+      <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({
+                      pathname: "/admin/Profile/adminProfile",
+                      params: {
+                        Aid: params.Aid,
+                        firstName: params.firstName,
+                        lastName: params.lastName,
+                        email: params.email,
+                      },
+                    });}}>
+                    <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                      Profile
+                    </Text>
+                  </TouchableOpacity>
     </View>
       
       <View style={styles.footerGraphic}>
@@ -581,4 +610,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default driverScreen;
+export default DriverScreen;

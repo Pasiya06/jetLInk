@@ -22,19 +22,17 @@ import {
   FontAwesome,
 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import AlertBadge from "../../../components/AlertBadge";
+import TourPackageCard, { TourPackage } from "../../../components/TourPackageCard";
+import PickupTownPicker from "../../../components/PickupTownPicker";
+
+import FieldError from "../../../components/FieldError";
+import { useFieldErrors } from "../../../utils/validation";
+const BUS_TYPES = ["Standard bus", "Semi-luxury", "Luxury", "A/C bus"];
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-type PackageItem = {
-  _id: string;
-  description: string;
-  packageType: string;
-  totalDistance: string;
-  tripDuration: string;
-  maxPassengers: number;
-  maxPrice: number;
-  createdAt?: string;
-};
+type PackageItem = TourPackage;
 
 type PackageTier = "Silver" | "Gold" | "Diamond";
 
@@ -73,6 +71,7 @@ const getDurationLabel = (duration: string) => duration || "Duration not set";
 
 export default function PackagesScreen() {
   const router = useRouter();
+  const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
   const params = useLocalSearchParams();
 
   const [packages, setPackages] = useState<PackageItem[]>([]);
@@ -93,6 +92,13 @@ export default function PackagesScreen() {
   const [tripDuration, setTripDuration] = useState("");
   const [maxPassengers, setMaxPassengers] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+  const [extraKmPrice, setExtraKmPrice] = useState("");
+  const [title, setTitle] = useState("");
+  const [destination, setDestination] = useState("");
+  // const [pickupMinKm, setPickupMinKm] = useState("");
+  // const [pickupMaxKm, setPickupMaxKm] = useState("");
+  const [busType, setBusType] = useState("Standard bus");
+  const [destPickerOpen, setDestPickerOpen] = useState(false);
 
   const resetForm = () => {
     setPackageType("Silver");
@@ -101,6 +107,11 @@ export default function PackagesScreen() {
     setTripDuration("");
     setMaxPassengers("");
     setMaxPrice("");
+    setExtraKmPrice("");
+    setTitle("");
+    setDestination("");
+    
+    setBusType("Standard bus");
   };
 
   const getPackages = useCallback(async () => {
@@ -135,10 +146,29 @@ export default function PackagesScreen() {
     setTripDuration(item.tripDuration || "");
     setMaxPassengers(String(item.maxPassengers ?? ""));
     setMaxPrice(String(item.maxPrice ?? ""));
+    setExtraKmPrice(String(item.extraKmPrice ?? 0));
+    setTitle(item.title || "");
+    setDestination(item.destination || "");
+    
+    setBusType(item.busType || "Standard bus");
     setEditModalVisible(true);
   };
 
+  
+
   const createPackage = async () => {
+    if (!validateFields([
+      { key: "destination", label: "Destination", value: destination },
+      { key: "title", label: "Package title", value: title },
+      { key: "description", label: "Description", value: description },
+      { key: "maxPrice", label: "Price", value: maxPrice, type: "number", min: 1 },
+      { key: "extraKmPrice", label: "Extra km price", value: extraKmPrice, type: "number" },
+      { key: "tripDuration", label: "Duration", value: tripDuration },
+      { key: "totalDistance", label: "Distance", value: totalDistance },
+      { key: "maxPassengers", label: "Maximum passengers", value: maxPassengers, type: "int" },
+    ])) return;
+
+    
     if (!description.trim()) {
       Alert.alert("Required", "Please enter a package description.");
       return;
@@ -160,6 +190,11 @@ export default function PackagesScreen() {
           tripDuration: tripDuration.trim(),
           maxPassengers: Number(maxPassengers) || 0,
           maxPrice: Number(maxPrice) || 0,
+          extraKmPrice: Number(extraKmPrice) || 0,
+          title: title.trim(),
+          destination: destination.trim(),
+          
+          busType: busType.trim(),
         }),
       });
       const data = await response.json();
@@ -180,7 +215,20 @@ export default function PackagesScreen() {
   };
 
   const updatePackage = async () => {
+    if (!validateFields([
+      { key: "destination", label: "Destination", value: destination },
+      { key: "title", label: "Package title", value: title },
+      
+      { key: "description", label: "Description", value: description },
+      { key: "maxPrice", label: "Price", value: maxPrice, type: "number", min: 1 },
+      { key: "extraKmPrice", label: "Extra km price", value: extraKmPrice, type: "number" },
+      { key: "tripDuration", label: "Duration", value: tripDuration },
+      { key: "totalDistance", label: "Distance", value: totalDistance },
+      { key: "maxPassengers", label: "Maximum passengers", value: maxPassengers, type: "int" },
+    ])) return;
+
     if (!selectedPackage) return;
+    
 
     try {
       setUpdating(true);
@@ -194,6 +242,11 @@ export default function PackagesScreen() {
           tripDuration: tripDuration.trim(),
           maxPassengers: Number(maxPassengers) || 0,
           maxPrice: Number(maxPrice) || 0,
+          extraKmPrice: Number(extraKmPrice) || 0,
+          title: title.trim(),
+          destination: destination.trim(),
+          
+          busType: busType.trim(),
         }),
       });
       const data = await response.json();
@@ -206,7 +259,7 @@ export default function PackagesScreen() {
           item._id === selectedPackage._id ? data.data : item
         )
       );
-      setEditModalVisible(true);
+      setEditModalVisible(false);
       setSelectedPackage(null);
       Alert.alert("Success", "Package updated successfully.");
     } catch (error: any) {
@@ -273,105 +326,20 @@ export default function PackagesScreen() {
     return (
       item.packageType?.toLowerCase().includes(query) ||
       item.description?.toLowerCase().includes(query) ||
-      item.totalDistance?.toLowerCase().includes(query)
+      item.totalDistance?.toLowerCase().includes(query) ||
+      item.title?.toLowerCase().includes(query) ||
+      item.destination?.toLowerCase().includes(query)
     );
   });
 
-  const renderPackage = ({ item }: { item: PackageItem }) => {
-    const tier = getTier(item.packageType || "");
-    const colors = tierColors[tier];
-    const expanded = expandedId === item._id;
-
-    return (
-      <View style={styles.packageCard}>
-        <View style={styles.cardTopRow}>
-          <View style={[styles.tierBadge, { backgroundColor: colors.pale }]}>
-            <Text style={[styles.tierBadgeText, { color: colors.main }]}>
-              {tier.toUpperCase()}
-            </Text>
-          </View>
-          <View style={[styles.tierIconCircle, { backgroundColor: colors.pale }]}>
-            <MaterialCommunityIcons
-              name={colors.icon}
-              size={23}
-              color={colors.main}
-            />
-          </View>
-        </View>
-
-        <TouchableOpacity
-          activeOpacity={0.85}
-          onPress={() => goToPackageDetails(item)}
-        >
-          <Text style={styles.packageTitle}>{item.packageType || "Tour"} PACKAGE</Text>
-          <Text style={styles.packageDescription} numberOfLines={2}>
-            {item.description || "Explore memorable destinations with JetLink."}
-          </Text>
-        </TouchableOpacity>
-
-        <View style={styles.priceRow}>
-          <Text style={styles.currency}>LKR</Text>
-          <Text style={styles.price}>{Number(item.maxPrice || 0).toLocaleString()}</Text>
-        </View>
-
-        <View style={styles.viewDetailsRow}>
-          <Text style={styles.startingPrice}>Per vehicle · Starting price</Text>
-          <TouchableOpacity
-            style={styles.detailsButton}
-            onPress={() => setExpandedId(expanded ? null : item._id)}
-          >
-            <Text style={styles.detailsButtonText}>
-              {expanded ? "Hide details" : "View details"}
-            </Text>
-            <Ionicons
-              name={expanded ? "chevron-up" : "chevron-down"}
-              size={16}
-              color="#12966F"
-            />
-          </TouchableOpacity>
-        </View>
-
-        {expanded && (
-          <View style={styles.expandedDetails}>
-            <Text style={styles.expandedDescription}>
-              {item.description || "No additional description available."}
-            </Text>
-            <TouchableOpacity onPress={() => goToPackageDetails(item)}>
-              <Text style={styles.expandedLink}>Open package details</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-
-        <View style={styles.cardDivider} />
-        <View style={styles.cardFooter}>
-          <View style={styles.detailItem}>
-            <Feather name="navigation" size={17} color="#12966F" />
-            <Text style={styles.detailText}>{item.totalDistance || "Distance not set"}</Text>
-          </View>
-          <View style={styles.detailItem}>
-            <Feather name="clock" size={17} color="#12966F" />
-            <Text style={styles.detailText}>{getDurationLabel(item.tripDuration)}</Text>
-          </View>
-          <View style={styles.actions}>
-            <TouchableOpacity
-              style={styles.iconButton}
-              accessibilityLabel="Edit package"
-              onPress={() => openEditPackage(item) }
-            >
-              <Octicons name="pencil" size={20} color="#F59E0B" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.iconButton}
-              accessibilityLabel="Delete package"
-              onPress={() => deletePackage(item._id)}
-            >
-              <MaterialIcons name="delete-outline" size={23} color="#EF4444" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-    );
-  };
+  const renderPackage = ({ item }: { item: PackageItem }) => (
+    <TourPackageCard
+      pkg={item}
+      onPress={() => goToPackageDetails(item)}
+      onEdit={() => openEditPackage(item)}
+      onDelete={() => deletePackage(item._id)}
+    />
+  );
 
   const renderForm = (isEdit: boolean) => (
       <Modal
@@ -445,9 +413,67 @@ export default function PackagesScreen() {
                 })}
               </View>
   
-              <Text style={styles.fieldLabel}>Package name</Text>
-              <View style={styles.readOnlyName}>
-                <Text style={styles.readOnlyNameText}>{packageType} Package</Text>
+              <Text style={styles.fieldLabel}>Destination</Text>
+              <TouchableOpacity style={styles.selectInput} onPress={() => setDestPickerOpen(true)}>
+                <Ionicons name="location-outline" size={18} color="#12966F" />
+                <Text style={[styles.selectText, !destination && { color: "#94A3B8" }]}>
+                  {destination || "Choose destination town"}
+                </Text>
+                <Ionicons name="chevron-down" size={18} color="#64748B" />
+              </TouchableOpacity>
+              <FieldError message={fieldError("destination", destination)} />
+
+              <Text style={styles.fieldLabel}>Package title</Text>
+              <TextInput
+                style={styles.input}
+                placeholder={destination ? `e.g. ${destination} ${packageType} Tour` : "e.g. Jaffna Silver Tour"}
+                placeholderTextColor="#94A3B8"
+                value={title}
+                onChangeText={setTitle}
+              />
+              <FieldError message={fieldError("title", title)} />
+
+              {/* <Text style={styles.fieldLabel}>Pickup towns distance from destination (km)</Text>
+              <View style={styles.twoColumnRow}>
+                <View style={styles.halfField}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="From e.g. 200"
+                    placeholderTextColor="#94A3B8"
+                    value={pickupMinKm}
+                    onChangeText={setPickupMinKm}
+                    keyboardType="numeric"
+                  />
+                  <FieldError message={fieldError("pickupMinKm", pickupMinKm)} />
+                </View>
+                <View style={styles.halfField}>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="To e.g. 300"
+                    placeholderTextColor="#94A3B8"
+                    value={pickupMaxKm}
+                    onChangeText={setPickupMaxKm}
+                    keyboardType="numeric"
+                  />
+                  <FieldError message={fieldError("pickupMaxKm", pickupMaxKm)} />
+                </View>
+              </View>
+              <Text style={styles.hint}>Enter 0 and 0 to allow pickup from any town.</Text> */}
+
+              <Text style={styles.fieldLabel}>Bus type</Text>
+              <View style={styles.chipRow}>
+                {BUS_TYPES.map((t) => {
+                  const on = busType === t;
+                  return (
+                    <TouchableOpacity
+                      key={t}
+                      onPress={() => setBusType(t)}
+                      style={[styles.chip, on && styles.chipOn]}
+                    >
+                      <Text style={[styles.chipText, on && styles.chipTextOn]}>{t}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
   
               <Text style={styles.fieldLabel}>Description</Text>
@@ -460,6 +486,7 @@ export default function PackagesScreen() {
                 multiline
                 textAlignVertical="top"
               />
+              <FieldError message={fieldError("description", description)} />
   
               <Text style={styles.fieldLabel}>Price per vehicle (LKR)</Text>
               <TextInput
@@ -470,27 +497,42 @@ export default function PackagesScreen() {
                 onChangeText={setMaxPrice}
                 keyboardType="numeric"
               />
+              <FieldError message={fieldError("maxPrice", maxPrice)} />
+
+              <Text style={styles.fieldLabel}>Extra km price (LKR per km)</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="e.g. 150"
+                placeholderTextColor="#94A3B8"
+                value={extraKmPrice}
+                onChangeText={setExtraKmPrice}
+                keyboardType="numeric"
+              />
+              <FieldError message={fieldError("extraKmPrice", extraKmPrice)} />
+              <Text style={styles.hint}>Passengers pay this for each extra km they add. Enter 0 to turn extra km off.</Text>
   
               <View style={styles.twoColumnRow}>
                 <View style={styles.halfField}>
                   <Text style={styles.fieldLabel}>Duration</Text>
                   <TextInput
                     style={styles.input}
-                    placeholder="e.g. 1 day"
+                    placeholder="e.g. 2D / 1N"
                     placeholderTextColor="#94A3B8"
                     value={tripDuration}
                     onChangeText={setTripDuration}
                   />
+                  <FieldError message={fieldError("tripDuration", tripDuration)} />
                 </View>
                 <View style={styles.halfField}>
                   <Text style={styles.fieldLabel}>Distance (km)</Text>
                   <TextInput
                     style={styles.input}
-                    placeholder="e.g. 120 km"
+                    placeholder="e.g. 700km"
                     placeholderTextColor="#94A3B8"
                     value={totalDistance}
                     onChangeText={setTotalDistance}
                   />
+                  <FieldError message={fieldError("totalDistance", totalDistance)} />
                 </View>
               </View>
   
@@ -503,11 +545,23 @@ export default function PackagesScreen() {
                 onChangeText={setMaxPassengers}
                 keyboardType="numeric"
               />
+              <FieldError message={fieldError("maxPassengers", maxPassengers)} />
               <Text style={styles.formNote}>
-                Package name is generated from the selected tier. The current API stores
-                description, type, price, distance, duration and passenger capacity.
+                If the title is empty, it is shown as "Destination + Tier + Tour".
+                The places line on the card comes from the places added on the package details page.
               </Text>
             </ScrollView>
+
+            <PickupTownPicker
+              visible={destPickerOpen}
+              title="Choose destination"
+              selected={destination}
+              onSelect={(town) => {
+                setDestination(town ?? "");
+                setDestPickerOpen(false);
+              }}
+              onClose={() => setDestPickerOpen(false)}
+            />
   
             <View style={styles.modalFooter}>
               <TouchableOpacity
@@ -664,19 +718,27 @@ export default function PackagesScreen() {
             <Ionicons name="home-outline" size={28} color="#fff" />             
           </TouchableOpacity>
     
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "admin" } }); }}>
+            <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="admin" /></View>
             <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
               Alerts
             </Text>
           </TouchableOpacity>
     
-          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-            <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-            <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-              Profile
-            </Text>
-          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({
+                      pathname: "/admin/Profile/adminProfile",
+                      params: {
+                        Aid: params.Aid,
+                        firstName: params.firstName,
+                        lastName: params.lastName,
+                        email: params.email,
+                      },
+                    });}}>
+                    <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                      Profile
+                    </Text>
+                  </TouchableOpacity>
         </View>
 
         {/* Bottom Graphic Design Element */}
@@ -1071,6 +1133,31 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "700",
   },
+  selectInput: {
+    minHeight: 48,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    borderRadius: 13,
+    borderWidth: 1,
+    borderColor: "#E2EAF3",
+    paddingHorizontal: 14,
+    backgroundColor: "#FFFFFF",
+  },
+  selectText: { flex: 1, fontSize: 14, color: "#334155" },
+  hint: { fontSize: 11, color: "#94A3B8", marginTop: 2 },
+  chipRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: "#E2EAF3",
+    backgroundColor: "#fff",
+  },
+  chipOn: { backgroundColor: "#E8F7F2", borderColor: "#12966F" },
+  chipText: { fontSize: 12.5, color: "#475569", fontWeight: "600" },
+  chipTextOn: { color: "#12966F" },
   readOnlyName: {
     height: 48,
     justifyContent: "center",

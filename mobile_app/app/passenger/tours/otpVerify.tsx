@@ -6,6 +6,12 @@ import { Feather as Icon, AntDesign, Fontisto, Ionicons } from '@expo/vector-ico
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const OTP_LENGTH = 6;
+
+// "700km", "700 km", "1,200 KM" -> 700 / 1200 (0 if no number)
+const parseDistanceKm = (value: unknown): number => {
+  const match = String(value ?? "").replace(/,/g, "").match(/\d+(\.\d+)?/);
+  return match ? Number(match[0]) : 0;
+};
 const RESEND_SECONDS = 30;
 
 export const FlatmateLogin: React.FC = () => {
@@ -161,7 +167,8 @@ export const FlatmateLogin: React.FC = () => {
                 packageId: params.packageId,        
                 description: params.description,        
                 packageType: params.packageType,        
-                totalDistance: Number(params.totalDistance) || 0,    
+                // Package distance is text like "700km" -> save the number 700
+                totalDistance: parseDistanceKm(params.totalDistance),
                 tripDuration: params.tripDuration,    
                 maxPassengers: Number(params.maxPassengers) || 0,     
                 maxPrice: Number(params.maxPrice) || 0,      
@@ -508,7 +515,7 @@ export const FlatmateLogin: React.FC = () => {
             </TouchableOpacity>
 
             <View style={styles.resendRow}>
-                <Text style={styles.resendText}>Didn't get the code? </Text>
+                <Text style={styles.resendText}>Didn&apos;t get the code? </Text>
                 <TouchableOpacity onPress={handleResend} disabled={timer > 0 || resending}>
                 <Text style={[styles.resendLink, timer > 0 && styles.resendLinkDisabled]}>
                     {resending ? "Sending..." : timer > 0 ? `Resend in ${timer}s` : "Resend"}

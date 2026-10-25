@@ -14,7 +14,7 @@ import {
   UIManager,
   TextInput,
 } from "react-native";
-import { router, Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { router, Stack, useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons, FontAwesome, Feather } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -69,6 +69,8 @@ interface Receipt {
   plastName: string;
   pphoneNumber: string;
   pemail: string;
+  extraKm?: number;
+  extraKmAmount?: number;
 }
 
 /* ---------- Screen ---------- */
@@ -131,9 +133,12 @@ export default function ReceiptList() {
     [pemail]
   );
 
-  useEffect(() => {
-    fetchReceipts();
-  }, [fetchReceipts]);
+  // Reload every time the list is shown (e.g. after paying for extra km)
+  useFocusEffect(
+    useCallback(() => {
+      fetchReceipts();
+    }, [fetchReceipts])
+  );
 
   const packagede = () => {
     router.push({
@@ -181,7 +186,7 @@ export default function ReceiptList() {
           <View style={[styles.stateIcon, { backgroundColor: "#fde8ea" }]}>
             <Ionicons name="cloud-offline-outline" size={36} color={C.danger} />
           </View>
-          <Text style={styles.stateTitle}>Couldn't load receipts</Text>
+          <Text style={styles.stateTitle}>Couldn&apos;t load receipts</Text>
           <Text style={styles.infoText}>{error}</Text>
           <TouchableOpacity
             style={styles.primaryButton}
@@ -313,7 +318,7 @@ export default function ReceiptList() {
 
           <TouchableOpacity
             style={styles.item}
-            onPress={() => {setActiveTab("routes"); router.push("/admin/index1");}}
+            onPress={() => {setActiveTab("routes"); router.push({ pathname: "/notifications", params: { role: "passenger" } });}}
           >
             <Ionicons name="notifications-outline" size={24} color={ activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[styles.label1, activeTab === "alerts" && styles.activeLabel,]}>
@@ -326,7 +331,7 @@ export default function ReceiptList() {
 
           <TouchableOpacity
             style={styles.item}
-            onPress={() => {setActiveTab("profile"); router.push( "/admin/index1");}}
+            onPress={() => {router.push({ pathname: "/passenger/passengerProfile", params: { role: "passenger",NIC: params.NIC } });}}
           >
             <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
@@ -465,6 +470,40 @@ function ReceiptCard({ item }: { item: Receipt }) {
         </View>
       </View>
 
+      {/* Extra kilometers */}
+      <View style={styles.extraRow}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.fieldLabel}>Extra km</Text>
+          <Text style={styles.extraText}>
+            {item.extraKm
+              ? `${item.extraKm} km · Rs. ${Number(item.extraKmAmount || 0).toLocaleString()} paid`
+              : "None added"}
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={styles.extraButton}
+          activeOpacity={0.85}
+          onPress={() =>
+            router.push({
+              pathname: "/passenger/tours/extraKm",
+              params: {
+                receiptId: item.receiptId,
+                Pid: params.Pid,
+                Pid1: params.Pid1,
+                pfirstName: params.pfirstName,
+                plastName: params.plastName,
+                pphoneNumber: params.pphoneNumber,
+                pemail: params.pemail,
+                NIC: params.NIC,
+              },
+            })
+          }
+        >
+          <Ionicons name="add-circle-outline" size={16} color="#fff" />
+          <Text style={styles.extraButtonText}>Add extra km</Text>
+        </TouchableOpacity>
+      </View>
+
       {/* Expandable details */}
       {open && (
         <View style={styles.details}>
@@ -566,6 +605,28 @@ function Detail({
 const NOTCH = 22;
 
 const styles = StyleSheet.create({
+  extraRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginHorizontal: 18,
+    marginTop: 4,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: "#EEF2F6",
+  },
+  extraText: { fontSize: 13, color: "#0f1b2d", fontWeight: "600", marginTop: 2 },
+  extraButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: "#12966F",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+  },
+  extraButtonText: { color: "#fff", fontWeight: "700", fontSize: 12.5 },
+
   container: { flex: 1, backgroundColor: C.bg },
 
   /* Header */

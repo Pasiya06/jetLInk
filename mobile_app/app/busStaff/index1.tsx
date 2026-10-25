@@ -26,6 +26,13 @@ import {
 import * as Location from "expo-location";
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import AlertBadge from "../../components/AlertBadge";
+import {
+  startBusLocationSharing,
+  stopBusLocationSharing,
+  subscribeBusLocation,
+  isBusLocationSharing,
+} from "../../services/busLocationService";
 // ─── Environment Variables ─────────────────────────────────────────
 const API_URL     = process.env.EXPO_PUBLIC_API_URL;
 const WEATHER_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
@@ -69,8 +76,6 @@ export default function DriverHome() {
   } | null>(null);
 
   // ─── Refs ────────────────────────────────────────────────────────
-  const locationInterval = useRef<ReturnType<typeof setInterval> | null>(null);
-  const locationSub      = useRef<Location.LocationSubscription | null>(null);
 
   // ─── Params ─────────────────────────────────────────────────────
   // busNo is sent from login screen
@@ -104,197 +109,44 @@ export default function DriverHome() {
   };
 
   // ────────────────────────────────────────────────────────────────
-  // 2. Send Location to Backend  
-  //    Fixed endpoint: /api/locations/update
-  //    Fixed field:    busNama (not busNumber)
+  // 2. Live location sharing
+  //    Runs in services/busLocationService so it keeps going while staff
+  //    open other busStaff screens. It stops only on logout.
   // ────────────────────────────────────────────────────────────────
-  const sendLocation = async () => {
-    try {
-      // Check permission
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert(
-          "Permission Denied",
-          "Location permission is required to share bus location."
-        );
-        return;
-      }
+  useEffect(() => {
+    return subscribeBusLocation((s) => {
+      setSharingActive(s.active);
+      setCurrentSpeed(s.speedKmh ?? 0);
+      setUpdateCount(s.updates);
+      setLastSentTime(s.lastSent ?? "--");
+      setCurrentCoords(
+        s.latitude != null && s.longitude != null ? { lat: s.latitude, lng: s.longitude } : null
+      );
+      if (!s.active) setLocationName("Not sharing location");
+    });
+  }, []);
 
-      if (!API_URL) {
-        console.log("API_URL is not set in .env");
-        return;
-      }
-
-      // Get current GPS position
-      const currentLocation = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-      });
-
-      const { latitude, longitude, speed, heading } = currentLocation.coords;
-      const speedKmh = Math.max(0, (speed ?? 0) * 3.6); // m/s → km/h
-
-      // Update state
-      setCurrentCoords({ lat: latitude, lng: longitude });
-      setCurrentSpeed(speedKmh);
-
-      // ── Send to backend ────────────────────────────────────────
-      // FIXED: endpoint changed from /location/update 
-      //        to /api/locations/update
-      // FIXED: field changed from busNumber to busNama
-      const response = await fetch(`${API_URL}/locations/update`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          busNumber:   busNum,      // ← FIXED field name
-          latitude:  latitude,
-          longitude: longitude,
-          speed:     speedKmh,
-          driverNIC:params.driverId,
-          conductorNIC:params.conductorNIC,
-          driverD:driverD,
-          conductorD:conductorD,
-          heading:   heading ?? 0,
-        }),
-      });
-
-      if (!response.ok) {
-        const errText = await response.text();
-        console.log("Send location failed:", response.status, errText);
-        return;
-      }
-
-      const data = await response.json();
-
-      if (data.success) {
-        setUpdateCount((prev) => prev + 1);
-        setLastSentTime(new Date().toLocaleTimeString());
-        console.log("✅ Location sent:", latitude, longitude);
-
-        // Get place name every 5 updates to reduce API calls
-        setUpdateCount((prev) => {
-          if (prev % 5 === 0 || prev === 0) {
-            getPlaceName(latitude, longitude).then(setLocationName);
-          }
-          return prev + 1;
-        });
-      }
-    } catch (error) {
-      console.log("Send location error:", error);
-    }
-  };
-
-  // ────────────────────────────────────────────────────────────────
-  // 3. Stop sharing and mark bus offline
-  //    Fixed: field changed from busNumber to busNama
-  // ────────────────────────────────────────────────────────────────
-  const stopSharing = async () => {
-  try {
-    // Stop location updates
-    if (locationInterval.current) {
-      clearInterval(locationInterval.current);
-      locationInterval.current = null;
-    }
-
-    if (locationSub.current) {
-      locationSub.current.remove();
-      locationSub.current = null;
-    }
-
-    const sendOfflineRequest = async () => {
-      try {
-        const response = await fetch(`${API_URL}/locations/update1`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            busNumber: busNum,
-            latitude: 0,
-            longitude: 0,
-            speed: 0,
-            driverNIC: driverNIC1,
-            conductorNIC: conductorNIC1,
-            driverD: driverD1,
-            conductorD: conductorD1,
-            heading: 0,
-          }),
-        });
-
-        console.log("✅ Bus marked offline");
-      } catch (err) {
-        console.log("Request failed:", err);
-      }
-    };
-
-    // Send immediately
-    await sendOfflineRequest();
-
-    // Send every 2 seconds
-    const retryInterval = setInterval(sendOfflineRequest, 2000);
-
-    // Stop after 10 seconds
-    setTimeout(() => {
-      clearInterval(retryInterval);
-      console.log("Stopped retrying");
-    }, 30000);
-
-    setSharingActive(false);
-    setCurrentCoords(null);
-    setCurrentSpeed(0);
-    setLocationName("Not sharing location");
-    setUpdateCount(0);
-    setLastSentTime("--");
-
-  } catch (error) {
-    console.log("Stop sharing error:", error);
-  }
-};
-
-  // ────────────────────────────────────────────────────────────────
-  // 4. Start sharing location
-  // ────────────────────────────────────────────────────────────────
   const startSharing = async () => {
     setLoading(true);
-
-    // Send first location immediately
-    await sendLocation();
-
-    // Then send every 5 seconds
-    if (locationInterval.current) {
-      clearInterval(locationInterval.current);
-    }
-
-    locationInterval.current = setInterval(() => {
-      sendLocation();
-    }, 5000);
-
-    setSharingActive(true);
+    const result = await startBusLocationSharing({
+      busNumber: busNum,
+      driverNIC: params.driverId as string,
+      conductorNIC: params.conductorNIC as string,
+      driverD,
+      conductorD,
+    });
     setLoading(false);
 
-    // Alert.alert(
-    //   "Location Sharing Active",
-    //   "Your location is updating every 5 seconds. Do you want to continue?",
-    //   [
-    //     {
-    //       text: "No",
-    //       onPress: () => stopSharing(),
-    //       style: "cancel",
-    //     },
-    //     {
-    //       text: "Yes",
-    //       onPress: () => console.log("Continue sharing"),
-    //     },
-    //   ]
-    // );
-      
-
-          
-
-          
-    
-    
+    if (result === "denied") {
+      Alert.alert(
+        "Permission Denied",
+        "Location permission is required to share bus location."
+      );
+    }
   };
 
   // ────────────────────────────────────────────────────────────────
-  // 5. Auto-ask on screen load if busNum exists
+  // 3. Start on screen load (if already sharing, it just continues)
   // ────────────────────────────────────────────────────────────────
   useEffect(() => {
     const backAction = () => {
@@ -309,94 +161,41 @@ export default function DriverHome() {
 
     if (!busNum) {
       console.log("No busNum in params — sharing skipped.");
-      return () => subscription.remove();
+    } else {
+      startSharing();
     }
 
-    // Start sharing automatically
-    startSharing();
-
-    // Cleanup on unmount
-    return () => {
-      subscription.remove();
-
-      if (locationInterval.current) {
-        clearInterval(locationInterval.current);
-        locationInterval.current = null;
-      }
-    };
+    // Leaving this screen does NOT stop sharing
+    return () => subscription.remove();
   }, [busNum]);
 
   // ────────────────────────────────────────────────────────────────
-  // 6. Logout Function
+  // 4. Logout: stop sharing, clear location on the server, then log out
   // ────────────────────────────────────────────────────────────────
   const logout = () => {
-    if (sharingActive) {
-      Alert.alert(
-        "Stop Sharing?",
-        "Admin will no longer see your location.",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Stop",
-            style: "destructive",
-            onPress: stopSharing,
-            
-          },
-        ]
-      );
-    } 
-    else {
-      stopSharing();
-      Alert.alert(
+    Alert.alert(
       "Logout",
-      "Are you sure you want to logout?",
+      isBusLocationSharing()
+        ? "Location sharing will stop and the admin will no longer see this bus. Logout?"
+        : "Are you sure you want to logout?",
       [
-        {
-          text: "Cancel",
-          style: "cancel",
-        },
+        { text: "Cancel", style: "cancel" },
         {
           text: "Logout",
           style: "destructive",
           onPress: async () => {
-            if (sharingActive) {
-              await stopSharing();
-            }
+            setLoading(true);
+            await stopBusLocationSharing();
             await AsyncStorage.clear();
+            setLoading(false);
             router.replace("/passenger/selectScreen");
           },
         },
       ]
     );
-    }
-    
-  };
-
-  // ────────────────────────────────────────────────────────────────
-  // 7. Toggle sharing on/off manually
-  // ────────────────────────────────────────────────────────────────
-  const toggleSharing = () => {
-    if (sharingActive) {
-      Alert.alert(
-        "Stop Sharing?",
-        "Admin will no longer see your location.",
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Stop",
-            style: "destructive",
-            onPress: stopSharing,
-            
-          },
-        ]
-      );
-    } else {
-      startSharing();
-    }
   };
 
   const handleSearch = () => {
-      stopSharing();
       router.push({
 
         pathname: "/busStaff/manageParcel",
@@ -417,7 +216,6 @@ export default function DriverHome() {
     };
 
     const handleBusTicket = () => {
-      stopSharing();
       router.push({
 
         pathname: "/busStaff/VerifyTicketScreen",
@@ -438,7 +236,6 @@ export default function DriverHome() {
     };
 
     const handleTour = () => {
-      stopSharing();
       router.push({
 
         pathname: "/busStaff/ReceiptList",
@@ -459,7 +256,6 @@ export default function DriverHome() {
     };
 
     const handleEmergency = () => {
-      stopSharing();
       router.push({
 
         pathname: "/busStaff/emergencyState",
@@ -480,7 +276,6 @@ export default function DriverHome() {
     };
 
     const handleHelp = () => {
-      stopSharing();
       router.push({
 
         pathname: "/busStaff/help",
@@ -732,14 +527,29 @@ export default function DriverHome() {
                     <Ionicons name="home-outline" size={28} color="#fff" />             
                   </TouchableOpacity>
         
-                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "staff" } });}}>
-                    <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "staff" } }); }}>
+                    <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="staff" /></View>
                     <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
                       Alerts
                     </Text>
                   </TouchableOpacity>
         
-                  <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+                  <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({
+                      pathname: "/busStaff/busProfile",
+                      params: {
+                        Cid: params.Cid,
+                        conductorId: params.conductorId,
+                        conductorNIC: params.conductorNIC,
+                        cfirstName: params.cfirstName,
+                        clastName: params.clastName,
+                        cphoneNumber: params.cphoneNumber,
+                        driverId: params.driverId,
+                        dfirstName: params.dfirstName,
+                        dlastName: params.dlastName,
+                        dphoneNumber: params.dphoneNumber,
+                        busNo: params.busNo,
+                      },
+                    });}}>
                     <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
                     <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
                       Profile

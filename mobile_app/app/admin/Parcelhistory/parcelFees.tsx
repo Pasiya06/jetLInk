@@ -16,7 +16,10 @@ import {
   Feather 
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient'; 
+import AlertBadge from "../../../components/AlertBadge";
 
+import FieldError from "../../../components/FieldError";
+import { useFieldErrors } from "../../../utils/validation";
 const ParcelService = () => {
     const API_URL = process.env.EXPO_PUBLIC_API_URL;
     const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -24,6 +27,7 @@ const ParcelService = () => {
     const params = useLocalSearchParams();
     const [activeTab, setActiveTab] = useState('');
     const router = useRouter();
+    const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
 
     const [busFare, setBusFare] = useState("");
     const [weighFare, setWeighFare] = useState("");
@@ -63,6 +67,12 @@ const ParcelService = () => {
 
   // Update Parcel Fee
   const updateParcelFee = async () => {
+    if (!validateFields([
+      { key: "busFare", label: "Bus fare", value: busFare, type: "number" },
+      { key: "weighFare", label: "Weight fare", value: weighFare, type: "number" },
+      { key: "serviceTax", label: "Service tax", value: serviceTax, type: "number" },
+    ])) return;
+
 
     try {
 
@@ -225,6 +235,7 @@ const ParcelService = () => {
                 />
               </View>
             </View>
+            <FieldError message={fieldError("busFare", busFare)} />
 
             <Text style={styles.inputLabel}>Weight Fee for 1kg</Text>  
             <View style={styles.inputWrapper}>                
@@ -239,6 +250,7 @@ const ParcelService = () => {
                 />
               </View>
             </View>
+            <FieldError message={fieldError("weighFare", weighFare)} />
 
             <Text style={styles.inputLabel}>Service Tax</Text>  
             <View style={styles.inputWrapper}>                
@@ -253,6 +265,7 @@ const ParcelService = () => {
                 />
               </View>
             </View>
+            <FieldError message={fieldError("serviceTax", serviceTax)} />
 
           </View>
         </View>
@@ -326,19 +339,27 @@ const ParcelService = () => {
             <Ionicons name="home-outline" size={28} color="#fff" />             
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "admin" } }); }}>
+            <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="admin" /></View>
             <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
               Alerts
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-            <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-            <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-              Profile
-            </Text>
-          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({
+                      pathname: "/admin/Profile/adminProfile",
+                      params: {
+                        Aid: params.Aid,
+                        firstName: params.firstName,
+                        lastName: params.lastName,
+                        email: params.email,
+                      },
+                    });}}>
+                    <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                      Profile
+                    </Text>
+                  </TouchableOpacity>
         </View>  
 
       

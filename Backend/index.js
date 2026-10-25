@@ -21,6 +21,7 @@ import paymentRoutes from "./routes/paymentRoutes.js";
 import otpRoutes from "./routes/otpRoutes.js";
 import packageRoutes from "./routes/packageRoutes.js";
 import tourRoutes from "./routes/tourRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 
 
@@ -82,6 +83,7 @@ app.use("/api/payment", paymentRoutes);
 app.use("/api/otp", otpRoutes);
 app.use("/api/packages", packageRoutes);
 app.use("/api/receipts", tourRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 // Invalid Route Handler
 app.use((req, res) => {

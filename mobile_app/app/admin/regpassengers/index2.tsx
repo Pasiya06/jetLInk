@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons, Feather, FontAwesome } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import AlertBadge from "../../../components/AlertBadge";
 
 const ToursScreen: React.FC = () => {
   const router = useRouter();
@@ -124,15 +125,25 @@ const ToursScreen: React.FC = () => {
             <Ionicons name="home-outline" size={28} color="#fff" />             
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push("/admin/index1"); }}>
-            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"} />
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "admin" } }); }}>
+            <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"} /><AlertBadge role="admin" /></View>
             <Text style={[styles.label1, activeTab === "alerts" && styles.activeLabel]}>Alerts</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("profile"); router.push("/admin/index1"); }}>
-            <Feather name="user" size={22} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"} />
-            <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel]}>Profile</Text>
-          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({
+                      pathname: "/admin/Profile/adminProfile",
+                      params: {
+                        Aid: params.Aid,
+                        firstName: params.firstName,
+                        lastName: params.lastName,
+                        email: params.email,
+                      },
+                    });}}>
+                    <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                      Profile
+                    </Text>
+                  </TouchableOpacity>
         </View>
 
         <View style={styles.footerGraphic}>

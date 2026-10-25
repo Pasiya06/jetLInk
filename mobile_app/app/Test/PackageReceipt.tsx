@@ -161,7 +161,7 @@ export default function PackageReceipt() {
           </View>
 
           <Text style={styles.emptyTitle}>
-            We can't find this receipt
+            We can&apos;t find this receipt
           </Text>
 
           <Text style={styles.emptyText}>

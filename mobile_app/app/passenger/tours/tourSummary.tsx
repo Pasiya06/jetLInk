@@ -25,6 +25,8 @@ import {
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 
+import FieldError from "../../../components/FieldError";
+import { useFieldErrors } from "../../../utils/validation";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 type Place = {
@@ -50,6 +52,7 @@ type PackageData = {
 
 export default function PackageDetails() {
   const router = useRouter();
+  const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
   const params = useLocalSearchParams();
   const [pickup, setPickup] = useState(String(params.pickup || ""));
   const [time, setTime] = useState(new Date());
@@ -80,6 +83,11 @@ export default function PackageDetails() {
   };
 
   const tourinterface = () => {
+    if (!validateFields([
+      { key: "pickup", label: "Pickup location", value: pickup },
+      { key: "selectedTime", label: "Pickup time", value: selectedTime },
+    ])) return;
+
     router.push({
       pathname: "/passenger/tours/paymentGateway",
       params: {
@@ -213,6 +221,7 @@ export default function PackageDetails() {
               />
             </View>
           </View>
+          <FieldError message={fieldError("pickup", pickup)} />
 
           <Text style={styles.inputLabel}>Time</Text>
           <View style={styles.inputWrapper}>
@@ -226,7 +235,8 @@ export default function PackageDetails() {
             <TouchableOpacity onPress={() => setShowTimePicker(true)}>
               <Ionicons name="time-outline" size={24} color="black" />
             </TouchableOpacity>
-          </View> 
+          </View>
+          <FieldError message={fieldError("selectedTime", selectedTime)} /> 
 
           {showTimePicker && (
             <DateTimePicker
@@ -279,7 +289,7 @@ export default function PackageDetails() {
     
                 else {
                   router.push({
-                    pathname: "/passenger/tours/selectPackeges",
+                    pathname: "/passenger/tours/PackagesScreen1",
                     params: {
                       Pid: params.Pid,
                       Pid1: params.Pid1,
@@ -317,14 +327,14 @@ export default function PackageDetails() {
             <Ionicons name="home-outline" size={28} color="#fff" />             
           </TouchableOpacity>
     
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push({ pathname: "/notifications", params: { role: "passenger" } });}}>
             <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
               Alerts
             </Text>
           </TouchableOpacity>
     
-          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({ pathname: "/passenger/passengerProfile", params: { role: "passenger",NIC: params.NIC } });}}>
             <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
               Profile

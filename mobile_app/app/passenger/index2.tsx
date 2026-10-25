@@ -15,12 +15,17 @@ import {
 
 import { Feather as Icon, EvilIcons, Fontisto, MaterialCommunityIcons, Entypo, AntDesign, Feather, Ionicons  } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { saveSession } from '../../services/notificationService';
 
+import FieldError from "../../components/FieldError";
+import { useFieldErrors } from "../../utils/validation";
 // Retrieve the base API URL from Expo environment variables
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const FlatmateLogin: React.FC = () => {
   const router = useRouter();
+  const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
   const params = useLocalSearchParams();
   const [isLoginTab, setIsLoginTab] = useState<boolean>(true);
   const [firstName, setFirstName] = useState<string>('');
@@ -51,6 +56,16 @@ export const FlatmateLogin: React.FC = () => {
   
 //register passenger
   const registerPassenger = async () => {
+    if (!validateFields([
+      { key: "firstName", label: "First name", value: firstName },
+      { key: "lastName", label: "Last name", value: lastName },
+      { key: "phoneNumber", label: "Phone number", value: phoneNumber, type: "phone" },
+      { key: "address", label: "Address", value: address },
+      { key: "NIC", label: "NIC", value: NIC, type: "nic" },
+      { key: "email", label: "Email", value: email, type: "email" },
+      { key: "password", label: "Password", value: password, type: "password" },
+    ])) return;
+
 
     if (!firstName || !lastName  || !phoneNumber || !address || !NIC || !email || !password ) {
     alert("Please fill required fields");
@@ -127,6 +142,11 @@ export const FlatmateLogin: React.FC = () => {
   };
 //login passenger
 const loginPassenger = async () => {
+  if (!validateFields([
+    { key: "email1", label: "Email", value: email1, type: "email" },
+    { key: "password1", label: "Password", value: password1 },
+  ])) return;
+
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   
@@ -152,6 +172,10 @@ const loginPassenger = async () => {
 
     if (data1.success) {
       const user = data1.passenger;
+
+      // Remember who is signed in so the Profile screen works from any page
+      await AsyncStorage.setItem("@jetlink_passenger_nic", String(user.NIC ?? "")).catch(() => {});
+      await saveSession({ role: "passenger" });
       
       router.push({
         pathname: "/passenger/index1",
@@ -188,6 +212,8 @@ const loginPassenger = async () => {
 
     if (data2.success) {
       const admin = data2.admin;
+      // Admin alerts: this phone will now receive admin notifications
+      await saveSession({ role: "admin" });
       setAdmiEmail(admin.email)
       router.push({
         pathname: "/admin/index1",
@@ -276,6 +302,7 @@ const loginPassenger = async () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("firstName", firstName)} />
 
                 <Text style={styles.inputLabel}>Last Name</Text>  
                 <View style={styles.inputWrapper}>
@@ -292,6 +319,7 @@ const loginPassenger = async () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("lastName", lastName)} />
 
                 <Text style={styles.inputLabel}>Phone Number</Text>  
                 <View style={styles.inputWrapper}>
@@ -310,6 +338,7 @@ const loginPassenger = async () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("phoneNumber", phoneNumber)} />
 
                 <Text style={styles.inputLabel}>Address</Text>  
                 <View style={styles.inputWrapper}>
@@ -327,6 +356,7 @@ const loginPassenger = async () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("address", address)} />
 
                 <Text style={styles.inputLabel}>NIC</Text>  
                 <View style={styles.inputWrapper}>
@@ -345,6 +375,7 @@ const loginPassenger = async () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("NIC", NIC)} />
 
                 <Text style={styles.inputLabel}>Email Address</Text>
                 <View style={styles.inputWrapper}>
@@ -364,6 +395,7 @@ const loginPassenger = async () => {
                     />
                   </View>
                 </View>
+                <FieldError message={fieldError("email", email)} />
 
                 <Text style={styles.inputLabel}>Password</Text>
                 <View style={styles.inputWrapper}>
@@ -385,6 +417,7 @@ const loginPassenger = async () => {
                     <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color="#A3A3A3" />
                   </TouchableOpacity>
                 </View>
+                <FieldError message={fieldError("password", password)} />
 
                 
 
@@ -442,6 +475,7 @@ const loginPassenger = async () => {
                   />
                 </View>
               </View>
+              <FieldError message={fieldError("email1", email1)} />
 
               <Text style={styles.inputLabel}>Password</Text>
               <View style={styles.inputWrapper}>
@@ -463,6 +497,7 @@ const loginPassenger = async () => {
                   <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color="#A3A3A3" />
                 </TouchableOpacity>
               </View>
+              <FieldError message={fieldError("password1", password1)} />
 
               <View style={styles.rowJustify}>
                 <TouchableOpacity onPress={handleSearch1}>

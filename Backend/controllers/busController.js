@@ -1,4 +1,5 @@
 import Bus from "../models/Bus.js";
+import { notify } from "./notificationController.js";
 
 // @desc    Get all buses
 export const getBuses = async (req, res) => {
@@ -253,12 +254,14 @@ export const reportEmergency = async (req, res) => {
       });
     }
 
+    const reportedAt = new Date();
     const bus = await Bus.findOneAndUpdate(
       { busNumber: busNumber.trim().toUpperCase() },
       {
         $set: {
           emergency: true,
           status,
+          emergencyAt: reportedAt,
         },
       },
       {
@@ -273,6 +276,27 @@ export const reportEmergency = async (req, res) => {
         message: "Bus not found",
       });
     }
+
+    await notify({
+      title: `🚨 Emergency: Bus ${bus.busNumber}`,
+      body: `Bus ${bus.busNumber} reported a ${status} at ${reportedAt.toLocaleString("en-GB", {
+        timeZone: "Asia/Colombo",
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
+      })}. Check the emergency page for its location.`,
+      type: "emergency",
+      audience: ["admin", "staff"],
+      data: {
+        busNumber: bus.busNumber,
+        status,
+        emergencyAt: reportedAt.toISOString(),
+        url: "/admin/emergency/EmergencyBuses",
+      },
+    });
 
     return res.status(200).json({
       success: true,
@@ -301,6 +325,7 @@ export const resolveEmergency = async (req, res) => {
         $set: {
           emergency: false,
           status: "normal",
+          emergencyAt: null,
         },
       },
       {
@@ -315,6 +340,14 @@ export const resolveEmergency = async (req, res) => {
         message: "Bus not found",
       });
     }
+
+    await notify({
+      title: `✅ Emergency resolved: Bus ${bus.busNumber}`,
+      body: `Bus ${bus.busNumber} is back to normal.`,
+      type: "emergency",
+      audience: ["admin", "staff"],
+      data: { busNumber: bus.busNumber, status: "normal" },
+    });
 
     return res.status(200).json({
       success: true,
@@ -339,7 +372,7 @@ export const getBusEmergency = async (req, res) => {
 
     const bus = await Bus.findOne({
       busNumber: busNumber.trim().toUpperCase(),
-    }).select("busNumber emergency status");
+    }).select("busNumber emergency status emergencyAt");
 
     if (!bus) {
       return res.status(404).json({
@@ -366,7 +399,9 @@ export const getBusEmergency = async (req, res) => {
 // Get all buses where emergency is true
 export const getAllEmergencyBuses = async (req, res) => {
   try {
+    // Newest emergency first
     const buses = await Bus.find({ emergency: true }).sort({
+      emergencyAt: -1,
       busId: 1,
     });
 
@@ -407,6 +442,30 @@ export const getOtherEmergencyBuses = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Failed to fetch emergency buses",
+    });
+  }
+};
+
+// GET /api/buses/profile/:busNumber  → full bus details for the bus staff profile
+export const getBusProfile = async (req, res) => {
+  try {
+    const bus = await Bus.findOne({ busNumber: req.params.busNumber });
+
+    if (!bus) {
+      return res.status(404).json({
+        success: false,
+        message: "Bus not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: bus,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
     });
   }
 };

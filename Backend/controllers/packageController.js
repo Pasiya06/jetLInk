@@ -8,6 +8,12 @@ import Package from "../models/Package.js";
 export const createPackage = async (req, res) => {
   try {
     const {
+      title,
+      destination,
+      pickupMinKm,
+      pickupMaxKm,
+      busType,
+      extraKmPrice,
       description,
       packageType,
       totalDistance,
@@ -16,7 +22,22 @@ export const createPackage = async (req, res) => {
       maxPrice,
     } = req.body;
 
+    const min = Number(pickupMinKm) || 0;
+    const max = Number(pickupMaxKm) || 0;
+    if (max && min > max) {
+      return res.status(400).json({
+        success: false,
+        message: "Pickup 'from' km cannot be more than 'to' km",
+      });
+    }
+
     const newPackage = await Package.create({
+      title,
+      destination,
+      pickupMinKm: min,
+      pickupMaxKm: max,
+      busType,
+      extraKmPrice: Math.max(0, Number(extraKmPrice) || 0),
       description,
       packageType,
       totalDistance,
@@ -49,6 +70,12 @@ UPDATE PACKAGE
 export const updatePackage = async (req, res) => {
   try {
   const {
+  title,
+  destination,
+  pickupMinKm,
+  pickupMaxKm,
+  busType,
+  extraKmPrice,
   description,
   packageType,
   totalDistance,
@@ -70,6 +97,37 @@ export const updatePackage = async (req, res) => {
 
 
   /* ================= UPDATE FIELDS ================= */
+
+  if (title !== undefined) {
+    packageData.title = String(title).trim();
+  }
+
+  if (destination !== undefined) {
+    packageData.destination = String(destination).trim();
+  }
+
+  if (pickupMinKm !== undefined) {
+    packageData.pickupMinKm = Number(pickupMinKm) || 0;
+  }
+
+  if (pickupMaxKm !== undefined) {
+    packageData.pickupMaxKm = Number(pickupMaxKm) || 0;
+  }
+
+  if (packageData.pickupMaxKm && packageData.pickupMinKm > packageData.pickupMaxKm) {
+    return res.status(400).json({
+      success: false,
+      message: "Pickup 'from' km cannot be more than 'to' km",
+    });
+  }
+
+  if (extraKmPrice !== undefined) {
+    packageData.extraKmPrice = Math.max(0, Number(extraKmPrice) || 0);
+  }
+
+  if (busType !== undefined) {
+    packageData.busType = String(busType).trim();
+  }
 
   if (description !== undefined) {
     packageData.description = description.trim();

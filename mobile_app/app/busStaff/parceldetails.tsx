@@ -19,8 +19,11 @@ import {
 } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
+import AlertBadge from "../../components/AlertBadge";
 
 
+import FieldError from "../../components/FieldError";
+import { useFieldErrors } from "../../utils/validation";
 const JetLinkInterface: React.FC = () => {
   const params = useLocalSearchParams();
   const [sendername, setsendername] = useState(String(params.sendername || ""));
@@ -41,6 +44,7 @@ const JetLinkInterface: React.FC = () => {
   const [activeTab, setActiveTab] = useState('');
   
   const router = useRouter();
+  const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
 
 
   const onTimeChange = (event: any, selected?: Date) => {
@@ -61,6 +65,19 @@ const JetLinkInterface: React.FC = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const handlesenderD = async () => {
+    if (!validateFields([
+      { key: "sendername", label: "Sender name", value: sendername },
+      { key: "smobilenumber", label: "Sender mobile number", value: smobilenumber, type: "phone" },
+      { key: "receivername", label: "Receiver name", value: receivername },
+      { key: "rmobilenumber", label: "Receiver mobile number", value: rmobilenumber, type: "phone" },
+      { key: "remail", label: "Receiver email", value: remail, type: "email" },
+      { key: "weight", label: "Weight", value: weight, type: "number", min: 0.1 },
+      { key: "pickup", label: "Pickup location", value: pickup },
+      { key: "drop", label: "Drop location", value: drop },
+      { key: "date", label: "Date", value: date },
+      { key: "selectedTime", label: "Time", value: selectedTime },
+    ])) return;
+
 
   if (!sendername || !smobilenumber  || !receivername || !remail || !rmobilenumber || !weight || !pickup || !drop ) {
     alert("Please fill required fields");
@@ -174,6 +191,7 @@ const JetLinkInterface: React.FC = () => {
             />
             
           </View>
+          <FieldError message={fieldError("sendername", sendername)} />
 
           <Text style={styles.label}>Sender Mobile Number</Text>
           <View style={styles.inputWrapper}>
@@ -188,6 +206,7 @@ const JetLinkInterface: React.FC = () => {
             />
              
           </View>
+          <FieldError message={fieldError("smobilenumber", smobilenumber)} />
 
           <Text style={styles.label}>Bus Number</Text>
           <View style={styles.inputWrapper}>
@@ -206,6 +225,7 @@ const JetLinkInterface: React.FC = () => {
               />
             
           </View>
+          <FieldError message={fieldError("receivername", receivername)} />
 
           <Text style={styles.label}>Receiver Mobile Number</Text>
           <View style={styles.inputWrapper}>
@@ -220,6 +240,7 @@ const JetLinkInterface: React.FC = () => {
             />
             
           </View>
+          <FieldError message={fieldError("rmobilenumber", rmobilenumber)} />
 
           <Text style={styles.label}>Receiver Email</Text>
           <View style={styles.inputWrapper}>
@@ -234,6 +255,7 @@ const JetLinkInterface: React.FC = () => {
             />
             
           </View>
+          <FieldError message={fieldError("remail", remail)} />
 
           <Text style={styles.label}>Weight(kg)</Text>
           <View style={styles.inputWrapper}>
@@ -247,6 +269,7 @@ const JetLinkInterface: React.FC = () => {
               placeholderTextColor="#A3A3A3"
               />           
           </View>
+          <FieldError message={fieldError("weight", weight)} />
           
           <Text style={styles.label}>Pick up Location</Text>
           <View style={styles.inputWrapper}>
@@ -260,6 +283,7 @@ const JetLinkInterface: React.FC = () => {
               placeholderTextColor="#A3A3A3"
               />
           </View>
+          <FieldError message={fieldError("pickup", pickup)} />
           
           <Text style={styles.label}>Delivery Location</Text>
           <View style={styles.inputWrapper}>
@@ -274,6 +298,7 @@ const JetLinkInterface: React.FC = () => {
             />
             
           </View>
+          <FieldError message={fieldError("drop", drop)} />
           
           <Text style={styles.label}>Date</Text>
           <View style={styles.inputWrapper}>
@@ -282,6 +307,7 @@ const JetLinkInterface: React.FC = () => {
               <FontAwesome5 name="calendar-alt" size={24} color="black" />  
             </TouchableOpacity>
           </View>
+          <FieldError message={fieldError("date", date)} />
 
           {showCalendar && (
                   <DateTimePicker
@@ -310,7 +336,8 @@ const JetLinkInterface: React.FC = () => {
             <TouchableOpacity onPress={() => setShowTimePicker(true)}>
               <Ionicons name="time-outline" size={24} color="black" />
             </TouchableOpacity>
-          </View> 
+          </View>
+          <FieldError message={fieldError("selectedTime", selectedTime)} /> 
 
           {showTimePicker && (
             <DateTimePicker
@@ -356,7 +383,7 @@ const JetLinkInterface: React.FC = () => {
         
                     else {
                       router.push({
-                        pathname: "/busStaff/parceldetails",
+                        pathname: "/busStaff/busBookedParcel",
                         params: {
                           Cid: params.Cid,
                           conductorId: params.conductorId,
@@ -405,19 +432,34 @@ const JetLinkInterface: React.FC = () => {
                 <Ionicons name="home-outline" size={28} color="#fff" />             
               </TouchableOpacity>
         
-              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-                <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "staff" } }); }}>
+                <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="staff" /></View>
                 <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
                   Alerts
                 </Text>
               </TouchableOpacity>
         
-              <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-                <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-                <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-                  Profile
-                </Text>
-              </TouchableOpacity>
+              <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({
+                      pathname: "/busStaff/busProfile",
+                      params: {
+                        Cid: params.Cid,
+                        conductorId: params.conductorId,
+                        conductorNIC: params.conductorNIC,
+                        cfirstName: params.cfirstName,
+                        clastName: params.clastName,
+                        cphoneNumber: params.cphoneNumber,
+                        driverId: params.driverId,
+                        dfirstName: params.dfirstName,
+                        dlastName: params.dlastName,
+                        dphoneNumber: params.dphoneNumber,
+                        busNo: params.busNo,
+                      },
+                    });}}>
+                    <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                      Profile
+                    </Text>
+                  </TouchableOpacity>
             </View>
 
       {/* Bottom Graphic Design Element */}

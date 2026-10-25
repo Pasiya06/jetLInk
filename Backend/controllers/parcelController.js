@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import Parcel from "../models/Parcel.js";
 import Bus from "../models/Bus.js"; // adjust path to match your project
+import { notify } from "./notificationController.js";
 
 export const createParcel = async (req, res) => {
   try {
@@ -17,6 +18,15 @@ export const createParcel = async (req, res) => {
     const parcel = await Parcel.create({
       ...req.body,
       parcelId,
+    });
+
+    await notify({
+      title: `📦 New parcel ${parcel.parcelId}`,
+      body: `${parcel.pickup || "?"} → ${parcel.drop || "?"} on ${parcel.date || "-"} ${parcel.time || ""}. Bus ${parcel.Bnumber || "-"}.`,
+      type: "parcel",
+      audience: ["admin", "staff"],
+      busNumber: parcel.Bnumber,
+      data: { parcelId: parcel.parcelId },
     });
 
     res.status(201).json({
@@ -131,6 +141,14 @@ export const verifyParcelQR = async (req, res) => {
 
       await parcel.save();
 
+      await notify({
+        title: `📦 Parcel ${parcel.parcelId} picked up`,
+        body: `Bus ${parcel.Bnumber || "-"} collected the parcel (${parcel.pickup || "?"} → ${parcel.drop || "?"}).`,
+        type: "parcel",
+        audience: ["admin"],
+        data: { parcelId: parcel.parcelId },
+      });
+
       return res.json({
         valid: true,
         stage: "pickup",
@@ -146,6 +164,14 @@ export const verifyParcelQR = async (req, res) => {
       parcel.status = "Delivered";
 
       await parcel.save();
+
+      await notify({
+        title: `✅ Parcel ${parcel.parcelId} delivered`,
+        body: `Delivered to ${parcel.receivername || "the receiver"} at ${parcel.drop || "destination"}.`,
+        type: "parcel",
+        audience: ["admin"],
+        data: { parcelId: parcel.parcelId },
+      });
 
       return res.json({
         valid: true,
@@ -264,6 +290,14 @@ export const markParcelDelivered = async (req, res) => {
 
       await parcel.save();
 
+      await notify({
+        title: `📦 Parcel ${parcel.parcelId} picked up`,
+        body: `Bus ${parcel.Bnumber || "-"} collected the parcel (${parcel.pickup || "?"} → ${parcel.drop || "?"}).`,
+        type: "parcel",
+        audience: ["admin"],
+        data: { parcelId: parcel.parcelId },
+      });
+
       return res.json({
         valid: true,
         stage: "pickup",
@@ -279,6 +313,14 @@ export const markParcelDelivered = async (req, res) => {
       parcel.status = "Delivered";
 
       await parcel.save();
+
+      await notify({
+        title: `✅ Parcel ${parcel.parcelId} delivered`,
+        body: `Delivered to ${parcel.receivername || "the receiver"} at ${parcel.drop || "destination"}.`,
+        type: "parcel",
+        audience: ["admin"],
+        data: { parcelId: parcel.parcelId },
+      });
 
       return res.json({
         valid: true,

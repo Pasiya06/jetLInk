@@ -784,9 +784,7 @@ const JetLinkInterface: React.FC = () => {
                 "routes"
               );
 
-              router.push(
-                "/admin/index1"
-              );
+              router.push({ pathname: "/notifications", params: { role: "passenger" } });
 
             }}
           >
@@ -826,9 +824,7 @@ const JetLinkInterface: React.FC = () => {
                 "profile"
               );
 
-              router.push(
-                "/admin/index1"
-              );
+              router.push({ pathname: "/passenger/passengerProfile", params: { role: "passenger",NIC: params.NIC } });
 
             }}
           >

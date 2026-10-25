@@ -25,14 +25,19 @@ export default function PaymentSuccessScreen() {
   const bNumber = params.bNumber as string;
   const [qrToken, setQrToken] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const receiptId: string = "REC-50942272";
+  // The receipt that was just created (sent from otpVerify)
+  const receiptId = String(params.receiptId ?? "").trim();
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
-  //const receiptId = params.receiptId as string;
   const fetchParcelQR = async () => {
-  
+      if (!receiptId) {
+        setError("Receipt ID missing. Open the booking from My Receipts to see the QR.");
+        return;
+      }
+
       try {
-        const url = `${API_URL}/receipts/receiptId/${receiptId}/qr`;
+        setError(null);
+        const url = `${API_URL}/receipts/receiptId/${encodeURIComponent(receiptId)}/qr`;
         console.log("Request URL:", url);
         const response = await fetch(url);
         console.log("Status:", response.status);
@@ -54,7 +59,7 @@ export default function PaymentSuccessScreen() {
   
     useEffect(() => {
       fetchParcelQR();
-    }, []);
+    }, [receiptId]);
 
 //   const loadQr = async () => {
 //   try {

@@ -4,10 +4,13 @@ import { ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity,
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather as Icon, AntDesign, Fontisto, Ionicons } from '@expo/vector-icons';
 
+import FieldError from "../../components/FieldError";
+import { useFieldErrors } from "../../utils/validation";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const FlatmateLogin: React.FC = () => {
   const router = useRouter();
+  const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
   const [busNum, setBusNum] = useState('');
   const [DNIC, DsetNIC] = useState('');
   const [CNIC, CsetNIC] = useState('');
@@ -57,6 +60,12 @@ export const FlatmateLogin: React.FC = () => {
   
 
 const verify = async () => {
+  if (!validateFields([
+    { key: "busNum", label: "Bus number", value: busNum },
+    { key: "DNIC", label: "Driver NIC", value: DNIC, type: "nic" },
+    { key: "CNIC", label: "Conductor NIC", value: CNIC, type: "nic" },
+  ])) return;
+
   try {
     const busResponse = await fetch(`${API_URL}/buses/check/${busNum}`);
     const bus = await busResponse.json();
@@ -160,69 +169,71 @@ const verify = async () => {
        
         <View style={styles.card}>
           <View style={styles.formContainer}>
-            <Text style={styles.inputLabel}>Bus Number</Text>
-            <View style={styles.inputWrapper1}>
-              <View style={[styles.iconWrap, ]}>
-                <Fontisto name="bus" size={18} color="#000000" />
+              <View style={styles.field}>
+                <Text style={styles.inputLabel}>Bus Number</Text>
+                <View style={styles.inputWrapper1}>
+                  <View style={styles.iconWrap}>
+                    <Fontisto name="bus" size={18} color="#000000" />
+                  </View>
+                  <View style={styles.inputInnerWrapper}>
+                    <TextInput
+                      style={styles.textInput}
+                      value={busNum}
+                      onChangeText={handleBusNumber}
+                      placeholder="Bus Number"
+                      placeholderTextColor="#A3A3A3"
+                      autoCapitalize="characters"
+                      autoCorrect={false}
+                      maxLength={7}
+                    />
+                  </View>
+                </View>
+                <FieldError style={styles.fieldError} message={fieldError("busNum", busNum)} />
               </View>
-              <View style={styles.inputInnerWrapper}>
-                <TextInput 
-                  style={styles.textInput} 
-                  value={busNum} 
-                  onChangeText={handleBusNumber} 
-                  placeholder="Bus Number"
-                  placeholderTextColor="#A3A3A3"
-                  autoCapitalize="characters"
-                  autoCorrect={false}
-                  maxLength={7}
-                />
-              </View>
-            </View>
 
-            <Text style={styles.inputLabel}>Driver NIC</Text>  
-            <View style={styles.inputWrapper1}>
-              <View style={[styles.iconWrap, ]}>
-              <AntDesign name="idcard" size={18} color="#000000" />
+              <View style={styles.field}>
+                <Text style={styles.inputLabel}>Driver NIC</Text>
+                <View style={styles.inputWrapper1}>
+                  <View style={styles.iconWrap}>
+                    <AntDesign name="idcard" size={18} color="#000000" />
+                  </View>
+                  <View style={styles.inputInnerWrapper}>
+                    <TextInput
+                      style={styles.textInput}
+                      value={DNIC}
+                      onChangeText={DsetNIC}
+                      placeholder="123456789012"
+                      placeholderTextColor="#A3A3A3"
+                    />
+                  </View>
+                </View>
+                <FieldError style={styles.fieldError} message={fieldError("DNIC", DNIC)} />
               </View>
-              <View style={styles.inputInnerWrapper}>
-                <TextInput
-                  style={styles.textInput}
-                  value={DNIC}
-                  onChangeText={DsetNIC}
-                  placeholder="123456789012"
-                  placeholderTextColor="#A3A3A3"
-                />
-              </View>
-            </View>
 
-            <Text style={styles.inputLabel}>Conductor NIC</Text>  
-            <View style={styles.inputWrapper1}>
-              <View style={[styles.iconWrap, ]}>
-                <AntDesign name="idcard" size={18} color="#000000" />
+              <View style={styles.field}>
+                <Text style={styles.inputLabel}>Conductor NIC</Text>
+                <View style={styles.inputWrapper1}>
+                  <View style={styles.iconWrap}>
+                    <AntDesign name="idcard" size={18} color="#000000" />
+                  </View>
+                  <View style={styles.inputInnerWrapper}>
+                    <TextInput
+                      style={styles.textInput}
+                      value={CNIC}
+                      onChangeText={CsetNIC}
+                      placeholder="123456789012"
+                      placeholderTextColor="#A3A3A3"
+                    />
+                  </View>
+                </View>
+                <FieldError style={styles.fieldError} message={fieldError("CNIC", CNIC)} />
               </View>
-              <View style={styles.inputInnerWrapper}>
-                <TextInput
-                    style={styles.textInput}
-                    value={CNIC}
-                    onChangeText={CsetNIC}
-                    placeholder="123456789012"
-                    placeholderTextColor="#A3A3A3"
-                />
-              </View>
-            </View>
+          </View>
 
-            <View style={styles.footerContainer}>
-        
-              <TouchableOpacity
-                style={styles.primaryButton}
-                onPress={verify}
-              >
-                <Text style={styles.primaryButtonText}>
-                  Verify
-                </Text>
-              </TouchableOpacity>
-        
-            </View>                  
+          <View style={styles.footerContainer}>
+            <TouchableOpacity style={styles.primaryButton} onPress={verify}>
+              <Text style={styles.primaryButtonText}>Verify</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -280,22 +291,14 @@ const styles = StyleSheet.create({
 
   card: {
     width: '90%',
-    height: '50%',
     backgroundColor: '#FFF',
-    //padding: 24,
-    //alignItems: 'center',
-
-    marginTop: -50,   
+    marginTop: -50,
     alignSelf: 'center',
-
     borderRadius: 20,
+    paddingBottom: 18,
     elevation: 10,
-
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
+    shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.2,
     shadowRadius: 5,
   },
@@ -331,22 +334,28 @@ const styles = StyleSheet.create({
   
 
   formContainer: {
-    
-    marginTop: 34,
-    //marginBottom:70,
-    //width: '90%',  
+    marginTop: 24,
   },
 
 
+  // one label + input box + error message
+  field: {
+    marginBottom: 16,
+  },
+
+  // error lines up with the input box, right under it
+  fieldError: {
+    marginHorizontal: 17,
+    marginTop: 6,
+    marginBottom: 0,
+  },
+
   inputWrapper1: {
-    height: '13%',
+    minHeight: 52,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#F2F4F5',
-    marginRight: 15,
-    marginLeft: 15,
-    marginBottom: 25,
-    borderLeftWidth: 1,
+    marginHorizontal: 15,
     borderWidth: 1,
     borderColor: '#ECEEF2',
     borderRadius: 12,
@@ -390,12 +399,11 @@ const styles = StyleSheet.create({
   },
 
   inputLabel: {
-    marginRight: 15,
-    marginLeft: 15,
+    marginHorizontal: 15,
     fontSize: 16,
     color: '#4B6CF5',
     fontWeight: '500',
-    marginBottom: 10,
+    marginBottom: 8,
   },
 
   textInput: {
@@ -408,12 +416,8 @@ const styles = StyleSheet.create({
   },
 
   footerContainer: {
-    
-    marginTop: 'auto', 
-    paddingBottom: 10,
-    //marginBottom: 10,
-    marginRight: 15,
-    marginLeft: 15,
+    marginTop: 6,
+    marginHorizontal: 15,
   },
 
   primaryButton: {

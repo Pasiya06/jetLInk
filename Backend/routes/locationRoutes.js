@@ -6,6 +6,7 @@ import {
   getBusLocation,
   getAllLocations,
   setOffline,
+  clearLocation,
 } from "../controllers/locationController.js";
 
 const router = express.Router();
@@ -23,5 +24,8 @@ router.get("/:busNumber", getBusLocation);
 
 // POST /api/locations/offline → set bus offline
 router.post("/offline", setOffline);
+
+// POST /api/locations/clear   → staff logout: clear location + set offline
+router.post("/clear", clearLocation);
 
 export default router;

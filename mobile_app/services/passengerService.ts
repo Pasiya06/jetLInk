@@ -33,3 +33,29 @@ export async function getPassengers() {
   return await response.json();
 };
 
+
+
+// Edit passenger profile (currentPassword/newPassword are optional)
+export const updatePassenger = async (
+  id: string,
+  passenger: {
+    firstName?: string;
+    lastName?: string;
+    phoneNumber?: string;
+    address?: string;
+    NIC?: string;
+    email?: string;
+    currentPassword?: string;
+    newPassword?: string;
+  }
+) => {
+  const response = await fetch(`${API}/passengers/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(passenger),
+  });
+
+  return await response.json();
+};

@@ -1,5 +1,17 @@
 import mongoose from "mongoose";
 
+// One extra-kilometer payment made by the passenger
+const extraKmPaymentSchema = new mongoose.Schema(
+  {
+    km: { type: Number, required: true },
+    pricePerKm: { type: Number, required: true },
+    amount: { type: Number, required: true },
+    cardLast4: { type: String, default: "" },
+    paidAt: { type: Date, default: Date.now },
+  },
+  { _id: true }
+);
+
 const receiptSchema = new mongoose.Schema(
   {
     receiptId: {
@@ -116,6 +128,22 @@ const receiptSchema = new mongoose.Schema(
       type: String,
       required: true,
       lowercase: true,
+    },
+
+    // Extra kilometers added and paid by the passenger
+    extraKm: {
+      type: Number,
+      default: 0,
+    },
+
+    extraKmAmount: {
+      type: Number,
+      default: 0,
+    },
+
+    extraKmPayments: {
+      type: [extraKmPaymentSchema],
+      default: [],
     },
   },
   {

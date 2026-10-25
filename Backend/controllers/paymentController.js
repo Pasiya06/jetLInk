@@ -1,3 +1,27 @@
+// Returns an error message, or null when the card passes the (test) checks.
+// Same rules as POST /api/payment/pay.
+export const validateCard = ({ cardNumber, expiry, cvc } = {}) => {
+  const cleanCard = String(cardNumber || "").replace(/\s/g, "");
+  if (!/^\d{16}$/.test(cleanCard)) return "Card number must contain exactly 16 digits";
+  if (!/^[45]/.test(cleanCard)) return "Invalid card number";
+
+  const [month, year] = String(expiry || "").split("/");
+  const expMonth = Number(month);
+  const expYear = 2000 + Number(year);
+  const today = new Date();
+  if (!(expMonth >= 1 && expMonth <= 12)) return "Invalid expiry month";
+  if (
+    expYear < today.getFullYear() ||
+    (expYear === today.getFullYear() && expMonth <= today.getMonth() + 1)
+  ) {
+    return "Card expired";
+  }
+
+  const cvcNumber = Number(cvc);
+  if (!(cvcNumber >= 800 && cvcNumber <= 900)) return "CVC validation failed";
+  return null;
+};
+
 export const pay = async (req, res) => {
 
     const { cardNumber, expiry, cvc } = req.body;

@@ -28,6 +28,7 @@ export default function PaymentSuccessScreen() {
         plastName:params.plastName,
         pphoneNumber: params.pphoneNumber,
         pemail: params.pemail,
+        NIC: params.NIC,
         pickup:params.pickup,
         drop:params.drop,
         date:params.date,
@@ -54,6 +55,7 @@ export default function PaymentSuccessScreen() {
         plastName:params.plastName,
         pphoneNumber: params.pphoneNumber,
         pemail: params.pemail,
+        NIC: params.NIC,
         
       } 
         

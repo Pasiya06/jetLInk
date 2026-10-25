@@ -13,15 +13,17 @@ import {
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import * as Notifications from "expo-notifications";
 import {
   initNotifications,
+  getNotificationPermissionStatus,
+  notificationsAvailable,
   getNotificationHistory,
   clearNotificationHistory,
   subscribeToNotificationHistory,
   NotificationAudience,
   NotificationRecord,
 } from "../services/notificationService";
+import StaffAlertsScreen from "../components/StaffAlertsScreen";
 
 function formatTime(timestamp: number) {
   const date = new Date(timestamp);
@@ -35,8 +37,21 @@ function formatTime(timestamp: number) {
 }
 
 export default function NotificationsScreen() {
+  const { role, busNumber, busNo } = useLocalSearchParams<{
+    role?: string;
+    busNumber?: string;
+    busNo?: string;
+  }>();
+
+  // Admin and bus staff alerts come from the server
+  if (role === "admin" || role === "staff") {
+    return <StaffAlertsScreen role={role} busNumber={busNumber || busNo || undefined} />;
+  }
+  return <PassengerNotifications role={role} />;
+}
+
+function PassengerNotifications({ role }: { role?: string }) {
   const router = useRouter();
-  const { role } = useLocalSearchParams<{ role?: string }>();
   const audience: NotificationAudience = role === "staff" ? "staff" : "passenger";
   const [permissionGranted, setPermissionGranted] = useState<boolean | null>(null);
   const [notificationsList, setNotificationsList] = useState<NotificationRecord[]>([]);
@@ -54,11 +69,18 @@ export default function NotificationsScreen() {
   }, [audience]);
 
   const checkPermission = async () => {
-    const { status } = await Notifications.getPermissionsAsync();
+    const status = await getNotificationPermissionStatus();
     setPermissionGranted(status === "granted");
   };
 
   const handleRequestPermission = async () => {
+    if (!notificationsAvailable) {
+      Alert.alert(
+        "Not available in Expo Go",
+        "Status-bar notifications need the JetLink APK or a development build. Alerts will still appear in this list."
+      );
+      return;
+    }
     const granted = await initNotifications();
     setPermissionGranted(granted);
     if (!granted) {

@@ -613,7 +613,7 @@ const JetLinkInterface: React.FC = () => {
 
           <TouchableOpacity
             style={styles.item}
-            onPress={() => {setActiveTab("routes"); router.push("/admin/index1");}}
+            onPress={() => {setActiveTab("routes"); router.push({ pathname: "/notifications", params: { role: "passenger" } });}}
           >
             <Ionicons name="notifications-outline" size={24} color={ activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[styles.label1, activeTab === "alerts" && styles.activeLabel,]}>
@@ -626,7 +626,7 @@ const JetLinkInterface: React.FC = () => {
 
           <TouchableOpacity
             style={styles.item}
-            onPress={() => {setActiveTab("profile"); router.push( "/admin/index1");}}
+            onPress={() => {router.push({ pathname: "/passenger/passengerProfile", params: { role: "passenger",NIC: params.NIC } });}}
           >
             <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>

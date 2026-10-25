@@ -15,6 +15,7 @@ import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons, MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
+import AlertBadge from "../../components/AlertBadge";
 
 // ─── Types ────────────────────────────────────────────────────────
 interface BusLocationData {
@@ -311,22 +312,23 @@ const PassengerTrackScreen: React.FC = () => {
             if (isSearching) {
               setIsSearching(false);
             } else {
-              router.push({
-                pathname: "/busStaff/help",
-                params: {
-                  Cid: params.Cid,
-                  conductorId: params.conductorId,
-                  conductorNIC:params.conductorNIC,
-                  cfirstName: params.cfirstName,
-                  clastName: params.clastName,
-                  cphoneNumber:params.cphoneNumber,
-                  driverId:params.driverId,
-                  dfirstName:params.dfirstName,
-                  dlastName:params.dlastName,
-                  dphoneNumber:params.dphoneNumber,
-                  busNo: params.busNo,
-                },       
-              });
+              // router.push({
+              //   pathname: "/busStaff/help",
+              //   params: {
+              //     Cid: params.Cid,
+              //     conductorId: params.conductorId,
+              //     conductorNIC:params.conductorNIC,
+              //     cfirstName: params.cfirstName,
+              //     clastName: params.clastName,
+              //     cphoneNumber:params.cphoneNumber,
+              //     driverId:params.driverId,
+              //     dfirstName:params.dfirstName,
+              //     dlastName:params.dlastName,
+              //     dphoneNumber:params.dphoneNumber,
+              //     busNo: params.busNo,
+              //   },       
+              // });
+              router.back()
             }
           }}>
             <Ionicons name={isSearching ? "arrow-back" : "arrow-back-outline"} size={24} color={activeTab === "home" ? "#0057D9" : "#8A8A8A"} />
@@ -361,19 +363,34 @@ const PassengerTrackScreen: React.FC = () => {
             <Ionicons name="home-outline" size={28} color="#fff" />             
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1"); }}>
-            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"} />
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "staff" } }); }}>
+            <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"} /><AlertBadge role="staff" /></View>
             <Text style={[styles.label1, activeTab === "alerts" && styles.activeLabel]}>
               Alerts
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("profile"); router.push("/admin/index1"); }}>
-            <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"} />
-            <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel]}>
-              Profile
-            </Text>
-          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({
+                      pathname: "/busStaff/busProfile",
+                      params: {
+                        Cid: params.Cid,
+                        conductorId: params.conductorId,
+                        conductorNIC: params.conductorNIC,
+                        cfirstName: params.cfirstName,
+                        clastName: params.clastName,
+                        cphoneNumber: params.cphoneNumber,
+                        driverId: params.driverId,
+                        dfirstName: params.dfirstName,
+                        dlastName: params.dlastName,
+                        dphoneNumber: params.dphoneNumber,
+                        busNo: params.busNo,
+                      },
+                    });}}>
+                    <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                      Profile
+                    </Text>
+                  </TouchableOpacity>
         </View>
 
         <View style={styles.footerGraphic}>

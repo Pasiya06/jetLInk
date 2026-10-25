@@ -1,8 +1,11 @@
 import React, { useEffect } from "react";
 import { Stack, useRouter } from "expo-router";
-import * as Notifications from "expo-notifications";
 import * as SplashScreen from "expo-splash-screen";
-import { initNotifications, recordReceivedNotification } from "../services/notificationService";
+import {
+  initNotifications,
+  addNotificationListeners,
+  startServerAlertPolling,
+} from "../services/notificationService";
 
 // Prevent splash screen from auto-hiding before initialization
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -27,25 +30,21 @@ export default function RootLayout() {
 
     prepare();
 
-    // Save every notification the app receives so the Alerts pages can show it
-    const receivedListener = Notifications.addNotificationReceivedListener((notification) => {
-      recordReceivedNotification(notification).catch(() => {});
+    // Save every notification the app receives so the Alerts pages can show it,
+    // and open the linked screen when a notification in the status bar is tapped
+    const removeListeners = addNotificationListeners((data) => {
+      console.log("Notification tapped from status bar:", data);
+      if (data?.url && typeof data.url === "string") {
+        router.push(data.url as any);
+      }
     });
 
-    // Listen for notification taps in the phone notification bar
-    const responseListener = Notifications.addNotificationResponseReceivedListener(
-      (response) => {
-        const data = response.notification.request.content.data;
-        console.log("Notification tapped from status bar:", data);
-        if (data?.url && typeof data.url === "string") {
-          router.push(data.url as any);
-        }
-      }
-    );
+    // Admin & bus staff: check the server for new alerts every 30 seconds
+    const stopPolling = startServerAlertPolling();
 
     return () => {
-      receivedListener.remove();
-      responseListener.remove();
+      removeListeners();
+      stopPolling();
     };
   }, []);
 

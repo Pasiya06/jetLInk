@@ -19,6 +19,8 @@ import {
   AntDesign 
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import AlertBadge from "../../components/AlertBadge";
+import { formatEmergencyTime, emergencyTimeAgo } from "../../utils/emergencyTime";
 
 type EmergencyStatus = "normal" | "accident" | "breakdown";
 
@@ -28,6 +30,7 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
 export default function EmergencyButton() {
   const [emergency, setEmergency] = useState(false);
   const [status, setStatus] = useState<EmergencyStatus>("normal");
+  const [emergencyAt, setEmergencyAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -53,6 +56,7 @@ export default function EmergencyButton() {
 
       setEmergency(data.bus.emergency);
       setStatus(data.bus.status);
+      setEmergencyAt(data.bus.emergencyAt ?? null);
     } catch (error) {
       console.error("Fetch emergency error:", error);
     }
@@ -112,6 +116,7 @@ export default function EmergencyButton() {
 
               setEmergency(data.bus.emergency);
               setStatus(data.bus.status);
+      setEmergencyAt(data.bus.emergencyAt ?? null);
 
               Alert.alert(
                 "Emergency Reported",
@@ -177,6 +182,7 @@ export default function EmergencyButton() {
 
               setEmergency(data.bus.emergency);
               setStatus(data.bus.status);
+      setEmergencyAt(data.bus.emergencyAt ?? null);
 
               Alert.alert(
                 "Success",
@@ -241,6 +247,12 @@ export default function EmergencyButton() {
                 ? status.toUpperCase()
                 : "NORMAL"}
             </Text>
+            {emergency && emergencyAt ? (
+              <Text style={styles.reportedAt}>
+                Reported: {formatEmergencyTime(emergencyAt)}
+                {"\n"}({emergencyTimeAgo(emergencyAt)})
+              </Text>
+            ) : null}
           </View>
 
           
@@ -361,19 +373,34 @@ export default function EmergencyButton() {
                 <Ionicons name="home-outline" size={28} color="#fff" />             
             </TouchableOpacity>
   
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "staff" } }); }}>
+            <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="staff" /></View>
             <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
               Alerts
             </Text>
           </TouchableOpacity>
   
-          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-            <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-            <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-              Profile
-            </Text>
-          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({
+                      pathname: "/busStaff/busProfile",
+                      params: {
+                        Cid: params.Cid,
+                        conductorId: params.conductorId,
+                        conductorNIC: params.conductorNIC,
+                        cfirstName: params.cfirstName,
+                        clastName: params.clastName,
+                        cphoneNumber: params.cphoneNumber,
+                        driverId: params.driverId,
+                        dfirstName: params.dfirstName,
+                        dlastName: params.dlastName,
+                        dphoneNumber: params.dphoneNumber,
+                        busNo: params.busNo,
+                      },
+                    });}}>
+                    <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                      Profile
+                    </Text>
+                  </TouchableOpacity>
         </View>  
   
         
@@ -486,6 +513,13 @@ const styles = StyleSheet.create({
   statusLabel: {
     fontSize: 14,
     color: "#333333",
+  },
+  reportedAt: {
+    marginTop: 8,
+    fontSize: 13,
+    color: "#7F1D1D",
+    fontWeight: "600",
+    textAlign: "center",
   },
   statusText: {
     fontSize: 20,

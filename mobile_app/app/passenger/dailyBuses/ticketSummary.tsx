@@ -19,6 +19,8 @@ import {
 
 import { LinearGradient } from 'expo-linear-gradient';
 
+import FieldError from "../../../components/FieldError";
+import { useFieldErrors } from "../../../utils/validation";
 const ParcelService = () => {
     const API_URL = process.env.EXPO_PUBLIC_API_URL;
     const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -27,6 +29,7 @@ const ParcelService = () => {
     const seatNumbers:number = 0;
     const [activeTab, setActiveTab] = useState('');
     const router = useRouter();
+    const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
     const [tikNo, settikNo] = useState(String(1 || ""));
 
     const total = (
@@ -35,6 +38,10 @@ const ParcelService = () => {
     ).toFixed(2);
     
     const handleSearch = () => {
+      if (!validateFields([
+        { key: "tikNo", label: "Number of tickets", value: tikNo, type: "int" },
+      ])) return;
+
         router.push({
             pathname: "/passenger/dailyBuses/paymentGateway",
             params:{ 
@@ -44,6 +51,7 @@ const ParcelService = () => {
                 plastName:params.plastName,
                 pphoneNumber: params.pphoneNumber,
                 pemail: params.pemail,
+                NIC: params.NIC,
                 pickup:params.pickup,
                 drop:params.drop,
                 date:params.date,
@@ -137,6 +145,7 @@ const ParcelService = () => {
                         maxLength={2} 
                     />           
                 </View>
+                <FieldError message={fieldError("tikNo", tikNo)} />
             </View>
         </View>
 
@@ -216,6 +225,7 @@ const ParcelService = () => {
                       plastName:params.plastName,
                       pphoneNumber: params.pphoneNumber,
                       pemail: params.pemail,
+                      NIC: params.NIC,
                       pickup:params.pickup,
                       drop:params.drop,
                       date:params.date,
@@ -245,19 +255,20 @@ const ParcelService = () => {
                       plastName:params.plastName,
                       pphoneNumber: params.pphoneNumber,
                       pemail: params.pemail,
+                      NIC: params.NIC,
                     },                    
                   });}} > 
             <Ionicons name="home-outline" size={28} color="#fff" />             
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+          <TouchableOpacity style={styles.item} onPress={() => { router.push({ pathname: "/notifications", params: { role: "passenger" } }); }}>
             <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
               Alerts
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({ pathname: "/passenger/passengerProfile", params: { role: "passenger",NIC: params.NIC } });}}>
             <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
               Profile

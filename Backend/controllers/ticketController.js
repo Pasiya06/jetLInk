@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import cron from "node-cron";
 import Ticket from "../models/Ticket.js";
+import { notify } from "./notificationController.js";
 
 export const createTicket = async (req, res) => {
   try {
@@ -37,6 +38,15 @@ export const createTicket = async (req, res) => {
     });
 
     await ticket.save();
+
+    await notify({
+      title: `🎫 New booking on Bus ${bNumber || "-"}`,
+      body: `${pfirstName || ""} ${plastName || ""} booked ${noOfTicket || 1} seat(s)${seatNumbers ? ` (${seatNumbers})` : ""}: ${pickup || "?"} → ${drop || "?"}, ${date || ""} ${time || ""}.`,
+      type: "ticket",
+      audience: ["admin", "staff"],
+      busNumber: bNumber,
+      data: { ticketId: ticket.ticketId },
+    });
 
     res.status(201).json({
       success: true,

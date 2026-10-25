@@ -480,7 +480,7 @@ export default function EmergencyBuses() {
         <View style={styles.errorBox}>
           <Ionicons name="cloud-offline-outline" size={20} color={C.alert} />
           <View style={{ flex: 1 }}>
-            <Text style={styles.errorTitle}>Couldn't load buses</Text>
+            <Text style={styles.errorTitle}>Couldn&apos;t load buses</Text>
             <Text style={styles.errorText}>{error}</Text>
           </View>
           <Pressable onPress={retry} hitSlop={10}>

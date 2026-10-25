@@ -175,3 +175,53 @@ export const updateLocation1 = async (req, res) => {
     });
   }
 };
+
+// ─── Clear Bus Location (staff logout) ─────────────────────────────
+// POST /api/locations/clear   body: { busNumber }
+// Wipes the live position and crew details and marks the bus offline.
+export const clearLocation = async (req, res) => {
+  try {
+    const { busNumber } = req.body;
+
+    if (!busNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "busNumber is required",
+      });
+    }
+
+    const bus = await Location.findOneAndUpdate(
+      { busNumber },
+      {
+        latitude: 0,
+        longitude: 0,
+        speed: 0,
+        heading: 0,
+        isOnline: false,
+        driverNIC: "Not ",
+        conductorNIC: "Not ",
+        driverD: "Not login yet",
+        conductorD: "Not login yet",
+      },
+      { new: true }
+    );
+
+    if (!bus) {
+      return res.status(404).json({
+        success: false,
+        message: "Bus not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Bus location cleared",
+    });
+  } catch (error) {
+    console.error("clearLocation error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

@@ -14,6 +14,7 @@ import {
   getBusEmergency,
   getAllEmergencyBuses,
   getOtherEmergencyBuses,
+  getBusProfile,
 } from "../controllers/busController.js";
 
 const router = express.Router();
@@ -27,6 +28,9 @@ router.get("/emergency", getAllEmergencyBuses);
 router.post("/offline", logoutBus);
 
 router.get("/check/:busNumber", checkBusNumber);
+
+// Full bus details for the bus staff profile screen
+router.get("/profile/:busNumber", getBusProfile);
 router.get("/check1/:driverNIC", checkDriver);
 router.get("/check2/:conductorNIC", checkConductor);
 

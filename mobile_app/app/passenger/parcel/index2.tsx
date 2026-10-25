@@ -21,6 +21,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
 
 
+import FieldError from "../../../components/FieldError";
+import { useFieldErrors } from "../../../utils/validation";
 const JetLinkInterface: React.FC = () => {
   const params = useLocalSearchParams();
   const [sendername, setsendername] = useState(`${params.pfirstName ?? ""} ${params.plastName ?? ""}`.trim());
@@ -40,6 +42,7 @@ const JetLinkInterface: React.FC = () => {
   const [activeTab, setActiveTab] = useState('');
   
   const router = useRouter();
+  const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
 
 
   const onTimeChange = (event: any, selected?: Date) => {
@@ -60,6 +63,19 @@ const JetLinkInterface: React.FC = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const handlesenderD = async () => {
+    if (!validateFields([
+      { key: "sendername", label: "Sender name", value: sendername },
+      { key: "smobilenumber", label: "Sender mobile number", value: smobilenumber, type: "phone" },
+      { key: "receivername", label: "Receiver name", value: receivername },
+      { key: "rmobilenumber", label: "Receiver mobile number", value: rmobilenumber, type: "phone" },
+      { key: "remail", label: "Receiver email", value: remail, type: "email" },
+      { key: "weight", label: "Weight", value: weight, type: "number", min: 0.1 },
+      { key: "pickup", label: "Pickup location", value: pickup },
+      { key: "drop", label: "Drop location", value: drop },
+      { key: "date", label: "Date", value: date },
+      { key: "selectedTime", label: "Time", value: selectedTime },
+    ])) return;
+
 
   if (!sendername || !smobilenumber  || !receivername || !remail || !rmobilenumber || !weight || !pickup || !drop ) {
     alert("Please fill required fields");
@@ -165,6 +181,7 @@ const JetLinkInterface: React.FC = () => {
             <TextInput style={styles.input} value={sendername} onChangeText={setsendername} />
             
           </View>
+          <FieldError message={fieldError("sendername", sendername)} />
 
           <Text style={styles.label}>Sender Mobile Number</Text>
           <View style={styles.inputWrapper}>
@@ -176,6 +193,7 @@ const JetLinkInterface: React.FC = () => {
               maxLength={10}/>
             
           </View>
+          <FieldError message={fieldError("smobilenumber", smobilenumber)} />
 
           <Text style={styles.label}>Sender Email</Text>
           <View style={styles.inputWrapper}>
@@ -188,12 +206,14 @@ const JetLinkInterface: React.FC = () => {
             <TextInput style={styles.input} value={receivername} onChangeText={setreceivername} />
             
           </View>
+          <FieldError message={fieldError("receivername", receivername)} />
 
           <Text style={styles.label}>Receiver Mobile Number</Text>
           <View style={styles.inputWrapper}>
             <TextInput style={styles.input} value={rmobilenumber} onChangeText={Rsetmobilenumber} keyboardType="phone-pad" maxLength={10}/>
             
           </View>
+          <FieldError message={fieldError("rmobilenumber", rmobilenumber)} />
 
           <Text style={styles.label}>Receiver Email</Text>
           <View style={styles.inputWrapper}>
@@ -206,11 +226,13 @@ const JetLinkInterface: React.FC = () => {
             />
             
           </View>
+          <FieldError message={fieldError("remail", remail)} />
 
           <Text style={styles.label}>Weight(kg)</Text>
           <View style={styles.inputWrapper}>
             <TextInput style={styles.input} value={weight} onChangeText={setWeight} keyboardType="phone-pad" maxLength={2} />           
           </View>
+          <FieldError message={fieldError("weight", weight)} />
           
           <Text style={styles.label}>Pick up Location</Text>
           <View style={styles.inputWrapper}>
@@ -222,6 +244,7 @@ const JetLinkInterface: React.FC = () => {
               autoCorrect={false}
               />
           </View>
+          <FieldError message={fieldError("pickup", pickup)} />
           
           <Text style={styles.label}>Delivery Location</Text>
           <View style={styles.inputWrapper}>
@@ -234,6 +257,7 @@ const JetLinkInterface: React.FC = () => {
             />
             
           </View>
+          <FieldError message={fieldError("drop", drop)} />
           
            <Text style={styles.label}>Date</Text>
           <View style={styles.inputWrapper}>
@@ -242,6 +266,7 @@ const JetLinkInterface: React.FC = () => {
               <FontAwesome5 name="calendar-alt" size={24} color="black" />  
             </TouchableOpacity>
           </View>
+          <FieldError message={fieldError("date", date)} />
 
           {showCalendar && (
             <DateTimePicker
@@ -271,7 +296,8 @@ const JetLinkInterface: React.FC = () => {
             <TouchableOpacity onPress={() => setShowTimePicker(true)}>
               <Ionicons name="time-outline" size={24} color="black" />
             </TouchableOpacity>
-          </View> 
+          </View>
+          <FieldError message={fieldError("selectedTime", selectedTime)} /> 
 
           {showTimePicker && (
             <DateTimePicker
@@ -356,14 +382,14 @@ const JetLinkInterface: React.FC = () => {
                 <Ionicons name="home-outline" size={28} color="#fff" />             
               </TouchableOpacity>
         
-              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+              <TouchableOpacity style={styles.item} onPress={() => { router.push({ pathname: "/notifications", params: { role: "passenger" } }); }}>
                 <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
                 <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
                   Alerts
                 </Text>
               </TouchableOpacity>
         
-              <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+              <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({ pathname: "/passenger/passengerProfile", params: { role: "passenger",NIC: params.NIC } });}}>
                 <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
                 <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
                   Profile

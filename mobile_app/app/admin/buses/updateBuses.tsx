@@ -20,9 +20,13 @@ import {
 import { updateBus } from "../../../services/busService";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
+import AlertBadge from "../../../components/AlertBadge";
 
+import FieldError from "../../../components/FieldError";
+import { useFieldErrors } from "../../../utils/validation";
 const ToursScreen: React.FC = () => {
   const router = useRouter();
+  const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab, setActiveTab] = useState('');
@@ -39,6 +43,16 @@ const ToursScreen: React.FC = () => {
   const [showCalendar1, setShowCalendar1] = useState<boolean>(false);
   const [showCalendar2, setShowCalendar2] = useState<boolean>(false);
   const handleUpdate = async () => {
+    if (!validateFields([
+      { key: "chassisNo", label: "Chassis number", value: chassisNo },
+      { key: "engineNo", label: "Engine number", value: engineNo },
+      { key: "noOfSeats", label: "Number of seats", value: noOfSeats, type: "int" },
+      { key: "colour", label: "Colour", value: colour },
+      { key: "serviceDate", label: "Service date", value: serviceDate },
+      { key: "licenseDate", label: "License date", value: licenseDate },
+      { key: "emissionDate", label: "Emission date", value: emissionDate },
+    ])) return;
+
 
     try{
         if (!chassisNo || !engineNo  || !colour || !serviceDate  || !licenseDate || !emissionDate) {
@@ -119,6 +133,7 @@ const ToursScreen: React.FC = () => {
                     autoCorrect={false}
                 />
                 </View>
+                <FieldError message={fieldError("chassisNo", chassisNo)} />
             </View>
 
             <View style={styles.fieldContainer}>
@@ -137,6 +152,7 @@ const ToursScreen: React.FC = () => {
                     autoCorrect={false}
                 />
                 </View>
+                <FieldError message={fieldError("engineNo", engineNo)} />
             </View>
 
             <View style={styles.fieldContainer}>
@@ -152,6 +168,7 @@ const ToursScreen: React.FC = () => {
                   keyboardType="phone-pad" 
                   maxLength={2} />           
               </View>
+              <FieldError message={fieldError("noOfSeats", noOfSeats)} />
             </View>
 
             <View style={styles.fieldContainer}>
@@ -170,6 +187,7 @@ const ToursScreen: React.FC = () => {
                     autoCorrect={false}
                 />
                 </View>
+                <FieldError message={fieldError("colour", colour)} />
             </View>
 
             <View style={styles.fieldContainer}>
@@ -189,6 +207,7 @@ const ToursScreen: React.FC = () => {
                         <FontAwesome5 name="calendar-alt" size={24} color="#A0A5B1" />  
                     </TouchableOpacity>
                 </View>
+                <FieldError message={fieldError("serviceDate", serviceDate)} />
                 
             </View>
 
@@ -209,6 +228,7 @@ const ToursScreen: React.FC = () => {
                         <FontAwesome5 name="calendar-alt" size={24} color="#A0A5B1" />  
                     </TouchableOpacity>
                 </View>
+                <FieldError message={fieldError("licenseDate", licenseDate)} />
                 
             </View>
 
@@ -229,6 +249,7 @@ const ToursScreen: React.FC = () => {
                         <FontAwesome5 name="calendar-alt" size={24} color="#A0A5B1" />  
                     </TouchableOpacity>
                 </View>
+                <FieldError message={fieldError("emissionDate", emissionDate)} />
             </View>
 
                 {showCalendar && (
@@ -363,19 +384,27 @@ const ToursScreen: React.FC = () => {
             <Ionicons name="home-outline" size={28} color="#fff" />             
         </TouchableOpacity>
 
-      <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-        <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+      <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "admin" } }); }}>
+        <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="admin" /></View>
         <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
           Alerts
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-        <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-        <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-          Profile
-        </Text>
-      </TouchableOpacity>
+      <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({
+                      pathname: "/admin/Profile/adminProfile",
+                      params: {
+                        Aid: params.Aid,
+                        firstName: params.firstName,
+                        lastName: params.lastName,
+                        email: params.email,
+                      },
+                    });}}>
+                    <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                      Profile
+                    </Text>
+                  </TouchableOpacity>
     </View>
       
       <View style={styles.footerGraphic}>

@@ -278,7 +278,7 @@ export default function OtpVerification() {
         </TouchableOpacity>
 
         <View style={styles.resendRow}>
-          <Text style={styles.resendText}>Didn't get the code? </Text>
+          <Text style={styles.resendText}>Didn&apos;t get the code? </Text>
           <TouchableOpacity onPress={handleResend} disabled={timer > 0 || resending}>
             <Text style={[styles.resendLink, timer > 0 && styles.resendLinkDisabled]}>
               {resending ? "Sending..." : timer > 0 ? `Resend in ${timer}s` : "Resend"}

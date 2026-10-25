@@ -269,7 +269,7 @@ export default function BusReceipts() {
           <View style={[styles.stateIcon, { backgroundColor: "#fde8ea" }]}>
             <Ionicons name="cloud-offline-outline" size={36} color={C.danger} />
           </View>
-          <Text style={styles.stateTitle}>Couldn't load receipts</Text>
+          <Text style={styles.stateTitle}>Couldn&apos;t load receipts</Text>
           <Text style={styles.infoText}>{error}</Text>
           <TouchableOpacity
             style={styles.primaryButton}

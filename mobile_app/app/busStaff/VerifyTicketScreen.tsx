@@ -22,6 +22,7 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import axios from "axios";
+import AlertBadge from "../../components/AlertBadge";
 
 const { width } = Dimensions.get("window");
 const API_URL = process.env.EXPO_PUBLIC_API_URL; // TODO: replace with your backend base URL
@@ -382,19 +383,34 @@ export default function VerifyTicketScreen() {
             <Ionicons name="home-outline" size={28} color="#fff" />             
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "staff" } }); }}>
+            <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="staff" /></View>
             <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
               Alerts
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-            <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-            <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-              Profile
-            </Text>
-          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({
+                      pathname: "/busStaff/busProfile",
+                      params: {
+                        Cid: params.Cid,
+                        conductorId: params.conductorId,
+                        conductorNIC: params.conductorNIC,
+                        cfirstName: params.cfirstName,
+                        clastName: params.clastName,
+                        cphoneNumber: params.cphoneNumber,
+                        driverId: params.driverId,
+                        dfirstName: params.dfirstName,
+                        dlastName: params.dlastName,
+                        dphoneNumber: params.dphoneNumber,
+                        busNo: params.busNo,
+                      },
+                    });}}>
+                    <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                      Profile
+                    </Text>
+                  </TouchableOpacity>
         </View>  
 
       

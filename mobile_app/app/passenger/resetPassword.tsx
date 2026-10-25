@@ -5,10 +5,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather as Icon, EvilIcons, Fontisto, Ionicons } from '@expo/vector-icons';
 import axios from "axios";
 
+import FieldError from "../../components/FieldError";
+import { useFieldErrors } from "../../utils/validation";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const FlatmateLogin: React.FC = () => {
   const router = useRouter();
+  const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
   const params = useLocalSearchParams();
   const email = Array.isArray(params.email) ? params.email[0] : params.email;
 
@@ -37,6 +40,11 @@ export const FlatmateLogin: React.FC = () => {
   };
 
   const handleUpdate = async () => {
+    if (!validateFields([
+      { key: "password", label: "New password", value: password, type: "password" },
+      { key: "confirmPassword", label: "Confirm password", value: confirmPassword, equals: { value: password, message: "Passwords do not match" } },
+    ])) return;
+
     if (!validate()) return;
     if (!email) {
       setError("Missing email — please try again");
@@ -110,6 +118,7 @@ export const FlatmateLogin: React.FC = () => {
             />
             </TouchableOpacity>
         </View>
+        <FieldError message={fieldError("password", password)} />
 
         <Text style={styles.cardTitle}>Confirm Password</Text>
 
@@ -138,6 +147,7 @@ export const FlatmateLogin: React.FC = () => {
             />
             </TouchableOpacity>
         </View>
+        <FieldError message={fieldError("confirmPassword", confirmPassword)} />
 
         {/* Error Pill */}
         {error ? (

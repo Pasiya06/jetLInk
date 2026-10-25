@@ -42,6 +42,12 @@ const busSchema = new mongoose.Schema({
     default: "normal",
   },
 
+  // Date & time the accident/breakdown button was pressed (null when normal)
+  emergencyAt: {
+    type: Date,
+    default: null,
+  },
+
   busType: {
     type: String,
     enum: ["NormalWay", "Highway", "tour"],

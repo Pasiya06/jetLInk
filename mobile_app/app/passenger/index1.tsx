@@ -298,7 +298,7 @@ export default function Index() {
                     </Text>
                   </TouchableOpacity>
         
-                  <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); }}>
+                  <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({ pathname: "/passenger/passengerProfile", params: { role: "passenger",NIC: params.NIC } });}}>
                     <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
                     <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
                       Profile
@@ -307,23 +307,24 @@ export default function Index() {
                 </View>
 
         <View style={styles.footerGraphic}>
-                <LinearGradient
-                  colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-                  style={styles.submitGradient}
-                >
-                </LinearGradient>
-              </View>
-              <View style={styles.footerGraphic1}>
-                <LinearGradient
-                colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-                style={styles.submitGradient}
-                >
-                </LinearGradient>
-              </View>
+          <LinearGradient
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
+        </View>
+        
+        <View style={styles.footerGraphic1}>
+          <LinearGradient
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
+            style={styles.submitGradient}
+          >
+          </LinearGradient>
+        </View>
       </SafeAreaView>
     </>
   );

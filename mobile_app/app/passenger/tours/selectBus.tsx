@@ -24,6 +24,16 @@ import {
   FontAwesome5, 
 } from "@expo/vector-icons";
 
+import {
+  MIN_DAYS_AHEAD,
+  addDays,
+  earliestTourDate,
+  formatMMDDYYYY,
+  isTooSoon,
+  parseMMDDYYYY,
+  parseTripDays,
+} from "../../../utils/tourDates";
+
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 interface Bus {
@@ -73,7 +83,13 @@ export default function PackageDetails() {
   const router = useRouter();
   const params = useLocalSearchParams();
   const [date, setDate] = useState(String(params.date || ""));
-  const [date1, setdate] = useState(new Date());
+  const [date1, setdate] = useState(earliestTourDate());
+  const [hiddenCount, setHiddenCount] = useState(0);
+  const tripDays = parseTripDays(params.tripDuration as string);
+  const startDate = parseMMDDYYYY(date);
+  const tooSoon = startDate ? isTooSoon(startDate) : false;
+  const dateOk = isValidDateString(date) && !tooSoon;
+  const tripEnd = startDate ? formatMMDDYYYY(addDays(startDate, tripDays - 1)) : "";
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const busType3: string = "tour";
   const [loading, setLoading] = useState(false);
@@ -83,8 +99,8 @@ export default function PackageDetails() {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   const loadBuses = async () => {
-    // Never load or display buses until a valid date has been entered.
-    if (!isValidDateString(date)) {
+    // Never load or display buses until a valid date (at least a week ahead) is entered.
+    if (!dateOk) {
       setBusData([]);
       setLoading(false);
       return;
@@ -100,24 +116,41 @@ export default function PackageDetails() {
     try {
       setLoading(true);
 
-      const response = await fetch(`${API_URL}/buses?busType=${busType3}`);
+      const [response, bookedRes] = await Promise.all([
+        fetch(`${API_URL}/buses?busType=${busType3}`),
+        fetch(
+          `${API_URL}/receipts/booked-buses?date=${encodeURIComponent(date)}` +
+            `&tripDuration=${encodeURIComponent(String(params.tripDuration ?? ""))}`
+        ),
+      ]);
 
       if (!response.ok) {
         throw new Error("Network issues encountered");
       }
 
       const data = await response.json();
+      const booked = await bookedRes.json();
+      if (!bookedRes.ok || !booked.success) {
+        throw new Error(booked.message || "Could not check bus bookings");
+      }
+
+      // Hide buses already booked on any day of this trip
+      const bookedSet = new Set<string>(booked.bookedBuses ?? []);
       const typeOfBuses = Array.isArray(data)
         ? data.filter((bus: Bus) => bus.busType === busType3)
         : [];
+      const freeBuses = typeOfBuses.filter((bus: Bus) => !bookedSet.has(bus.busNumber));
 
-      setBusData(typeOfBuses);
+      setHiddenCount(typeOfBuses.length - freeBuses.length);
+      setBusData(freeBuses);
     } catch (error) {
       console.log("Error details:", error);
       setBusData([]);
       Alert.alert(
         "Network Error",
-        "Unable to load buses from the server. Please try again."
+        error instanceof Error && error.message !== "Network issues encountered"
+          ? error.message
+          : "Unable to load buses from the server. Please try again."
       );
     } finally {
       setLoading(false);
@@ -126,14 +159,14 @@ export default function PackageDetails() {
 
   useFocusEffect(
     useCallback(() => {
-      if (!isValidDateString(date)) {
+      if (!dateOk) {
         setBusData([]);
         setLoading(false);
         return;
       }
 
       loadBuses();
-    }, [date])
+    }, [date, dateOk])
   );
 
   
@@ -210,7 +243,7 @@ export default function PackageDetails() {
                 <TextInput 
                     style={styles.input1} 
                     value={date} 
-                    placeholder="MM/DD/YYYY" 
+                    placeholder={`From ${formatMMDDYYYY(earliestTourDate())}`} 
                     placeholderTextColor="#99999a"
                     onChangeText={(value) => setDate(value)} />
                 <TouchableOpacity onPress={() => setShowCalendar(true)}>
@@ -223,7 +256,7 @@ export default function PackageDetails() {
               value={date1 || new Date()}
               mode="date"
               display="default"
-              minimumDate={new Date()}   // Cannot select a date before today
+              minimumDate={earliestTourDate()}   // At least a week from today
               onChange={(event, selectedDate) => {
                 setShowCalendar(false);
 
@@ -261,6 +294,15 @@ export default function PackageDetails() {
                 Enter a real date in MM/DD/YYYY format.
               </Text>
             </View>
+          ) : tooSoon ? (
+            <View style={styles.dateMessageContainer}>
+              <Fontisto name="calendar" size={40} color="#D97706" />
+              <Text style={styles.dateMessageTitle}>Book at least {MIN_DAYS_AHEAD} days ahead</Text>
+              <Text style={styles.dateMessageText}>
+                Tours need a week's notice. The earliest date you can choose is{" "}
+                {formatMMDDYYYY(earliestTourDate())}.
+              </Text>
+            </View>
           ) : loading ? (
             <View style={styles.loadingContainer}>
               <ActivityIndicator size="large" color="#159B79" />
@@ -268,6 +310,19 @@ export default function PackageDetails() {
             </View>
           ) : (
             <FlatList
+              ListHeaderComponent={
+                <View style={styles.tripInfo}>
+                  <Ionicons name="calendar-outline" size={18} color="#155B8A" />
+                  <Text style={styles.tripInfoText}>
+                    {tripDays === 1
+                      ? `Trip on ${date}`
+                      : `${tripDays}-day trip: ${date} – ${tripEnd}`}
+                    {hiddenCount > 0
+                      ? `\n${hiddenCount} bus${hiddenCount === 1 ? " is" : "es are"} already booked on these dates and hidden.`
+                      : ""}
+                  </Text>
+                </View>
+              }
               style={styles.svw}
               data={filteredBusData}
               renderItem={renderBusItem}
@@ -279,7 +334,9 @@ export default function PackageDetails() {
                   <Fontisto name="bus" size={40} color="#98A2B3" />
                   <Text style={styles.dateMessageTitle}>No Buses Found</Text>
                   <Text style={styles.dateMessageText}>
-                    No tour buses are currently available.
+                    {hiddenCount > 0
+                      ? "All tour buses are already booked for these dates. Try another date."
+                      : "No tour buses are currently available."}
                   </Text>
                 </View>
               }
@@ -342,14 +399,14 @@ export default function PackageDetails() {
             <Ionicons name="home-outline" size={28} color="#fff" />             
           </TouchableOpacity>
     
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push({ pathname: "/notifications", params: { role: "passenger" } });}}>
             <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
               Alerts
             </Text>
           </TouchableOpacity>
     
-          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
+          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({ pathname: "/passenger/passengerProfile", params: { role: "passenger",NIC: params.NIC } });}}>
             <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
               Profile
@@ -980,6 +1037,23 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 25, 
   },
 
+
+  tripInfo: {
+    flexDirection: "row",
+    gap: 8,
+    marginHorizontal: 15,
+    marginBottom: 12,
+    padding: 12,
+    borderRadius: 14,
+    backgroundColor: "#E6EEF9",
+  },
+
+  tripInfoText: {
+    flex: 1,
+    color: "#173C79",
+    fontSize: 13,
+    lineHeight: 19,
+  },
 
   dateMessageContainer: {
     flex: 1,

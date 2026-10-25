@@ -1,11 +1,35 @@
-import * as Notifications from "expo-notifications";
+import type * as NotificationsModule from "expo-notifications";
+import Constants, { ExecutionEnvironment } from "expo-constants";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// ─── Load expo-notifications safely ─────────────────────────────────────
+// Expo Go (SDK 53+) no longer ships the native modules expo-notifications needs,
+// so importing it there crashes the whole app ("Cannot find native module
+// 'ExpoTopicSubscriptionModule'"). Load it only in a development build / APK,
+// and fall back to "no system notifications" everywhere else.
+const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+
+function loadNotificationsModule(): typeof NotificationsModule | null {
+  if (isExpoGo) return null;
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    return require("expo-notifications");
+  } catch (err) {
+    console.warn("expo-notifications is unavailable in this build:", err);
+    return null;
+  }
+}
+
+const Notifications = loadNotificationsModule();
+
+/** False in Expo Go: system-bar notifications need a development build or the APK. */
+export const notificationsAvailable = Notifications !== null;
 
 // ─── Configure Global Notification Behavior ─────────────────────────────
 // This ensures notifications appear as a heads-up banner / in the notification bar
 // even when the app is running in the foreground.
-Notifications.setNotificationHandler({
+Notifications?.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldShowBanner: true,
@@ -20,6 +44,7 @@ Notifications.setNotificationHandler({
  * Call this in the root component (_layout.tsx) when the app starts.
  */
 export async function initNotifications(): Promise<boolean> {
+  if (!Notifications) return false;
   try {
     // 1. Android Notification Channels (required for Android 8+)
     if (Platform.OS === "android") {
@@ -110,16 +135,19 @@ export async function sendLocalNotification({
 }): Promise<string | null> {
   try {
     const content: Record<string, any> = { ...data, ...(audience ? { audience } : {}) };
-    const id = await Notifications.scheduleNotificationAsync({
-      content: {
-        title,
-        body,
-        data: content,
-        sound: true,
-        ...(Platform.OS === "android" ? { channelId } : {}),
-      },
-      trigger: null, // null delivers immediately
-    });
+    // In Expo Go there is no system notification, but still keep it in the in-app history.
+    const id = Notifications
+      ? await Notifications.scheduleNotificationAsync({
+          content: {
+            title,
+            body,
+            data: content,
+            sound: true,
+            ...(Platform.OS === "android" ? { channelId } : {}),
+          },
+          trigger: null, // null delivers immediately
+        })
+      : `local-${Date.now()}`;
     await addToNotificationHistory({
       id,
       title,
@@ -151,6 +179,7 @@ export async function scheduleNotification({
   data?: Record<string, any>;
   channelId?: "default" | "emergency" | "bookings" | "parcels";
 }): Promise<string | null> {
+  if (!Notifications) return null;
   try {
     const id = await Notifications.scheduleNotificationAsync({
       content: {
@@ -170,6 +199,35 @@ export async function scheduleNotification({
     console.error("❌ Error scheduling notification:", err);
     return null;
   }
+}
+
+/** Current permission status, or "unavailable" when running in Expo Go. */
+export async function getNotificationPermissionStatus(): Promise<string> {
+  if (!Notifications) return "unavailable";
+  try {
+    const { status } = await Notifications.getPermissionsAsync();
+    return status;
+  } catch {
+    return "unavailable";
+  }
+}
+
+/**
+ * Save every received notification to history and handle taps from the status bar.
+ * Returns a cleanup function. Does nothing in Expo Go.
+ */
+export function addNotificationListeners(onTap: (data: Record<string, unknown>) => void): () => void {
+  if (!Notifications) return () => {};
+  const receivedListener = Notifications.addNotificationReceivedListener((notification) => {
+    recordReceivedNotification(notification).catch(() => {});
+  });
+  const responseListener = Notifications.addNotificationResponseReceivedListener((response) => {
+    onTap(response.notification.request.content.data ?? {});
+  });
+  return () => {
+    receivedListener.remove();
+    responseListener.remove();
+  };
 }
 
 // ─── Domain Specific Notification Helpers ───────────────────────────────
@@ -334,8 +392,9 @@ export async function addToNotificationHistory(record: NotificationRecord) {
 }
 
 /** Save a notification delivered by the OS (push, scheduled, or local). */
-export async function recordReceivedNotification(notification: Notifications.Notification) {
+export async function recordReceivedNotification(notification: NotificationsModule.Notification) {
   const { title, body, data } = notification.request.content;
+  if (data?.serverAlert) return;
   await addToNotificationHistory({
     id: notification.request.identifier,
     title: title || "New Notification",
@@ -359,4 +418,187 @@ export function subscribeToNotificationHistory(listener: () => void) {
   return () => {
     historyListeners.delete(listener);
   };
+}
+
+// ─── Admin & Bus Staff Alerts (stored on the server) ────────────────────
+// Admin and staff use different phones, so their alerts live in the backend
+// (/api/notifications). While an admin or staff member is signed in, the app
+// checks for new alerts every 30 seconds and shows them in the status bar.
+
+export type StaffRole = "admin" | "staff";
+export type ServerAlertType = "emergency" | "parcel" | "ticket" | "tour" | "general";
+
+export interface ServerAlert {
+  _id: string;
+  title: string;
+  body: string;
+  type: ServerAlertType;
+  audience: StaffRole[];
+  busNumber?: string | null;
+  data?: Record<string, any>;
+  createdAt: string;
+}
+
+export interface Session {
+  role: StaffRole | "passenger";
+  busNumber?: string;
+}
+
+const SESSION_KEY = "@jetlink_session";
+const lastReadKey = (role: StaffRole) => `@jetlink_alerts_last_read_${role}`;
+const LAST_POLLED_KEY = "@jetlink_alerts_last_polled";
+const POLL_INTERVAL_MS = 30_000;
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
+/** Call after login so the app knows whose alerts to fetch. */
+export async function saveSession(session: Session) {
+  try {
+    await AsyncStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    // Start from "now" so a new login doesn't pop up every old alert
+    await AsyncStorage.setItem(LAST_POLLED_KEY, new Date().toISOString());
+  } catch (err) {
+    console.warn("Could not save session:", err);
+  }
+}
+
+export async function getSession(): Promise<Session | null> {
+  try {
+    const saved = await AsyncStorage.getItem(SESSION_KEY);
+    return saved ? JSON.parse(saved) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Call on logout so the phone stops receiving staff/admin alerts. */
+export async function clearSession() {
+  try {
+    await AsyncStorage.multiRemove([SESSION_KEY, LAST_POLLED_KEY]);
+  } catch {}
+}
+
+export async function fetchServerAlerts(
+  role: StaffRole,
+  busNumber?: string,
+  since?: string
+): Promise<ServerAlert[]> {
+  const query = new URLSearchParams({ role, limit: "100" });
+  if (busNumber) query.append("busNumber", busNumber);
+  if (since) query.append("since", since);
+
+  const response = await fetch(`${API_URL}/notifications?${query.toString()}`);
+  const data = await response.json();
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || "Failed to load alerts");
+  }
+  return data.notifications as ServerAlert[];
+}
+
+/** Admin → staff announcement (or any manual alert). */
+export async function sendServerAlert(alert: {
+  title: string;
+  body?: string;
+  type?: ServerAlertType;
+  audience: StaffRole[];
+  busNumber?: string;
+}) {
+  const response = await fetch(`${API_URL}/notifications`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(alert),
+  });
+  const data = await response.json();
+  if (!response.ok || !data.success) {
+    throw new Error(data.message || "Failed to send alert");
+  }
+  return data.notification as ServerAlert;
+}
+
+export async function deleteServerAlert(id: string) {
+  const response = await fetch(`${API_URL}/notifications/${id}`, { method: "DELETE" });
+  if (!response.ok) throw new Error("Failed to delete alert");
+}
+
+export async function getAlertsLastRead(role: StaffRole): Promise<number> {
+  try {
+    return Number(await AsyncStorage.getItem(lastReadKey(role))) || 0;
+  } catch {
+    return 0;
+  }
+}
+
+export async function markAlertsRead(role: StaffRole) {
+  try {
+    await AsyncStorage.setItem(lastReadKey(role), String(Date.now()));
+  } catch {}
+  historyListeners.forEach((listener) => listener());
+}
+
+/** Number of alerts newer than the last time the Alerts screen was opened. */
+export async function getUnreadAlertCount(role: StaffRole, busNumber?: string): Promise<number> {
+  try {
+    const lastRead = await getAlertsLastRead(role);
+    const alerts = await fetchServerAlerts(role, busNumber, new Date(lastRead).toISOString());
+    return alerts.length;
+  } catch {
+    return 0;
+  }
+}
+
+function channelFor(type: ServerAlertType): "default" | "emergency" | "bookings" | "parcels" {
+  if (type === "emergency") return "emergency";
+  if (type === "parcel") return "parcels";
+  if (type === "ticket" || type === "tour") return "bookings";
+  return "default";
+}
+
+let polling = false;
+
+async function pollOnce() {
+  const session = await getSession();
+  if (!session || session.role === "passenger") return;
+
+  const since = (await AsyncStorage.getItem(LAST_POLLED_KEY)) || new Date().toISOString();
+  const alerts = await fetchServerAlerts(session.role, session.busNumber, since);
+  if (alerts.length === 0) return;
+
+  // Remember the newest one we've seen
+  await AsyncStorage.setItem(LAST_POLLED_KEY, alerts[0].createdAt);
+  historyListeners.forEach((listener) => listener());
+
+  if (!Notifications) return; // Expo Go: the Alerts screen still shows them
+
+  // Oldest first, at most 5 at once so the status bar isn't flooded
+  for (const alert of alerts.slice(0, 5).reverse()) {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: alert.title,
+        body: alert.body,
+        sound: true,
+        // serverAlert: already listed from the server, so don't copy it into local history
+        data: { ...(alert.data ?? {}), serverAlert: true, url: `/notifications?role=${session.role}` },
+        ...(Platform.OS === "android" ? { channelId: channelFor(alert.type) } : {}),
+      },
+      trigger: null,
+    });
+  }
+}
+
+/** Start checking the server for new admin/staff alerts. Returns a stop function. */
+export function startServerAlertPolling(): () => void {
+  const tick = async () => {
+    if (polling) return;
+    polling = true;
+    try {
+      await pollOnce();
+    } catch {
+      // Server unreachable — try again next time
+    } finally {
+      polling = false;
+    }
+  };
+  tick();
+  const timer = setInterval(tick, POLL_INTERVAL_MS);
+  return () => clearInterval(timer);
 }

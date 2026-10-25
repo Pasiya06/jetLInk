@@ -4,12 +4,15 @@ import { ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity,
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather as Icon, AntDesign, Fontisto, Ionicons } from '@expo/vector-icons';
 
+import FieldError from "../../components/FieldError";
+import { useFieldErrors } from "../../utils/validation";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const OTP_LENGTH = 6;
 const RESEND_SECONDS = 30;
 
 export const FlatmateLogin: React.FC = () => {
   const router = useRouter();
+  const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
   const [showLogin, setShowOtp] = useState(false);
   const params = useLocalSearchParams();
   const [email, setEmail] = useState(String(params.email || ""));
@@ -62,6 +65,10 @@ export const FlatmateLogin: React.FC = () => {
  
 
 const verify = async () => {
+  if (!validateFields([
+    { key: "email", label: "Email", value: email, type: "email" },
+  ])) return;
+
   try {
     setShowOtp(true);
     sendOTP();
@@ -219,6 +226,7 @@ useEffect(() => {
                         />
                     </View>
                     </View>
+                    <FieldError message={fieldError("email", email)} />
                   
             
                   <TouchableOpacity
@@ -264,6 +272,7 @@ useEffect(() => {
                         />
                     </View>
                     </View>
+                    <FieldError message={fieldError("email", email)} />
                   
             
                   <TouchableOpacity
@@ -330,7 +339,7 @@ useEffect(() => {
                     </TouchableOpacity>
 
                     <View style={styles.resendRow}>
-                      <Text style={styles.resendText}>Didn't get the code? </Text>
+                      <Text style={styles.resendText}>Didn&apos;t get the code? </Text>
                       <TouchableOpacity onPress={handleResend} disabled={timer > 0 || resending}>
                         <Text style={[styles.resendLink, timer > 0 && styles.resendLinkDisabled]}>
                           {resending ? "Sending..." : timer > 0 ? `Resend in ${timer}s` : "Resend"}

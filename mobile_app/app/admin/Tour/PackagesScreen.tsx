@@ -23,7 +23,10 @@ import {
 } from "@expo/vector-icons";
 
 import { LinearGradient } from "expo-linear-gradient";
+import AlertBadge from "../../../components/AlertBadge";
 
+import FieldError from "../../../components/FieldError";
+import { useFieldErrors } from "../../../utils/validation";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 type PackageItem = {
@@ -40,6 +43,7 @@ type PackageItem = {
 
 export default function PackagesScreen() {
   const router = useRouter();
+  const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
   const params = useLocalSearchParams();
   const [packages, setPackages] = useState<PackageItem[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<PackageItem | null>(null);
@@ -122,6 +126,15 @@ export default function PackagesScreen() {
   };
 
   const createPackage = async () => {
+    if (!validateFields([
+      { key: "description", label: "Description", value: description },
+      { key: "packageType", label: "Package type", value: packageType },
+      { key: "totalDistance", label: "Distance", value: totalDistance },
+      { key: "tripDuration", label: "Duration", value: tripDuration },
+      { key: "maxPassengers", label: "Maximum passengers", value: maxPassengers, type: "int" },
+      { key: "maxPrice", label: "Price", value: maxPrice, type: "number", min: 1 },
+    ])) return;
+
 
     // if (!packageName.trim()) {
     //   Alert.alert(
@@ -258,6 +271,15 @@ export default function PackagesScreen() {
   };
 
   const updatePackage = async () => {
+    if (!validateFields([
+      { key: "description", label: "Description", value: description },
+      { key: "packageType", label: "Package type", value: packageType },
+      { key: "totalDistance", label: "Distance", value: totalDistance },
+      { key: "tripDuration", label: "Duration", value: tripDuration },
+      { key: "maxPassengers", label: "Maximum passengers", value: maxPassengers, type: "int" },
+      { key: "maxPrice", label: "Price", value: maxPrice, type: "number", min: 1 },
+    ])) return;
+
     if (!selectedPackage) {
     return;
     }
@@ -507,6 +529,7 @@ export default function PackagesScreen() {
               multiline={true}
               textAlignVertical="top"
               />
+              <FieldError message={fieldError("description", description)} />
 
               <TextInput
               style={styles.input}
@@ -515,6 +538,7 @@ export default function PackagesScreen() {
               value={packageType}
               onChangeText={setPackageType}
               />
+              <FieldError message={fieldError("packageType", packageType)} />
 
               <TextInput
               style={styles.input}
@@ -523,6 +547,7 @@ export default function PackagesScreen() {
               value={totalDistance}
               onChangeText={setTotalDistance}
               />
+              <FieldError message={fieldError("totalDistance", totalDistance)} />
 
               <TextInput
               style={styles.input}
@@ -531,6 +556,7 @@ export default function PackagesScreen() {
               value={tripDuration}
               onChangeText={setTripDuration}
               />
+              <FieldError message={fieldError("tripDuration", tripDuration)} />
 
               <TextInput
               style={styles.input}
@@ -540,6 +566,7 @@ export default function PackagesScreen() {
               onChangeText={setMaxPassengers}
               keyboardType="numeric"
               />
+              <FieldError message={fieldError("maxPassengers", maxPassengers)} />
 
               <TextInput
               style={styles.input}
@@ -549,6 +576,7 @@ export default function PackagesScreen() {
               onChangeText={setMaxPrice}
               keyboardType="numeric"
               />
+              <FieldError message={fieldError("maxPrice", maxPrice)} />
 
               <View style={styles.modalButtons}>
                 <TouchableOpacity
@@ -615,6 +643,7 @@ export default function PackagesScreen() {
             multiline={true}
             textAlignVertical="top"
           />
+          <FieldError message={fieldError("description", description)} />
 
           {/* PACKAGE TYPE */}
 
@@ -625,6 +654,7 @@ export default function PackagesScreen() {
             value={packageType}
             onChangeText={ setPackageType}
           />
+          <FieldError message={fieldError("packageType", packageType)} />
 
           {/* DISTANCE */}
 
@@ -635,6 +665,7 @@ export default function PackagesScreen() {
             value={totalDistance}
             onChangeText={setTotalDistance}
           />
+          <FieldError message={fieldError("totalDistance", totalDistance)} />
 
           {/* DURATION */}
 
@@ -645,6 +676,7 @@ export default function PackagesScreen() {
             value={tripDuration}
             onChangeText={setTripDuration}
           />
+          <FieldError message={fieldError("tripDuration", tripDuration)} />
 
           {/* MAX PASSENGERS */}
 
@@ -656,6 +688,7 @@ export default function PackagesScreen() {
             onChangeText={ setMaxPassengers}
             keyboardType="numeric"
           />
+          <FieldError message={fieldError("maxPassengers", maxPassengers)} />
 
           {/* MAX PRICE */}
 
@@ -667,6 +700,7 @@ export default function PackagesScreen() {
             onChangeText={ setMaxPrice}
             keyboardType="numeric"
           />
+          <FieldError message={fieldError("maxPrice", maxPrice)} />
 
           {/* BUTTONS */}
 
@@ -769,19 +803,27 @@ export default function PackagesScreen() {
             <Ionicons name="home-outline" size={28} color="#fff" />             
           </TouchableOpacity>
     
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "admin" } }); }}>
+            <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="admin" /></View>
             <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
               Alerts
             </Text>
           </TouchableOpacity>
     
-          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-            <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-            <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-              Profile
-            </Text>
-          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({
+                      pathname: "/admin/Profile/adminProfile",
+                      params: {
+                        Aid: params.Aid,
+                        firstName: params.firstName,
+                        lastName: params.lastName,
+                        email: params.email,
+                      },
+                    });}}>
+                    <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                      Profile
+                    </Text>
+                  </TouchableOpacity>
         </View>
 
         {/* Bottom Graphic Design Element */}

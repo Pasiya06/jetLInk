@@ -81,6 +81,7 @@ export default function PaymentSuccessScreen() {
         plastName:params.plastName,
         pphoneNumber: params.pphoneNumber,
         pemail: params.pemail,
+        NIC: params.NIC,
         
       },
     })
@@ -97,6 +98,7 @@ export default function PaymentSuccessScreen() {
         plastName:params.plastName,
         pphoneNumber: params.pphoneNumber,
         pemail: params.pemail,
+        NIC: params.NIC,
         
       },
     })

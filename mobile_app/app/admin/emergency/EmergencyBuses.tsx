@@ -23,6 +23,8 @@ import {
   FontAwesome
  } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
+import AlertBadge from "../../../components/AlertBadge";
+import { formatEmergencyTime, emergencyTimeAgo } from "../../../utils/emergencyTime";
 
 if (
   Platform.OS === "android" &&
@@ -65,6 +67,7 @@ type Bus = {
   emissionDate?: string;
   emergency?: boolean;
   status?: "normal" | "accident" | "breakdown";
+  emergencyAt?: string | null;
   busType?: string;
   latitude?: number;
   longitude?: number;
@@ -244,6 +247,15 @@ function BusCard({ bus }: { bus: Bus }) {
           </Text>
         </View>
 
+        {bus.emergencyAt ? (
+          <View style={styles.reportedWrap}>
+            <Ionicons name="time-outline" size={14} color={meta.color} />
+            <Text style={[styles.reportedText, { color: meta.color }]}>
+              {formatEmergencyTime(bus.emergencyAt)} · {emergencyTimeAgo(bus.emergencyAt)}
+            </Text>
+          </View>
+        ) : null}
+
       </View>
 
       {/* Actions */}
@@ -277,6 +289,11 @@ function BusCard({ bus }: { bus: Bus }) {
       {/* Expanded details */}
       {open && (
         <View style={styles.details}>
+          <Group title="Emergency">
+            <Row label="Type" value={meta.label} />
+            <Row label="Reported at" value={formatEmergencyTime(bus.emergencyAt)} />
+          </Group>
+
           <Group title="Vehicle">
             <Row label="Bus ID" value={bus.busId} />
             <Row label="Chassis number" value={bus.chassisNo} />
@@ -446,7 +463,7 @@ export default function EmergencyBuses() {
           <View style={styles.errorBox}>
             <Ionicons name="cloud-offline-outline" size={20} color={C.alert} />
             <View style={{ flex: 1 }}>
-              <Text style={styles.errorTitle}>Couldn't load buses</Text>
+              <Text style={styles.errorTitle}>Couldn&apos;t load buses</Text>
               <Text style={styles.errorText}>{error}</Text>
             </View>
             <Pressable onPress={retry} hitSlop={10}>
@@ -544,19 +561,27 @@ export default function EmergencyBuses() {
                 <Ionicons name="home-outline" size={28} color="#fff" />             
             </TouchableOpacity>
           
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push("/admin/index1");}}>
-            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("alerts"); router.push({ pathname: "/notifications", params: { role: "admin" } }); }}>
+            <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="admin" /></View>
             <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
               Alerts
             </Text>
           </TouchableOpacity>
           
-          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push("/admin/index1");}}>
-            <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
-            <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
-              Profile
-            </Text>
-          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={() => {setActiveTab("profile"); router.push({
+                      pathname: "/admin/Profile/adminProfile",
+                      params: {
+                        Aid: params.Aid,
+                        firstName: params.firstName,
+                        lastName: params.lastName,
+                        email: params.email,
+                      },
+                    });}}>
+                    <Feather name="user" size={24} color={activeTab === "profile" ? "#0057D9" : "#8A8A8A"}/>
+                    <Text style={[styles.label1, activeTab === "profile" && styles.activeLabel,]}>
+                      Profile
+                    </Text>
+                  </TouchableOpacity>
         </View>
         
         
@@ -715,6 +740,16 @@ const styles = StyleSheet.create({
   chipText: { fontSize: 12, fontWeight: "700" },
 
   /* Live strip */
+  reportedWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    flexShrink: 1,
+  },
+  reportedText: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
   liveStrip: {
     flexDirection: "row",
     alignItems: "center",
