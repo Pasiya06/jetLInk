@@ -129,45 +129,47 @@ export const FlatmateLogin: React.FC = () => {
                 });
             }
 
-            const response = await fetch(`${API_URL}/tickets`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    pickup:params.pickup,
-                    drop:params.drop,
-                    date:params.date,
-                    time:params.time,
-                    pfirstName: params.pfirstName,
-                    plastName:params.plastName,
-                    pemail: params.pemail,
-                    bNumber:params.bNumber,
-                    busType:params.busType,
-                    seatNumbers:params.seatNumbers,
-                    noOfTicket:params.noOfTicket,
-                    totalFare:params.totalFare,
-                }),
-            });
+            else{
+              const response = await fetch(`${API_URL}/tickets`, {
+                  method: "POST",
+                  headers: {
+                      "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                      pickup:params.pickup,
+                      drop:params.drop,
+                      date:params.date,
+                      time:params.time,
+                      pfirstName: params.pfirstName,
+                      plastName:params.plastName,
+                      pemail: params.pemail,
+                      bNumber:params.bNumber,
+                      busType:params.busType,
+                      seatNumbers:params.seatNumbers,
+                      noOfTicket:params.noOfTicket,
+                      totalFare:params.totalFare,
+                  }),
+              });
 
-            const data1 = await response.json();
+              const data1 = await response.json();
 
-            if (response.ok && data1.success) {
-                router.push({
-                    pathname: "/passenger/dailyBuses/paymentSuccessful",
-                    params: {
-                        Pid: params.Pid,
-                        Pid1: params.Pid1,
-                        pfirstName: params.pfirstName,
-                        plastName:params.plastName,
-                        pphoneNumber: params.pphoneNumber,
-                        pemail: params.pemail,
-                        NIC: params.NIC,
-                        totalFare:params.totalFare,
-                        bNumber:params.bNumber,
-                    },
-                });
-            }
+              if (response.ok && data1.success) {
+                  router.push({
+                      pathname: "/passenger/dailyBuses/paymentSuccessful",
+                      params: {
+                          Pid: params.Pid,
+                          Pid1: params.Pid1,
+                          pfirstName: params.pfirstName,
+                          plastName:params.plastName,
+                          pphoneNumber: params.pphoneNumber,
+                          pemail: params.pemail,
+                          NIC: params.NIC,
+                          totalFare:params.totalFare,
+                          bNumber:params.bNumber,
+                      },
+                  });
+              }
+            };
             
 
                 

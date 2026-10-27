@@ -141,7 +141,8 @@ export const FlatmateLogin: React.FC = () => {
               });
             }
             
-            try {
+            else{
+              try {
               
               const API_URL = process.env.EXPO_PUBLIC_API_URL;
         
@@ -421,6 +422,7 @@ export const FlatmateLogin: React.FC = () => {
             // }
 
         } 
+      }
         catch (err) {
         setError("Something went wrong. Check your connection.");
         } 
