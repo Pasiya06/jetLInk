@@ -7,8 +7,10 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   StyleSheet,
-  TextInput
+  TextInput,
+  ScrollView,
 } from "react-native";
+import { ScreenHeader, IconBox, GradientButton, C, ui } from "../../components/JetUI";
 import SearchPanel from "../../components/SearchPanel";
 import { Alert } from "../../components/JetAlert";
 import { 
@@ -208,105 +210,90 @@ export default function EmergencyButton() {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <View style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
+      <View style={[styles.container, { backgroundColor: C.bg }]}>
+        <ScreenHeader eyebrow={`Bus ${busNumber || ""}`.trim()} title="Emergency" />
 
-          <View style={styles.header}>          
-            <TouchableOpacity><Text style={styles.title}>Emergency States</Text></TouchableOpacity>          
-          </View>
-    
-        </LinearGradient>
-        <View style={styles.card}>
-          <Text style={styles.CardTitle}>Bus Emergency</Text>
-
-          <Text style={styles.busNumber}>
-            Bus Number: {busNumber}
-          </Text>
-
-          <View
-            style={[
-              styles.statusBox,
-              emergency ? styles.emergencyBox : styles.normalBox,
-            ]}
-          >
-            <Text style={styles.statusLabel}>
-              Current Status
-            </Text>
-
-            <Text
-              style={[
-                styles.statusText,
-                { color: emergency ? "#B91C1C" : "#15803D" },
-              ]}
-            >
-              {emergency
-                ? status.toUpperCase()
-                : "NORMAL"}
-            </Text>
-            {emergency && emergencyAt ? (
-              <Text style={styles.reportedAt}>
-                Reported: {formatEmergencyTime(emergencyAt)}
-                {"\n"}({emergencyTimeAgo(emergencyAt)})
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          <View style={[ui.card, styles.statusCard, emergency ? styles.statusBad : styles.statusOk]}>
+            <IconBox bg={emergency ? C.redSoft : C.greenSoft} size={58}>
+              <Ionicons
+                name={emergency ? (status === "accident" ? "warning" : "construct") : "shield-checkmark"}
+                size={30}
+                color={emergency ? C.red : C.green}
+              />
+            </IconBox>
+            <View style={{ flex: 1, marginLeft: 14 }}>
+              <Text style={styles.statusLabel}>Current status</Text>
+              <Text style={[styles.statusText, { color: emergency ? C.red : C.green }]}>
+                {emergency ? (status === "accident" ? "Accident reported" : "Breakdown reported") : "Running normally"}
               </Text>
-            ) : null}
+              {emergency && emergencyAt ? (
+                <Text style={styles.reportedAt}>
+                  Reported {formatEmergencyTime(emergencyAt)} · {emergencyTimeAgo(emergencyAt)}
+                </Text>
+              ) : null}
+              <Text style={styles.statusHint}>
+                {emergency
+                  ? "Passengers can't book this bus until you mark it fixed."
+                  : "Report a problem below if something goes wrong."}
+              </Text>
+            </View>
           </View>
 
-          
-        </View>
-
-        {loading ? (
-          <ActivityIndicator
-            size="large"
-            color="#0047AB"
-            style={styles.loader}
-          />
-        ) : (
-          <>
-            {!emergency && (
-              <>
-                <TouchableOpacity
-                  style={[styles.card1, styles.accidentButton]}
-                  onPress={() => reportEmergency("accident")}
-                  accessibilityRole="button"
-                  accessibilityLabel="Report accident"
-                >
-                  <Text style={styles.buttonText}>
-                    🚨 Report Accident
-                  </Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={[styles.card1, styles.breakdownButton]}
-                  onPress={() => reportEmergency("breakdown")}
-                  accessibilityRole="button"
-                  accessibilityLabel="Report breakdown"
-                >
-                  <Text style={styles.buttonText}>
-                    🚌 Report Breakdown
-                  </Text>
-                </TouchableOpacity>
-              </>
-            )}
-
-            {emergency && (
+          {loading ? (
+            <ActivityIndicator size="large" color={C.blue} style={{ marginTop: 24 }} />
+          ) : !emergency ? (
+            <>
+              <Text style={styles.sectionTitle}>Report a problem</Text>
               <TouchableOpacity
-                style={[styles.card1, styles.resolveButton]}
-                onPress={resolveEmergency}
+                style={[ui.card, styles.actionCard]}
+                onPress={() => reportEmergency("accident")}
+                activeOpacity={0.85}
                 accessibilityRole="button"
-                accessibilityLabel="Resolve emergency"
+                accessibilityLabel="Report accident"
               >
-                <Text style={styles.buttonText}>
-                  ✓ Resolve Emergency
-                </Text>
+                <IconBox bg={C.redSoft} size={52}>
+                  <Ionicons name="warning" size={26} color={C.red} />
+                </IconBox>
+                <View style={{ flex: 1, marginLeft: 14 }}>
+                  <Text style={ui.rowTitle}>Accident</Text>
+                  <Text style={ui.rowSub}>The bus was in an accident</Text>
+                </View>
+                <View style={[styles.goDot, { backgroundColor: C.red }]}>
+                  <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+                </View>
               </TouchableOpacity>
-            )}
-          </>
-        )}
+
+              <TouchableOpacity
+                style={[ui.card, styles.actionCard]}
+                onPress={() => reportEmergency("breakdown")}
+                activeOpacity={0.85}
+                accessibilityRole="button"
+                accessibilityLabel="Report breakdown"
+              >
+                <IconBox bg={C.amberSoft} size={52}>
+                  <Ionicons name="construct" size={26} color={C.amber} />
+                </IconBox>
+                <View style={{ flex: 1, marginLeft: 14 }}>
+                  <Text style={ui.rowTitle}>Breakdown</Text>
+                  <Text style={ui.rowSub}>The bus can't continue the trip</Text>
+                </View>
+                <View style={[styles.goDot, { backgroundColor: C.amber }]}>
+                  <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+                </View>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <View style={{ marginTop: 6 }}>
+              <GradientButton
+                label="Bus is fixed – back in service"
+                icon="checkmark-circle-outline"
+                onPress={resolveEmergency}
+              />
+            </View>
+          )}
+        </ScrollView>
+
 
         <SearchPanel
           visible={isSearching}
@@ -428,6 +415,13 @@ export default function EmergencyButton() {
 }
 
 const styles = StyleSheet.create({
+  statusCard: { flexDirection: "row", alignItems: "center", padding: 18, borderWidth: 1.5 },
+  statusOk: { borderColor: "#BFE6D6" },
+  statusBad: { borderColor: "#F5B5B5" },
+  statusHint: { fontSize: 12.5, color: "#5B6B7F", marginTop: 4 },
+  sectionTitle: { fontSize: 16, fontWeight: "800", color: "#0F1B2D", marginTop: 6, marginBottom: 10, marginLeft: 4 },
+  actionCard: { flexDirection: "row", alignItems: "center", padding: 16 },
+  goDot: { width: 36, height: 36, borderRadius: 18, alignItems: "center", justifyContent: "center" },
 
   container:{
     flex:1,
@@ -510,22 +504,9 @@ const styles = StyleSheet.create({
   emergencyBox: {
     backgroundColor: "#FEE2E2",
   },
-  statusLabel: {
-    fontSize: 14,
-    color: "#333333",
-  },
-  reportedAt: {
-    marginTop: 8,
-    fontSize: 13,
-    color: "#7F1D1D",
-    fontWeight: "600",
-    textAlign: "center",
-  },
-  statusText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginTop: 4,
-  },
+  statusLabel: { fontSize: 12.5, fontWeight: "700", color: "#5B6B7F" },
+  reportedAt: { fontSize: 12.5, fontWeight: "700", color: "#B91C1C", marginTop: 4 },
+  statusText: { fontSize: 19, fontWeight: "800", marginTop: 2 },
   button: {
     paddingVertical: 15,
     paddingHorizontal: 12,

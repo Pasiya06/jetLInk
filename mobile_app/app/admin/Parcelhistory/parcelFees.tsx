@@ -1,13 +1,17 @@
 import React from 'react';
 import  { useState,useEffect } from 'react';
 import { Stack,useRouter,useLocalSearchParams} from "expo-router";
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  SafeAreaView, 
-  TextInput} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
+  TextInput,
+  ScrollView,
+} from 'react-native';
+import { FormSection, FormField } from "../../../components/JetForm";
+import { ScreenHeader, GradientButton, C, ui } from "../../../components/JetUI";
 import SearchPanel from "../../../components/SearchPanel";
 import { Alert } from "../../../components/JetAlert";
 import { 
@@ -178,113 +182,84 @@ const ParcelService = () => {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
+      <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
+        <ScreenHeader eyebrow="Parcel service" title="Parcel fares" />
+
+        <ScrollView
+          style={ui.body}
+          contentContainerStyle={ui.bodyContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-       
-          <View style={styles.header}> 
-              <TouchableOpacity><Text style={styles.title}>Parcel Fare</Text></TouchableOpacity>
-          </View>
-        </LinearGradient>
-      
-      
-        
-        
-        <View style={styles.card} >
-          <View style={styles.svw}>
-            <Text style={styles.cardTitle}>Fare Breakdown</Text>
-
-            {rows.map((row, index) => (
-              <View key={index} style={styles.row}>
-                <View style={styles.rowLeft}>
-                  <View style={[styles.iconWrap, { backgroundColor: `${row.color}20` }]}>
-                    <Ionicons name ={row.icon as any} size={18} color={row.color} />
-                  </View>
-                  <Text style={styles.label}>{row.label}</Text>
-                </View>
-                <Text style={styles.value}>Rs. {row.value}</Text>
+          <View style={[ui.card, styles.fareCard]}>
+            <Text style={styles.fareHeading}>How a parcel price is made</Text>
+            <View style={styles.fareTiles}>
+              <View style={[styles.fareTile, { backgroundColor: C.blueSoft }]}>
+                <Ionicons name="bus-outline" size={20} color={C.blue} />
+                <Text style={styles.fareTileLabel}>Bus fare</Text>
+                <Text style={[styles.fareTileValue, { color: C.blue }]}>Rs. {busFare || "0"}</Text>
               </View>
-            ))}
-
-              {/* <View style={styles.divider} />
-
-              <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Total</Text>
-                <Text style={styles.totalValue}>Rs. {total}</Text>
-              </View> */}
-          </View>
-                
-        </View>
-
-        <View style={styles.card1} >
-          <View style={styles.svw}>
-            <Text style={styles.inputLabel}>Bus Fee</Text>  
-            <View style={styles.inputWrapper}>                
-              <View style={styles.inputInnerWrapper}>
-                <TextInput
-                  style={styles.textInput}
-                  value={busFare}
-                  onChangeText={setBusFare}
-                  
-                  placeholderTextColor="#A3A3A3"
-                  keyboardType="phone-pad"
-                />
+              <View style={[styles.fareTile, { backgroundColor: C.amberSoft }]}>
+                <Ionicons name="barbell-outline" size={20} color={C.amber} />
+                <Text style={styles.fareTileLabel}>Per kg</Text>
+                <Text style={[styles.fareTileValue, { color: C.amber }]}>Rs. {weighFare || "0"}</Text>
+              </View>
+              <View style={[styles.fareTile, { backgroundColor: C.greenSoft }]}>
+                <Ionicons name="receipt-outline" size={20} color={C.green} />
+                <Text style={styles.fareTileLabel}>Service tax</Text>
+                <Text style={[styles.fareTileValue, { color: C.green }]}>Rs. {serviceTax || "0"}</Text>
               </View>
             </View>
-            <FieldError message={fieldError("busFare", busFare)} />
-
-            <Text style={styles.inputLabel}>Weight Fee for 1kg</Text>  
-            <View style={styles.inputWrapper}>                
-              <View style={styles.inputInnerWrapper}>
-                <TextInput
-                  style={styles.textInput}
-                  value={weighFare}
-                  onChangeText={setWeighFare}
-                  
-                  placeholderTextColor="#A3A3A3"
-                  keyboardType="phone-pad"
-                />
-              </View>
+            <View style={styles.exampleRow}>
+              <Ionicons name="information-circle-outline" size={16} color={C.muted} />
+              <Text style={styles.exampleText}>
+                Example 1 kg parcel: Rs. {total}
+              </Text>
             </View>
-            <FieldError message={fieldError("weighFare", weighFare)} />
-
-            <Text style={styles.inputLabel}>Service Tax</Text>  
-            <View style={styles.inputWrapper}>                
-              <View style={styles.inputInnerWrapper}>
-                <TextInput
-                  style={styles.textInput}
-                  value={serviceTax}
-                  onChangeText={setServiceTax}
-                  placeholder="077 1234567"
-                  
-                  keyboardType="phone-pad"
-                />
-              </View>
-            </View>
-            <FieldError message={fieldError("serviceTax", serviceTax)} />
-
           </View>
-        </View>
 
-        <TouchableOpacity style={styles.searchButton} onPress={updateParcelFee} disabled={loading}>
-          <LinearGradient
-            colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-            style={styles.submitGradient}
-          >
-            <Text style={styles.searchButtonText}>{loading ? "Updating..." : "Update Fee"}</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+          <FormSection title="Change fares" subtitle="New bookings use these prices" icon="create-outline">
+            <FormField
+              label="Bus fare"
+              icon="bus-outline"
+              value={busFare}
+              onChangeText={(t) => setBusFare(t.replace(/[^0-9.]/g, ""))}
+              keyboardType="decimal-pad"
+              placeholder="200"
+              suffix="LKR"
+              error={fieldError("busFare", busFare)}
+            />
+            <FormField
+              label="Weight fee for 1 kg"
+              icon="barbell-outline"
+              value={weighFare}
+              onChangeText={(t) => setWeighFare(t.replace(/[^0-9.]/g, ""))}
+              keyboardType="decimal-pad"
+              placeholder="50"
+              suffix="LKR"
+              error={fieldError("weighFare", weighFare)}
+            />
+            <FormField
+              label="Service tax"
+              icon="receipt-outline"
+              value={serviceTax}
+              onChangeText={(t) => setServiceTax(t.replace(/[^0-9.]/g, ""))}
+              keyboardType="decimal-pad"
+              placeholder="25"
+              suffix="LKR"
+              error={fieldError("serviceTax", serviceTax)}
+            />
+          </FormSection>
+
+          <GradientButton
+            label={loading ? "Saving…" : "Save fares"}
+            icon="checkmark-circle-outline"
+            onPress={updateParcelFee}
+            disabled={loading}
+          />
+        </ScrollView>
 
 
-
-        
-        
       <SearchPanel
           visible={isSearching}
           query={searchQuery}
@@ -387,6 +362,14 @@ const ParcelService = () => {
 };
 
 const styles = StyleSheet.create({
+  fareCard: { padding: 18 },
+  fareHeading: { fontSize: 17, fontWeight: "800", color: "#0F1B2D", marginBottom: 12 },
+  fareTiles: { flexDirection: "row", gap: 8 },
+  fareTile: { flex: 1, borderRadius: 16, padding: 12, gap: 4 },
+  fareTileLabel: { fontSize: 12, fontWeight: "700", color: "#5B6B7F", marginTop: 4 },
+  fareTileValue: { fontSize: 16, fontWeight: "800" },
+  exampleRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 14, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#EDF1F6" },
+  exampleText: { fontSize: 13, color: "#5B6B7F", fontWeight: "600" },
   container:{
     flex:1,
     backgroundColor:"#fff"

@@ -1,13 +1,19 @@
 import React, { useState, useCallback } from 'react';
 import { Stack, useRouter, useFocusEffect, useLocalSearchParams } from "expo-router";
 
-import { 
-  StyleSheet, 
-  View, 
-  Text,  
-  TouchableOpacity, 
-  SafeAreaView, 
-  TextInput} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
+  TextInput,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import { FormField, FieldRow } from "../../components/JetForm";
+import { ScreenHeader, GradientButton, GRADIENT, C, ui } from "../../components/JetUI";
 import SearchPanel from "../../components/SearchPanel";
 import { Alert } from "../../components/JetAlert";
 import { 
@@ -204,156 +210,110 @@ const JetLinkInterface: React.FC = () => {
   
       <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <SafeAreaView style={styles.container}>
-        <LinearGradient
-                colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-                style={styles.submitGradient1}
-            >
-        <View style={styles.header}>
-            
-        
-          <TouchableOpacity >
-            <Text style={styles.title}>JetLink</Text>
-          </TouchableOpacity>
-                 
-        </View>
-        </LinearGradient> 
-             
-        <View style={styles.card}>
-         {/* Tabs */}
-            <View style={styles.tabRow}>
-              <TouchableOpacity
-                style={styles.tabItem}
-                onPress={() => setActiveTab1('card')}
-              >
-                <Ionicons
-                  name="card-outline"
-                  size={16}
-                  color={activeTab1 === 'card' ? '#1E6091' : '#A3A3A3'}
-                />
-                <Text style={[styles.tabText, activeTab1 === 'card' && styles.tabTextActive]}>
-                  Card Payment
-                </Text>
-                {activeTab1 === 'card' && <View style={styles.tabUnderline} />}
-              </TouchableOpacity>
+      <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
+        <ScreenHeader eyebrow="Book a parcel · Step 3" title="Payment" />
 
-              <TouchableOpacity
-                style={styles.tabItem}
-                onPress={() => setActiveTab1('qr')}
-              >
-                <MaterialCommunityIcons
-                  name="qrcode"
-                  size={16}
-                  color={activeTab === 'qr' ? '#1E6091' : '#A3A3A3'}
-                />
-                <Text style={[styles.tabText, activeTab === 'qr' && styles.tabTextActive]}>
-                  QR Payment
-                </Text>
-                {activeTab === 'qr' && <View style={styles.tabUnderline} />}
-              </TouchableOpacity>
-            </View>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+          <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+            <LinearGradient colors={GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.amountCard}>
+              <Text style={styles.amountLabel}>Amount to pay</Text>
+              <Text style={styles.amountValue}>Rs. {params.totalFare ?? "0"}</Text>
+              <View style={styles.amountRow}>
+                <Ionicons name="shield-checkmark-outline" size={15} color="rgba(255,255,255,0.9)" />
+                <Text style={styles.amountNote}>Secure payment</Text>
+              </View>
+            </LinearGradient>
 
-            {activeTab1 === 'card' ? (
-              <>
-                {/* Card brand row */}
-                <View style={styles.brandRow}>
-                  {cardBrands.map((brand, index) => (
-                    <View key={index} style={styles.brandChip}>
-                      <MaterialCommunityIcons name={brand.icon as any} size={16} color="#5A5A5A" />
-                    </View>
-                  ))}
-                </View>
+            <View style={[ui.card, styles.payCard]}>
+              <View style={styles.segment}>
+                <TouchableOpacity
+                  style={[styles.segBtn, activeTab1 === "card" && styles.segBtnActive]}
+                  onPress={() => setActiveTab1("card")}
+                >
+                  <Ionicons name="card-outline" size={17} color={activeTab1 === "card" ? C.blue : C.muted} />
+                  <Text style={[styles.segText, activeTab1 === "card" && styles.segTextActive]}>Card</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.segBtn, activeTab1 === "qr" && styles.segBtnActive]}
+                  onPress={() => setActiveTab1("qr")}
+                >
+                  <MaterialCommunityIcons name="qrcode" size={17} color={activeTab1 === "qr" ? C.blue : C.muted} />
+                  <Text style={[styles.segText, activeTab1 === "qr" && styles.segTextActive]}>QR</Text>
+                </TouchableOpacity>
+              </View>
 
-                {/* Name on card */}
-                <Text style={styles.inputLabel}>Name on card</Text>
-                <View style={styles.inputWrapper}>
-                  <TextInput
-                    style={styles.textInput}
+              {activeTab1 === "card" ? (
+                <>
+                  <View style={styles.brandRow}>
+                    {cardBrands.map((brand, index) => (
+                      <View key={index} style={styles.brandChip}>
+                        <MaterialCommunityIcons name={brand.icon as any} size={18} color="#5A5A5A" />
+                      </View>
+                    ))}
+                  </View>
+
+                  <FormField
+                    label="Name on card"
+                    icon="person-outline"
                     value={nameOnCard}
                     onChangeText={setNameOnCard}
                     placeholder="Name on card"
-                    placeholderTextColor="#B0B0B0"
+                    error={fieldError("nameOnCard", nameOnCard)}
                   />
-                </View>
-                <FieldError message={fieldError("nameOnCard", nameOnCard)} />
-
-                {/* Card number */}
-                <Text style={styles.inputLabel}>Card number</Text>
-                <View style={styles.inputWrapper}>
-                  <TextInput
-                    style={styles.textInput}
+                  <FormField
+                    label="Card number"
+                    icon="card-outline"
                     value={cardNumber}
                     onChangeText={handleCardNumberChange}
-                    placeholder="•••• •••• •••• 4831"
-                    placeholderTextColor="#B0B0B0"
+                    placeholder="•••• •••• •••• ••••"
                     keyboardType="number-pad"
-                    maxLength={19} 
+                    maxLength={19}
+                    error={fieldError("cardNumber", cardNumber)}
                   />
+                  <FieldRow>
+                    <FormField
+                      label="Expiry"
+                      icon="calendar-outline"
+                      value={expiry}
+                      onChangeText={handleExpiryChange}
+                      placeholder="MM/YY"
+                      keyboardType="number-pad"
+                      maxLength={5}
+                      error={fieldError("expiry", expiry)}
+                    />
+                    <FormField
+                      label="CVC"
+                      icon="lock-closed-outline"
+                      value={cvc}
+                      onChangeText={setCvc}
+                      placeholder="•••"
+                      keyboardType="number-pad"
+                      secureTextEntry
+                      maxLength={3}
+                      error={fieldError("cvc", cvc)}
+                    />
+                  </FieldRow>
+
+                  <Text style={styles.secureText}>
+                    Securely processed and powered by <Text style={styles.secureBold}>BANCSTAC</Text>
+                  </Text>
+                </>
+              ) : (
+                <View style={styles.qrPlaceholder}>
+                  <MaterialCommunityIcons name="qrcode-scan" size={110} color={C.chevron} />
+                  <Text style={styles.qrText}>Scan to pay with your banking app</Text>
                 </View>
-                <FieldError message={fieldError("cardNumber", cardNumber)} />
+              )}
+            </View>
 
-                {/* Expiry / CVC row */}
-                <View style={styles.row}>
-                  <View style={styles.halfInput}>
-                    <Text style={styles.inputLabel}>Expiry</Text>
-                    <View style={styles.inputWrapper}>
-                      <TextInput
-                        style={styles.textInput}
-                        value={expiry}
-                        onChangeText={handleExpiryChange}
-                        placeholder="MM / YY"
-                        placeholderTextColor="#B0B0B0"
-                        keyboardType="number-pad"
-                        maxLength={5}
-                      />
-                    </View>
-                    <FieldError message={fieldError("expiry", expiry)} />
-                  </View>
+            <GradientButton
+              label={`Pay Rs. ${params.totalFare ?? ""}`.trim()}
+              icon="lock-closed-outline"
+              onPress={handlePayment}
+            />
+          </ScrollView>
+        </KeyboardAvoidingView>
 
-                  <View style={styles.halfInput}>
-                    <Text style={styles.inputLabel}>CVC</Text>
-                    <View style={styles.inputWrapper}>
-                      <TextInput
-                        style={styles.textInput}
-                        value={cvc}
-                        onChangeText={setCvc}
-                        placeholder="•••"
-                        placeholderTextColor="#B0B0B0"
-                        keyboardType="number-pad"
-                        secureTextEntry
-                        maxLength={3}
-                      />
-                    </View>
-                    <FieldError message={fieldError("cvc", cvc)} />
-                  </View>
-                </View>
-
-                
-
-                <Text style={styles.secureText}>
-                  Securely processed and powered by{' '}
-                  <Text style={styles.secureBold}>BANCSTAC</Text>
-                </Text>
-              </>
-            ) : (
-              <View style={styles.qrPlaceholder}>
-                <MaterialCommunityIcons name="qrcode-scan" size={120} color="#D0D0D0" />
-                <Text style={styles.qrText}>Scan to pay with your banking app</Text>
-              </View>
-            )}
-          </View>
-        <TouchableOpacity style={styles.submitButton} onPress={handlePayment}>
-            <LinearGradient
-                colors={["#173C79","#155B8A","#159B79",]}
-                start={{x: 0, y: 0,}}
-                end={{x: 1, y: 1,}}
-                style={styles.submitGradient}
-            >
-            <Text style={styles.submitText}>Pay</Text>
-            </LinearGradient>
-        </TouchableOpacity>
 
       <SearchPanel
           visible={isSearching}
@@ -491,6 +451,17 @@ const JetLinkInterface: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  amountCard: { borderRadius: 24, padding: 20 },
+  amountLabel: { color: "rgba(255,255,255,0.85)", fontSize: 13, fontWeight: "700", letterSpacing: 0.5, textTransform: "uppercase" },
+  amountValue: { color: "#FFFFFF", fontSize: 32, fontWeight: "800", marginTop: 4 },
+  amountRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 8 },
+  amountNote: { color: "rgba(255,255,255,0.9)", fontSize: 12.5, fontWeight: "600" },
+  payCard: { padding: 18 },
+  segment: { flexDirection: "row", backgroundColor: "#EEF2F7", borderRadius: 14, padding: 4 },
+  segBtn: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, paddingVertical: 10, borderRadius: 11 },
+  segBtnActive: { backgroundColor: "#FFFFFF", elevation: 2, shadowColor: "#0F1B2D", shadowOpacity: 0.08, shadowRadius: 6, shadowOffset: { width: 0, height: 2 } },
+  segText: { fontSize: 14, fontWeight: "700", color: "#5B6B7F" },
+  segTextActive: { color: "#155B8A" },
   container:{
     flex:1,
     backgroundColor:"#fff"
@@ -580,20 +551,9 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
 
-  brandRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
+  brandRow: { flexDirection: "row", gap: 8, marginTop: 16 },
 
-  brandChip: {
-    width: 40,
-    height: 30,
-    borderRadius: 8,
-    backgroundColor: '#F5F6FA',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  brandChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, borderWidth: 1, borderColor: "#E3E9F1", backgroundColor: "#FFFFFF" },
 
   inputLabel: {
     fontSize: 13,
@@ -652,22 +612,14 @@ const styles = StyleSheet.create({
   },
 
 
-  secureText: {
-    textAlign: 'center',
-    fontSize: 11,
-    color: '#A3A3A3',
-    marginTop: 14,
-  },
+  secureText: { fontSize: 12.5, color: "#5B6B7F", textAlign: "center", marginTop: 16 },
 
   secureBold: {
     fontWeight: '700',
     color: '#5A5A5A',
   },
 
-  qrPlaceholder: {
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
+  qrPlaceholder: { alignItems: "center", justifyContent: "center", paddingVertical: 30 },
 
   qrText: {
     fontSize: 13,

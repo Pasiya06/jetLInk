@@ -10,6 +10,8 @@ import {
   Image,
   ScrollView 
 } from 'react-native';
+import { FormSection, FormField, PickerField, FieldRow } from "../../../components/JetForm";
+import { ScreenHeader, GradientButton, C, ui } from "../../../components/JetUI";
 import SearchPanel from "../../../components/SearchPanel";
 import { Alert } from "../../../components/JetAlert";
 import { 
@@ -98,223 +100,140 @@ const ToursScreen: React.FC = () => {
   return (
     <>
     <Stack.Screen options={{ title: "", headerShown: false }} />
-    <SafeAreaView style={styles.container}>
-      <LinearGradient
-              colors={["#173C79","#155B8A","#159B79",]}
-              start={{x: 0, y: 0,}}
-              end={{x: 1, y: 1,}}
-              style={styles.submitGradient1}
-      >
-        <View style={styles.header}>
-              
-                      
-              <TouchableOpacity >
-                <Text style={styles.title}>{params.busNumber}</Text>
-              </TouchableOpacity>
-                      
-    
-        </View>
-      </LinearGradient>      
+    <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
+        <ScreenHeader eyebrow={`${params.busTypeTopic || "Bus"} fleet`} title={`Edit ${params.busNumber || params.busNum || "bus"}`} />
 
-      <View style={styles.card}>
-        <ScrollView style={styles.svw} >
-      
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Chassis No</Text>
-                <View style={styles.inputWrapper}>
-                <View style={[styles.iconWrap, { backgroundColor: "#06B6D418" }]}>
-                    <Ionicons name="barcode-outline" size={18} color="#06B6D4" />
-                </View>
-                <TextInput
-                    style={styles.input}
-                    value={chassisNo}
-                    onChangeText={(text) => setChassisNo(text.replace(/\s/g, "").toUpperCase())}
-                    placeholder="CHS987654321"
-                    placeholderTextColor="#A0A5B1"
-                    autoCapitalize="characters"
-                    autoCorrect={false}
-                />
-                </View>
-                <FieldError message={fieldError("chassisNo", chassisNo)} />
-            </View>
-
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Engine No</Text>
-                <View style={styles.inputWrapper}>
-                <View style={[styles.iconWrap, { backgroundColor: "#EF444418" }]}>
-                    <MaterialCommunityIcons name ="engine-outline" size={18} color="#EF4444" />
-                </View>
-                <TextInput
-                    style={styles.input}
-                    value={engineNo}
-                    onChangeText={(text) => setEngineNo(text.replace(/\s/g, "").toUpperCase())}
-                    placeholder="EN12345678"
-                    placeholderTextColor="#A0A5B1"
-                    autoCapitalize="characters"
-                    autoCorrect={false}
-                />
-                </View>
-                <FieldError message={fieldError("engineNo", engineNo)} />
-            </View>
-
-            <View style={styles.fieldContainer}>
-              <Text style={styles.label}>Number of seats</Text>
-              <View style={styles.inputWrapper}>
-                <View style={[styles.iconWrap, { backgroundColor: "#fe880018" }]}>
-                    <MaterialCommunityIcons name ="car-seat" size={18} color="#fe8800" />
-                </View>
-                <TextInput 
-                  style={styles.input} 
-                  value={noOfSeats} 
-                  onChangeText={setnoOfSeats} 
-                  keyboardType="phone-pad" 
-                  maxLength={2} />           
-              </View>
-              <FieldError message={fieldError("noOfSeats", noOfSeats)} />
-            </View>
-
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Colour</Text>
-                <View style={styles.inputWrapper}>
-                <View style={[styles.iconWrap, { backgroundColor: "#EC489918" }]}>
-                    <Ionicons name="color-palette-outline" size={18} color="#EC4899" />
-                </View>
-                <TextInput
-                    style={styles.input}
-                    value={colour}
-                    onChangeText={(text) => setColour(text.replace(/\s/g, "").toUpperCase())}
-                    placeholder="GREEN"
-                    placeholderTextColor="#A0A5B1"
-                    autoCapitalize="characters"
-                    autoCorrect={false}
-                />
-                </View>
-                <FieldError message={fieldError("colour", colour)} />
-            </View>
-
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Service Date</Text>
-                <View style={styles.inputWrapper}>
-                    <View style={[styles.iconWrap, { backgroundColor: "#10B98118" }]}>
-                        <Ionicons name="calendar-outline" size={18} color="#10B981" />
-                    </View>
-                    <TextInput
-                        style={styles.input}
-                        value={serviceDate}
-                        onChangeText={setServiceDate}
-                        placeholder="MM/DD/YYYY"
-                        placeholderTextColor="#A0A5B1"
-                    />
-                    <TouchableOpacity onPress={() => setShowCalendar(true)}>
-                        <FontAwesome5 name="calendar-alt" size={24} color="#A0A5B1" />  
-                    </TouchableOpacity>
-                </View>
-                <FieldError message={fieldError("serviceDate", serviceDate)} />
-                
-            </View>
-
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>License Date</Text>
-                <View style={styles.inputWrapper}>
-                    <View style={[styles.iconWrap, { backgroundColor: "#3B82F618" }]}>
-                        <Ionicons name="document-text-outline" size={18} color="#3B82F6" />
-                    </View>
-                    <TextInput
-                        style={styles.input}
-                        value={licenseDate}
-                        onChangeText={setLicenseDate}
-                        placeholder="MM/DD/YYYY"
-                        placeholderTextColor="#A0A5B1"
-                    />
-                    <TouchableOpacity onPress={() => setShowCalendar1(true)}>
-                        <FontAwesome5 name="calendar-alt" size={24} color="#A0A5B1" />  
-                    </TouchableOpacity>
-                </View>
-                <FieldError message={fieldError("licenseDate", licenseDate)} />
-                
-            </View>
-
-            <View style={styles.fieldContainer}>
-                <Text style={styles.label}>Emission Date</Text>
-                <View style={styles.inputWrapper}>
-                    <View style={[styles.iconWrap, { backgroundColor: "#84CC1618" }]}>
-                        <Ionicons name="leaf-outline" size={18} color="#84CC16" />
-                    </View>
-                    <TextInput
-                        style={styles.input}
-                        value={emissionDate}
-                        onChangeText={setEmissionDate}
-                        placeholder="MM/DD/YYYY"
-                        placeholderTextColor="#A0A5B1"
-                    />
-                    <TouchableOpacity onPress={() => setShowCalendar2(true)}>
-                        <FontAwesome5 name="calendar-alt" size={24} color="#A0A5B1" />  
-                    </TouchableOpacity>
-                </View>
-                <FieldError message={fieldError("emissionDate", emissionDate)} />
-            </View>
-
-                {showCalendar && (
-                  <DateTimePicker
-                    value={date}
-                    mode="date"
-                    display="default"
-                    onChange={(event, selectedDate) => {
-                      setShowCalendar(false);
-                      if (selectedDate) {
-                        setDate(selectedDate);
-                        setServiceDate(selectedDate.toLocaleDateString()); 
-                      }
-                    }}
-                  />
-                )}
-
-                {showCalendar1 && (
-                  <DateTimePicker
-                    value={date}
-                    mode="date"
-                    display="default"
-                    onChange={(event, selectedDate) => {
-                      setShowCalendar1(false);
-                      if (selectedDate) {
-                        setDate(selectedDate);
-                        setLicenseDate(selectedDate.toLocaleDateString());
-                        
-                      }
-                    }}
-                  />
-                )}
-
-                {showCalendar2 && (
-                  <DateTimePicker
-                    value={date}
-                    mode="date"
-                    display="default"
-                    onChange={(event, selectedDate) => {
-                      setShowCalendar2(false);
-                      if (selectedDate) {
-                        setDate(selectedDate);
-                        setEmissionDate(selectedDate.toLocaleDateString()); 
-                      }
-                    }}
-                  />
-                )}           
-      
-        </ScrollView>
-       
-      
-      </View>
-
-      <TouchableOpacity style={styles.searchButton} onPress={handleUpdate}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient}
+        <ScrollView
+          style={ui.body}
+          contentContainerStyle={ui.bodyContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
         >
-          <Text style={styles.searchButtonText}>Update</Text>
-        </LinearGradient>
-      </TouchableOpacity>
+          <FormSection title="Bus details" subtitle="Registration and vehicle numbers" icon="bus-outline">
+            <FormField
+              label="Bus number"
+              icon="pricetag-outline"
+              value={String(params.busNumber || params.busNum || "")}
+              readOnly
+              hint="The bus number can't be changed"
+            />
+            <FormField
+              label="Chassis number"
+              icon="barcode-outline"
+              value={chassisNo}
+              onChangeText={(text) => setChassisNo(text.replace(/\s/g, "").toUpperCase())}
+              placeholder="CHS987654321"
+              autoCapitalize="characters"
+              autoCorrect={false}
+              error={fieldError("chassisNo", chassisNo)}
+            />
+            <FormField
+              label="Engine number"
+              icon="hardware-chip-outline"
+              value={engineNo}
+              onChangeText={(text) => setEngineNo(text.replace(/\s/g, "").toUpperCase())}
+              placeholder="EN12345678"
+              autoCapitalize="characters"
+              autoCorrect={false}
+              error={fieldError("engineNo", engineNo)}
+            />
+            <FieldRow>
+              <FormField
+                label="Seats"
+                icon="people-outline"
+                value={noOfSeats}
+                onChangeText={(t) => setnoOfSeats(t.replace(/[^0-9]/g, ""))}
+                keyboardType="number-pad"
+                maxLength={2}
+                placeholder="54"
+                error={fieldError("noOfSeats", noOfSeats)}
+              />
+              <FormField
+                label="Colour"
+                icon="color-palette-outline"
+                value={colour}
+                onChangeText={(text) => setColour(text.replace(/\s/g, "").toUpperCase())}
+                placeholder="GREEN"
+                autoCapitalize="characters"
+                autoCorrect={false}
+                error={fieldError("colour", colour)}
+              />
+            </FieldRow>
+          </FormSection>
+
+          <FormSection title="Renewal dates" subtitle="Tap a date to open the calendar" icon="calendar-outline" color={C.green} bg={C.greenSoft}>
+            <PickerField
+              label="Service date"
+              icon="construct-outline"
+              value={serviceDate}
+              placeholder="Choose service date"
+              onPress={() => setShowCalendar(true)}
+              error={fieldError("serviceDate", serviceDate)}
+            />
+            <PickerField
+              label="Licence date"
+              icon="document-text-outline"
+              value={licenseDate}
+              placeholder="Choose licence date"
+              onPress={() => setShowCalendar1(true)}
+              error={fieldError("licenseDate", licenseDate)}
+            />
+            <PickerField
+              label="Emission test date"
+              icon="leaf-outline"
+              value={emissionDate}
+              placeholder="Choose emission date"
+              onPress={() => setShowCalendar2(true)}
+              error={fieldError("emissionDate", emissionDate)}
+            />
+          </FormSection>
+
+          {showCalendar && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              onChange={(event, selectedDate) => {
+                setShowCalendar(false);
+                if (selectedDate) {
+                  setDate(selectedDate);
+                  setServiceDate(selectedDate.toLocaleDateString());
+                }
+              }}
+            />
+          )}
+          {showCalendar1 && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              onChange={(event, selectedDate) => {
+                setShowCalendar1(false);
+                if (selectedDate) {
+                  setDate(selectedDate);
+                  setLicenseDate(selectedDate.toLocaleDateString());
+                }
+              }}
+            />
+          )}
+          {showCalendar2 && (
+            <DateTimePicker
+              value={date}
+              mode="date"
+              display="default"
+              onChange={(event, selectedDate) => {
+                setShowCalendar2(false);
+                if (selectedDate) {
+                  setDate(selectedDate);
+                  setEmissionDate(selectedDate.toLocaleDateString());
+                }
+              }}
+            />
+          )}
+
+          <GradientButton label="Save changes" icon="checkmark-circle-outline" onPress={handleUpdate} />
+        </ScrollView>
+
 
       <SearchPanel
           visible={isSearching}

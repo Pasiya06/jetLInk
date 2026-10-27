@@ -471,9 +471,13 @@ export default function EmergencyBuses() {
           style={styles.submitGradient1}
         >
           <View style={styles.header}>
+            <Text style={styles.eyebrow}>Live alerts</Text>
             <View style={styles.headerTop}>
               <Text style={styles.title}>Emergency buses</Text>
-              
+              <View style={styles.livePill}>
+                <View style={styles.liveCore} />
+                <Text style={styles.liveText}>Live</Text>
+              </View>
             </View>
             <Text style={styles.subtitle}>
               {time ? `Updated at ${time}. Pull down to refresh.` : "Pull down to refresh."}
@@ -676,12 +680,10 @@ export default function EmergencyBuses() {
 /* --------------------------------- Styles --------------------------------- */
 
 const styles = StyleSheet.create({
+  eyebrow: { fontSize: 13, fontWeight: "600", color: "rgba(255,255,255,0.85)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 2 },
   container: { flex: 1, backgroundColor: C.paper },
 
-  submitGradient1: {
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
+  submitGradient1: { borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
 
   center: {
     flex: 1,
@@ -692,32 +694,15 @@ const styles = StyleSheet.create({
   loadingText: { marginTop: 12, color: C.muted, fontSize: 14 },
 
   /* Header */
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === "android" ? (StatusBar.currentHeight ?? 0) + 16 : 16,
-    paddingBottom: 56,
-  },
+  header: { paddingHorizontal: 24, paddingTop: 54, paddingBottom: 64 },
   headerTop: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
-  title: {
-    fontSize: 26,
-    fontWeight: "800",
-    color: "#FFFFFF",
-    letterSpacing: -0.5,
-  },
-  subtitle: { marginTop: 6, fontSize: 13, color: C.inkSoft },
-  livePill: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 999,
-  },
+  title: { fontSize: 28, fontWeight: "800", color: "#FFFFFF" },
+  subtitle: { marginTop: 6, fontSize: 13, color: "rgba(255,255,255,0.85)" },
+  livePill: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "rgba(255,255,255,0.16)", paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999 },
   liveText: { color: "#FFFFFF", fontSize: 12, fontWeight: "700" },
   liveWrap: { width: 10, height: 10, alignItems: "center", justifyContent: "center" },
   liveRing: {
@@ -727,20 +712,20 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: C.alert,
   },
-  liveCore: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.alert },
+  liveCore: { width: 8, height: 8, borderRadius: 4, backgroundColor: "#FF6B6B" },
 
   /* Summary */
   summary: {
     flexDirection: "row",
     backgroundColor: C.surface,
     marginHorizontal: 16,
-    marginTop: -34,
+    marginTop: -40,
     marginBottom: 10,
-    borderRadius: 18,
+    borderRadius: 20,
     paddingVertical: 16,
     elevation: 4,
-    shadowColor: C.ink,
-    shadowOpacity: 0.12,
+    shadowColor: "#0F1B2D",
+    shadowOpacity: 0.08,
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 6 },
   },

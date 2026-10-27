@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   FlatList,
 } from 'react-native';
+import { ScreenHeader, IconBox, Pill, EmptyState, NAV_SPACE, C, ui } from "../../../components/JetUI";
 import SearchPanel from "../../../components/SearchPanel";
 import { Alert } from "../../../components/JetAlert";
 import { Ionicons, MaterialIcons, FontAwesome, Feather, Fontisto } from '@expo/vector-icons';
@@ -82,7 +83,7 @@ const BusScreen: React.FC = () => {
   
   
   const renderBusItem = ({ item }: { item: Bus }) => (
-    <TouchableOpacity style={styles.friendRow}
+    <TouchableOpacity style={[ui.card, styles.busRow]} activeOpacity={0.85}
       onPress={() =>
         router.push({
           pathname: "/admin/buses/addSchedule",
@@ -115,11 +116,16 @@ const BusScreen: React.FC = () => {
       }
     >
       
-      <View style={styles.profileCircle}>
-        <Fontisto name={"bus"} size={25} color="#32CD32" />
+      <View style={styles.busRowIcon}>
+        <Fontisto name="bus" size={20} color={C.blue} />
       </View>
-      <Text style={styles.friendName}>{item.busNumber}</Text>
-      
+      <View style={{ flex: 1, marginLeft: 12 }}>
+        <Text style={styles.busRowTitle}>{item.busNumber}</Text>
+        <Text style={styles.busRowSub}>Tap to add a schedule</Text>
+      </View>
+      <View style={styles.rowArrow}>
+        <Ionicons name="add" size={20} color={C.blue} />
+      </View>
     </TouchableOpacity>
   );
 
@@ -130,32 +136,38 @@ const BusScreen: React.FC = () => {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-  
-          <View style={styles.header}>          
-            <TouchableOpacity><Text style={styles.title}>{params.busTypeTopic}</Text></TouchableOpacity>          
+      <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
+        <ScreenHeader eyebrow={`${params.busTypeTopic || ""} schedules`.trim()} title="Choose a bus" />
+
+        <View style={styles.listWrap}>
+          <View style={[ui.card, styles.introCard]}>
+            <IconBox bg={C.purpleSoft} size={44}>
+              <Ionicons name="calendar-outline" size={22} color={C.purple} />
+            </IconBox>
+            <View style={{ flex: 1, marginLeft: 12 }}>
+              <Text style={ui.rowTitle}>New schedule</Text>
+              <Text style={ui.rowSub}>Pick the bus that will run this trip</Text>
+            </View>
+            <Pill text={`${filteredBusData.length} ${filteredBusData.length === 1 ? "bus" : "buses"}`} />
           </View>
 
-        </LinearGradient>
-              
-        
-        <View style={styles.card}>
-          <Text style={styles.cardtitle}>Select a bus for add schedule</Text>
-          <FlatList style={styles.svw}
+          <FlatList
+            style={{ flex: 1 }}
             data={filteredBusData}
             renderItem={renderBusItem}
             keyExtractor={(item) => item._id}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingVertical: 10 }}
+            contentContainerStyle={{ paddingBottom: NAV_SPACE }}
+            ListEmptyComponent={
+              <EmptyState
+                icon={<Ionicons name="bus-outline" size={28} color={C.amber} />}
+                title={searchQuery ? "No matching buses" : "No buses yet"}
+                subtitle={searchQuery ? "Try another bus number." : "Add a bus first, then create its schedule."}
+              />
+            }
           />
-
         </View>
+
 
         <SearchPanel
           visible={isSearching}
@@ -260,6 +272,13 @@ const BusScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  busRow: { flexDirection: "row", alignItems: "center", padding: 14, marginBottom: 10 },
+  busRowIcon: { width: 48, height: 48, borderRadius: 15, backgroundColor: "#EAF1FB", alignItems: "center", justifyContent: "center" },
+  busRowTitle: { fontSize: 17, fontWeight: "800", color: "#0F1B2D", letterSpacing: 0.3 },
+  busRowSub: { fontSize: 12.5, color: "#5B6B7F", fontWeight: "600", marginTop: 2 },
+  rowArrow: { width: 34, height: 34, borderRadius: 17, backgroundColor: "#EAF1FB", alignItems: "center", justifyContent: "center" },
+  listWrap: { flex: 1, marginTop: -64, paddingHorizontal: 16 },
+  introCard: { flexDirection: "row", alignItems: "center", padding: 16, marginBottom: 12 },
   container:{
     flex:1,
     backgroundColor:"#fff"

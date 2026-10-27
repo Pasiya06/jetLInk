@@ -100,8 +100,9 @@ export default function ParcelScanner() {
         style={styles.submitGradient1}
       >
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>JetLink</Text>
-          <Text style={styles.headerSubtitle}>Scan the parcel QR to verify pickup or delivery</Text>
+          <Text style={styles.hdrEyebrow}>Parcel check</Text>
+          <Text style={styles.headerTitle}>Scan parcel QR</Text>
+          <Text style={styles.headerSubtitle}>Confirm a parcel pickup or delivery</Text>
         </View>
       </LinearGradient>
 
@@ -115,8 +116,11 @@ export default function ParcelScanner() {
               barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
               onBarcodeScanned={scanState === "idle" ? handleBarcodeScanned : undefined}
             />
-            <View style={styles.frameOverlay}>
-              <View style={styles.frameCorner} />
+            <View pointerEvents="none" style={styles.cornerBox}>
+              <View style={[styles.corner, styles.cTL]} />
+              <View style={[styles.corner, styles.cTR]} />
+              <View style={[styles.corner, styles.cBL]} />
+              <View style={[styles.corner, styles.cBR]} />
             </View>
 
             {scanState === "loading" && (
@@ -362,10 +366,14 @@ function InfoRow({
 // ---- Styles -------------------------------------------------------------
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: "#F8FAFC" 
-  },
+  hdrEyebrow: { fontSize: 13, fontWeight: "600", color: "rgba(255,255,255,0.85)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 2 },
+  cornerBox: { position: "absolute", top: "18%", bottom: "18%", left: "14%", right: "14%" },
+  corner: { position: "absolute", width: 36, height: 36, borderColor: "#FFFFFF" },
+  cTL: { top: 0, left: 0, borderTopWidth: 4, borderLeftWidth: 4, borderTopLeftRadius: 18 },
+  cTR: { top: 0, right: 0, borderTopWidth: 4, borderRightWidth: 4, borderTopRightRadius: 18 },
+  cBL: { bottom: 0, left: 0, borderBottomWidth: 4, borderLeftWidth: 4, borderBottomLeftRadius: 18 },
+  cBR: { bottom: 0, right: 0, borderBottomWidth: 4, borderRightWidth: 4, borderBottomRightRadius: 18 },
+  container: { flex: 1, backgroundColor: "#F4F7FB" },
 
   centerFill: {
     flex: 1,
@@ -375,20 +383,9 @@ const styles = StyleSheet.create({
     padding: 24,
   },
 
-  header: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    paddingBottom: 70,   
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
+  header: { paddingTop: 54, paddingHorizontal: 24, paddingBottom: 84 },
 
-  submitGradient1: {
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
+  submitGradient1: { borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
 
   headerIconWrap: {
     width: 52,
@@ -405,36 +402,17 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
 
-  headerTitle: { 
-    fontSize: 28, 
-    fontWeight: "700", 
-    color: "#FFFFFF" 
-  },
+  headerTitle: { fontSize: 28, fontWeight: "800", color: "#FFFFFF" },
 
-  headerSubtitle: {
-    fontSize: 13,
-    color: "#E0E7FF",
-    marginTop: 4,
-    textAlign: "center",
-  },
+  headerSubtitle: { fontSize: 13.5, color: "rgba(255,255,255,0.85)", marginTop: 6 },
 
-  scanArea: {
-    flex: 1, 
-    padding: 20, 
-    marginTop: -50,
-    maxHeight: '66%', 
-  },
+  scanArea: { flex: 1, paddingHorizontal: 16, marginTop: -60, maxHeight: "62%" },
 
   svw: {
     width: '100%',   
   },
 
-  cameraWrap: {
-    flex: 1,
-    borderRadius: 24,
-    overflow: "hidden",
-    backgroundColor: "#000",
-  },
+  cameraWrap: { flex: 1, borderRadius: 28, overflow: "hidden", backgroundColor: "#000", elevation: 6, shadowColor: "#0F1B2D", shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } },
 
   frameOverlay: {
     ...StyleSheet.absoluteFill,

@@ -8,6 +8,8 @@ import {
    SafeAreaView,
   ScrollView
 } from "react-native";
+import { FormSection, FormField, PickerField, FieldRow } from "../../../components/JetForm";
+import { ScreenHeader, GradientButton, C, ui } from "../../../components/JetUI";
 import SearchPanel from "../../../components/SearchPanel";
 import { Alert } from "../../../components/JetAlert";
 
@@ -138,160 +140,134 @@ const AddBus = () => {
   return (
     <>
     <Stack.Screen options={{ title: "", headerShown: false }} />
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
       
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-        start={{x: 0, y: 0,}}
-        end={{x: 1, y: 1,}}
-        style={styles.submitGradient1}
+      <ScreenHeader eyebrow="Bus schedule" title={`New schedule · ${params.busNumber || ""}`} />
+
+      <ScrollView
+        style={ui.body}
+        contentContainerStyle={ui.bodyContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.header}>
-            
-        
-          <TouchableOpacity >
-            <Text style={styles.title}>{params.busNumber}</Text>
-          </TouchableOpacity>
-                  
-        </View>
-      </LinearGradient> 
+        <FormSection title="Route" subtitle="Where the bus starts and ends" icon="navigate-outline">
+          <FormField
+            label="Departure location"
+            icon="location-outline"
+            value={pickuploca}
+            onChangeText={(text) => setpickuploca(text.replace(/\s/g, "").toUpperCase())}
+            placeholder="COLOMBO"
+            autoCapitalize="characters"
+            autoCorrect={false}
+            error={fieldError("pickuploca", pickuploca)}
+          />
+          <FormField
+            label="Arrival location"
+            icon="flag-outline"
+            value={dropoffloca}
+            onChangeText={(text) => setdropoffloca(text.replace(/\s/g, "").toUpperCase())}
+            placeholder="GALLE"
+            autoCapitalize="characters"
+            autoCorrect={false}
+            error={fieldError("dropoffloca", dropoffloca)}
+          />
+          <FormField
+            label="Stops"
+            icon="git-commit-outline"
+            value={stops}
+            onChangeText={(text) => setstops(text.replace(/\s/g, "").toUpperCase())}
+            placeholder="PANADURA,KALUTARA"
+            autoCapitalize="characters"
+            autoCorrect={false}
+            hint="Separate stops with commas"
+            error={fieldError("stops", stops)}
+          />
+        </FormSection>
 
-      <View style={styles.card}>
-        <ScrollView style={styles.svw}>
-        
-        <Text style={styles.label}>Date</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={busdate} onChangeText={setBusDate} />
-            <TouchableOpacity onPress={() => setShowCalendar(true)}>
-                {/* <FontAwesome5 name="calendar-alt" size={24} color="#A0A5B1" />   */}
+        <FormSection title="When" subtitle="Day and times of this trip" icon="time-outline" color={C.purple} bg={C.purpleSoft}>
+          <PickerField
+            label="Date"
+            icon="calendar-outline"
+            value={busdate === "ANY DATE" ? "Every day" : busdate}
+            placeholder="Choose a date"
+            onPress={() => setShowCalendar(true)}
+            error={fieldError("busdate", busdate)}
+          />
+          <View style={styles.chipRow}>
+            <TouchableOpacity
+              style={[styles.chip, busdate === "ANY DATE" && styles.chipActive]}
+              onPress={() => setBusDate("ANY DATE")}
+            >
+              <Ionicons name="repeat" size={15} color={busdate === "ANY DATE" ? "#FFFFFF" : C.blue} />
+              <Text style={[styles.chipText, busdate === "ANY DATE" && styles.chipTextActive]}>Every day</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.chip, busdate !== "ANY DATE" && styles.chipActive]}
+              onPress={() => setShowCalendar(true)}
+            >
+              <Ionicons name="calendar" size={15} color={busdate !== "ANY DATE" ? "#FFFFFF" : C.blue} />
+              <Text style={[styles.chipText, busdate !== "ANY DATE" && styles.chipTextActive]}>One date</Text>
             </TouchableOpacity>
           </View>
-          <FieldError message={fieldError("busdate", busdate)} />
-
-          {showCalendar && (
-                  <DateTimePicker
-                    value={date}
-                    mode="date"
-                    display="default"
-                    onChange={(event, selectedDate) => {
-                      setShowCalendar(false);
-                      if (selectedDate) {
-                        setDate(selectedDate);
-                        setBusDate(selectedDate.toLocaleDateString());
-                      }
-                    }}
-                  />
-                )}
-
-          <Text style={styles.label}>Depature location</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={pickuploca} 
-              onChangeText={(text) => setpickuploca(text.replace(/\s/g, "").toUpperCase())} 
-              autoCapitalize="characters"
-              autoCorrect={false}
-              />
-            <Text style={styles.inputIcon}>📍</Text>
-          </View>
-          <FieldError message={fieldError("pickuploca", pickuploca)} />
-
-          <Text style={styles.label}>Arrival location</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={dropoffloca} 
-              onChangeText={(text) => setdropoffloca(text.replace(/\s/g, "").toUpperCase())} 
-              autoCapitalize="characters"
-              autoCorrect={false}
-              />
-            <Text style={styles.inputIcon}>📍</Text>
-          </View>
-          <FieldError message={fieldError("dropoffloca", dropoffloca)} />
-
-          <Text style={styles.label}>Depature Time</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={depaturetime} onChangeText={setdepaturetime} />
-            <TouchableOpacity onPress={() => setShowTimePicker(true)}>
-                <Ionicons name="time-outline" size={24} color="#A0A5B1" />
-            </TouchableOpacity>
-          </View>
-          <FieldError message={fieldError("depaturetime", depaturetime)} />
-
-          {showTimePicker && (
-            <DateTimePicker
-              value={time}
-              mode="time"
-              display="default"
-              onChange={onTimeChange}
+          <FieldRow>
+            <PickerField
+              label="Departure"
+              icon="play-outline"
+              value={depaturetime}
+              placeholder="Time"
+              onPress={() => setShowTimePicker(true)}
+              right="time-outline"
+              error={fieldError("depaturetime", depaturetime)}
             />
-          )}    
-
-          <Text style={styles.label}>Arrival Time</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={arrivaltime} onChangeText={setarrivaltime} />
-            <TouchableOpacity onPress={() => setShowTimePicker1(true)}>
-                <Ionicons name="time-outline" size={24} color="#A0A5B1" />
-            </TouchableOpacity>
-          </View>
-          <FieldError message={fieldError("arrivaltime", arrivaltime)} />
-
-          {showTimePicker1 && (
-            <DateTimePicker
-              value={time}
-              mode="time"
-              display="default"
-              onChange={onTimeChange1}
+            <PickerField
+              label="Arrival"
+              icon="stop-outline"
+              value={arrivaltime}
+              placeholder="Time"
+              onPress={() => setShowTimePicker1(true)}
+              right="time-outline"
+              error={fieldError("arrivaltime", arrivaltime)}
             />
-          )}    
+          </FieldRow>
+        </FormSection>
 
-          <Text style={styles.label}>Price</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={ticketPrice} 
-              onChangeText={setticketPrice} 
-              placeholder='Price'
-              placeholderTextColor="#A3A3A3"
-              keyboardType="phone-pad"
-            />
-          </View>
-          <FieldError message={fieldError("ticketPrice", ticketPrice)} />
+        <FormSection title="Ticket price" icon="cash-outline" color={C.green} bg={C.greenSoft}>
+          <FormField
+            label="Price per ticket"
+            icon="pricetag-outline"
+            value={String(ticketPrice)}
+            onChangeText={(t) => setticketPrice(t.replace(/[^0-9.]/g, ""))}
+            placeholder="350"
+            keyboardType="decimal-pad"
+            suffix="LKR"
+            error={fieldError("ticketPrice", ticketPrice)}
+          />
+        </FormSection>
 
+        {showCalendar && (
+          <DateTimePicker
+            value={date}
+            mode="date"
+            display="default"
+            minimumDate={new Date()}
+            onChange={(event, selectedDate) => {
+              setShowCalendar(false);
+              if (selectedDate) {
+                setDate(selectedDate);
+                setBusDate(selectedDate.toLocaleDateString());
+              }
+            }}
+          />
+        )}
+        {showTimePicker && (
+          <DateTimePicker value={time} mode="time" display="default" onChange={onTimeChange} />
+        )}
+        {showTimePicker1 && (
+          <DateTimePicker value={time} mode="time" display="default" onChange={onTimeChange1} />
+        )}
 
-          <Text style={styles.label}>Stops</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={stops} 
-              onChangeText={(text) => setstops(text.replace(/\s/g, "").toUpperCase())} 
-              autoCapitalize="characters"
-              autoCorrect={false}
-            />
-            <Text style={styles.inputIcon}>📍</Text>
-          </View>
-          <FieldError message={fieldError("stops", stops)} />
-
-          
-
-          </ScrollView>
-
-          
-
-      </View>
-
-      <TouchableOpacity style={styles.searchButton} onPress={handleAddBus }>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient}
-        >
-          <Text style={styles.searchButtonText}>Add Schedule</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-
-
+        <GradientButton label="Add schedule" icon="add-circle-outline" onPress={handleAddBus} />
+      </ScrollView>
 
 
         <SearchPanel
@@ -410,6 +386,11 @@ const AddBus = () => {
 };
 
 const styles = StyleSheet.create({
+  chipRow: { flexDirection: "row", gap: 8, marginTop: 10 },
+  chip: { flexDirection: "row", alignItems: "center", gap: 6, paddingVertical: 8, paddingHorizontal: 14, borderRadius: 999, backgroundColor: "#EAF1FB" },
+  chipActive: { backgroundColor: "#155B8A" },
+  chipText: { fontSize: 13, fontWeight: "700", color: "#155B8A" },
+  chipTextActive: { color: "#FFFFFF" },
 
   container:{
     flex:1,

@@ -1,14 +1,16 @@
 import React from 'react';
 import  { useState } from 'react';
 import { Stack,useRouter,useLocalSearchParams} from "expo-router";
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  SafeAreaView, 
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
   TextInput,
+  ScrollView,
 } from 'react-native';
+import { ScreenHeader, FeatureCard, IconBox, C, ui } from "../../../components/JetUI";
 import SearchPanel from "../../../components/SearchPanel";
 import { Ionicons, 
   MaterialCommunityIcons, 
@@ -51,46 +53,39 @@ const ParcelService = () => {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-       
-        <View style={styles.header}> 
-            <TouchableOpacity><Text style={styles.title}>Parcel Details</Text></TouchableOpacity>
-        </View>
-      </LinearGradient>
-      
-      
-        
-        
-        <TouchableOpacity style={styles.card} onPress={handleSearch}>
-          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-              <Feather name="gift" size={58} color="#F59E0B" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>History</Text>
-            <Text style={styles.text2}>Manage All parcel history</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
+      <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
+        <ScreenHeader eyebrow="Parcel service" title="Parcels" />
 
-        <TouchableOpacity style={styles.card1} onPress={handleSearch1}>
-          <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
-              <MaterialCommunityIcons name="currency-usd" size={58} color="#8B5CF6" />
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          <View style={[ui.card, ui.rowCard]}>
+            <IconBox bg={C.amberSoft} size={48}>
+              <Feather name="package" size={24} color={C.amber} />
+            </IconBox>
+            <View style={{ flex: 1, marginLeft: 14 }}>
+              <Text style={ui.rowTitle}>Parcel delivery</Text>
+              <Text style={ui.rowSub}>Track every parcel and set the delivery fares</Text>
+            </View>
           </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Fare</Text>
-            <Text style={styles.text2}>Manage fare for a parcel</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
 
-        
-        
+          <FeatureCard
+            icon={<Feather name="clock" size={28} color={C.blue} />}
+            iconBg={C.blueSoft}
+            title="Parcel history"
+            subtitle="Pending, picked up and delivered parcels"
+            cta="View history"
+            onPress={handleSearch}
+          />
+          <FeatureCard
+            icon={<MaterialCommunityIcons name="cash-multiple" size={28} color={C.green} />}
+            iconBg={C.greenSoft}
+            title="Parcel fares"
+            subtitle="Set the price per kilogram and distance"
+            cta="Manage fares"
+            onPress={handleSearch1}
+          />
+        </ScrollView>
+
+
       <SearchPanel
           visible={isSearching}
           query={searchQuery}

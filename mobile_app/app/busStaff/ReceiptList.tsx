@@ -186,11 +186,8 @@ export default function BusReceipts() {
         end={{x: 1, y: 1,}}
         style={styles.submitGradient1}>
         <View style={styles.header}>
-          <TouchableOpacity>
-            <Text style={styles.title}>
-              Tour Receipt
-            </Text>
-          </TouchableOpacity>
+          <Text style={styles.eyebrow}>Bus {busNumber}</Text>
+          <Text style={styles.title}>Tour receipts</Text>
         </View>
       </LinearGradient>
 
@@ -217,8 +214,14 @@ export default function BusReceipts() {
           })
         }
       >
-        <Ionicons name="qr-code-outline" size={20} color="#FFFFFF" />
-        <Text style={styles.scanBtnText}>Scan tour QR</Text>
+        <LinearGradient colors={["#173C79", "#155B8A", "#159B79"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.scanIcon}>
+          <Ionicons name="qr-code-outline" size={24} color="#FFFFFF" />
+        </LinearGradient>
+        <View style={{ flex: 1, marginLeft: 14 }}>
+          <Text style={styles.scanBtnText}>Scan tour QR</Text>
+          <Text style={styles.scanBtnSub}>Check a passenger's tour booking</Text>
+        </View>
+        <Ionicons name="chevron-forward" size={20} color="#9AA8BA" />
       </TouchableOpacity>
 
       {loading ? (
@@ -715,31 +718,17 @@ function Detail({
 const NOTCH = 22;
 
 const styles = StyleSheet.create({
+  eyebrow: { fontSize: 13, fontWeight: "600", color: "rgba(255,255,255,0.85)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 2 },
+  scanIcon: { width: 50, height: 50, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  scanBtnSub: { color: "#5B6B7F", fontSize: 12.5, marginTop: 2 },
   container: { flex: 1, backgroundColor: C.bg },
 
   /* Header */
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
+  header: { paddingTop: 54, paddingHorizontal: 24, paddingBottom: 72 },
 
-  submitGradient1: {
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
+  submitGradient1: { borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
 
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#ffffff',
-    letterSpacing: 0.5,
-  },
+  title: { fontSize: 28, fontWeight: "800", color: "#ffffff" },
   backButton: {
     width: 40,
     height: 40,
@@ -780,23 +769,8 @@ const styles = StyleSheet.create({
   },
 
   list: { padding: 16, paddingTop: 18, paddingBottom: 150 },
-  scanBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    height: 52,
-    marginHorizontal: 16,
-    marginTop: -26,
-    borderRadius: 16,
-    backgroundColor: "#173C79",
-    elevation: 6,
-    shadowColor: "#0F1B2D",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.18,
-    shadowRadius: 14,
-  },
-  scanBtnText: { color: "#FFFFFF", fontWeight: "800", fontSize: 16 },
+  scanBtn: { flexDirection: "row", alignItems: "center", padding: 14, marginHorizontal: 16, marginTop: -48, borderRadius: 20, backgroundColor: "#FFFFFF", elevation: 4, shadowColor: "#0F1B2D", shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.08, shadowRadius: 14 },
+  scanBtnText: { color: "#0F1B2D", fontWeight: "800", fontSize: 16 },
   emptyContainer: { flexGrow: 1, justifyContent: "center", padding: 20 },
 
   /* Stats */

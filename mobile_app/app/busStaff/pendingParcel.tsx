@@ -10,6 +10,7 @@ import {
   TextInput,
    
 } from 'react-native';
+import { ScreenHeader, ParcelRow, EmptyState, IconBox, Pill, C, ui } from "../../components/JetUI";
 import SearchPanel, { filterBySearch } from "../../components/SearchPanel";
 import { 
   Ionicons, 
@@ -80,24 +81,17 @@ const JetLinkInterface: React.FC = () => {
 
     useFocusEffect(useCallback(()=>{getParcelByEmailAndUsed();},[]));
   
-    const renderBusItem = ({item}:{item:parcel}) => (
-      
-      <View style={styles.friendRow}>
-        <View style={styles.icon}>
-          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-            <Feather name="gift" size={50} color="#F59E0B" />
-          </View>
-          <View>
-            <Text style={styles.friendName1}>{item.parcelId}</Text>
-            <Text style={styles.friendName}>{item.pickup} - {item.drop}</Text>
-            <Text style={styles.friendName}>{item.date} - {item.time}</Text>
-            <Text style={styles.friendName}>{item.Bnumber}</Text>
-          </View>
-        </View>
-        <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC"  />
-        
-      </View>
-      
+    const renderBusItem = ({ item }: { item: parcel }) => (
+      <ParcelRow
+        id={item.parcelId}
+        from={item.pickup}
+        to={item.drop}
+        date={item.date}
+        time={item.time}
+        bus={item.Bnumber}
+        showChevron={false}
+        status="Pending"
+      />
     );
 
     
@@ -106,33 +100,38 @@ const JetLinkInterface: React.FC = () => {
   
       <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
         
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-          <View style={styles.header}>
-        
-            <TouchableOpacity >
-              <Text style={styles.title}>JetLink</Text>
-            </TouchableOpacity>
-                    
-          </View>
-        </LinearGradient> 
-             
-        <View style={styles.card}>
-          <Text style={styles.cardtitle}>All pending parcels of this bus</Text>
-          <FlatList style={styles.svw}
-            data={filterBySearch(parcelData, searchQuery)}
-            renderItem={renderBusItem}
-            keyExtractor={(item)=>item.parcelId}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingVertical: 10 }}
-          />  
-        </View>
+        <ScreenHeader eyebrow={`Bus ${params.busNo ?? ""}`.trim()} title="Pending parcels" />
+
+        <FlatList
+          style={ui.body}
+          contentContainerStyle={ui.bodyContent}
+          data={filterBySearch(parcelData, searchQuery)}
+          renderItem={renderBusItem}
+          keyExtractor={(item) => item.parcelId}
+          showsVerticalScrollIndicator={false}
+          ListHeaderComponent={
+            <View style={[ui.card, ui.rowCard]}>
+              <IconBox bg={C.amberSoft} size={48}>
+                <Ionicons name="time-outline" size={24} color={C.amber} />
+              </IconBox>
+              <View style={{ flex: 1, marginLeft: 14 }}>
+                <Text style={ui.rowTitle}>Waiting for pickup</Text>
+                <Text style={ui.rowSub}>Parcels booked on this bus that aren't picked up yet</Text>
+              </View>
+              <Pill text={String(parcelData.length)} bg={C.amberSoft} color={C.amber} />
+            </View>
+          }
+          ListEmptyComponent={
+            <EmptyState
+              icon={<Ionicons name="cube-outline" size={30} color={C.amber} />}
+              title="No pending parcels"
+              subtitle="New parcel bookings for this bus will show up here"
+            />
+          }
+        />
+
 
       <SearchPanel
           visible={isSearching}

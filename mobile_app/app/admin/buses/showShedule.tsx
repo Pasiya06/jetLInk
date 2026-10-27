@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   FlatList,
 } from 'react-native';
+import { ScreenHeader, IconBox, Pill, EmptyState, GradientButton, NAV_SPACE, C, ui } from "../../../components/JetUI";
 import { BusStatusNotice } from "../../../components/BusStatus";
 import SearchPanel, { filterBySearch } from "../../../components/SearchPanel";
 import { Alert } from "../../../components/JetAlert";
@@ -105,6 +106,17 @@ const BusScreen: React.FC = () => {
     });
   };
 
+  const confirmDelete = (item: Bussched) => {
+    Alert.alert(
+      "Delete schedule?",
+      `${item.pickuploca} → ${item.dropoffloca} at ${item.depaturetime} (bus ${item.busNo}) will be removed.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        { text: "Delete", style: "destructive", onPress: () => deleteBussched(item._id) },
+      ]
+    );
+  };
+
   const deleteBussched = async (id: string) => {
   try {
 
@@ -114,7 +126,7 @@ const BusScreen: React.FC = () => {
 
       Alert.alert("Schedule deleted", "The schedule was deleted successfully.");
 
-      getSchedules();
+      loadschedBuses();
 
     } else {
 
@@ -133,6 +145,7 @@ const BusScreen: React.FC = () => {
 
   const renderBusItem = ({item}:{item:Bussched}) => (
     <TouchableOpacity
+      activeOpacity={0.85}
       onPress={() => 
         router.push({
           pathname: "/admin/buses/updateBusSchedule",
@@ -160,50 +173,52 @@ const BusScreen: React.FC = () => {
         })
       }
     >
-    <View style={styles.friendRow}>
-        <BusStatusNotice item={item} note="Passengers can't book this bus until the emergency is resolved." />
-        
-        <View style={styles.topRow}>
-                <View style={styles.busNoPill}>
-                  <Ionicons name="bus" size={14} color="#4B7BEC" />
-                  <Text style={styles.busNoText}>{item.busNo}</Text>
-                </View>
-                <Text style={styles.dateText}>{item.busdate}</Text>
-              </View>
-        
-              {/* Route visual */}
-              <View style={styles.routeRow}>
-                <View style={styles.routeLine}>
-                  <View style={styles.dotFilled} />
-                  <View style={styles.connector} />
-                  <View style={styles.dotOutline} />
-                </View>
-        
-                <View style={styles.routeDetails}>
-                  <View style={styles.routeStop}>
-                    <Text style={styles.locationText}>{item.pickuploca}</Text>
-                    <Text style={styles.timeText}>{item.depaturetime}</Text>
-                  </View>
-        
-                  <View style={[styles.routeStop, { marginTop: 22 }]}>
-                    <Text style={styles.locationText}>{item.dropoffloca}</Text>
-                    <Text style={styles.timeText}>{item.arrivaltime}</Text>
-                  </View>
-                </View>
-              </View>
-        
-              {/* Stops row */}
-              <View style={styles.infoRow}>
-                <View style={styles.iconWrap}>
-                  <Ionicons name="location-outline" size={16} color="#4B7BEC" />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.infoLabel}>Stops</Text>
-                  <Text style={styles.infoValue}>{item.stops}</Text>
-                </View>
-              </View>
-            
-        
+    <View style={[ui.card, styles.schedCard]}>
+      <BusStatusNotice item={item} note="Passengers can't book this bus until the emergency is resolved." />
+      <View style={styles.schedTop}>
+        <View style={styles.busTag}>
+          <Ionicons name="bus" size={14} color={C.blue} />
+          <Text style={styles.busTagText}>{item.busNo}</Text>
+        </View>
+        <View style={styles.dayTag}>
+          <Ionicons name={item.busdate === "ANY DATE" ? "repeat" : "calendar-outline"} size={13} color={C.muted} />
+          <Text style={styles.dayTagText}>{item.busdate === "ANY DATE" ? "Every day" : item.busdate}</Text>
+        </View>
+      </View>
+
+      <View style={styles.routeWrap}>
+        <View style={styles.routeRail}>
+          <View style={styles.railDot} />
+          <View style={styles.railLine} />
+          <View style={styles.railDotEnd} />
+        </View>
+        <View style={{ flex: 1, justifyContent: "space-between" }}>
+          <View style={styles.stopRow}>
+            <Text style={styles.stopPlace} numberOfLines={1}>{item.pickuploca}</Text>
+            <Text style={styles.stopTime}>{item.depaturetime}</Text>
+          </View>
+          <View style={[styles.stopRow, { marginTop: 18 }]}>
+            <Text style={styles.stopPlace} numberOfLines={1}>{item.dropoffloca}</Text>
+            <Text style={styles.stopTime}>{item.arrivaltime}</Text>
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.schedFoot}>
+        <Ionicons name="git-commit-outline" size={16} color={C.muted} />
+        <Text style={styles.stopsText} numberOfLines={1}>{item.stops ? `Stops: ${item.stops}` : "No stops"}</Text>
+        {item.ticketPrice ? <Text style={styles.priceText}>Rs. {item.ticketPrice}</Text> : null}
+        <View style={[styles.iconAction, { backgroundColor: C.blueSoft }]}>
+          <Ionicons name="create-outline" size={18} color={C.blue} />
+        </View>
+        <TouchableOpacity
+          style={[styles.iconAction, { backgroundColor: C.redSoft }]}
+          onPress={() => confirmDelete(item)}
+          accessibilityLabel={`Delete schedule for bus ${item.busNo}`}
+        >
+          <Ionicons name="trash-outline" size={18} color={C.red} />
+        </TouchableOpacity>
+      </View>
     </View>
     </TouchableOpacity>
   );
@@ -212,47 +227,41 @@ const BusScreen: React.FC = () => {
 
     <>
     <Stack.Screen options={{ title: "", headerShown: false }} />
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
       
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-        style={styles.submitGradient1}
-      >
-        <View style={styles.header}>
+      <ScreenHeader eyebrow={`${params.busTypeTopic || ""} buses`.trim()} title="Schedules" />
 
-          <TouchableOpacity >
-            <Text style={styles.title}>{params.busTypeTopic}</Text>
-          </TouchableOpacity>
-                  
+      <View style={styles.listWrap}>
+        <View style={[ui.card, styles.introCard]}>
+          <IconBox bg={C.purpleSoft} size={44}>
+            <Ionicons name="calendar-outline" size={22} color={C.purple} />
+          </IconBox>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <Text style={ui.rowTitle}>All schedules</Text>
+            <Text style={ui.rowSub}>Tap a schedule to edit it</Text>
+          </View>
+          <Pill text={`${busschedData.length}`} />
         </View>
-      </LinearGradient> 
-           
-      <View style={styles.card}>
-        <Text style={styles.cardtitle}>Manage {params.busTypeTopic} Schedules</Text>
-        <FlatList style={styles.svw}
+
+        <FlatList
+          style={{ flex: 1 }}
           data={filterBySearch(busschedData, searchQuery)}
           renderItem={renderBusItem}
-          keyExtractor={(item)=>item.scheduleId}
+          keyExtractor={(item) => String(item.scheduleId)}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingVertical: 10 }}
-          />
-        
-        
-
+          contentContainerStyle={{ paddingBottom: NAV_SPACE + 70 }}
+          ListEmptyComponent={
+            <EmptyState
+              icon={<Ionicons name="calendar-outline" size={28} color={C.amber} />}
+              title={searchQuery ? "No matching schedules" : "No schedules yet"}
+              subtitle={searchQuery ? "Try another place, bus or time." : "Tap Add schedule to create the first one."}
+            />
+          }
+        />
       </View>
-      <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-        <LinearGradient
-            colors={["#173C79","#155B8A","#159B79",]}
-            start={{x: 0, y: 0,}}
-            end={{x: 1, y: 1,}}
-            style={styles.submitGradient}
-        >
-          <Text style={styles.searchButtonText}>Add Schedule</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-      
+
+      <GradientButton label="Add schedule" icon="add-circle-outline" onPress={handleSearch} style={styles.floatBtn} />
+
 
       <SearchPanel
           visible={isSearching}
@@ -356,6 +365,32 @@ const BusScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  schedCard: { padding: 16, marginBottom: 12 },
+  schedTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 },
+  busTag: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: "#EAF1FB", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10 },
+  busTagText: { color: "#155B8A", fontWeight: "800", fontSize: 13.5, letterSpacing: 0.3 },
+  dayTag: { flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: "#F3F6FA", paddingHorizontal: 10, paddingVertical: 6, borderRadius: 10 },
+  dayTagText: { color: "#5B6B7F", fontWeight: "700", fontSize: 12.5 },
+  routeWrap: { flexDirection: "row" },
+  routeRail: { alignItems: "center", marginRight: 12, paddingVertical: 4 },
+  railDot: { width: 11, height: 11, borderRadius: 6, backgroundColor: "#155B8A" },
+  railLine: { width: 2, flex: 1, minHeight: 26, backgroundColor: "#DCE3EC", marginVertical: 3 },
+  railDotEnd: { width: 11, height: 11, borderRadius: 6, borderWidth: 2.5, borderColor: "#159B79", backgroundColor: "#FFFFFF" },
+  stopRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  stopPlace: { fontSize: 15.5, fontWeight: "800", color: "#0F1B2D", flexShrink: 1, textTransform: "capitalize" },
+  stopTime: { fontSize: 14, fontWeight: "700", color: "#155B8A", marginLeft: 8 },
+  schedFoot: { flexDirection: "row", alignItems: "center", marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: "#EDF1F6", gap: 8 },
+  stopsText: { flex: 1, fontSize: 12.5, color: "#5B6B7F", fontWeight: "600" },
+  priceText: { fontSize: 16, fontWeight: "800", color: "#0B6B53" },
+  iconAction: { width: 36, height: 36, borderRadius: 12, alignItems: "center", justifyContent: "center" },
+  busRow: { flexDirection: "row", alignItems: "center", padding: 14, marginBottom: 10 },
+  busRowIcon: { width: 48, height: 48, borderRadius: 15, backgroundColor: "#EAF1FB", alignItems: "center", justifyContent: "center" },
+  busRowTitle: { fontSize: 17, fontWeight: "800", color: "#0F1B2D", letterSpacing: 0.3 },
+  busRowSub: { fontSize: 12.5, color: "#5B6B7F", fontWeight: "600", marginTop: 2 },
+  rowArrow: { width: 34, height: 34, borderRadius: 17, backgroundColor: "#EAF1FB", alignItems: "center", justifyContent: "center" },
+  listWrap: { flex: 1, marginTop: -64, paddingHorizontal: 16 },
+  introCard: { flexDirection: "row", alignItems: "center", padding: 16, marginBottom: 12 },
+  floatBtn: { position: "absolute", left: 20, right: 20, bottom: 168 },
   container:{
     flex:1,
     backgroundColor:"#fff"

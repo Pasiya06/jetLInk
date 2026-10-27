@@ -11,6 +11,7 @@ import {
   Linking,
   Animated,
 } from "react-native";
+import { GRADIENT, C } from "../../../components/JetUI";
 import SearchPanel from "../../../components/SearchPanel";
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import { LinearGradient } from "expo-linear-gradient";
@@ -200,7 +201,8 @@ const PassengerTrackScreen: React.FC = () => {
           
 
           <View style={styles.headerInfo}>
-            <Text style={styles.headerTitle}>Bus {busNumber}</Text>
+            <Text style={styles.headerEyebrow}>Live bus location</Text>
+              <Text style={styles.headerTitle}>Bus {busNumber}</Text>
             <View style={styles.statusPillStyle}>
               <View style={styles.dotWrap}>
                 {isOnline && (
@@ -232,6 +234,7 @@ const PassengerTrackScreen: React.FC = () => {
         </LinearGradient>
 
         {/* ── Map ─────────────────────────────────────────────── */}
+        <View style={styles.mapCard}>
         {isLoading ? (
           <View style={styles.loadingBox}>
             <ActivityIndicator size="large" color="#0047AB" />
@@ -285,11 +288,12 @@ const PassengerTrackScreen: React.FC = () => {
           </MapView>
         
         )}
+        </View>
 
         
         {/* ── Floating Locate Button ────────────────────────────── */}
         <TouchableOpacity style={styles.floatBtn} onPress={centerOnBus}>
-          <LinearGradient colors={["#2F80ED", "#0047AB"]} style={styles.floatBtnGradient}>
+          <LinearGradient colors={GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.floatBtnGradient}>
             <MaterialIcons name="my-location" size={22} color="#fff" />
           </LinearGradient>
         </TouchableOpacity>
@@ -399,16 +403,31 @@ const PassengerTrackScreen: React.FC = () => {
 
 // ─── Styles ───────────────────────────────────────────────────────
 const styles = StyleSheet.create({
+  headerEyebrow: { fontSize: 13, fontWeight: "600", color: "rgba(255,255,255,0.85)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 2 },
+  mapCard: {
+    flex: 1,
+    marginHorizontal: 14,
+    marginTop: 14,
+    marginBottom: 168,
+    borderRadius: 24,
+    overflow: "hidden",
+    backgroundColor: "#FFFFFF",
+    elevation: 4,
+    shadowColor: "#0F1B2D",
+    shadowOpacity: 0.1,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+  },
   container: {
     flex: 1,
-    backgroundColor: "#F5F7FB",
+    backgroundColor: C.bg,
   },
   header: {
     flexDirection: "row",
     alignItems: "center",
-    paddingTop: 50,
-    paddingBottom: 20,
-    paddingHorizontal: 18,
+    paddingTop: 54,
+    paddingBottom: 26,
+    paddingHorizontal: 24,
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     elevation: 8,
@@ -430,7 +449,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 26,
     fontWeight: "800",
     color: "#fff",
     marginBottom: 6,
@@ -588,8 +607,8 @@ const styles = StyleSheet.create({
   },
   floatBtn: {
     position: "absolute",
-    bottom: 180,
-    right: 18,
+    bottom: 184,
+    right: 28,
   },
   floatBtnGradient: {
     width: 50,

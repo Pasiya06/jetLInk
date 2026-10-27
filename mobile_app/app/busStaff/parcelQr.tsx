@@ -2,13 +2,18 @@ import React, { useState, useEffect, useRef } from "react";
 import * as Sharing from "expo-sharing";
 import * as FileSystem from "expo-file-system/legacy";
 import { Stack,useRouter,useLocalSearchParams} from "expo-router";
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  SafeAreaView, 
-  TextInput} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
+  TextInput,
+  ScrollView,
+  ActivityIndicator,
+} from 'react-native';
+import { DetailLine } from "../../components/JetForm";
+import { ScreenHeader, GradientButton, C, ui } from "../../components/JetUI";
 import SearchPanel from "../../components/SearchPanel";
 import { Alert } from "../../components/JetAlert";
 import {  
@@ -182,71 +187,62 @@ const ParcelService = () => {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
        
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-          <View style={styles.header}>    
-            <TouchableOpacity >
-              <Text style={styles.title}>JetLink</Text>
-            </TouchableOpacity>          
-          </View>
-        </LinearGradient> 
+        <ScreenHeader eyebrow="Parcel delivery" title={parcelId ? `Parcel #${parcelId}` : "Parcel QR"} />
 
-        <View style={styles.card} >
-          <View style={styles.svw}> 
-            {error && (
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          <View style={[ui.card, styles.qrCard]}>
+            <Text style={styles.qrTitle}>Show this to the receiver</Text>
+            <Text style={styles.qrSub}>They scan it to confirm they got the parcel</Text>
+
+            {error ? (
+              <View style={styles.errorBox}>
+                <Ionicons name="alert-circle" size={18} color={C.red} />
                 <Text style={styles.errorText}>{error}</Text>
-            )}
-            
-            
-            {qrToken && (
-                <View style={styles.qrWrapper}>
+              </View>
+            ) : null}
+
+            <View style={styles.qrFrame}>
+              {qrToken ? (
                 <QRCode
                   value={String(qrToken)}
-                  size={220}
+                  size={210}
                   getRef={(ref) => {
                     qrRef.current = ref;
                   }}
                 />
-              </View>
-            )}
-            
-          </View>      
-        </View>
-        
-        <View style={styles.button}>
-          <TouchableOpacity style={styles.submitButton} onPress={confirmDelivery}> 
-            <LinearGradient
-                colors={["#173C79","#155B8A","#159B79",]}
-                start={{x: 0, y: 0,}}
-                end={{x: 1, y: 1,}}
-                style={styles.submitGradient}
-            >
-                <Text style={styles.submitText}>Delevery</Text>
-            </LinearGradient>
+              ) : !error ? (
+                <ActivityIndicator size="large" color={C.blue} />
+              ) : (
+                <Ionicons name="qr-code-outline" size={80} color={C.chevron} />
+              )}
+            </View>
+
+            <View style={styles.routeRow}>
+              <View style={styles.routeDot} />
+              <Text style={styles.routeText} numberOfLines={1}>{pickup || "—"}</Text>
+              <Ionicons name="arrow-forward" size={16} color={C.muted} />
+              <Text style={[styles.routeText, { textAlign: "right" }]} numberOfLines={1}>{drop || "—"}</Text>
+              <View style={[styles.routeDot, { backgroundColor: C.green }]} />
+            </View>
+          </View>
+
+          <View style={[ui.card, styles.infoCard]}>
+            <DetailLine icon="person-outline" label="Receiver" value={receivername} />
+            <DetailLine icon="call-outline" label="Receiver phone" value={Rmobilenumber} />
+            <DetailLine icon="barbell-outline" label="Weight" value={weight ? `${weight} kg` : undefined} />
+            <DetailLine icon="cash-outline" label="Total fare" value={totalFare ? `Rs. ${totalFare}` : undefined} last />
+          </View>
+
+          <GradientButton label="Mark as delivered" icon="checkmark-done-outline" onPress={confirmDelivery} />
+          <TouchableOpacity style={styles.shareBtn} onPress={shareQR} activeOpacity={0.85}>
+            <Ionicons name="share-social-outline" size={20} color={C.blue} />
+            <Text style={styles.shareText}>Share QR</Text>
           </TouchableOpacity>
+        </ScrollView>
 
 
-          <TouchableOpacity style={styles.submitButton} onPress={shareQR}> 
-            <LinearGradient
-                colors={["#173C79","#155B8A","#159B79",]}
-                start={{x: 0, y: 0,}}
-                end={{x: 1, y: 1,}}
-                style={styles.submitGradient}
-            >
-                <Text style={styles.submitText}>Share QR</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-
-
-        
-        
       <SearchPanel
           visible={isSearching}
           query={searchQuery}
@@ -370,6 +366,17 @@ const ParcelService = () => {
 };
 
 const styles = StyleSheet.create({
+  qrCard: { padding: 20, alignItems: "center" },
+  qrTitle: { fontSize: 18, fontWeight: "800", color: "#0F1B2D" },
+  qrSub: { fontSize: 13, color: "#5B6B7F", marginTop: 4, textAlign: "center" },
+  qrFrame: { marginTop: 18, width: 250, height: 250, borderRadius: 24, borderWidth: 2, borderColor: "#E3E9F1", borderStyle: "dashed", alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF" },
+  errorBox: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: "#FDE2E2", borderRadius: 14, padding: 12, marginTop: 14, alignSelf: "stretch" },
+  routeRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 18, alignSelf: "stretch", backgroundColor: "#F3F6FA", borderRadius: 14, padding: 12 },
+  routeDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: "#155B8A" },
+  routeText: { flex: 1, fontSize: 14, fontWeight: "700", color: "#0F1B2D" },
+  infoCard: { paddingHorizontal: 18, paddingVertical: 4 },
+  shareBtn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, height: 52, borderRadius: 16, borderWidth: 1.5, borderColor: "#155B8A", backgroundColor: "#FFFFFF" },
+  shareText: { color: "#155B8A", fontSize: 16, fontWeight: "800" },
   container:{
     flex:1,
     backgroundColor:"#fff"
@@ -443,12 +450,7 @@ const styles = StyleSheet.create({
     marginLeft:10
   },
 
-  errorText: {
-    fontSize: 14,
-    color: '#c0392b',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
+  errorText: { flex: 1, color: "#C62828", fontWeight: "600", fontSize: 13 },
 
   
   cardTitle: {

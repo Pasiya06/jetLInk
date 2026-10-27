@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Stack, useRouter } from 'expo-router';
-import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, BackHandler    } from 'react-native';
+import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, BackHandler, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { FormField } from "../../components/JetForm";
 import { Alert } from "../../components/JetAlert";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather as Icon, AntDesign, Fontisto, EvilIcons, Ionicons } from '@expo/vector-icons';
@@ -9,7 +10,7 @@ import { saveSession } from "../../services/notificationService";
 
 import FieldError from "../../components/FieldError";
 import { useFieldErrors } from "../../utils/validation";
-import { C } from "../../components/JetUI";
+import { C, GRADIENT, GradientButton, ui } from "../../components/JetUI";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 export const FlatmateLogin: React.FC = () => {
   const router = useRouter();
@@ -185,146 +186,100 @@ const login = async () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <StatusBar barStyle="light-content" backgroundColor="#173C79" />
-      <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.hero}
-        >
-          <View style={styles.logo}>
-            <Fontisto name="bus" size={22} color="#FFFFFF" />
-          </View>
-          <Text style={styles.title}>Bus staff sign in</Text>
-          <Text style={styles.heroSub}>
-            {showLogin ? "Step 2 of 2 · Enter your passcode" : "Step 1 of 2 · Verify your bus and crew"}
-          </Text>
-        </LinearGradient>
-        
-        
-                
-              
-        {!showLogin ? (
-          <View style={styles.card}>
-            <View style={styles.formContainer}>
-              {/* Bus number */}
-              <View style={styles.field}>
-                <Text style={styles.inputLabel}>Bus Number</Text>
-                <View style={styles.inputWrapper1}>
-                  <View style={styles.iconWrap}>
-                    <Fontisto name="bus" size={16} color={C.blue} />
-                  </View>
-                  <View style={styles.inputInnerWrapper}>
-                    <TextInput
-                      style={styles.textInput}
-                      value={busNum}
-                      onChangeText={handleBusNumber}
-                      placeholder="Bus Number"
-                      placeholderTextColor="#8A97A8"
-                      autoCapitalize="characters"
-                      autoCorrect={false}
-                      maxLength={7}
-                    />
-                  </View>
-                </View>
-                <FieldError style={styles.fieldError} message={fieldError("busNum", busNum)} />
-              </View>
-
-              {/* Driver NIC */}
-              <View style={styles.field}>
-                <Text style={styles.inputLabel}>Driver NIC</Text>
-                <View style={styles.inputWrapper1}>
-                  <View style={styles.iconWrap}>
-                    <AntDesign name="idcard" size={18} color={C.blue} />
-                  </View>
-                  <View style={styles.inputInnerWrapper}>
-                    <TextInput
-                      style={styles.textInput}
-                      value={DNIC}
-                      onChangeText={DsetNIC}
-                      placeholder="123456789012"
-                      placeholderTextColor="#8A97A8"
-                    />
-                  </View>
-                </View>
-                <FieldError style={styles.fieldError} message={fieldError("DNIC", DNIC)} />
-              </View>
-
-              {/* Conductor NIC */}
-              <View style={styles.field}>
-                <Text style={styles.inputLabel}>Conductor NIC</Text>
-                <View style={styles.inputWrapper1}>
-                  <View style={styles.iconWrap}>
-                    <AntDesign name="idcard" size={18} color={C.blue} />
-                  </View>
-                  <View style={styles.inputInnerWrapper}>
-                    <TextInput
-                      style={styles.textInput}
-                      value={CNIC}
-                      onChangeText={CsetNIC}
-                      placeholder="123456789012"
-                      placeholderTextColor="#8A97A8"
-                    />
-                  </View>
-                </View>
-                <FieldError style={styles.fieldError} message={fieldError("CNIC", CNIC)} />
-              </View>
-            </View>
-
-            <View style={styles.footerContainer}>
-              <TouchableOpacity style={styles.primaryButton} onPress={verify}>
-                <LinearGradient
-                  colors={["#173C79", "#155B8A", "#159B79"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={StyleSheet.absoluteFill}
-                />
-                <Text style={styles.primaryButtonText}>Verify</Text>
+      <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+          <ScrollView contentContainerStyle={{ paddingBottom: 40 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+            <LinearGradient colors={GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+              <TouchableOpacity
+                style={styles.backBtn}
+                onPress={() => (showLogin ? setShowOtp(false) : router.replace("/passenger/selectScreen"))}
+                accessibilityLabel="Go back"
+              >
+                <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
               </TouchableOpacity>
-            </View>
-          </View>
-        ) : (
-          <View style={styles.card1}>
-            <View style={styles.formContainer}>
-              {/* Passcode */}
-              <View style={styles.field}>
-                <Text style={styles.inputLabel}>Passcode</Text>
-                <View style={styles.inputWrapper}>
-                  <View style={styles.iconWrap}>
-                    <Ionicons name="lock-closed-outline" size={18} color={C.blue} />
+              <View style={styles.logo}>
+                <Ionicons name={showLogin ? "lock-closed" : "bus"} size={32} color="#FFFFFF" />
+              </View>
+              <Text style={styles.brand}>JetLink</Text>
+              <Text style={styles.title}>Bus crew sign in</Text>
+              <Text style={styles.heroSub}>
+                {showLogin ? "Enter your passcode to continue" : "Enter your bus and crew details to start the trip"}
+              </Text>
+            </LinearGradient>
+
+            <View style={[ui.card, styles.card]}>
+              <View style={styles.stepRow}>
+                <View style={[styles.step, styles.stepActive]}>
+                  {showLogin ? <Ionicons name="checkmark" size={15} color="#FFFFFF" /> : <Text style={styles.stepNumActive}>1</Text>}
+                </View>
+                <Text style={styles.stepLabelActive}>Crew details</Text>
+                <View style={[styles.stepLine, showLogin && { backgroundColor: C.blue }]} />
+                <View style={[styles.step, showLogin && styles.stepActive]}>
+                  <Text style={showLogin ? styles.stepNumActive : styles.stepNum}>2</Text>
+                </View>
+                <Text style={showLogin ? styles.stepLabelActive : styles.stepLabel}>Passcode</Text>
+              </View>
+
+              {!showLogin ? (
+                <>
+                  <FormField
+                    label="Bus number"
+                    icon="bus-outline"
+                    value={busNum}
+                    onChangeText={handleBusNumber}
+                    placeholder="NA-1234"
+                    autoCapitalize="characters"
+                    autoCorrect={false}
+                    maxLength={7}
+                    error={fieldError("busNum", busNum)}
+                  />
+                  <FormField
+                    label="Driver NIC"
+                    icon="person-outline"
+                    value={DNIC}
+                    onChangeText={DsetNIC}
+                    placeholder="123456789012"
+                    autoCapitalize="characters"
+                    error={fieldError("DNIC", DNIC)}
+                  />
+                  <FormField
+                    label="Conductor NIC"
+                    icon="id-card-outline"
+                    value={CNIC}
+                    onChangeText={CsetNIC}
+                    placeholder="123456789012"
+                    autoCapitalize="characters"
+                    error={fieldError("CNIC", CNIC)}
+                  />
+                  <View style={{ marginTop: 20 }}>
+                    <GradientButton label="Verify crew" icon="arrow-forward-circle-outline" onPress={verify} />
                   </View>
-                  <View style={styles.inputInnerWrapper}>
-                    <TextInput
-                      style={styles.textInput}
-                      value={password1}
-                      onChangeText={setPassword1}
-                      placeholder="Abc@123"
-                      placeholderTextColor="#8A97A8"
-                      secureTextEntry={!showPassword}
-                      autoCapitalize="none"
-                    />
-                  </View>
-                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-                    <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color={C.muted} />
+                </>
+              ) : (
+                <>
+                  <FormField
+                    label="Passcode"
+                    icon="lock-closed-outline"
+                    value={password1}
+                    onChangeText={setPassword1}
+                    placeholder="Abc@123"
+                    secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                    error={fieldError("password1", password1)}
+                  />
+                  <TouchableOpacity style={styles.showPass} onPress={() => setShowPassword(!showPassword)}>
+                    <Icon name={showPassword ? "eye-off" : "eye"} size={16} color={C.blue} />
+                    <Text style={styles.showPassText}>{showPassword ? "Hide passcode" : "Show passcode"}</Text>
                   </TouchableOpacity>
-                </View>
-                <FieldError style={styles.fieldError} message={fieldError("password1", password1)} />
-              </View>
+                  <View style={{ marginTop: 16 }}>
+                    <GradientButton label="Log in" icon="log-in-outline" onPress={login} />
+                  </View>
+                </>
+              )}
             </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
 
-            <View style={styles.footerContainer}>
-              <TouchableOpacity style={styles.primaryButton1} onPress={login}>
-                <LinearGradient
-                  colors={["#173C79", "#155B8A", "#159B79"]}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={StyleSheet.absoluteFill}
-                />
-                <Text style={styles.primaryButtonText}>Login</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
 
         <View style={styles.footerGraphic}>
           <LinearGradient
@@ -350,9 +305,21 @@ const login = async () => {
 };
 
 const styles = StyleSheet.create({
-  heroSub: { fontSize: 14, fontWeight: '500', color: 'rgba(255,255,255,0.88)', marginTop: 4 },
-  logo: { width: 56, height: 56, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
-  hero: { borderBottomLeftRadius: 32, borderBottomRightRadius: 32, paddingTop: 56, paddingBottom: 92, alignItems: 'center' },
+  backBtn: { position: "absolute", top: 44, left: 18, width: 42, height: 42, borderRadius: 14, backgroundColor: "rgba(255,255,255,0.18)", alignItems: "center", justifyContent: "center" },
+  brand: { color: "rgba(255,255,255,0.85)", fontSize: 13, fontWeight: "800", letterSpacing: 2, marginTop: 14, textTransform: "uppercase" },
+  stepRow: { flexDirection: "row", alignItems: "center", marginBottom: 6 },
+  step: { width: 26, height: 26, borderRadius: 13, backgroundColor: "#EEF2F7", alignItems: "center", justifyContent: "center" },
+  stepActive: { backgroundColor: "#155B8A" },
+  stepNum: { fontSize: 13, fontWeight: "800", color: "#5B6B7F" },
+  stepNumActive: { fontSize: 13, fontWeight: "800", color: "#FFFFFF" },
+  stepLabel: { fontSize: 13, fontWeight: "700", color: "#5B6B7F", marginLeft: 8 },
+  stepLabelActive: { fontSize: 13, fontWeight: "800", color: "#0F1B2D", marginLeft: 8 },
+  stepLine: { flex: 1, height: 2, backgroundColor: "#E3E9F1", marginHorizontal: 10, borderRadius: 1 },
+  showPass: { flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-end", marginTop: 10, padding: 4 },
+  showPassText: { color: "#155B8A", fontWeight: "700", fontSize: 13 },
+  heroSub: { color: "rgba(255,255,255,0.85)", fontSize: 14, marginTop: 6, textAlign: "center" },
+  logo: { width: 72, height: 72, borderRadius: 24, backgroundColor: "rgba(255,255,255,0.18)", borderWidth: 1, borderColor: "rgba(255,255,255,0.35)", alignItems: "center", justifyContent: "center", marginTop: 8 },
+  hero: { paddingTop: 48, paddingBottom: 92, paddingHorizontal: 24, alignItems: "center", borderBottomLeftRadius: 32, borderBottomRightRadius: 32 },
   container: { flex: 1, backgroundColor: C.bg },
 
   header: {
@@ -371,20 +338,9 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 25,
   },
 
-  title: { fontSize: 26, fontWeight: '800', color: '#FFFFFF' },
+  title: { color: "#FFFFFF", fontSize: 26, fontWeight: "800", marginTop: 4 },
 
-  card: {
-    marginTop: -64,
-    marginHorizontal: 16,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 26,
-    padding: 18,
-    elevation: 6,
-    shadowColor: '#0F1B2D',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.12,
-    shadowRadius: 18,
-  },
+  card: { marginTop: -64, marginHorizontal: 18, padding: 20 },
 
   card1: {
     marginTop: -64,

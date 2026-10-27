@@ -1,13 +1,16 @@
 import React from 'react';
 import  { useState,useEffect } from 'react';
 import { Stack,useRouter,useLocalSearchParams} from "expo-router";
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  SafeAreaView, 
-  TextInput} from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
+  TextInput,
+  ScrollView,
+} from 'react-native';
+import { ScreenHeader, GradientButton, C, ui } from "../../components/JetUI";
 import SearchPanel from "../../components/SearchPanel";
 import { Alert } from "../../components/JetAlert";
 import { 
@@ -148,30 +151,16 @@ const ParcelService = () => {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
        
-      <LinearGradient
-                      colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-                      style={styles.submitGradient1}
-                  >
-              <View style={styles.header}>
-                  
-              
-                <TouchableOpacity >
-                  <Text style={styles.title}>JetLink</Text>
-                </TouchableOpacity>
-                       
-              </View>
-              </LinearGradient> 
+        <ScreenHeader eyebrow="Book a parcel · Step 2" title="Summary" />
 
-        <View style={styles.card} >
-          <View style={styles.svw}> 
-            {/* <Text style={styles.cardTitle}>Shipment Summary</Text> */}
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          <View style={[ui.card, styles.sumCard]}>
+            <Text style={styles.cardTitle}>Shipment</Text>
             {details.map((item, index) => (
-              <View key={index} style={styles.detailRow}>
-                <View style={[styles.iconWrap, { backgroundColor: `${item.color}20` }]}>
+              <View key={index} style={[styles.detailRow, index < details.length - 1 && styles.rowDivider]}>
+                <View style={[styles.iconWrap, { backgroundColor: `${item.color}1A` }]}>
                   <Ionicons name={item.icon} size={18} color={item.color} />
                 </View>
                 <View style={styles.detailTextWrap}>
@@ -180,48 +169,31 @@ const ParcelService = () => {
                 </View>
               </View>
             ))}
-          </View>      
-        </View>
+          </View>
 
-        <View style={styles.card1} >
-          <View style={styles.svw}>
-
+          <View style={[ui.card, styles.sumCard]}>
+            <Text style={styles.cardTitle}>Price</Text>
             {rows.map((row, index) => (
               <View key={index} style={styles.row}>
                 <View style={styles.rowLeft}>
-                  <View style={[styles.iconWrap1, { backgroundColor: `${row.color}20` }]}>
-                    <Ionicons name ={row.icon as any} size={18} color={row.color} />
+                  <View style={[styles.iconWrap1, { backgroundColor: `${row.color}1A` }]}>
+                    <Ionicons name={row.icon as any} size={18} color={row.color} />
                   </View>
                   <Text style={styles.label}>{row.label}</Text>
                 </View>
                 <Text style={styles.value}>Rs. {row.value}</Text>
               </View>
             ))}
-
-              <View style={styles.divider} />
-
-              <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Total</Text>
-                <Text style={styles.totalValue}>Rs. {total}</Text>
-              </View>
+            <View style={styles.totalBox}>
+              <Text style={styles.totalLabel}>Total to pay</Text>
+              <Text style={styles.totalValue}>Rs. {total}</Text>
+            </View>
           </View>
-        </View>
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSearch}>
-                    <LinearGradient
-                        colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-                        style={styles.submitGradient}
-                    >
-                    <Text style={styles.submitText}>Submit payment</Text>
-                    </LinearGradient>
-                </TouchableOpacity>
+          <GradientButton label="Continue to payment" icon="card-outline" onPress={handleSearch} />
+        </ScrollView>
 
 
-
-        
-        
       <SearchPanel
           visible={isSearching}
           query={searchQuery}
@@ -351,6 +323,10 @@ const ParcelService = () => {
 };
 
 const styles = StyleSheet.create({
+  sumCard: { padding: 18 },
+  cardTitle: { fontSize: 16, fontWeight: "800", color: "#0F1B2D", marginBottom: 6 },
+  rowDivider: { borderBottomWidth: 1, borderBottomColor: "#EDF1F6" },
+  totalBox: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 12, backgroundColor: "#E3F5EE", borderRadius: 14, paddingHorizontal: 14, paddingVertical: 12 },
   container:{
     flex:1,
     backgroundColor:"#fff"
@@ -427,14 +403,7 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
     marginBottom: 16,
   },
-  row: {
-    marginLeft: 20,
-    marginRight: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 14,
-  },
+  row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingVertical: 9 },
   rowLeft: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -447,17 +416,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 12,
   },
-  label: {
-    marginLeft: 20,
-    fontSize: 14,
-    color: '#4A4A4A',
-    fontWeight: '500',
-  },
-  value: {
-    fontSize: 14,
-    color: '#1A1A1A',
-    fontWeight: '600',
-  },
+  label: { marginLeft: 12, fontSize: 14, color: "#33475B", fontWeight: "600" },
+  value: { fontSize: 14.5, color: "#0F1B2D", fontWeight: "800" },
   divider: {
     marginLeft: 20,
     marginRight: 20,
@@ -472,31 +432,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 8,
   },
-  totalLabel: {
-    marginLeft: 20,
-    
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1A1A1A',
-  },
-  totalValue: {
-    marginRight: 20,
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#4A90E2',
-  },
+  totalLabel: { fontSize: 15, fontWeight: "700", color: "#0B6B53" },
+  totalValue: { fontSize: 20, fontWeight: "800", color: "#0B6B53" },
 
   svw: {
     width: '100%',
       
   },
 
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    marginLeft: 20,
-  },
+  detailRow: { flexDirection: "row", alignItems: "center", paddingVertical: 11 },
 
   iconWrap1: {
     width: 34,
@@ -506,23 +450,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  detailTextWrap: {
-    marginLeft: 12,
-    flex: 1,
-  },
+  detailTextWrap: { flex: 1 },
 
-  detailLabel: {
-    fontSize: 12,
-    color: '#8A8A8A',
-    fontWeight: '500',
-    marginBottom: 2,
-  },
+  detailLabel: { fontSize: 12.5, color: "#5B6B7F", fontWeight: "600", marginBottom: 2 },
 
-  detailValue: {
-    fontSize: 15,
-    color: '#1A1A1A',
-    fontWeight: '600',
-  },
+  detailValue: { fontSize: 15, color: "#0F1B2D", fontWeight: "700" },
 
   
   inputWrapper: {

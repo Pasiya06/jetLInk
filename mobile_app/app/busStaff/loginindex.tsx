@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, BackHandler    } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, TouchableOpacity, SafeAreaView, StatusBar, BackHandler, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { Alert } from "../../components/JetAlert";
 import { LinearGradient } from 'expo-linear-gradient';
-import { Feather as Icon, AntDesign, Fontisto, Ionicons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
+import { C, GRADIENT, GradientButton, ui } from "../../components/JetUI";
+import { FormField } from "../../components/JetForm";
 
-import FieldError from "../../components/FieldError";
 import { useFieldErrors } from "../../utils/validation";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -148,444 +149,179 @@ const verify = async () => {
 
 
  
+  const [checking, setChecking] = useState(false);
+  const onVerify = async () => {
+    if (checking) return;
+    setChecking(true);
+    try {
+      await verify();
+    } finally {
+      setChecking(false);
+    }
+  };
+
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <StatusBar barStyle="light-content" backgroundColor="#7db300" />
+      <StatusBar barStyle="light-content" backgroundColor="#173C79" />
       <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-          <View style={styles.header}>
-          
-            <TouchableOpacity >
-              <Text style={styles.title}>JetLink</Text>
-            </TouchableOpacity>
-                  
-          </View>
-        </LinearGradient>
-       
-        <View style={styles.card}>
-          <View style={styles.formContainer}>
-              <View style={styles.field}>
-                <Text style={styles.inputLabel}>Bus Number</Text>
-                <View style={styles.inputWrapper1}>
-                  <View style={styles.iconWrap}>
-                    <Fontisto name="bus" size={18} color="#000000" />
-                  </View>
-                  <View style={styles.inputInnerWrapper}>
-                    <TextInput
-                      style={styles.textInput}
-                      value={busNum}
-                      onChangeText={handleBusNumber}
-                      placeholder="Bus Number"
-                      placeholderTextColor="#A3A3A3"
-                      autoCapitalize="characters"
-                      autoCorrect={false}
-                      maxLength={7}
-                    />
-                  </View>
-                </View>
-                <FieldError style={styles.fieldError} message={fieldError("busNum", busNum)} />
-              </View>
-
-              <View style={styles.field}>
-                <Text style={styles.inputLabel}>Driver NIC</Text>
-                <View style={styles.inputWrapper1}>
-                  <View style={styles.iconWrap}>
-                    <AntDesign name="idcard" size={18} color="#000000" />
-                  </View>
-                  <View style={styles.inputInnerWrapper}>
-                    <TextInput
-                      style={styles.textInput}
-                      value={DNIC}
-                      onChangeText={DsetNIC}
-                      placeholder="123456789012"
-                      placeholderTextColor="#A3A3A3"
-                    />
-                  </View>
-                </View>
-                <FieldError style={styles.fieldError} message={fieldError("DNIC", DNIC)} />
-              </View>
-
-              <View style={styles.field}>
-                <Text style={styles.inputLabel}>Conductor NIC</Text>
-                <View style={styles.inputWrapper1}>
-                  <View style={styles.iconWrap}>
-                    <AntDesign name="idcard" size={18} color="#000000" />
-                  </View>
-                  <View style={styles.inputInnerWrapper}>
-                    <TextInput
-                      style={styles.textInput}
-                      value={CNIC}
-                      onChangeText={CsetNIC}
-                      placeholder="123456789012"
-                      placeholderTextColor="#A3A3A3"
-                    />
-                  </View>
-                </View>
-                <FieldError style={styles.fieldError} message={fieldError("CNIC", CNIC)} />
-              </View>
-          </View>
-
-          <View style={styles.footerContainer}>
-            <TouchableOpacity style={styles.primaryButton} onPress={verify}>
-              <Text style={styles.primaryButtonText}>Verify</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.footerGraphic}>
-          <LinearGradient
-            colors={["#173C79","#155B8A","#159B79",]}
-            start={{x: 0, y: 0,}}
-            end={{x: 1, y: 1,}}
-            style={styles.submitGradient}
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+          <ScrollView
+            contentContainerStyle={styles.scroll}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
           >
-          </LinearGradient>
-        </View>
-        <View style={styles.footerGraphic1}>
-          <LinearGradient
-            colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-            style={styles.submitGradient}
-          >
-          </LinearGradient>
-        </View>
+            <LinearGradient colors={GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+              <TouchableOpacity
+                style={styles.backBtn}
+                onPress={() => router.replace("/passenger/selectScreen")}
+                accessibilityLabel="Go back"
+              >
+                <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+              </TouchableOpacity>
+
+              <View style={styles.heroBadge}>
+                <Ionicons name="bus" size={34} color="#FFFFFF" />
+              </View>
+              <Text style={styles.brand}>JetLink</Text>
+              <Text style={styles.heroTitle}>Bus crew sign in</Text>
+              <Text style={styles.heroSub}>Enter your bus and crew details to start the trip</Text>
+            </LinearGradient>
+
+            <View style={[ui.card, styles.card]}>
+              <View style={styles.stepRow}>
+                <View style={[styles.step, styles.stepActive]}>
+                  <Text style={styles.stepNumActive}>1</Text>
+                </View>
+                <Text style={styles.stepLabelActive}>Crew details</Text>
+                <View style={styles.stepLine} />
+                <View style={styles.step}>
+                  <Text style={styles.stepNum}>2</Text>
+                </View>
+                <Text style={styles.stepLabel}>Code</Text>
+              </View>
+
+              <FormField
+                label="Bus number"
+                icon="bus-outline"
+                value={busNum}
+                onChangeText={handleBusNumber}
+                placeholder="NA-1234"
+                autoCapitalize="characters"
+                autoCorrect={false}
+                maxLength={7}
+                error={fieldError("busNum", busNum)}
+              />
+              <FormField
+                label="Driver NIC"
+                icon="person-outline"
+                value={DNIC}
+                onChangeText={DsetNIC}
+                placeholder="123456789012"
+                autoCapitalize="characters"
+                autoCorrect={false}
+                error={fieldError("DNIC", DNIC)}
+              />
+              <FormField
+                label="Conductor NIC"
+                icon="id-card-outline"
+                value={CNIC}
+                onChangeText={CsetNIC}
+                placeholder="123456789012"
+                autoCapitalize="characters"
+                autoCorrect={false}
+                error={fieldError("CNIC", CNIC)}
+              />
+
+              <View style={styles.note}>
+                <Ionicons name="shield-checkmark-outline" size={18} color={C.blue} />
+                <Text style={styles.noteText}>
+                  After checking, we send a one-time code to the conductor's phone.
+                </Text>
+              </View>
+
+              <View style={{ marginTop: 18 }}>
+                <GradientButton
+                  label={checking ? "Checking…" : "Verify crew"}
+                  icon="arrow-forward-circle-outline"
+                  onPress={onVerify}
+                  disabled={checking}
+                />
+              </View>
+              {checking ? <ActivityIndicator color={C.blue} style={{ marginTop: 12 }} /> : null}
+            </View>
+
+            <View style={styles.helpRow}>
+              <Ionicons name="help-circle-outline" size={16} color={C.muted} />
+              <Text style={styles.helpText}>Problems signing in? Ask your depot admin to check your details.</Text>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',  
+  container: { flex: 1, backgroundColor: C.bg },
+  scroll: { paddingBottom: 40 },
+  hero: {
+    paddingTop: 48,
+    paddingBottom: 92,
+    paddingHorizontal: 24,
+    alignItems: "center",
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
   },
-
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    paddingBottom: 70,   
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
-
-  submitGradient1: {
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
-
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#ffffff',
-    letterSpacing: 0.5,  
-  },
-
-  card: {
-    width: '90%',
-    backgroundColor: '#FFF',
-    marginTop: -50,
-    alignSelf: 'center',
-    borderRadius: 20,
-    paddingBottom: 18,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-
-  card1: {
-    width: '90%',
-    height: '25%',
-    backgroundColor: '#FFF',
-    //padding: 24,
-    //alignItems: 'center',
-
-    marginTop: -50,   
-    alignSelf: 'center',
-
-    borderRadius: 20,
-    elevation: 10,
-
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-  
-  eyeIcon: {
-    padding: 4,
-  },
- 
-  
-  
-  
-
-  formContainer: {
-    marginTop: 24,
-  },
-
-
-  // one label + input box + error message
-  field: {
-    marginBottom: 16,
-  },
-
-  // error lines up with the input box, right under it
-  fieldError: {
-    marginHorizontal: 17,
-    marginTop: 6,
-    marginBottom: 0,
-  },
-
-  inputWrapper1: {
-    minHeight: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F2F4F5',
-    marginHorizontal: 15,
-    borderWidth: 1,
-    borderColor: '#ECEEF2',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-
-  inputWrapper: {
-    height: '45%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F2F4F5',
-    marginRight: 15,
-    marginLeft: 15,
-    
-    borderLeftWidth: 1,
-    borderWidth: 1,
-    borderColor: '#ECEEF2',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-
-  iconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
-
-  input3dIcon: {
-    marginRight: 12,
-    width:25,
-    height:25
-  },
-
-  inputInnerWrapper: {
-    flex: 1,
-  },
-
-  inputLabel: {
-    marginHorizontal: 15,
-    fontSize: 16,
-    color: '#4B6CF5',
-    fontWeight: '500',
-    marginBottom: 8,
-  },
-
-  textInput: {
-    
-    fontSize: 16,
-    color: '#000000',
-    fontWeight: '500',
-    padding: 0, 
-    marginTop: 2,
-  },
-
-  footerContainer: {
-    marginTop: 6,
-    marginHorizontal: 15,
-  },
-
-  primaryButton: {
-    //marginBottom: 60,
-    width: '100%',
-    
-    backgroundColor: '#4B6CF5',
-    padding: 14,
-    alignItems: 'center',   
-    alignSelf: 'center',
-    marginBottom: 2,
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-
-  primaryButton1: {
-    
-    width: '100%',
-    marginBottom: 10,
-    backgroundColor: '#32CD32',
-    padding: 14,
-    alignItems: 'center',   
-    alignSelf: 'center',
-    //marginTop: 10,
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-
-  primaryButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-
-  otpcard: {
-    marginTop: -28,
-    marginHorizontal: 20,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 24,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 5,
-  },
-  otplabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#1F2937",
-    marginBottom: 16,
-    textAlign: "center",
-  },
-  otpRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 8,
-  },
-  otpBox: {
-    width: 46,
-    height: 56,
+  backBtn: {
+    position: "absolute",
+    top: 44,
+    left: 18,
+    width: 42,
+    height: 42,
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: "#E2E6F0",
-    backgroundColor: "#F8F9FC",
-    textAlign: "center",
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#1F2937",
-  },
-  otpBoxFilled: {
-    borderColor: "#4C6FFF",
-    backgroundColor: "#EEF1FF",
-  },
-  otpBoxError: {
-    borderColor: "#E4453A",
-    backgroundColor: "#FDEEEE",
-  },
-  errorRow: {
-    flexDirection: "row",
+    backgroundColor: "rgba(255,255,255,0.18)",
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 10,
-    gap: 6,
   },
-  errorText: {
-    color: "#E4453A",
-    fontSize: 13,
-    fontWeight: "500",
-  },
-  verifyButton: {
-    marginTop: 24,
-    backgroundColor: "#32CD32",
-    borderRadius: 999,
-    paddingVertical: 16,
+  heroBadge: {
+    width: 72,
+    height: 72,
+    borderRadius: 24,
+    backgroundColor: "rgba(255,255,255,0.18)",
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.35)",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#32CD32",
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 4,
+    marginTop: 8,
   },
-  verifyButtonDisabled: {
-    backgroundColor: "#70e070",
-    shadowOpacity: 0,
-    elevation: 0,
-  },
-  verifyButtonText: {
-    color: "#FFFFFF",
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  resendRow: {
+  brand: { color: "rgba(255,255,255,0.85)", fontSize: 13, fontWeight: "800", letterSpacing: 2, marginTop: 14, textTransform: "uppercase" },
+  heroTitle: { color: "#FFFFFF", fontSize: 26, fontWeight: "800", marginTop: 4 },
+  heroSub: { color: "rgba(255,255,255,0.85)", fontSize: 14, marginTop: 6, textAlign: "center" },
+
+  card: { marginTop: -64, marginHorizontal: 18, padding: 20 },
+  stepRow: { flexDirection: "row", alignItems: "center", marginBottom: 6 },
+  step: { width: 26, height: 26, borderRadius: 13, backgroundColor: "#EEF2F7", alignItems: "center", justifyContent: "center" },
+  stepActive: { backgroundColor: C.blue },
+  stepNum: { fontSize: 13, fontWeight: "800", color: C.muted },
+  stepNumActive: { fontSize: 13, fontWeight: "800", color: "#FFFFFF" },
+  stepLabel: { fontSize: 13, fontWeight: "700", color: C.muted, marginLeft: 8 },
+  stepLabelActive: { fontSize: 13, fontWeight: "800", color: C.ink, marginLeft: 8 },
+  stepLine: { flex: 1, height: 2, backgroundColor: "#E3E9F1", marginHorizontal: 10, borderRadius: 1 },
+
+  note: {
     flexDirection: "row",
-    justifyContent: "center",
-    marginTop: 20,
+    alignItems: "center",
+    gap: 10,
+    backgroundColor: C.blueSoft,
+    borderRadius: 14,
+    padding: 12,
+    marginTop: 16,
   },
-  resendText: {
-    color: "#6B7280",
-    fontSize: 13,
-  },
-  resendLink: {
-    color: "#3454E8",
-    fontSize: 13,
-    fontWeight: "700",
-  },
-  resendLinkDisabled: {
-    color: "#A5AEC7",
-  },
-  
-  submitGradient: {
-    paddingVertical: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  noteText: { flex: 1, fontSize: 13, color: C.ink, fontWeight: "600" },
 
-  footerGraphic: {
-    position: 'absolute',
-    bottom: 0,
-    width: '100%',
-    overflow: 'hidden',
-  },
-
-  footerGraphic1: {
-
-    position: 'absolute',
-    bottom: 20,
-    width: '100%',
-    overflow: 'hidden',
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25, 
-  },
+  helpRow: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 18, paddingHorizontal: 24 },
+  helpText: { fontSize: 12.5, color: C.muted, textAlign: "center", flexShrink: 1 },
 });
 
 export default FlatmateLogin;

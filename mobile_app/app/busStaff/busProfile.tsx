@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { ScreenHeader, Pill, C, GRADIENT, ui } from "../../components/JetUI";
 import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, MaterialIcons, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -56,14 +57,16 @@ const InfoRow = ({
   value,
   badge,
   onPress,
+  last,
 }: {
   icon: React.ReactNode;
   label: string;
   value?: string;
   badge?: { text: string; color: string } | null;
   onPress?: () => void;
+  last?: boolean;
 }) => (
-  <TouchableOpacity style={styles.row} activeOpacity={onPress ? 0.7 : 1} disabled={!onPress} onPress={onPress}>
+  <TouchableOpacity style={[styles.row, !last && styles.rowDivider]} activeOpacity={onPress ? 0.7 : 1} disabled={!onPress} onPress={onPress}>
     <View style={styles.iconWrap}>{icon}</View>
     <View style={{ flex: 1 }}>
       <Text style={styles.label}>{label}</Text>
@@ -74,7 +77,7 @@ const InfoRow = ({
         <Text style={[styles.smallBadgeText, { color: badge.color }]}>{badge.text}</Text>
       </View>
     ) : null}
-    {onPress ? <Ionicons name="call-outline" size={18} color="#159B79" style={{ marginLeft: 8 }} /> : null}
+    {onPress ? <View style={styles.callBtn}><Ionicons name="call" size={16} color="#FFFFFF" /></View> : null}
   </TouchableOpacity>
 );
 
@@ -149,86 +152,93 @@ export default function BusStaffBusProfile() {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <SafeAreaView style={styles.container}>
-        <LinearGradient colors={["#173C79", "#155B8A", "#159B79"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.headerGradient}>
-          <View style={styles.header}>
-            <Text style={styles.title}>Jetlink</Text>
-          </View>
-        </LinearGradient>
+      <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
+        <ScreenHeader eyebrow="My bus" title={bus?.busNumber || busNo || "Bus profile"} />
 
-        <View style={styles.card}>
-          {/* Top: bus number, type, status */}
-          <View style={styles.cardHeader}>
-            <View style={styles.avatar}>
-              <MaterialIcons name="directions-bus" size={34} color="#fff" />
-            </View>
-            <View style={{ marginLeft: 12, flex: 1 }}>
-              <Text style={styles.busNumber}>{bus?.busNumber || busNo || "—"}</Text>
-              <View style={styles.badgeRow}>
-                {bus?.busType ? (
-                  <View style={[styles.badge, { backgroundColor: "#EAF0FB" }]}>
-                    <Text style={[styles.badgeText, { color: "#0057D9" }]}>{BUS_TYPE_LABEL[bus.busType] ?? bus.busType}</Text>
-                  </View>
-                ) : null}
-                <View style={[styles.badge, { backgroundColor: `${status.color}1A` }]}>
-                  <Text style={[styles.badgeText, { color: status.color }]}>{status.text}</Text>
+        <ScrollView
+          style={ui.body}
+          contentContainerStyle={ui.bodyContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadBus(); }} />}
+        >
+          <View style={[ui.card, styles.heroCard]}>
+            <View style={styles.heroTop}>
+              <LinearGradient colors={GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.avatar}>
+                <MaterialIcons name="directions-bus" size={32} color="#fff" />
+              </LinearGradient>
+              <View style={{ marginLeft: 14, flex: 1 }}>
+                <Text style={styles.busNumber}>{bus?.busNumber || busNo || "—"}</Text>
+                <View style={styles.badgeRow}>
+                  {bus?.busType ? (
+                    <Pill text={BUS_TYPE_LABEL[bus.busType] ?? bus.busType} bg={C.blueSoft} color={C.blue} />
+                  ) : null}
+                  <Pill text={status.text} bg={`${status.color}1A`} color={status.color} />
                 </View>
               </View>
             </View>
+
+            <TouchableOpacity
+              activeOpacity={0.8}
+              style={[styles.liveStrip, { backgroundColor: share.active ? C.greenSoft : C.redSoft }]}
+              onPress={() => router.push({ pathname: "/busStaff/loaction", params: { ...staffParams, busNumber: busNo } })}
+            >
+              <View style={[styles.liveDot, { backgroundColor: share.active ? "#22C55E" : C.red }]} />
+              <Text style={[styles.liveText, { color: share.active ? C.green : C.red }]}>
+                {share.active
+                  ? `Sharing live location${share.lastSent ? ` · last sent ${share.lastSent}` : ""}`
+                  : "Location sharing is off"}
+              </Text>
+              <Ionicons name="chevron-forward" size={18} color={share.active ? C.green : C.red} />
+            </TouchableOpacity>
           </View>
 
-          {/* Live sharing strip */}
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={[styles.liveStrip, { backgroundColor: share.active ? "#EAF7EC" : "#FFF0F0" }]}
-            onPress={() => router.push({ pathname: "/busStaff/loaction", params: { ...staffParams, busNumber: busNo } })}
-          >
-            <View style={[styles.liveDot, { backgroundColor: share.active ? "#32CD32" : "#FF6B6B" }]} />
-            <Text style={[styles.liveText, { color: share.active ? "#2F9E44" : "#E5484D" }]}>
-              {share.active
-                ? `Sharing live location${share.lastSent ? ` · last sent ${share.lastSent}` : ""}`
-                : "Location sharing is OFF"}
-            </Text>
-            <Ionicons name="map-outline" size={18} color={share.active ? "#2F9E44" : "#E5484D"} />
-          </TouchableOpacity>
-
           {loading && !bus ? (
-            <ActivityIndicator size="large" color="#155B8A" style={{ marginTop: 40 }} />
+            <ActivityIndicator size="large" color={C.blue} style={{ marginTop: 30 }} />
           ) : (
-            <ScrollView
-              contentContainerStyle={styles.body}
-              refreshControl={<RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadBus(); }} />}
-            >
-              {error ? <Text style={styles.error}>{error}</Text> : null}
+            <>
+              {error ? (
+                <View style={styles.errorBox}>
+                  <Ionicons name="alert-circle" size={18} color={C.red} />
+                  <Text style={styles.error}>{error}</Text>
+                </View>
+              ) : null}
 
-              <Text style={styles.section}>Crew</Text>
-              <InfoRow
-                icon={<MaterialCommunityIcons name="steering" size={18} color="#4A6FA5" />}
-                label="Driver"
-                value={driverName ? `${driverName}${params.dphoneNumber ? ` · ${params.dphoneNumber}` : ""}` : undefined}
-                onPress={params.dphoneNumber ? () => call(params.dphoneNumber) : undefined}
-              />
-              <InfoRow
-                icon={<Ionicons name="person-outline" size={18} color="#4A6FA5" />}
-                label="Conductor"
-                value={conductorName ? `${conductorName}${params.cphoneNumber ? ` · ${params.cphoneNumber}` : ""}` : undefined}
-                onPress={params.cphoneNumber ? () => call(params.cphoneNumber) : undefined}
-              />
+              <View style={[ui.card, styles.sectionCard]}>
+                <Text style={styles.section}>Crew</Text>
+                <InfoRow
+                  icon={<MaterialCommunityIcons name="steering" size={18} color={C.amber} />}
+                  label="Driver"
+                  value={driverName ? `${driverName}${params.dphoneNumber ? ` · ${params.dphoneNumber}` : ""}` : undefined}
+                  onPress={params.dphoneNumber ? () => call(params.dphoneNumber) : undefined}
+                />
+                <InfoRow
+                  icon={<Ionicons name="person-outline" size={18} color={C.purple} />}
+                  label="Conductor"
+                  value={conductorName ? `${conductorName}${params.cphoneNumber ? ` · ${params.cphoneNumber}` : ""}` : undefined}
+                  onPress={params.cphoneNumber ? () => call(params.cphoneNumber) : undefined}
+                  last
+                />
+              </View>
 
-              <Text style={styles.section}>Bus Details</Text>
-              <InfoRow icon={<Ionicons name="pricetag-outline" size={18} color="#4A6FA5" />} label="Bus ID" value={bus?.busId != null ? `#${bus.busId}` : undefined} />
-              <InfoRow icon={<MaterialCommunityIcons name="car-cog" size={18} color="#4A6FA5" />} label="Chassis No" value={bus?.chassisNo} />
-              <InfoRow icon={<MaterialCommunityIcons name="engine-outline" size={18} color="#4A6FA5" />} label="Engine No" value={bus?.engineNo} />
-              <InfoRow icon={<MaterialCommunityIcons name="seat-passenger" size={18} color="#4A6FA5" />} label="No. of Seats" value={bus?.noOfSeats} />
-              <InfoRow icon={<Ionicons name="color-palette-outline" size={18} color="#4A6FA5" />} label="Colour" value={bus?.colour} />
+              <View style={[ui.card, styles.sectionCard]}>
+                <Text style={styles.section}>Bus details</Text>
+                <InfoRow icon={<Ionicons name="pricetag-outline" size={18} color={C.blue} />} label="Bus ID" value={bus?.busId != null ? `#${bus.busId}` : undefined} />
+                <InfoRow icon={<MaterialCommunityIcons name="car-cog" size={18} color={C.blue} />} label="Chassis number" value={bus?.chassisNo} />
+                <InfoRow icon={<MaterialCommunityIcons name="engine-outline" size={18} color={C.blue} />} label="Engine number" value={bus?.engineNo} />
+                <InfoRow icon={<MaterialCommunityIcons name="seat-passenger" size={18} color={C.blue} />} label="Seats" value={bus?.noOfSeats} />
+                <InfoRow icon={<Ionicons name="color-palette-outline" size={18} color={C.blue} />} label="Colour" value={bus?.colour} last />
+              </View>
 
-              <Text style={styles.section}>Documents</Text>
-              <InfoRow icon={<MaterialCommunityIcons name="wrench-outline" size={18} color="#4A6FA5" />} label="Service Date" value={bus?.serviceDate} badge={dateStatus(bus?.serviceDate)} />
-              <InfoRow icon={<Ionicons name="document-text-outline" size={18} color="#4A6FA5" />} label="License Date" value={bus?.licenseDate} badge={dateStatus(bus?.licenseDate)} />
-              <InfoRow icon={<MaterialCommunityIcons name="smoke" size={18} color="#4A6FA5" />} label="Emission Date" value={bus?.emissionDate} badge={dateStatus(bus?.emissionDate)} />
-            </ScrollView>
+              <View style={[ui.card, styles.sectionCard]}>
+                <Text style={styles.section}>Documents</Text>
+                <InfoRow icon={<MaterialCommunityIcons name="wrench-outline" size={18} color={C.green} />} label="Service date" value={bus?.serviceDate} badge={dateStatus(bus?.serviceDate)} />
+                <InfoRow icon={<Ionicons name="document-text-outline" size={18} color={C.green} />} label="Licence date" value={bus?.licenseDate} badge={dateStatus(bus?.licenseDate)} />
+                <InfoRow icon={<MaterialCommunityIcons name="smoke" size={18} color={C.green} />} label="Emission date" value={bus?.emissionDate} badge={dateStatus(bus?.emissionDate)} last />
+              </View>
+            </>
           )}
-        </View>
+        </ScrollView>
+
 
         {/* Bottom nav */}
         <View style={styles.bottomNav}>
@@ -275,6 +285,12 @@ export default function BusStaffBusProfile() {
 }
 
 const styles = StyleSheet.create({
+  heroCard: { padding: 18 },
+  heroTop: { flexDirection: "row", alignItems: "center" },
+  sectionCard: { paddingHorizontal: 18, paddingVertical: 8 },
+  rowDivider: { borderBottomWidth: 1, borderBottomColor: "#EDF1F6" },
+  callBtn: { width: 32, height: 32, borderRadius: 16, backgroundColor: "#159B79", alignItems: "center", justifyContent: "center", marginLeft: 10 },
+  errorBox: { flexDirection: "row", alignItems: "center", gap: 8, backgroundColor: "#FDE2E2", borderRadius: 14, padding: 12, marginBottom: 12 },
   container: { flex: 1, backgroundColor: "#fff" },
   headerGradient: { borderBottomLeftRadius: 25, borderBottomRightRadius: 25 },
   header: { alignItems: "center", justifyContent: "center", paddingTop: 50, paddingBottom: 70 },
@@ -302,60 +318,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     backgroundColor: "#F4F7FC",
   },
-  avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: "#4A6FA5",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  busNumber: { fontSize: 20, fontWeight: "800", color: "#1E293B" },
+  avatar: { width: 62, height: 62, borderRadius: 20, justifyContent: "center", alignItems: "center" },
+  busNumber: { fontSize: 22, fontWeight: "800", color: "#0F1B2D" },
   badgeRow: { flexDirection: "row", gap: 6, marginTop: 8, flexWrap: "wrap" },
   badge: { paddingVertical: 4, paddingHorizontal: 12, borderRadius: 12 },
   badgeText: { fontSize: 11, fontWeight: "700" },
 
-  liveStrip: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    gap: 8,
-  },
-  liveDot: { width: 9, height: 9, borderRadius: 5 },
+  liveStrip: { flexDirection: "row", alignItems: "center", paddingVertical: 12, paddingHorizontal: 14, gap: 10, borderRadius: 14, marginTop: 16 },
+  liveDot: { width: 10, height: 10, borderRadius: 5 },
   liveText: { flex: 1, fontSize: 13, fontWeight: "600" },
 
   body: { paddingHorizontal: 20, paddingBottom: 30 },
-  section: {
-    fontSize: 12,
-    fontWeight: "700",
-    color: "#94A3B8",
-    textTransform: "uppercase",
-    letterSpacing: 1,
-    marginTop: 16,
-    marginBottom: 2,
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F0F0F0",
-  },
-  iconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#EAF0FB",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 14,
-  },
-  label: { fontSize: 12, color: "#94A3B8", marginBottom: 2, textTransform: "uppercase", letterSpacing: 0.5 },
-  value: { fontSize: 15, color: "#1E293B", fontWeight: "500" },
+  section: { fontSize: 16, fontWeight: "800", color: "#0F1B2D", marginTop: 10, marginBottom: 2 },
+  row: { flexDirection: "row", alignItems: "center", paddingVertical: 12 },
+  iconWrap: { width: 38, height: 38, borderRadius: 12, backgroundColor: "#F3F6FA", justifyContent: "center", alignItems: "center", marginRight: 12 },
+  label: { fontSize: 12.5, color: "#5B6B7F", fontWeight: "600", marginBottom: 2 },
+  value: { fontSize: 15, color: "#0F1B2D", fontWeight: "700" },
   smallBadge: { paddingVertical: 3, paddingHorizontal: 8, borderRadius: 10 },
   smallBadgeText: { fontSize: 11, fontWeight: "700" },
-  error: { color: "#D32F2F", textAlign: "center", marginTop: 12 },
+  error: { flex: 1, color: "#C62828", fontWeight: "600", fontSize: 13 },
 
   bottomNav: {
     position: "absolute",

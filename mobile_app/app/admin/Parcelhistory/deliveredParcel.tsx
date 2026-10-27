@@ -10,6 +10,8 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
+import { DetailLine } from "../../../components/JetForm";
+import { ScreenHeader, C, ui } from "../../../components/JetUI";
 import SearchPanel from "../../../components/SearchPanel";
 import { Ionicons, 
   MaterialCommunityIcons, 
@@ -29,170 +31,48 @@ const ParcelService = () => {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-       
-        <View style={styles.header}> 
-            <TouchableOpacity><Text style={styles.title}>{params.parcelId}</Text></TouchableOpacity>
-        </View>
-      </LinearGradient>
+      <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
+        <ScreenHeader eyebrow="Delivered parcel" title={String(params.parcelId || "Parcel")} />
 
-        <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        >
-        {/* Sender */}
-        <View style={styles.card}>
-            <Text style={styles.sectionHeader}>Sender</Text>
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#6366f1" }]}>
-            <Ionicons name="person" size={18} color="#fff" />
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          <View style={[ui.card, styles.heroCard]}>
+            <View style={[styles.heroIcon, { backgroundColor: C.greenSoft }]}>
+              <Feather name="check-circle" size={28} color={C.green} />
             </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Name</Text>
-            <Text style={styles.infoValue}>{params.sendername}</Text>
+            <View style={{ flex: 1, marginLeft: 14 }}>
+              <Text style={styles.heroTitle} numberOfLines={1}>{params.pickup} → {params.drop}</Text>
+              <Text style={styles.heroSub}>{[params.date, params.time].filter(Boolean).join(" · ")}</Text>
+              <View style={[styles.statusPill, { backgroundColor: C.greenSoft }]}>
+                <View style={[styles.statusDotSm, { backgroundColor: C.green }]} />
+                <Text style={[styles.statusTextSm, { color: C.green }]}>Delivered</Text>
+              </View>
             </View>
-            </View>
+          </View>
 
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#6366f1" }]}>
-            <Ionicons name="call" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Mobile Number</Text>
-            <Text style={styles.infoValue}>{params.Smobilenumber}</Text>
-            </View>
-            </View>
+          <View style={[ui.card, styles.detailCard]}>
+            <Text style={styles.cardHeading}>Sender</Text>
+            <DetailLine icon="person-outline" label="Name" value={String(params.sendername || "")} />
+            <DetailLine icon="call-outline" label="Mobile" value={String(params.Smobilenumber || "")} />
+            <DetailLine icon="mail-outline" label="Email" value={String(params.Semail || "")} last />
+          </View>
 
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#6366f1" }]}>
-                <Ionicons name="mail" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-                <Text style={styles.infoLabel}>Email</Text>
-                <Text style={styles.infoValue}>{params.Semail}</Text>
-            </View>
-            </View>
+          <View style={[ui.card, styles.detailCard]}>
+            <Text style={styles.cardHeading}>Receiver</Text>
+            <DetailLine icon="person-outline" label="Name" value={String(params.receivername || "")} color={C.green} />
+            <DetailLine icon="call-outline" label="Mobile" value={String(params.Rmobilenumber || "")} color={C.green} />
+            <DetailLine icon="mail-outline" label="Email" value={String(params.Remail || "")} color={C.green} last />
+          </View>
 
-        </View>
-
-        {/* Receiver */}
-        <View style={styles.card}>
-            <Text style={styles.sectionHeader}>Receiver</Text>
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#059669" }]}>
-            <Ionicons name="person" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Name</Text>
-            <Text style={styles.infoValue}>{params.receivername}</Text>
-            </View>
-            </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#059669" }]}>
-            <Ionicons name="call" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Mobile Number</Text>
-            <Text style={styles.infoValue}>{params.Rmobilenumber}</Text>
-            </View>
-            </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#059669" }]}>
-            <Ionicons name="mail" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Email</Text>
-            <Text style={styles.infoValue}>{params.Remail}</Text>
-            </View>
-            </View>
-
-        </View>
-
-        {/* Trip / Parcel info */}
-        <View style={styles.card}>
-            <Text style={styles.sectionHeader}>Shipment</Text>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="scale" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Weight</Text>
-            <Text style={styles.infoValue}>{params.weight}</Text>
-            </View>
-            </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="location" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Pickup</Text>
-            <Text style={styles.infoValue}>{params.pickup}</Text>
-            </View>
-            </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="flag" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Drop-off</Text>
-            <Text style={styles.infoValue}>{params.drop}</Text>
-            </View>
-            </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="calendar" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Date</Text>
-            <Text style={styles.infoValue}>{params.date}</Text>
-            </View>
-            </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="time" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Time</Text>
-            <Text style={styles.infoValue}>{params.time}</Text>
-            </View>
-            </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="bus" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Bus Number</Text>
-            <Text style={styles.infoValue}>{params.Bnumber}</Text>
-            </View>
-            </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <MaterialCommunityIcons name="currency-usd" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Total Fare</Text>
-            <Text style={styles.infoValue}>Rs.{params.totalFare}</Text>
-            </View>
-            </View>
-
-        </View>
+          <View style={[ui.card, styles.detailCard]}>
+            <Text style={styles.cardHeading}>Shipment</Text>
+            <DetailLine icon="barbell-outline" label="Weight" value={params.weight ? `${params.weight} kg` : ""} color={C.amber} />
+            <DetailLine icon="location-outline" label="Pickup" value={String(params.pickup || "")} color={C.amber} />
+            <DetailLine icon="flag-outline" label="Drop-off" value={String(params.drop || "")} color={C.amber} />
+            <DetailLine icon="bus-outline" label="Bus" value={String(params.Bnumber || "")} color={C.amber} />
+            <DetailLine icon="cash-outline" label="Total fare" value={params.totalFare ? `Rs. ${params.totalFare}` : ""} color={C.amber} last />
+          </View>
         </ScrollView>
+
 
       <SearchPanel
           visible={isSearching}
@@ -297,6 +177,17 @@ const ParcelService = () => {
 };
 
 const styles = StyleSheet.create({
+  heroCard: { padding: 18, flexDirection: "row", alignItems: "center" },
+  heroIcon: { width: 58, height: 58, borderRadius: 18, alignItems: "center", justifyContent: "center", overflow: "hidden" },
+  heroTitle: { fontSize: 22, fontWeight: "800", color: "#0F1B2D", letterSpacing: 0.3 },
+  heroSub: { fontSize: 13, color: "#5B6B7F", fontWeight: "600", marginTop: 2 },
+  statusPill: { flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, marginTop: 6 },
+  statusDotSm: { width: 7, height: 7, borderRadius: 4 },
+  statusTextSm: { fontSize: 12, fontWeight: "800" },
+  editBtn: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, height: 40, borderRadius: 14, backgroundColor: "#EAF1FB" },
+  editBtnText: { color: "#155B8A", fontWeight: "800", fontSize: 14 },
+  detailCard: { paddingHorizontal: 18, paddingVertical: 6 },
+  cardHeading: { fontSize: 13, fontWeight: "800", color: "#5B6B7F", letterSpacing: 0.8, textTransform: "uppercase", marginTop: 12, marginBottom: 2 },
   container:{
     flex:1,
     backgroundColor:"#fff"

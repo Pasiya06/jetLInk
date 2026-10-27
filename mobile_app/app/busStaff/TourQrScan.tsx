@@ -156,10 +156,10 @@ export default function TourQrScan() {
           end={{x: 1, y: 1,}}
           style={styles.submitGradient1}
         >
-          <View style={styles.header}>    
-            <TouchableOpacity >
-              <Text style={styles.title}>Scan Tour QR</Text>
-            </TouchableOpacity>          
+          <View style={styles.header}>
+            <Text style={styles.hdrEyebrow}>Tour boarding</Text>
+            <Text style={styles.title}>Scan tour QR</Text>
+            <Text style={styles.hdrSub}>Check the passenger's tour booking</Text>
           </View>
         </LinearGradient>
 
@@ -186,6 +186,16 @@ export default function TourQrScan() {
             
             
           
+          <View pointerEvents="none" style={styles.cornerBox}>
+            <View style={[styles.corner, styles.cTL]} />
+            <View style={[styles.corner, styles.cTR]} />
+            <View style={[styles.corner, styles.cBL]} />
+            <View style={[styles.corner, styles.cBR]} />
+          </View>
+        </View>
+        <View style={styles.hintChip}>
+          <Ionicons name="scan-outline" size={18} color="#155B8A" />
+          <Text style={styles.hintText}>Point the camera at the tour QR</Text>
         </View>
 
         {/* Result Modal */}
@@ -194,7 +204,7 @@ export default function TourQrScan() {
             <View style={styles.modalCard}>
               {loading ? (
                 <View style={styles.loadingWrap}>
-                  <ActivityIndicator size="large" color="#6C5CE7" />
+                  <ActivityIndicator size="large" color="#155B8A" />
                   <Text style={styles.loadingText}>Checking tour booking...</Text>
                 </View>
               ) : (
@@ -268,7 +278,7 @@ export default function TourQrScan() {
                       ].map((row) => (
                         <View style={styles.infoRow} key={row.label}>
                           <View style={styles.infoIconTint}>
-                            <Ionicons name={row.icon as any} size={16} color="#6C5CE7" />
+                            <Ionicons name={row.icon as any} size={16} color="#155B8A" />
                           </View>
                           <Text style={styles.infoLabel}>{row.label}</Text>
                           <Text style={styles.infoValue} numberOfLines={2}>{row.value || "-"}</Text>
@@ -282,7 +292,7 @@ export default function TourQrScan() {
                     onPress={resetScanner}
                   >
                     <LinearGradient
-                      colors={["#6C5CE7", "#4834D4"]}
+                      colors={["#155B8A", "#4834D4"]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
                       style={styles.scanAgainGradient}
@@ -422,6 +432,16 @@ export default function TourQrScan() {
 
 
 const styles = StyleSheet.create({
+  hdrEyebrow: { fontSize: 13, fontWeight: "600", color: "rgba(255,255,255,0.85)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 2 },
+  hdrSub: { fontSize: 13.5, color: "rgba(255,255,255,0.85)", marginTop: 6 },
+  cornerBox: { position: "absolute", top: "18%", bottom: "18%", left: "14%", right: "14%" },
+  corner: { position: "absolute", width: 36, height: 36, borderColor: "#FFFFFF" },
+  cTL: { top: 0, left: 0, borderTopWidth: 4, borderLeftWidth: 4, borderTopLeftRadius: 18 },
+  cTR: { top: 0, right: 0, borderTopWidth: 4, borderRightWidth: 4, borderTopRightRadius: 18 },
+  cBL: { bottom: 0, left: 0, borderBottomWidth: 4, borderLeftWidth: 4, borderBottomLeftRadius: 18 },
+  cBR: { bottom: 0, right: 0, borderBottomWidth: 4, borderRightWidth: 4, borderBottomRightRadius: 18 },
+  hintChip: { flexDirection: "row", alignItems: "center", gap: 8, alignSelf: "center", marginTop: 14, backgroundColor: "#FFFFFF", paddingHorizontal: 16, paddingVertical: 10, borderRadius: 999, elevation: 3, shadowColor: "#0F1B2D", shadowOpacity: 0.08, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
+  hintText: { fontSize: 13, fontWeight: "700", color: "#0F1B2D" },
   earlyBox: {
     flexDirection: "row",
     alignItems: "center",
@@ -433,40 +453,15 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   earlyText: { color: "#B26A00", fontWeight: "700", fontSize: 13 },
-  container: { flex: 1, backgroundColor: "#ffffff" },
+  container: { flex: 1, backgroundColor: "#F4F7FB" },
   
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    paddingBottom: 70,   
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
+  header: { paddingTop: 54, paddingHorizontal: 24, paddingBottom: 84 },
 
-  submitGradient1: {
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
+  submitGradient1: { borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
 
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#ffffff',
-    letterSpacing: 0.5,
-  },
+  title: { fontSize: 28, fontWeight: "800", color: "#ffffff" },
 
-  cameraWrap: {
-    flex: 1,
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: -60,
-    borderRadius: 24,
-    overflow: "hidden",
-    maxHeight: "65%",
-  },
+  cameraWrap: { flex: 1, marginHorizontal: 16, marginTop: -60, borderRadius: 28, overflow: "hidden", maxHeight: "58%", backgroundColor: "#000", elevation: 6, shadowColor: "#0F1B2D", shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } },
 
   frameWrap: {
     width: 250,
@@ -478,7 +473,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     width: 32,
     height: 32,
-    borderColor: "#A29BFE",
+    borderColor: "#5FE3B5",
   },
   cornerTL: {
     top: 0,
@@ -511,8 +506,8 @@ const styles = StyleSheet.create({
   scanLine: {
     width: "100%",
     height: 2,
-    backgroundColor: "#A29BFE",
-    shadowColor: "#A29BFE",
+    backgroundColor: "#5FE3B5",
+    shadowColor: "#5FE3B5",
     shadowOpacity: 0.9,
     shadowRadius: 8,
   },

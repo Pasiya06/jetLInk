@@ -6,7 +6,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
-  Dimensions} from 'react-native';
+  Dimensions,
+  ScrollView,
+} from 'react-native';
+import { GradientButton } from "../../components/JetUI";
 import { Alert } from "../../components/JetAlert";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -195,72 +198,46 @@ export default function PaymentSuccessScreen() {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <LinearGradient
-        colors={['#fff8f8', '#3DDC84']}
-        style={styles.container}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        {/* Success Icon */}
-        <Animated.View
-          style={[
-            styles.iconWrapper,
-            { transform: [{ scale: scaleAnim }] },
-          ]}
-        >
-          <View style={styles.iconCircleOuter}>
-            <View style={styles.iconCircleInner}>
-              <Ionicons name="checkmark" size={64} color="#fff" />
-            </View>
-          </View>
-        </Animated.View>
+      <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          <LinearGradient colors={["#0B6B53", "#159B79", "#3DDC84"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+            <Animated.View style={[styles.iconWrapper, { transform: [{ scale: scaleAnim }] }]}>
+              <View style={styles.iconCircleOuter}>
+                <View style={styles.iconCircleInner}>
+                  <Ionicons name="checkmark" size={56} color="#159B79" />
+                </View>
+              </View>
+            </Animated.View>
+            <Text style={styles.title}>Payment successful</Text>
+            <Text style={styles.subtitle}>The parcel is booked. Give the sender this QR code.</Text>
+          </LinearGradient>
 
-        <Animated.View style={{ opacity: fadeAnim, width: '100%', alignItems: 'center' }}>
-          <Text style={styles.title}>Payment Successful</Text>
-          <Text style={styles.subtitle}>
-            Your parcel has been booked successfully
-          </Text>
+          <Animated.View style={{ opacity: fadeAnim }}>
+            <View style={styles.card}>
+              <Text style={styles.amountLabel}>Amount paid</Text>
+              <Text style={styles.amount}>Rs. {amount}</Text>
 
-          {/* Amount */}
-          <Text style={styles.amount}>LKR {amount}</Text>
-
-          {/* QR code */}
-          <View style={styles.card}>
-              <View style={styles.svw}> 
-              {error && (
-                  <Text style={styles.errorText}>{error}</Text>
-              )}
-              
-              
-              {qrToken && (
+              {error ? <Text style={styles.errorText}>{error}</Text> : null}
+              {qrToken ? (
+                <>
                   <View style={styles.qrWrapper}>
-                  <QRCode value={String(qrToken)} size={220} />
+                    <QRCode value={String(qrToken)} size={200} />
                   </View>
-              )}
-              
-            </View>     
-            
-          </View>
+                  <Text style={styles.qrHint}>The receiver shows this code when collecting the parcel</Text>
+                </>
+              ) : null}
+            </View>
 
-          {/* Actions */}
-          <TouchableOpacity
-            style={styles.primaryButton}
-            onPress={handleSaveParcel}
-            activeOpacity={0.85}
-          >
-            
-            <Text style={styles.primaryButtonText}>Book Another</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.secondaryButton}
-            onPress={handleSearch}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.secondaryButtonText}>Back to Home</Text>
-          </TouchableOpacity>
-        </Animated.View>
-      </LinearGradient>
+            <View style={styles.actions}>
+              <GradientButton label="Book another parcel" icon="add-circle-outline" onPress={handleSaveParcel} />
+              <TouchableOpacity style={styles.secondaryButton} onPress={handleSearch} activeOpacity={0.85}>
+                <Ionicons name="home-outline" size={19} color="#155B8A" />
+                <Text style={styles.secondaryButtonText}>Back to home</Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </ScrollView>
+      </View>
     </>
   );
 }
@@ -268,125 +245,23 @@ export default function PaymentSuccessScreen() {
 
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 24,
-  },
-  iconWrapper: {
-    marginBottom: 24,
-  },
-  iconCircleOuter: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: 'rgba(134, 133, 133, 0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconCircleInner: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: '#3DDC84',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1E3C72',
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#1E3C72',
-    marginBottom: 18,
-    textAlign: 'center',
-  },
-  amount: {
-    fontSize: 34,
-    fontWeight: '800',
-    color: '#1E3C72',
-    marginBottom: 24,
-  },
-  card: {
-    width: width - 48,
-    backgroundColor: '#fff',
-    borderRadius: 18,
-    
-    marginBottom: 18,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.15,
-    shadowRadius: 10,
-    elevation: 6,
-  },
-
-   svw: {
-    width: '100%',
-    padding: 50,   
-  },
-
-  qrWrapper: {
-    marginBottom:40,
-    marginLeft:10
-  },
-
-  errorText: {
-    fontSize: 14,
-    color: '#c0392b',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
-
-  detailRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-  },
-  detailLabelWrap: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  detailLabel: {
-    marginLeft: 8,
-    fontSize: 13,
-    color: '#666',
-  },
-  detailValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1E3C72',
-  },
-  divider: {
-    height: 1,
-    backgroundColor: '#eee',
-  },
-  primaryButton: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: width - 48,
-    marginBottom: 12,
-  },
-  primaryButtonText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#1E3C72',
-  },
-  secondaryButton: {
-    paddingVertical: 12,
-  },
-  secondaryButtonText: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.85)',
-    fontWeight: '500',
-  },
+  container: { flex: 1, backgroundColor: "#F4F7FB" },
+  scroll: { paddingBottom: 40 },
+  hero: { paddingTop: 70, paddingBottom: 110, alignItems: "center", borderBottomLeftRadius: 32, borderBottomRightRadius: 32 },
+  iconWrapper: { alignItems: "center", justifyContent: "center" },
+  iconCircleOuter: { width: 120, height: 120, borderRadius: 60, backgroundColor: "rgba(255,255,255,0.18)", alignItems: "center", justifyContent: "center" },
+  iconCircleInner: { width: 88, height: 88, borderRadius: 44, alignItems: "center", justifyContent: "center", backgroundColor: "#FFFFFF" },
+  title: { color: "#FFFFFF", fontSize: 26, fontWeight: "800", marginTop: 18 },
+  subtitle: { color: "rgba(255,255,255,0.9)", fontSize: 14, marginTop: 6, textAlign: "center", paddingHorizontal: 32 },
+  card: { marginTop: -76, marginHorizontal: 18, backgroundColor: "#FFFFFF", borderRadius: 24, padding: 20, alignItems: "center", elevation: 5, shadowColor: "#0F1B2D", shadowOpacity: 0.1, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } },
+  amountLabel: { fontSize: 12.5, fontWeight: "700", color: "#5B6B7F", letterSpacing: 0.5, textTransform: "uppercase" },
+  amount: { fontSize: 30, fontWeight: "800", color: "#0F1B2D", marginTop: 4 },
+  qrWrapper: { marginTop: 18, padding: 14, borderRadius: 20, borderWidth: 2, borderStyle: "dashed", borderColor: "#E3E9F1" },
+  qrHint: { fontSize: 12.5, color: "#5B6B7F", marginTop: 10, textAlign: "center" },
+  errorText: { color: "#C62828", fontWeight: "600", marginTop: 12, textAlign: "center" },
+  reasonRow: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: "#FDE2E2", borderRadius: 14, padding: 14, alignSelf: "stretch" },
+  reasonText: { flex: 1, color: "#9F1D1D", fontSize: 13.5, fontWeight: "600" },
+  actions: { marginHorizontal: 18, marginTop: 18, gap: 12 },
+  secondaryButton: { height: 54, borderRadius: 16, borderWidth: 1.5, borderColor: "#155B8A", backgroundColor: "#FFFFFF", alignItems: "center", justifyContent: "center", flexDirection: "row", gap: 8 },
+  secondaryButtonText: { color: "#155B8A", fontSize: 16, fontWeight: "800" },
 });

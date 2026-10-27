@@ -1,15 +1,17 @@
 import React from 'react';
 import  { useState } from 'react';
 import { Stack,useRouter,useLocalSearchParams} from "expo-router";
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  SafeAreaView, 
-  Image ,
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
+  Image,
   TextInput,
+  ScrollView,
 } from 'react-native';
+import { ScreenHeader, RowCard, IconBox, C, ui } from "../../../components/JetUI";
 import SearchPanel from "../../../components/SearchPanel";
 import { 
   Ionicons, 
@@ -82,55 +84,44 @@ const ParcelService = () => {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-       
-          <View style={styles.header}> 
-              <TouchableOpacity><Text style={styles.title}>Select Receipt Type</Text></TouchableOpacity>
-          </View>
-        </LinearGradient>
-      
-      
-        
-        
-        <TouchableOpacity style={styles.card} onPress={handleSearch}>
-          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-              <Feather name="gift" size={50} color="#F59E0B" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Pending</Text>
-            <Text style={styles.text2}>Manage pending all parcel</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
+      <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
+        <ScreenHeader eyebrow="Parcel history" title="Choose a list" />
 
-        <TouchableOpacity style={styles.card1} onPress={handleSearch1}>
-          <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
-              <Feather name="gift" size={50} color="#8B5CF6" />
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          <View style={[ui.card, ui.rowCard]}>
+            <IconBox bg={C.blueSoft} size={48}>
+              <Feather name="layers" size={24} color={C.blue} />
+            </IconBox>
+            <View style={{ flex: 1, marginLeft: 14 }}>
+              <Text style={ui.rowTitle}>Parcels by stage</Text>
+              <Text style={ui.rowSub}>Each parcel moves from pending to delivered</Text>
+            </View>
           </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Pickup</Text>
-            <Text style={styles.text2}>Manage pickup all parcel</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card2} onPress={handleSearch2}>
-          <View style={[styles.iconWrap, { backgroundColor: "#32CD3218" }]}>
-              <Feather name="gift" size={50} color="#32CD32" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Delivered</Text>
-            <Text style={styles.text2}>Manage Delivered all parcel</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
-        
+          <RowCard
+            icon={<Feather name="clock" size={24} color={C.amber} />}
+            iconBg={C.amberSoft}
+            title="Pending"
+            subtitle="Booked, waiting for the bus"
+            onPress={handleSearch}
+          />
+          <RowCard
+            icon={<Feather name="truck" size={24} color={C.purple} />}
+            iconBg={C.purpleSoft}
+            title="Picked up"
+            subtitle="On the bus, on the way"
+            onPress={handleSearch1}
+          />
+          <RowCard
+            icon={<Feather name="check-circle" size={24} color={C.green} />}
+            iconBg={C.greenSoft}
+            title="Delivered"
+            subtitle="Handed over to the receiver"
+            onPress={handleSearch2}
+          />
+        </ScrollView>
+
+
       <SearchPanel
           visible={isSearching}
           query={searchQuery}

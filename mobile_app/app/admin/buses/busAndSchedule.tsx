@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { Stack,useRouter,useLocalSearchParams} from "expo-router";
-import { 
-  StyleSheet, 
-  View, 
+import {
+  StyleSheet,
+  View,
   Text,
-  TextInput, 
-  TouchableOpacity, 
-  SafeAreaView, 
-  Image 
+  TextInput,
+  TouchableOpacity,
+  SafeAreaView,
+  Image,
+  ScrollView,
 } from 'react-native';
+import { ScreenHeader, FeatureCard, IconBox, C, ui } from "../../../components/JetUI";
 import SearchPanel from "../../../components/SearchPanel";
 import { 
   AntDesign,
@@ -35,71 +37,50 @@ const ToursScreen: React.FC = () => {
 return (
     <>
     <Stack.Screen options={{ title: "", headerShown: false }} />
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
       
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-        start={{x: 0, y: 0,}}
-        end={{x: 1, y: 1,}}
-        style={styles.submitGradient1}
-      >
+      <ScreenHeader eyebrow="Fleet" title="Buses & schedules" />
 
-        <View style={styles.header}>          
-          <TouchableOpacity><Text style={styles.title}>Bus and Schedule</Text></TouchableOpacity>          
+      <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+        <View style={[ui.card, ui.rowCard]}>
+          <IconBox bg={C.blueSoft} size={48}>
+            <Ionicons name="bus-outline" size={24} color={C.blue} />
+          </IconBox>
+          <View style={{ flex: 1, marginLeft: 14 }}>
+            <Text style={ui.rowTitle}>Manage your fleet</Text>
+            <Text style={ui.rowSub}>Add buses, edit details and plan their trips</Text>
+          </View>
         </View>
 
-      </LinearGradient>
-
-        <TouchableOpacity
-          onPress={() =>
-            router.push({
-              pathname: "/admin/buses/busType",
-              params: {
-                Aid: params.Aid,
-                  firstName: params.firstName,
-                  lastName: params.lastName,
-                  email: params.email,
-                },
-              })
-            }
-          style={styles.card} 
-        >
-          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-              <AntDesign name="profile" size={50} color="#F59E0B" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Profile</Text>
-            <Text style={styles.text2}>Manage bus profile</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
- 
-        <TouchableOpacity 
-          style={styles.card1} 
-          onPress={() =>
-            router.push({
-              pathname: "/admin/buses/chooseBusType",
-              params: {
+        <FeatureCard
+          icon={<AntDesign name="profile" size={28} color={C.amber} />}
+          iconBg={C.amberSoft}
+          title="Bus profiles"
+          subtitle="Add new buses and update chassis, engine, licence and service details"
+          cta="Manage buses"
+          onPress={() => router.push({ pathname: "/admin/buses/busType", params: {
                 Aid: params.Aid,
                 firstName: params.firstName,
                 lastName: params.lastName,
                 email: params.email,
-              },
-            })
-          }
-        >
-          <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
-              <AntDesign name="schedule" size={50} color="#8B5CF6" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Schedule</Text>
-            <Text style={styles.text2}>Manage bus schedule</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
+              } })}
+        />
 
-        
-      
+        <FeatureCard
+          icon={<AntDesign name="schedule" size={28} color={C.purple} />}
+          iconBg={C.purpleSoft}
+          title="Schedules"
+          subtitle="Create routes with departure and arrival times, stops and ticket prices"
+          cta="Manage schedules"
+          onPress={() => router.push({ pathname: "/admin/buses/chooseBusType", params: {
+                Aid: params.Aid,
+                firstName: params.firstName,
+                lastName: params.lastName,
+                email: params.email,
+              } })}
+        />
+      </ScrollView>
+
 
         <SearchPanel
           visible={isSearching}

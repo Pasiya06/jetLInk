@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { Stack,useRouter,useLocalSearchParams} from "expo-router";
 import {
-  StyleSheet, 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  SafeAreaView, 
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  SafeAreaView,
   StatusBar,
-  ScrollView 
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
+import { FormSection, FormField, PickerField, FieldRow } from "../../components/JetForm";
+import { ScreenHeader, GradientButton, C, ui } from "../../components/JetUI";
 import SearchPanel from "../../components/SearchPanel";
 import { Alert } from "../../components/JetAlert";
 import { 
@@ -154,215 +158,144 @@ const JetLinkInterface: React.FC = () => {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
       <StatusBar barStyle="light-content" backgroundColor="#0056b3" />
       
       {/* Header Section */}
-      <LinearGradient
-                      colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-                      style={styles.submitGradient1}
-                  >
-              <View style={styles.header}>
-                  
-              
-                <TouchableOpacity >
-                  <Text style={styles.title}>Book Parcel</Text>
-                </TouchableOpacity>
-                       
-              </View>
-              </LinearGradient> 
+      <ScreenHeader eyebrow="Book a parcel · Step 1" title="Parcel details" />
 
-      
-    
-
-      
-      <View style={styles.card}>
-
-        <ScrollView style={styles.svw}>
-          <Text style={styles.label}>Sender Name</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={sendername} 
-              onChangeText={setsendername} 
-              placeholder='Pasindu Kelum'
-              placeholderTextColor="#A3A3A3"
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+          <FormSection title="Sender" subtitle="Who is sending the parcel" icon="person-outline">
+            <FormField
+              label="Sender name"
+              icon="person-outline"
+              value={sendername}
+              onChangeText={setsendername}
+              placeholder="Pasindu Kelum"
+              error={fieldError("sendername", sendername)}
             />
-            
-          </View>
-          <FieldError message={fieldError("sendername", sendername)} />
-
-          <Text style={styles.label}>Sender Mobile Number</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={smobilenumber} 
-              onChangeText={Ssetmobilenumber} 
-              placeholder='0771111111'
-              keyboardType="phone-pad" 
+            <FormField
+              label="Sender mobile number"
+              icon="call-outline"
+              value={smobilenumber}
+              onChangeText={Ssetmobilenumber}
+              placeholder="0771111111"
+              keyboardType="phone-pad"
               maxLength={10}
-              placeholderTextColor="#A3A3A3"
+              error={fieldError("smobilenumber", smobilenumber)}
             />
-             
-          </View>
-          <FieldError message={fieldError("smobilenumber", smobilenumber)} />
+          </FormSection>
 
-          <Text style={styles.label}>Bus Number</Text>
-          <View style={styles.inputWrapper}>
-            <Text style={styles.input1}>{params.busNo}</Text>
-            
-          </View>
-
-          <Text style={styles.label}>Receiver Name</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={receivername} 
-              onChangeText={setreceivername} 
-              placeholder='Deshith Sandakelum'
-              placeholderTextColor="#A3A3A3"
-              />
-            
-          </View>
-          <FieldError message={fieldError("receivername", receivername)} />
-
-          <Text style={styles.label}>Receiver Mobile Number</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={rmobilenumber} 
-              onChangeText={Rsetmobilenumber} 
-              keyboardType="phone-pad" 
+          <FormSection title="Receiver" subtitle="Who will collect the parcel" icon="people-outline" color={C.purple} bg={C.purpleSoft}>
+            <FormField
+              label="Receiver name"
+              icon="person-outline"
+              value={receivername}
+              onChangeText={setreceivername}
+              placeholder="Deshith Sandakelum"
+              error={fieldError("receivername", receivername)}
+            />
+            <FormField
+              label="Receiver mobile number"
+              icon="call-outline"
+              value={rmobilenumber}
+              onChangeText={Rsetmobilenumber}
+              placeholder="0711111111"
+              keyboardType="phone-pad"
               maxLength={10}
-              placeholder='0711111111'
-              placeholderTextColor="#A3A3A3"
+              error={fieldError("rmobilenumber", rmobilenumber)}
             />
-            
-          </View>
-          <FieldError message={fieldError("rmobilenumber", rmobilenumber)} />
-
-          <Text style={styles.label}>Receiver Email</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={remail} 
+            <FormField
+              label="Receiver email (optional)"
+              icon="mail-outline"
+              value={remail}
               onChangeText={(text) => RsetEmail(text.replace(/\s/g, "").toLowerCase())}
-              placeholder='abc@gmail.com or no email' 
+              placeholder="abc@gmail.com or no email"
               autoCapitalize="none"
               autoCorrect={false}
-              placeholderTextColor="#A3A3A3"
+              keyboardType="email-address"
+              error={fieldError("remail", remail)}
             />
-            
-          </View>
-          <FieldError message={fieldError("remail", remail)} />
+          </FormSection>
 
-          <Text style={styles.label}>Weight(kg)</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={weight} 
-              onChangeText={setWeight} 
-              keyboardType="phone-pad" 
-              maxLength={2} 
-              placeholder='23'
-              placeholderTextColor="#A3A3A3"
-              />           
-          </View>
-          <FieldError message={fieldError("weight", weight)} />
-          
-          <Text style={styles.label}>Pick up Location</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={pickup}  
-              onChangeText={(text) => setPickup(text.replace(/\s/g, "").toUpperCase())}
-              autoCapitalize="characters"
-              placeholder='MATARA'
-              autoCorrect={false}
-              placeholderTextColor="#A3A3A3"
+          <FormSection title="Parcel" subtitle="Route, weight and pickup time" icon="cube-outline" color={C.amber} bg={C.amberSoft}>
+            <FormField label="Bus number" icon="bus-outline" value={String(params.busNo ?? "")} readOnly />
+            <FieldRow>
+              <FormField
+                label="Pickup"
+                icon="location-outline"
+                value={pickup}
+                onChangeText={(text) => setPickup(text.replace(/\s/g, "").toUpperCase())}
+                autoCapitalize="characters"
+                autoCorrect={false}
+                placeholder="MATARA"
+                error={fieldError("pickup", pickup)}
               />
-          </View>
-          <FieldError message={fieldError("pickup", pickup)} />
-          
-          <Text style={styles.label}>Delivery Location</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={drop} 
-              onChangeText={(text) => setDrop(text.replace(/\s/g, "").toUpperCase())}
-              autoCapitalize="characters"
-              autoCorrect={false} 
-              placeholder='GALLE'
-              placeholderTextColor="#A3A3A3"
+              <FormField
+                label="Delivery"
+                icon="flag-outline"
+                value={drop}
+                onChangeText={(text) => setDrop(text.replace(/\s/g, "").toUpperCase())}
+                autoCapitalize="characters"
+                autoCorrect={false}
+                placeholder="GALLE"
+                error={fieldError("drop", drop)}
+              />
+            </FieldRow>
+            <FormField
+              label="Weight"
+              icon="barbell-outline"
+              value={weight}
+              onChangeText={setWeight}
+              keyboardType="number-pad"
+              maxLength={2}
+              placeholder="23"
+              suffix="kg"
+              error={fieldError("weight", weight)}
             />
-            
-          </View>
-          <FieldError message={fieldError("drop", drop)} />
-          
-          <Text style={styles.label}>Date</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={date} placeholder="YYYY-MM-DD" onChangeText={setDate} />
-            <TouchableOpacity onPress={() => setShowCalendar(true)}>
-              <FontAwesome5 name="calendar-alt" size={24} color="black" />  
-            </TouchableOpacity>
-          </View>
-          <FieldError message={fieldError("date", date)} />
+            <FieldRow>
+              <PickerField
+                label="Date"
+                icon="calendar-outline"
+                value={date}
+                placeholder="Choose date"
+                onPress={() => setShowCalendar(true)}
+                error={fieldError("date", date)}
+              />
+              <PickerField
+                label="Time"
+                icon="time-outline"
+                value={selectedTime}
+                placeholder="Choose time"
+                onPress={() => setShowTimePicker(true)}
+                error={fieldError("selectedTime", selectedTime)}
+              />
+            </FieldRow>
+          </FormSection>
 
           {showCalendar && (
-                  <DateTimePicker
-                    value={date1}
-                    mode="date"
-                    display="default"
-                    onChange={(event, selectedDate) => {
-                      setShowCalendar(false);
-                      if (selectedDate) {
-                        setdate(selectedDate);
-                        setDate(selectedDate.toLocaleDateString());
-                      }
-                    }}
-                  />
-                )}
-          <Text style={styles.label}>Time</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input}
-              
-              value={selectedTime}
-              placeholder="00:00"
-              editable={false}
-              placeholderTextColor="#A3A3A3"
-            />
-
-            <TouchableOpacity onPress={() => setShowTimePicker(true)}>
-              <Ionicons name="time-outline" size={24} color="black" />
-            </TouchableOpacity>
-          </View>
-          <FieldError message={fieldError("selectedTime", selectedTime)} /> 
-
-          {showTimePicker && (
             <DateTimePicker
-              value={time}
-              mode="time"
+              value={date1}
+              mode="date"
               display="default"
-              onChange={onTimeChange}
+              onChange={(event, selectedDate) => {
+                setShowCalendar(false);
+                if (selectedDate) {
+                  setdate(selectedDate);
+                  setDate(selectedDate.toLocaleDateString());
+                }
+              }}
             />
-          )}                   
- 
-        </ScrollView>
-        
-      </View>
+          )}
+          {showTimePicker && (
+            <DateTimePicker value={time} mode="time" display="default" onChange={onTimeChange} />
+          )}
 
-      <TouchableOpacity style={styles.submitButton} onPress={handlesenderD}>
-                          <LinearGradient
-                              colors={["#173C79","#155B8A","#159B79",]}
-                              start={{x: 0, y: 0,}}
-                              end={{x: 1, y: 1,}}
-                              style={styles.submitGradient}
-                          >
-                          <Text style={styles.submitText}>Next</Text>
-                          </LinearGradient>
-                      </TouchableOpacity>
+          <GradientButton label="Next" icon="arrow-forward-circle-outline" onPress={handlesenderD} />
+        </ScrollView>
+      </KeyboardAvoidingView>
+
 
         <SearchPanel
           visible={isSearching}

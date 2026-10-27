@@ -8,6 +8,8 @@ import {
    SafeAreaView,
   ScrollView
 } from "react-native";
+import { DetailLine } from "../../../components/JetForm";
+import { ScreenHeader, GRADIENT, C, ui } from "../../../components/JetUI";
 import SearchPanel from "../../../components/SearchPanel";
 
 import {  } from "react-native-safe-area-context";
@@ -64,172 +66,48 @@ const AddBus = () => {
   return (
     <>
     <Stack.Screen options={{ title: "", headerShown: false }} />
-    <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-        start={{x: 0, y: 0,}}
-        end={{x: 1, y: 1,}}
-        style={styles.submitGradient1}
-      >
-      
-        <View style={styles.header}>
-          
-          
-          <TouchableOpacity><Text style={styles.title}>Jetlink</Text></TouchableOpacity>
-          
-          
-        </View>
-      </LinearGradient>
+    <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
+      <ScreenHeader eyebrow={`${params.busTypeTopic || "Bus"} profile`} title={String(params.busNumber || "Bus")} />
 
-      
-        
-        
-
-
-
-      
-      
-
-      <View style={styles.card}>
-      {/* Header */}
-      <LinearGradient
-        colors={['#F4F7FC', '#F4F7FC']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.header1}
-      >
-          <View style={styles.subHead}>
-            <View style={styles.avatar}>
-                <MaterialCommunityIcons name="bus" size={32} color="#ffffff" />
+      <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+        <View style={[ui.card, styles.heroCard]}>
+          <LinearGradient colors={GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.heroIcon}>
+            <MaterialCommunityIcons name="bus" size={30} color="#FFFFFF" />
+          </LinearGradient>
+          <View style={{ flex: 1, marginLeft: 14 }}>
+            <Text style={styles.heroTitle}>{params.busNumber}</Text>
+            <View style={[styles.statusPill, { backgroundColor: isOnline ? C.greenSoft : C.redSoft }]}>
+              <View style={[styles.statusDotSm, { backgroundColor: isOnline ? C.green : C.red }]} />
+              <Text style={[styles.statusTextSm, { color: isOnline ? C.green : C.red }]}>{isOnline ? "Online" : "Offline"}</Text>
             </View>
-            <View>
-              <Text style={styles.fullName}>{params.busNumber}</Text>
-            
-              <View style={[ styles.badge, { backgroundColor: isOnline ? '#EAFBEF' : '#FDEDED' },]}>
-                
-                <View style={[styles.statusDot, { backgroundColor: isOnline ? '#22C55E' : '#EF4444' },]}/>
-                <Text style={[styles.badgeText,{ color: isOnline ? '#2F9E44' : '#DC2626' },]}>
-                  {isOnline ? 'Online' : 'Offline'}
-                </Text>
-              </View>
-            </View>
-            
           </View>
-        <TouchableOpacity activeOpacity={0.85} onPress={handleSearch}>
-              <Ionicons name="create-outline" size={28} color="#8A8A8A" style={{ marginRight: 8 }} />
-              <Text style={styles.searchButtonText}>Edit</Text> 
-            </TouchableOpacity>
-      </LinearGradient>
-
-      {/* Body */}
-      <View style={styles.body}>
-       
-        
-        <View style={styles.row}>
-          <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
-              <Ionicons name="person-circle-outline" size={18} color="#8B5CF6" />
-          </View>
-          <View style={styles.rowText}>
-              <Text style={styles.label}>Conductor</Text>
-              <Text style={styles.value}>{params.conductorD}</Text>
-          </View>
+          <TouchableOpacity style={styles.editBtn} activeOpacity={0.85} onPress={handleSearch} accessibilityLabel="Edit bus">
+            <Ionicons name="create-outline" size={18} color={C.blue} />
+            <Text style={styles.editBtnText}>Edit</Text>
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.row}>
-        <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-            <MaterialCommunityIcons name="steering" size={18} color="#F59E0B" />
-        </View>
-        <View style={styles.rowText}>
-            <Text style={styles.label}>Driver</Text>
-            <Text style={styles.value}>{params.driverD}</Text>
-        </View>
+        <View style={[ui.card, styles.detailCard]}>
+          <Text style={styles.cardHeading}>Crew</Text>
+          <DetailLine icon="person-outline" label="Driver" value={String(params.driverD || "")} />
+          <DetailLine icon="person-circle-outline" label="Conductor" value={String(params.conductorD || "")} last />
         </View>
 
-        <View style={styles.row}>
-        <View style={[styles.iconWrap, { backgroundColor: "#06B6D418" }]}>
-            <Ionicons name="barcode-outline" size={18} color="#06B6D4" />
-        </View>
-        <View style={styles.rowText}>
-            <Text style={styles.label}>Chassis Number</Text>
-            <Text style={styles.value}>{params.chassis}</Text>
-        </View>
+        <View style={[ui.card, styles.detailCard]}>
+          <Text style={styles.cardHeading}>Vehicle</Text>
+          <DetailLine icon="barcode-outline" label="Chassis number" value={String(params.chassis || "")} />
+          <DetailLine icon="hardware-chip-outline" label="Engine number" value={String(params.engine || "")} />
+          <DetailLine icon="people-outline" label="Seats" value={String(params.noOfSeats || "")} />
+          <DetailLine icon="color-palette-outline" label="Colour" value={String(params.colour || "")} last />
         </View>
 
-        <View style={styles.row}>
-        <View style={[styles.iconWrap, { backgroundColor: "#EF444418" }]}>
-            <MaterialCommunityIcons name ="engine-outline" size={18} color="#EF4444" />
+        <View style={[ui.card, styles.detailCard]}>
+          <Text style={styles.cardHeading}>Renewal dates</Text>
+          <DetailLine icon="construct-outline" label="Service" value={String(params.serviceDate || "")} color={C.green} />
+          <DetailLine icon="document-text-outline" label="Licence" value={String(params.licenseDate || "")} color={C.green} />
+          <DetailLine icon="leaf-outline" label="Emission test" value={String(params.emissionDate || "")} color={C.green} last />
         </View>
-        <View style={styles.rowText}>
-            <Text style={styles.label}>Engine Number</Text>
-            <Text style={styles.value}>{params.engine}</Text>
-        </View>
-        </View>
-
-        <View style={styles.row}>
-        <View style={[styles.iconWrap, { backgroundColor: "#fe880018" }]}>
-            <MaterialCommunityIcons name ="car-seat" size={18} color="#fe8800" />
-        </View>
-        <View style={styles.rowText}>
-            <Text style={styles.label}>Number of seats</Text>
-            <Text style={styles.value}>{params.noOfSeats}</Text>
-        </View>
-        </View>
-
-        <View style={styles.row}>
-        <View style={[styles.iconWrap, { backgroundColor: "#EC489918" }]}>
-            <Ionicons name="color-palette-outline" size={18} color="#EC4899" />
-        </View>
-        <View style={styles.rowText}>
-            <Text style={styles.label}>Colour</Text>
-            <Text style={styles.value}>{params.colour}</Text>
-        </View>
-        </View>
-
-        
-
-        <View style={styles.row}>
-        <View style={[styles.iconWrap, { backgroundColor: "#10B98118" }]}>
-            <Ionicons name="calendar-outline" size={18} color="#10B981" />
-        </View>
-        <View style={styles.rowText}>
-            <Text style={styles.label}>Service Date</Text>
-            <Text style={styles.value}>{params.serviceDate}</Text>
-        </View>
-        </View>
-
-        <View style={styles.row}>
-        <View style={[styles.iconWrap, { backgroundColor: "#3B82F618" }]}>
-            <Ionicons name="document-text-outline" size={18} color="#3B82F6" />
-        </View>
-        <View style={styles.rowText}>
-            <Text style={styles.label}>License Date</Text>
-            <Text style={styles.value}>{params.licenseDate}</Text>
-        </View>
-        </View>
-
-        <View style={styles.row}>
-        <View style={[styles.iconWrap, { backgroundColor: "#84CC1618" }]}>
-            <Ionicons name="leaf-outline" size={18} color="#84CC16" />
-        </View>
-        <View style={styles.rowText}>
-            <Text style={styles.label}>Emission Date</Text>
-            <Text style={styles.value}>{params.emissionDate}</Text>
-        </View>
-        </View>
-      
-
-
-
-
-      </View>
-
-      {/* Edit Button */}
-      
-    </View>
-
-    
-
-
+      </ScrollView>
 
 
         <SearchPanel
@@ -348,6 +226,17 @@ const AddBus = () => {
 };
 
 const styles = StyleSheet.create({
+  heroCard: { padding: 18, flexDirection: "row", alignItems: "center" },
+  heroIcon: { width: 58, height: 58, borderRadius: 18, alignItems: "center", justifyContent: "center", overflow: "hidden" },
+  heroTitle: { fontSize: 22, fontWeight: "800", color: "#0F1B2D", letterSpacing: 0.3 },
+  heroSub: { fontSize: 13, color: "#5B6B7F", fontWeight: "600", marginTop: 2 },
+  statusPill: { flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-start", paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, marginTop: 6 },
+  statusDotSm: { width: 7, height: 7, borderRadius: 4 },
+  statusTextSm: { fontSize: 12, fontWeight: "800" },
+  editBtn: { flexDirection: "row", alignItems: "center", gap: 6, paddingHorizontal: 14, height: 40, borderRadius: 14, backgroundColor: "#EAF1FB" },
+  editBtnText: { color: "#155B8A", fontWeight: "800", fontSize: 14 },
+  detailCard: { paddingHorizontal: 18, paddingVertical: 6 },
+  cardHeading: { fontSize: 13, fontWeight: "800", color: "#5B6B7F", letterSpacing: 0.8, textTransform: "uppercase", marginTop: 12, marginBottom: 2 },
 
   container:{
     flex:1,

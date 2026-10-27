@@ -1,14 +1,16 @@
 import React from 'react';
 import  { useState } from 'react';
 import { Stack,useRouter,useLocalSearchParams} from "expo-router";
-import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TouchableOpacity, 
-  SafeAreaView, 
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  SafeAreaView,
   TextInput,
+  ScrollView,
 } from 'react-native';
+import { ScreenHeader, FeatureCard, IconBox, C, ui } from "../../../components/JetUI";
 import SearchPanel from "../../../components/SearchPanel";
 import { Ionicons, 
   MaterialCommunityIcons, 
@@ -51,46 +53,40 @@ const ParcelService = () => {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-       
-        <View style={styles.header}> 
-            <TouchableOpacity><Text style={styles.title}>Staff</Text></TouchableOpacity>
+      <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
+      <ScreenHeader eyebrow="Team" title="Staff" />
+
+      <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+        <View style={[ui.card, ui.rowCard]}>
+          <IconBox bg={C.blueSoft} size={48}>
+            <Ionicons name="people-outline" size={24} color={C.blue} />
+          </IconBox>
+          <View style={{ flex: 1, marginLeft: 14 }}>
+            <Text style={ui.rowTitle}>Manage your crew</Text>
+            <Text style={ui.rowSub}>Add, edit and remove drivers and conductors</Text>
+          </View>
         </View>
-      </LinearGradient>
-      
-      
-        
-        
-        <TouchableOpacity style={styles.card} onPress={handleSearch}>
-          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-              <MaterialCommunityIcons name="steering" size={58} color="#F59E0B" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Drivers</Text>
-            <Text style={styles.text2}>Manage drivers accounts</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card1} onPress={handleSearch1}>
-          <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
-              <Ionicons name="person-circle-outline" size={58} color="#8B5CF6" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Conductors</Text>
-            <Text style={styles.text2}>Manage conductor accounts</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
+        <FeatureCard
+          icon={<MaterialCommunityIcons name="steering" size={30} color={C.amber} />}
+          iconBg={C.amberSoft}
+          title="Drivers"
+          subtitle="See every driver, update their details or add a new one"
+          cta="Manage drivers"
+          onPress={handleSearch}
+        />
 
-        
-        
+        <FeatureCard
+          icon={<Ionicons name="person-circle-outline" size={30} color={C.purple} />}
+          iconBg={C.purpleSoft}
+          title="Conductors"
+          subtitle="See every conductor, update their details or add a new one"
+          cta="Manage conductors"
+          onPress={handleSearch1}
+        />
+      </ScrollView>
+
+
       <SearchPanel
           visible={isSearching}
           query={searchQuery}

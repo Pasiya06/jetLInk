@@ -184,9 +184,23 @@ export const FlatmateLogin: React.FC = () => {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <StatusBar barStyle="light-content" backgroundColor="#7db300" />
+      <StatusBar barStyle="light-content" backgroundColor="#173C79" />
       <SafeAreaView style={styles.container}>
-        <ScreenHeader center eyebrow="Staff sign in" title="JetLink" />
+        <LinearGradient colors={GRADIENT} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.hero}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={() => router.replace("/busStaff/loginindex")}
+            accessibilityLabel="Go back"
+          >
+            <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+          </TouchableOpacity>
+          <View style={styles.heroBadge}>
+            <Ionicons name="lock-closed" size={32} color="#FFFFFF" />
+          </View>
+          <Text style={styles.brand}>JetLink</Text>
+          <Text style={styles.heroTitle}>Bus crew sign in</Text>
+          <Text style={styles.heroSub}>One last step to start the trip</Text>
+        </LinearGradient>
         
         
                 
@@ -194,12 +208,23 @@ export const FlatmateLogin: React.FC = () => {
                
 
                   <View style={styles.otpcard}>
+                    <View style={styles.stepRow}>
+                      <View style={[styles.step, styles.stepActive]}>
+                        <Ionicons name="checkmark" size={15} color="#FFFFFF" />
+                      </View>
+                      <Text style={styles.stepLabelActive}>Crew details</Text>
+                      <View style={[styles.stepLine, { backgroundColor: C.blue }]} />
+                      <View style={[styles.step, styles.stepActive]}>
+                        <Text style={styles.stepNumActive}>2</Text>
+                      </View>
+                      <Text style={styles.stepLabelActive}>Code</Text>
+                    </View>
                     <View style={styles.otpHead}>
                       <IconBox bg={C.greenSoft} size={64} radius={32}>
                         <Ionicons name="shield-checkmark-outline" size={30} color={C.green} />
                       </IconBox>
                       <Text style={styles.otplabel}>Enter verification code</Text>
-                      <Text style={styles.otpHint}>Type the 6-digit code we sent you.</Text>
+                      <Text style={styles.otpHint}>{email ? `Type the 6-digit code we sent to ${email}` : "Type the 6-digit code we sent to the conductor."}</Text>
                     </View>
 
                     <View style={styles.otpRow}>
@@ -289,6 +314,18 @@ export const FlatmateLogin: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+  hero: { paddingTop: 48, paddingBottom: 92, paddingHorizontal: 24, alignItems: "center", borderBottomLeftRadius: 32, borderBottomRightRadius: 32 },
+  backBtn: { position: "absolute", top: 44, left: 18, width: 42, height: 42, borderRadius: 14, backgroundColor: "rgba(255,255,255,0.18)", alignItems: "center", justifyContent: "center" },
+  heroBadge: { width: 72, height: 72, borderRadius: 24, backgroundColor: "rgba(255,255,255,0.18)", borderWidth: 1, borderColor: "rgba(255,255,255,0.35)", alignItems: "center", justifyContent: "center", marginTop: 8 },
+  brand: { color: "rgba(255,255,255,0.85)", fontSize: 13, fontWeight: "800", letterSpacing: 2, marginTop: 14, textTransform: "uppercase" },
+  heroTitle: { color: "#FFFFFF", fontSize: 26, fontWeight: "800", marginTop: 4 },
+  heroSub: { color: "rgba(255,255,255,0.85)", fontSize: 14, marginTop: 6, textAlign: "center" },
+  stepRow: { flexDirection: "row", alignItems: "center", marginBottom: 18 },
+  step: { width: 26, height: 26, borderRadius: 13, backgroundColor: "#EEF2F7", alignItems: "center", justifyContent: "center" },
+  stepActive: { backgroundColor: C.blue },
+  stepNumActive: { fontSize: 13, fontWeight: "800", color: "#FFFFFF" },
+  stepLabelActive: { fontSize: 13, fontWeight: "800", color: C.ink, marginLeft: 8 },
+  stepLine: { flex: 1, height: 2, backgroundColor: "#E3E9F1", marginHorizontal: 10, borderRadius: 1 },
   container: { flex: 1, backgroundColor: C.bg },
 
   header: {
@@ -500,7 +537,7 @@ const styles = StyleSheet.create({
 
   otpcard: {
     marginTop: -64,
-    marginHorizontal: 16,
+    marginHorizontal: 18,
     backgroundColor: "#FFFFFF",
     borderRadius: 26,
     paddingHorizontal: 20,
