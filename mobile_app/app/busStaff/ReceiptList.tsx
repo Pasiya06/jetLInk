@@ -56,6 +56,9 @@ interface Receipt {
   isOnline: boolean;
   date: string;
   pickup: string;
+  pickupLat?: number | null;
+  pickupLng?: number | null;
+  pickupAddress?: string;
   time: string;
   packageId: string;
   description: string;
@@ -77,7 +80,7 @@ export default function BusReceipts() {
   const router = useRouter();
 
   const params = useLocalSearchParams();
-  const busNumber:string = "HH-7788";
+  const busNumber = params.busNo as string;
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -426,33 +429,43 @@ function ReceiptCard({ item }: { item: Receipt }) {
               {[item.date, item.time].filter(Boolean).join("  ") || "No date"}
             </Text>
           </View>
-          <View
-            style={[
-              styles.status,
-              { backgroundColor: item.isOnline ? C.successSoft : C.neutralSoft },
-            ]}
-          >
-            <View
-              style={[
-                styles.statusDot,
-                { backgroundColor: item.isOnline ? C.success : C.neutral },
-              ]}
-            />
-            <Text
-              style={[
-                styles.statusText,
-                { color: item.isOnline ? C.success : C.neutral },
-              ]}
-            >
-              {item.isOnline ? "Online" : "Offline"}
-            </Text>
-          </View>
+          
         </View>
 
         <Text style={styles.fieldLabel}>Pickup</Text>
         <Text style={styles.pickup} numberOfLines={2}>
           {item.pickup || "N/A"}
         </Text>
+        {!!item.pickupAddress && (
+          <Text style={styles.pickupAddress} numberOfLines={2}>
+            {item.pickupAddress}
+          </Text>
+        )}
+
+        {item.pickupLat != null && item.pickupLng != null && (
+          <TouchableOpacity
+            style={styles.mapBtn}
+            activeOpacity={0.85}
+            onPress={() =>
+              router.push({
+                pathname: "/busStaff/pickupLocation",
+                params: {
+                  pickupLat: String(item.pickupLat),
+                  pickupLng: String(item.pickupLng),
+                  pickupAddress: item.pickupAddress || "",
+                  pickup: item.pickup,
+                  passengerName: passenger,
+                  passengerPhone: item.pphoneNumber || "",
+                  date: item.date,
+                  time: item.time,
+                },
+              })
+            }
+          >
+            <Ionicons name="map-outline" size={16} color={C.brand} />
+            <Text style={styles.mapBtnText}>View pickup on map</Text>
+          </TouchableOpacity>
+        )}
 
         <View style={styles.metaRow}>
           <Meta
@@ -864,6 +877,19 @@ const styles = StyleSheet.create({
     letterSpacing: -0.3,
     lineHeight: 28,
   },
+  pickupAddress: { fontSize: 12.5, color: C.muted, marginTop: 2 },
+  mapBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    gap: 6,
+    marginTop: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: C.brandSoft,
+  },
+  mapBtnText: { color: C.brand, fontWeight: "700", fontSize: 13 },
   metaRow: { flexDirection: "row", flexWrap: "wrap", gap: 14, marginTop: 14 },
   meta: { flexDirection: "row", alignItems: "center", gap: 5 },
   metaText: { fontSize: 13, color: C.muted, fontWeight: "500" },

@@ -60,6 +60,22 @@ const receiptSchema = new mongoose.Schema(
       required: true,
     },
 
+    // Pickup point the passenger picked on the map (optional)
+    pickupLat: {
+      type: Number,
+      default: null,
+    },
+
+    pickupLng: {
+      type: Number,
+      default: null,
+    },
+
+    pickupAddress: {
+      type: String,
+      default: "",
+    },
+
     time: {
       type: String,
       required: true,

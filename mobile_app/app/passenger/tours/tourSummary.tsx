@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
   View,
@@ -26,6 +26,8 @@ import {
 } from "@expo/vector-icons";
 
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as Location from "expo-location";
+import MapView, { Marker, MapPressEvent, Region } from "react-native-maps";
 
 import FieldError from "../../../components/FieldError";
 import { useFieldErrors } from "../../../utils/validation";
@@ -40,6 +42,9 @@ type Place = {
   color: string;
   order: number;
 };
+
+type Coords = { latitude: number; longitude: number };
+const DEFAULT_REGION: Region = { latitude: 7.8731, longitude: 80.7718, latitudeDelta: 3, longitudeDelta: 3 }; // Sri Lanka
 
 type PackageData = {
   _id: string;
@@ -68,6 +73,72 @@ export default function PackageDetails() {
   const [activeTab, setActiveTab] = useState(''); 
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Current-location pickup + map
+  const mapRef = useRef<MapView>(null);
+  const [pickupCoords, setPickupCoords] = useState<Coords | null>(
+    params.pickupLat && params.pickupLng
+      ? { latitude: Number(params.pickupLat), longitude: Number(params.pickupLng) }
+      : null
+  );
+  const [pickupAddress, setPickupAddress] = useState(String(params.pickupAddress || ""));
+  const [locating, setLocating] = useState(false);
+  const [mapTouching, setMapTouching] = useState(false);
+
+  // Move map camera to a point
+  const focusMap = (c: Coords) => {
+    mapRef.current?.animateToRegion({ ...c, latitudeDelta: 0.01, longitudeDelta: 0.01 }, 600);
+  };
+
+  // Set the pickup from a map point: save coords + turn them into a place name
+  const setPickupFromCoords = async (c: Coords) => {
+    setPickupCoords(c);
+    let name = "";
+    let address = "";
+    try {
+      const [addr] = await Location.reverseGeocodeAsync(c);
+      name = addr?.city || addr?.district || addr?.subregion || addr?.region || addr?.name || "";
+      address = [addr?.name, addr?.street, addr?.city || addr?.district, addr?.region]
+        .filter((v, i, a) => !!v && a.indexOf(v) === i)
+        .join(", ");
+    } catch {}
+
+    if (!name) name = `${c.latitude.toFixed(5)},${c.longitude.toFixed(5)}`;
+    setPickupAddress(address || `${c.latitude.toFixed(5)}, ${c.longitude.toFixed(5)}`);
+
+    // Same format as typed input: no spaces, uppercase
+    setPickup(name.replace(/\s/g, "").toUpperCase());
+  };
+
+  const getCurrentLocation = async (silent = false) => {
+    try {
+      setLocating(true);
+
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        if (!silent) Alert.alert("Permission needed", "Allow location access to use your current location as the pickup.");
+        return;
+      }
+
+      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+      const c = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
+      focusMap(c);
+      await setPickupFromCoords(c);
+    } catch (e) {
+      if (!silent) Alert.alert("Location error", "Could not get your current location. Please turn on GPS and try again.");
+    } finally {
+      setLocating(false);
+    }
+  };
+
+  // Tap anywhere on the map, or drag the pin, to change the pickup
+  const onMapPress = (e: MapPressEvent) => setPickupFromCoords(e.nativeEvent.coordinate);
+  const onMarkerDragEnd = (e: any) => setPickupFromCoords(e.nativeEvent.coordinate);
+
+  // Auto-fill pickup with current location when screen opens (if not already set)
+  useEffect(() => {
+    if (!pickup) getCurrentLocation(true);
+  }, []);
 
   const onTimeChange = (event: any, selected?: Date) => {
     setShowTimePicker(false);
@@ -101,6 +172,9 @@ export default function PackageDetails() {
         isOnline: params.isOnline,
         date: params.date,
         pickup: pickup,
+        pickupLat: pickupCoords ? String(pickupCoords.latitude) : "",
+        pickupLng: pickupCoords ? String(pickupCoords.longitude) : "",
+        pickupAddress: pickupAddress,
         time: selectedTime,
         packageId: params.packageId,
         description: params.description,
@@ -144,6 +218,7 @@ export default function PackageDetails() {
 
         <ScrollView
           style={styles.scroll}
+          scrollEnabled={!mapTouching}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
@@ -249,13 +324,71 @@ export default function PackageDetails() {
               value={pickup}  
               placeholder="GALLE"
               placeholderTextColor="#8A97A8"
-              onChangeText={(text) => setPickup(text.replace(/\s/g, "").toUpperCase())}
+              onChangeText={(text) => { setPickup(text.replace(/\s/g, "").toUpperCase()); setPickupCoords(null); setPickupAddress(""); }}
               autoCapitalize="characters"
               autoCorrect={false}
               />
             </View>
+            <TouchableOpacity
+              style={styles.timeBtn}
+              activeOpacity={0.8}
+              onPress={() => getCurrentLocation(false)}
+              disabled={locating}
+            >
+              {locating
+                ? <ActivityIndicator size="small" color={C.blue} />
+                : <MaterialCommunityIcons name="crosshairs-gps" size={18} color={C.blue} />}
+            </TouchableOpacity>
           </View>
           <FieldError message={fieldError("pickup", pickup)} />
+
+          {/* MAP: shows pickup pin; tap map or drag pin to change */}
+          <View
+            style={styles.mapWrap}
+            onTouchStart={() => setMapTouching(true)}
+            onTouchEnd={() => setMapTouching(false)}
+            onTouchCancel={() => setMapTouching(false)}
+          >
+            <MapView
+              ref={mapRef}
+              style={styles.map}
+              initialRegion={DEFAULT_REGION}
+              showsUserLocation
+              showsMyLocationButton={false}
+              onPress={onMapPress}
+              onMapReady={() => { if (pickupCoords) focusMap(pickupCoords); }}
+            >
+              {pickupCoords && (
+                <Marker
+                  coordinate={pickupCoords}
+                  draggable
+                  onDragEnd={onMarkerDragEnd}
+                  title="Pickup location"
+                  description={pickupAddress}
+                  pinColor={C.green}
+                />
+              )}
+            </MapView>
+
+            <TouchableOpacity
+              style={styles.mapLocateBtn}
+              activeOpacity={0.85}
+              onPress={() => getCurrentLocation(false)}
+              disabled={locating}
+            >
+              {locating
+                ? <ActivityIndicator size="small" color={C.blue} />
+                : <MaterialCommunityIcons name="crosshairs-gps" size={20} color={C.blue} />}
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.locHint} numberOfLines={2}>
+            {pickupCoords
+              ? `📍 ${pickupAddress}`
+              : "Tap the map or the GPS icon to set your pickup location"}
+          </Text>
+          {!!pickupCoords && (
+            <Text style={styles.locSubHint}>Tap the map or drag the pin to change it</Text>
+          )}
 
           <Text style={styles.inputLabel}>Pickup time</Text>
           <TouchableOpacity style={styles.inputWrapper} activeOpacity={0.8} onPress={() => setShowTimePicker(true)}>
@@ -436,6 +569,33 @@ const styles = StyleSheet.create({
     backgroundColor: C.blueSoft,
     alignItems: "center",
     justifyContent: "center",
+  },
+  locHint: { fontSize: 12, color: C.ink, fontWeight: "600", marginLeft: 4, marginTop: 8 },
+  locSubHint: { fontSize: 11.5, color: C.muted, fontWeight: "600", marginLeft: 4, marginTop: 2 },
+  mapWrap: {
+    height: 220,
+    borderRadius: 16,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#DCE3EC",
+    marginTop: 6,
+  },
+  map: { flex: 1 },
+  mapLocateBtn: {
+    position: "absolute",
+    right: 10,
+    bottom: 10,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: "#FFFFFF",
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 4,
+    shadowColor: "#0F1B2D",
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
   },
   ctaWrap: { paddingHorizontal: 20, paddingTop: 10, marginBottom: 165 },
   ctaGradient: {

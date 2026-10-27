@@ -399,27 +399,6 @@ function ReceiptCard({ item }: { item: Receipt }) {
             <Text style={styles.busBadgeText}>{item.busNumber || "—"}</Text>
           </View>
 
-          <View
-            style={[
-              styles.status,
-              { backgroundColor: item.isOnline ? C.successSoft : C.neutralSoft },
-            ]}
-          >
-            <View
-              style={[
-                styles.statusDot,
-                { backgroundColor: item.isOnline ? C.success : C.neutral },
-              ]}
-            />
-            <Text
-              style={[
-                styles.statusText,
-                { color: item.isOnline ? C.success : C.neutral },
-              ]}
-            >
-              {item.isOnline ? "Online" : "Offline"}
-            </Text>
-          </View>
         </View>
 
         <Text style={styles.fieldLabel}>Pickup</Text>

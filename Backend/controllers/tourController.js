@@ -154,6 +154,9 @@ export const createReceipt = async (req, res) => {
       isOnline,
       date,
       pickup,
+      pickupLat,
+      pickupLng,
+      pickupAddress,
       time,
       packageId,
       description,
@@ -169,6 +172,13 @@ export const createReceipt = async (req, res) => {
       pphoneNumber,
       pemail,
     } = req.body;
+
+    // Map pickup point is optional; keep it only if both numbers are valid
+    const lat = Number(pickupLat);
+    const lng = Number(pickupLng);
+    const hasPickupPoint =
+      pickupLat !== undefined && pickupLat !== "" && pickupLng !== undefined && pickupLng !== "" &&
+      Number.isFinite(lat) && Number.isFinite(lng);
 
     // Date must be at least a week ahead, and the bus must be free on every trip day
     const dateError = checkTourDate(date);
@@ -209,6 +219,9 @@ export const createReceipt = async (req, res) => {
       isOnline,
       date,
       pickup,
+      pickupLat: hasPickupPoint ? lat : null,
+      pickupLng: hasPickupPoint ? lng : null,
+      pickupAddress: pickupAddress || "",
       time,
       packageId,
       description,
