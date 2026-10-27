@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Stack, useRouter } from 'expo-router';
 import { Image, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, Alert, BackHandler    } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Feather as Icon, AntDesign, Fontisto, EvilIcons } from '@expo/vector-icons';
+import { Feather as Icon, AntDesign, Fontisto, EvilIcons, Ionicons } from '@expo/vector-icons';
 import { saveSession } from "../../services/notificationService";
 
 
 import FieldError from "../../components/FieldError";
 import { useFieldErrors } from "../../utils/validation";
+import { C } from "../../components/JetUI";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 export const FlatmateLogin: React.FC = () => {
   const router = useRouter();
@@ -182,21 +183,21 @@ const login = async () => {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <StatusBar barStyle="light-content" backgroundColor="#7db300" />
+      <StatusBar barStyle="light-content" backgroundColor="#173C79" />
       <SafeAreaView style={styles.container}>
         <LinearGradient
           colors={["#173C79","#155B8A","#159B79",]}
           start={{x: 0, y: 0,}}
           end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
+          style={styles.hero}
         >
-          <View style={styles.header}>
-          
-            <TouchableOpacity >
-              <Text style={styles.title}>JetLink</Text>
-            </TouchableOpacity>
-                  
+          <View style={styles.logo}>
+            <Fontisto name="bus" size={22} color="#FFFFFF" />
           </View>
+          <Text style={styles.title}>Bus staff sign in</Text>
+          <Text style={styles.heroSub}>
+            {showLogin ? "Step 2 of 2 · Enter your passcode" : "Step 1 of 2 · Verify your bus and crew"}
+          </Text>
         </LinearGradient>
         
         
@@ -209,8 +210,8 @@ const login = async () => {
               <View style={styles.field}>
                 <Text style={styles.inputLabel}>Bus Number</Text>
                 <View style={styles.inputWrapper1}>
-                  <View style={[styles.iconWrap, { backgroundColor: "#FF9F1C1A" }]}>
-                    <Fontisto name="bus" size={18} color="#FF9F1C" />
+                  <View style={styles.iconWrap}>
+                    <Fontisto name="bus" size={16} color={C.blue} />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -218,7 +219,7 @@ const login = async () => {
                       value={busNum}
                       onChangeText={handleBusNumber}
                       placeholder="Bus Number"
-                      placeholderTextColor="#A3A3A3"
+                      placeholderTextColor="#8A97A8"
                       autoCapitalize="characters"
                       autoCorrect={false}
                       maxLength={7}
@@ -232,8 +233,8 @@ const login = async () => {
               <View style={styles.field}>
                 <Text style={styles.inputLabel}>Driver NIC</Text>
                 <View style={styles.inputWrapper1}>
-                  <View style={[styles.iconWrap, { backgroundColor: "#38B0001A" }]}>
-                    <AntDesign name="idcard" size={18} color="#38B000" />
+                  <View style={styles.iconWrap}>
+                    <AntDesign name="idcard" size={18} color={C.blue} />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -241,7 +242,7 @@ const login = async () => {
                       value={DNIC}
                       onChangeText={DsetNIC}
                       placeholder="123456789012"
-                      placeholderTextColor="#A3A3A3"
+                      placeholderTextColor="#8A97A8"
                     />
                   </View>
                 </View>
@@ -252,8 +253,8 @@ const login = async () => {
               <View style={styles.field}>
                 <Text style={styles.inputLabel}>Conductor NIC</Text>
                 <View style={styles.inputWrapper1}>
-                  <View style={[styles.iconWrap, { backgroundColor: "#F725851A" }]}>
-                    <AntDesign name="idcard" size={18} color="#F72585" />
+                  <View style={styles.iconWrap}>
+                    <AntDesign name="idcard" size={18} color={C.blue} />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -261,7 +262,7 @@ const login = async () => {
                       value={CNIC}
                       onChangeText={CsetNIC}
                       placeholder="123456789012"
-                      placeholderTextColor="#A3A3A3"
+                      placeholderTextColor="#8A97A8"
                     />
                   </View>
                 </View>
@@ -271,6 +272,12 @@ const login = async () => {
 
             <View style={styles.footerContainer}>
               <TouchableOpacity style={styles.primaryButton} onPress={verify}>
+                <LinearGradient
+                  colors={["#173C79", "#155B8A", "#159B79"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={StyleSheet.absoluteFill}
+                />
                 <Text style={styles.primaryButtonText}>Verify</Text>
               </TouchableOpacity>
             </View>
@@ -282,8 +289,8 @@ const login = async () => {
               <View style={styles.field}>
                 <Text style={styles.inputLabel}>Passcode</Text>
                 <View style={styles.inputWrapper}>
-                  <View style={[styles.iconWrap, { backgroundColor: "#FF9F1C1A" }]}>
-                    <EvilIcons name="lock" size={28} color="#FF9F1C" />
+                  <View style={styles.iconWrap}>
+                    <Ionicons name="lock-closed-outline" size={18} color={C.blue} />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -291,13 +298,13 @@ const login = async () => {
                       value={password1}
                       onChangeText={setPassword1}
                       placeholder="Abc@123"
-                      placeholderTextColor="#A3A3A3"
+                      placeholderTextColor="#8A97A8"
                       secureTextEntry={!showPassword}
                       autoCapitalize="none"
                     />
                   </View>
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-                    <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color="#A3A3A3" />
+                    <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color={C.muted} />
                   </TouchableOpacity>
                 </View>
                 <FieldError style={styles.fieldError} message={fieldError("password1", password1)} />
@@ -306,6 +313,12 @@ const login = async () => {
 
             <View style={styles.footerContainer}>
               <TouchableOpacity style={styles.primaryButton1} onPress={login}>
+                <LinearGradient
+                  colors={["#173C79", "#155B8A", "#159B79"]}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={StyleSheet.absoluteFill}
+                />
                 <Text style={styles.primaryButtonText}>Login</Text>
               </TouchableOpacity>
             </View>
@@ -336,10 +349,10 @@ const login = async () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',  
-  },
+  heroSub: { fontSize: 14, fontWeight: '500', color: 'rgba(255,255,255,0.88)', marginTop: 4 },
+  logo: { width: 56, height: 56, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
+  hero: { borderBottomLeftRadius: 32, borderBottomRightRadius: 32, paddingTop: 56, paddingBottom: 92, alignItems: 'center' },
+  container: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: 'row',
@@ -357,58 +370,45 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 25,
   },
 
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#ffffff',
-    letterSpacing: 0.5,  
-  },
+  title: { fontSize: 26, fontWeight: '800', color: '#FFFFFF' },
 
   card: {
-    width: '90%',
-    backgroundColor: '#FFF',
-    marginTop: -50,
-    alignSelf: 'center',
-    borderRadius: 20,
-    paddingBottom: 16,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    marginTop: -64,
+    marginHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 26,
+    padding: 18,
+    elevation: 6,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
   },
 
   card1: {
-    width: '90%',
-    backgroundColor: '#FFF',
-    marginTop: -50,
-    alignSelf: 'center',
-    borderRadius: 20,
-    paddingBottom: 16,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    marginTop: -64,
+    marginHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 26,
+    padding: 18,
+    elevation: 6,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
   },
   
-  eyeIcon: {
-    padding: 4,
-  },
+  eyeIcon: { padding: 6 },
  
   
   
   
 
-  formContainer: {
-    marginTop: 24,
-  },
+  formContainer: { width: '100%' },
 
 
   // one label + input + error message
-  field: {
-    marginBottom: 14,
-  },
+  field: { marginBottom: 6 },
 
   // line the error up with the input box
   fieldError: {
@@ -416,40 +416,11 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
 
-  inputWrapper1: {
-    minHeight: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F2F4F5',
-    marginHorizontal: 15,
-    borderWidth: 1,
-    borderColor: '#ECEEF2',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
+  inputWrapper1: { flexDirection: 'row', alignItems: 'center', minHeight: 52, borderWidth: 1.5, borderColor: '#E3E9F1', backgroundColor: '#F7F9FC', borderRadius: 14, paddingHorizontal: 12 },
 
-  inputWrapper: {
-    minHeight: 52,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F2F4F5',
-    marginHorizontal: 15,
-    borderWidth: 1,
-    borderColor: '#ECEEF2',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
+  inputWrapper: { flexDirection: 'row', alignItems: 'center', minHeight: 52, borderWidth: 1.5, borderColor: '#E3E9F1', backgroundColor: '#F7F9FC', borderRadius: 14, paddingHorizontal: 12 },
 
-  iconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
+  iconWrap: { width: 26, alignItems: 'center', marginRight: 8 },
 
   otpContainer: {
     width: '100%',
@@ -478,77 +449,19 @@ const styles = StyleSheet.create({
     height:25
   },
 
-  inputInnerWrapper: {
-    flex: 1,
-  },
+  inputInnerWrapper: { flex: 1 },
 
-  inputLabel: {
-    marginHorizontal: 15,
-    fontSize: 16,
-    color: '#000000',
-    fontWeight: '500',
-    marginBottom: 8,
-  },
+  inputLabel: { fontSize: 13, fontWeight: '700', color: C.muted, marginBottom: 6, marginLeft: 2, marginTop: 4 },
 
-  textInput: {
-    
-    fontSize: 16,
-    color: '#000000',
-    fontWeight: '500',
-    padding: 0, 
-    marginTop: 2,
-  },
+  textInput: { fontSize: 15, fontWeight: '600', color: C.ink, paddingVertical: 12 },
 
-  footerContainer: {
-    marginTop: 8,
-    marginHorizontal: 15,
-  },
+  footerContainer: { paddingTop: 14 },
 
-  primaryButton: {
-    //marginBottom: 60,
-    width: '100%',
-    
-    backgroundColor: '#32CD32',
-    padding: 14,
-    alignItems: 'center',   
-    alignSelf: 'center',
-    marginBottom: 2,
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
+  primaryButton: { height: 54, borderRadius: 27, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', elevation: 4 },
 
-  primaryButton1: {
-    
-    width: '100%',
-    marginBottom: 10,
-    backgroundColor: '#32CD32',
-    padding: 14,
-    alignItems: 'center',   
-    alignSelf: 'center',
-    //marginTop: 10,
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
+  primaryButton1: { height: 54, borderRadius: 27, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', elevation: 4 },
 
-  primaryButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '500',
-  },
+  primaryButtonText: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
   
   submitGradient: {
     paddingVertical: 16,

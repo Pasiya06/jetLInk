@@ -17,6 +17,7 @@ import {
   MaterialIcons} 
 from '@expo/vector-icons'; 
 import { LinearGradient } from 'expo-linear-gradient';
+import { ScreenHeader, C, ui } from "../../../components/JetUI";
 
 const ParcelService = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -39,121 +40,66 @@ const ParcelService = () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-       
-          <View style={styles.header}> 
-              <TouchableOpacity>
-                  <Text style={styles.title}>{params.ticketId}</Text>
-              </TouchableOpacity>
+        <ScreenHeader eyebrow="Used ticket" title={String(params.ticketId ?? "Ticket")} />
+
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          <View style={styles.pass}>
+          <View style={styles.passTop}>
+            <View style={styles.passRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.passLabel}>From</Text>
+                <Text style={styles.passPlace} numberOfLines={1}>{params.pickup}</Text>
+              </View>
+              <View style={styles.passIcon}>
+                <Ionicons name="bus" size={18} color="#FFFFFF" />
+              </View>
+              <View style={{ flex: 1, alignItems: "flex-end" }}>
+                <Text style={styles.passLabel}>To</Text>
+                <Text style={styles.passPlace} numberOfLines={1}>{params.drop}</Text>
+              </View>
+            </View>
           </View>
-        </LinearGradient>
+          <View style={styles.stamp}>
+            <Ionicons name="checkmark-done" size={15} color="#5B6B7F" />
+            <Text style={styles.stampText}>USED</Text>
+          </View>
 
-        <ScrollView
-          style={styles.scroll}
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-        >
-        
+          <View style={styles.perf}>
+            <View style={styles.notchL} />
+            <View style={styles.perfLine} />
+            <View style={styles.notchR} />
+          </View>
 
-          {/* Trip / Parcel info */}
-          <View style={styles.card}>
-            <Text style={styles.sectionHeader}>Ticket Details</Text>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <MaterialIcons name="email" size={18} color="#fff" />
+          <View style={styles.grid}>
+            <View style={styles.gridItem}>
+              <Text style={styles.gridLabel}>Date</Text>
+              <Text style={styles.gridValue}>{params.date}</Text>
             </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Email</Text>
-            <Text style={styles.infoValue}>{params.pemail}</Text>
+            <View style={styles.gridItem}>
+              <Text style={styles.gridLabel}>Time</Text>
+              <Text style={styles.gridValue}>{params.time}</Text>
             </View>
+            <View style={styles.gridItem}>
+              <Text style={styles.gridLabel}>Bus number</Text>
+              <Text style={styles.gridValue}>{params.bNumber}</Text>
             </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="location" size={18} color="#fff" />
+            <View style={styles.gridItem}>
+              <Text style={styles.gridLabel}>Seats</Text>
+              <Text style={styles.gridValue}>{seatNumber()}</Text>
             </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Pickup</Text>
-            <Text style={styles.infoValue}>{params.pickup}</Text>
+            <View style={styles.gridItem}>
+              <Text style={styles.gridLabel}>Tickets</Text>
+              <Text style={styles.gridValue}>{params.noOfTicket}</Text>
             </View>
+            <View style={styles.gridItem}>
+              <Text style={styles.gridLabel}>Total fare</Text>
+              <Text style={styles.gridValue}>Rs. {params.totalFare}</Text>
             </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="flag" size={18} color="#fff" />
+            <View style={styles.gridItem}>
+              <Text style={styles.gridLabel}>Email</Text>
+              <Text style={styles.gridValue}>{params.pemail}</Text>
             </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Drop-off</Text>
-            <Text style={styles.infoValue}>{params.drop}</Text>
-            </View>
-            </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="calendar" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Date</Text>
-            <Text style={styles.infoValue}>{params.date}</Text>
-            </View>
-            </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="time" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Time</Text>
-            <Text style={styles.infoValue}>{params.time}</Text>
-            </View>
-            </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="bus" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Bus Number</Text>
-            <Text style={styles.infoValue}>{params.bNumber}</Text>
-            </View>
-            </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <MaterialIcons name="format-list-numbered" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>No of Tickets</Text>
-            <Text style={styles.infoValue}>{params.noOfTicket}</Text>
-            </View>
-            </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <MaterialCommunityIcons name="car-seat" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Seat Numbers</Text>
-            <Text style={styles.infoValue}>{seatNumber()}</Text>
-            </View>
-            </View>
-
-            <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <MaterialCommunityIcons name="currency-usd" size={18} color="#fff" />
-            </View>
-            <View style={styles.infoTextWrap}>
-            <Text style={styles.infoLabel}>Total Fare</Text>
-            <Text style={styles.infoValue}>Rs.{params.totalFare}</Text>
-            </View>
-            </View>
-
+          </View>
           </View>
         </ScrollView>
 
@@ -267,10 +213,38 @@ const ParcelService = () => {
 };
 
 const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    backgroundColor:"#fff"
+  stampText: { fontSize: 13, fontWeight: '800', color: '#5B6B7F', letterSpacing: 1 },
+  stamp: { position: 'absolute', top: 18, right: 18, flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 2, borderColor: '#8A97A8', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 4, transform: [{ rotate: '-8deg' }] },
+  errorText: { flex: 1, fontSize: 13, fontWeight: '600', color: C.red },
+  errorBox: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#FDF1F1', borderRadius: 12, padding: 12, marginBottom: 12 },
+  gridValue: { fontSize: 15, fontWeight: '800', color: C.ink, marginTop: 2 },
+  gridLabel: { fontSize: 12, fontWeight: '600', color: C.muted },
+  gridItem: { width: '50%' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 20, paddingBottom: 20, rowGap: 14 },
+  qrHintText: { fontSize: 13, fontWeight: '600', color: C.muted },
+  qrHint: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 12 },
+  qrFrame: { padding: 14, borderRadius: 18, borderWidth: 1.5, borderColor: '#E3E9F1', backgroundColor: '#FFFFFF' },
+  qrBox: { alignItems: 'center', paddingVertical: 20, paddingHorizontal: 20 },
+  perfLine: { flex: 1, borderTopWidth: 2, borderTopColor: '#E3E9F1', borderStyle: 'dashed', marginHorizontal: 8 },
+  notchR: { width: 24, height: 24, borderRadius: 12, backgroundColor: C.bg, marginRight: -12 },
+  notchL: { width: 24, height: 24, borderRadius: 12, backgroundColor: C.bg, marginLeft: -12 },
+  perf: { flexDirection: 'row', alignItems: 'center', height: 24 },
+  passIcon: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#159B79', alignItems: 'center', justifyContent: 'center', marginHorizontal: 10 },
+  passPlace: { fontSize: 20, fontWeight: '800', color: C.navy, marginTop: 2 },
+  passLabel: { fontSize: 12, fontWeight: '700', color: C.muted },
+  passRow: { flexDirection: 'row', alignItems: 'center' },
+  passTop: { padding: 20 },
+  pass: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 26,
+    overflow: 'hidden',
+    elevation: 6,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 18,
   },
+  container: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: 'row',

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Stack,useRouter,useLocalSearchParams} from "expo-router";
+import React, { useCallback, useMemo, useState } from 'react';
+import { Stack, useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import { 
   Alert ,
   StyleSheet, 
@@ -23,6 +23,27 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import FieldError from "../../../components/FieldError";
 import { useFieldErrors } from "../../../utils/validation";
+import { getSchedules } from "../../../services/scheduleServices";
+import LocationSheet, { LocationOption } from "../../../components/LocationSheet";
+import { ScreenHeader, GradientButton, C, ui } from "../../../components/JetUI";
+
+type Schedule = {
+  pickuploca?: string;
+  dropoffloca?: string;
+};
+
+// Count how many schedules use each location, sorted A–Z
+const toOptions = (names: (string | undefined)[]): LocationOption[] => {
+  const counts = new Map<string, number>();
+  names.forEach((n) => {
+    const name = String(n || "").trim();
+    if (name) counts.set(name, (counts.get(name) || 0) + 1);
+  });
+  return Array.from(counts, ([name, count]) => ({ name, count })).sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+};
+
 const JetLinkInterface: React.FC = () => {
   const params = useLocalSearchParams();
   const [sendername, setsendername] = useState(`${params.pfirstName ?? ""} ${params.plastName ?? ""}`.trim());
@@ -36,29 +57,67 @@ const JetLinkInterface: React.FC = () => {
   const [date, setDate] = useState(String(params.date || ""));
   const [date1, setdate] = useState(new Date());
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
-  const [time, setTime] = useState(new Date());
-  const [showTimePicker, setShowTimePicker] = useState(false);
-  const [selectedTime, setSelectedTime] = useState("");
   const [activeTab, setActiveTab] = useState('');
+
+  // Schedules -> pickup / drop-off dropdowns
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [loadingRoutes, setLoadingRoutes] = useState(true);
+  const [sheet, setSheet] = useState<null | 'pickup' | 'drop'>(null);
   
   const router = useRouter();
   const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
 
+  const loadSchedules = async () => {
+    try {
+      setLoadingRoutes(true);
+      const result = await getSchedules();
+      setSchedules(result?.success && Array.isArray(result.data) ? result.data : []);
+    } catch (error) {
+      console.log("Load schedules error:", error);
+      setSchedules([]);
+    } finally {
+      setLoadingRoutes(false);
+    }
+  };
 
-  const onTimeChange = (event: any, selected?: Date) => {
-  setShowTimePicker(false);
+  useFocusEffect(useCallback(() => { loadSchedules(); }, []));
 
-  if (selected) {
-    setTime(selected);
+  // Pickup list: places with a schedule to the chosen drop-off (all if none chosen)
+  const pickupOptions = useMemo(
+    () => toOptions(schedules.filter((s) => !drop || s.dropoffloca === drop).map((s) => s.pickuploca)),
+    [schedules, drop]
+  );
 
-    const formatted = selected.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  // Drop-off list: places with a schedule from the chosen pickup (all if none chosen)
+  const dropOptions = useMemo(
+    () => toOptions(schedules.filter((s) => !pickup || s.pickuploca === pickup).map((s) => s.dropoffloca)),
+    [schedules, pickup]
+  );
 
-    setSelectedTime(formatted);
-  }
-};
+  const routeExists = (p: string, d: string) =>
+    schedules.some((s) => s.pickuploca === p && s.dropoffloca === d);
+
+  const selectPickup = (name: string) => {
+    setPickup(name);
+    if (drop && !routeExists(name, drop)) setDrop("");
+    setSheet(null);
+  };
+
+  const selectDrop = (name: string) => {
+    setDrop(name);
+    if (pickup && !routeExists(pickup, name)) setPickup("");
+    setSheet(null);
+  };
+
+  const swapLocations = () => {
+    if (!pickup && !drop) return;
+    if (pickup && drop && !routeExists(drop, pickup)) {
+      Alert.alert("No return route", `There is no bus from ${drop} to ${pickup}.`);
+      return;
+    }
+    setPickup(drop);
+    setDrop(pickup);
+  };
 
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -73,12 +132,16 @@ const JetLinkInterface: React.FC = () => {
       { key: "pickup", label: "Pickup location", value: pickup },
       { key: "drop", label: "Drop location", value: drop },
       { key: "date", label: "Date", value: date },
-      { key: "selectedTime", label: "Time", value: selectedTime },
     ])) return;
 
 
   if (!sendername || !smobilenumber  || !receivername || !remail || !rmobilenumber || !weight || !pickup || !drop ) {
     alert("Please fill required fields");
+    return;
+  }
+
+  if (!routeExists(pickup, drop)) {
+    Alert.alert("No buses on this route", "Please choose a pickup and delivery location from the lists.");
     return;
   }
 
@@ -118,6 +181,7 @@ const JetLinkInterface: React.FC = () => {
             plastName:params.plastName,
             pphoneNumber: params.pphoneNumber,
             pemail: params.pemail,
+            NIC: params.NIC,
             sendername,
             smobilenumber,
             semail:params.pemail,
@@ -128,7 +192,6 @@ const JetLinkInterface: React.FC = () => {
             pickup,
             drop,
             date,
-            //time:selectedTime
           } 
           
       });
@@ -147,125 +210,57 @@ const JetLinkInterface: React.FC = () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0056b3" />
-      
-      {/* Header Section */}
-      <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-              <View style={styles.header}>
-                  
-              
-                <TouchableOpacity >
-                  <Text style={styles.title}>Book Parcel</Text>
-                </TouchableOpacity>
-                       
-              </View>
-              </LinearGradient> 
+      <StatusBar barStyle="light-content" backgroundColor="#173C79" />
 
-      
-    
+      <ScreenHeader eyebrow="Send a parcel" title="Book parcel" />
 
-      
-      <View style={styles.card}>
-        
-        
+      <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 
-        
-        <ScrollView style={styles.svw}>
-          <Text style={styles.label}>Sender Name</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={sendername} onChangeText={setsendername} />
-            
-          </View>
-          <FieldError message={fieldError("sendername", sendername)} />
-
-          <Text style={styles.label}>Sender Mobile Number</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={smobilenumber} 
-              onChangeText={Ssetmobilenumber} 
-              keyboardType="phone-pad" 
-              maxLength={10}/>
-            
-          </View>
-          <FieldError message={fieldError("smobilenumber", smobilenumber)} />
-
-          <Text style={styles.label}>Sender Email</Text>
-          <View style={styles.inputWrapper}>
-            <Text style={styles.input1}>{params.pemail}</Text>
-            
+        {/* Route */}
+        <View style={styles.section}>
+          <View style={styles.sectionHead}>
+            <Ionicons name="navigate-outline" size={18} color={C.blue} />
+            <Text style={styles.sectionTitle}>Route</Text>
           </View>
 
-          <Text style={styles.label}>Receiver Name</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={receivername} onChangeText={setreceivername} />
-            
-          </View>
-          <FieldError message={fieldError("receivername", receivername)} />
+          <View style={styles.routeBox}>
+            <View style={styles.routeLine}>
+              <View style={[styles.dot, { backgroundColor: C.blue }]} />
+              <View style={styles.dash} />
+              <View style={[styles.dot, { backgroundColor: '#159B79' }]} />
+            </View>
 
-          <Text style={styles.label}>Receiver Mobile Number</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={rmobilenumber} onChangeText={Rsetmobilenumber} keyboardType="phone-pad" maxLength={10}/>
-            
-          </View>
-          <FieldError message={fieldError("rmobilenumber", rmobilenumber)} />
+            <View style={{ flex: 1 }}>
+              <TouchableOpacity style={styles.selectRow} onPress={() => setSheet('pickup')} accessibilityLabel="Choose pickup location">
+                <Text style={styles.label}>Pick up location</Text>
+                <Text style={[styles.selectValue, !pickup && styles.placeholder]} numberOfLines={1}>
+                  {pickup || "Choose pickup"}
+                </Text>
+              </TouchableOpacity>
 
-          <Text style={styles.label}>Receiver Email</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={remail} 
-              onChangeText={(text) => RsetEmail(text.replace(/\s/g, "").toLowerCase())} 
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            
-          </View>
-          <FieldError message={fieldError("remail", remail)} />
+              <View style={styles.divider} />
 
-          <Text style={styles.label}>Weight(kg)</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={weight} onChangeText={setWeight} keyboardType="phone-pad" maxLength={2} />           
-          </View>
-          <FieldError message={fieldError("weight", weight)} />
-          
-          <Text style={styles.label}>Pick up Location</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={pickup}  
-              onChangeText={(text) => setPickup(text.replace(/\s/g, "").toUpperCase())}
-              autoCapitalize="characters"
-              autoCorrect={false}
-              />
-          </View>
-          <FieldError message={fieldError("pickup", pickup)} />
-          
-          <Text style={styles.label}>Delivery Location</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput 
-              style={styles.input} 
-              value={drop} 
-              onChangeText={(text) => setDrop(text.replace(/\s/g, "").toUpperCase())}
-              autoCapitalize="characters"
-              autoCorrect={false} 
-            />
-            
-          </View>
-          <FieldError message={fieldError("drop", drop)} />
-          
-           <Text style={styles.label}>Date</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input} value={date} placeholder="YYYY-MM-DD" onChangeText={setDate} />
-            <TouchableOpacity onPress={() => setShowCalendar(true)}>
-              <FontAwesome5 name="calendar-alt" size={24} color="black" />  
+              <TouchableOpacity style={styles.selectRow} onPress={() => setSheet('drop')} accessibilityLabel="Choose delivery location">
+                <Text style={styles.label}>Delivery location</Text>
+                <Text style={[styles.selectValue, !drop && styles.placeholder]} numberOfLines={1}>
+                  {drop || "Choose delivery"}
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.swapBtn} onPress={swapLocations} accessibilityLabel="Swap pickup and delivery">
+              <Ionicons name="swap-vertical" size={20} color={C.blue} />
             </TouchableOpacity>
           </View>
+          <FieldError message={fieldError("pickup", pickup)} />
+          <FieldError message={fieldError("drop", drop)} />
+
+          <Text style={[styles.label, { marginTop: 12 }]}>Date</Text>
+          <TouchableOpacity style={styles.inputWrapper} onPress={() => setShowCalendar(true)} accessibilityLabel="Choose date">
+            <Ionicons name="calendar-outline" size={19} color={C.muted} style={styles.fieldIcon} />
+            <Text style={[styles.dateValue, !date && styles.placeholder]}>{date || "Choose a date"}</Text>
+            <Ionicons name="chevron-down" size={18} color="#8A97A8" />
+          </TouchableOpacity>
           <FieldError message={fieldError("date", date)} />
 
           {showCalendar && (
@@ -284,44 +279,129 @@ const JetLinkInterface: React.FC = () => {
               }}
             />
           )}
-          {/*<Text style={styles.label}>Time</Text>
-          <View style={styles.inputWrapper}>
-            <TextInput style={styles.input}
-              
-              value={selectedTime}
-              placeholder="00:00"
-              editable={false}
-            />
 
-            <TouchableOpacity onPress={() => setShowTimePicker(true)}>
-              <Ionicons name="time-outline" size={24} color="black" />
-            </TouchableOpacity>
+          {!loadingRoutes && schedules.length === 0 ? (
+            <View style={styles.notice}>
+              <Ionicons name="information-circle-outline" size={18} color={C.amber} />
+              <Text style={styles.noticeText}>No bus schedules found yet.</Text>
+            </View>
+          ) : null}
+        </View>
+
+        {/* Parcel */}
+        <View style={styles.section}>
+          <View style={styles.sectionHead}>
+            <Feather name="package" size={18} color={C.blue} />
+            <Text style={styles.sectionTitle}>Parcel</Text>
           </View>
-          <FieldError message={fieldError("selectedTime", selectedTime)} /> 
+          <Text style={styles.label}>Weight (kg)</Text>
+          <View style={styles.inputWrapper}>
+            <Ionicons name="barbell-outline" size={19} color={C.muted} style={styles.fieldIcon} />
+            <TextInput style={styles.input} value={weight} onChangeText={(t) => setWeight(t.replace(/[^0-9.]/g, ""))} keyboardType="decimal-pad" maxLength={4} placeholder="5" placeholderTextColor="#8A97A8" />
+            <Text style={styles.unit}>kg</Text>
+          </View>
+          <FieldError message={fieldError("weight", weight)} />
+        </View>
 
-          {showTimePicker && (
-            <DateTimePicker
-              value={time}
-              mode="time"
-              display="default"
-              onChange={onTimeChange}
+        {/* Sender */}
+        <View style={styles.section}>
+          <View style={styles.sectionHead}>
+            <Ionicons name="person-outline" size={18} color={C.blue} />
+            <Text style={styles.sectionTitle}>Sender</Text>
+          </View>
+
+          <Text style={styles.label}>Name</Text>
+          <View style={styles.inputWrapper}>
+            <Ionicons name="person-outline" size={19} color={C.muted} style={styles.fieldIcon} />
+            <TextInput style={styles.input} value={sendername} onChangeText={setsendername} />
+          </View>
+          <FieldError message={fieldError("sendername", sendername)} />
+
+          <Text style={styles.label}>Mobile number</Text>
+          <View style={styles.inputWrapper}>
+            <Ionicons name="call-outline" size={19} color={C.muted} style={styles.fieldIcon} />
+            <TextInput 
+              style={styles.input} 
+              value={smobilenumber} 
+              onChangeText={(t) => Ssetmobilenumber(t.replace(/[^0-9]/g, ""))} 
+              keyboardType="phone-pad" 
+              maxLength={10}/>
+          </View>
+          <FieldError message={fieldError("smobilenumber", smobilenumber)} />
+
+          <Text style={styles.label}>Email</Text>
+          <View style={[styles.inputWrapper, styles.readOnly]}>
+            <Ionicons name="mail-outline" size={19} color={C.muted} style={styles.fieldIcon} />
+            <Text style={styles.input1} numberOfLines={1}>{params.pemail}</Text>
+            <Ionicons name="lock-closed-outline" size={16} color="#8A97A8" />
+          </View>
+        </View>
+
+        {/* Receiver */}
+        <View style={styles.section}>
+          <View style={styles.sectionHead}>
+            <Ionicons name="people-outline" size={18} color={C.blue} />
+            <Text style={styles.sectionTitle}>Receiver</Text>
+          </View>
+
+          <Text style={styles.label}>Name</Text>
+          <View style={styles.inputWrapper}>
+            <Ionicons name="person-outline" size={19} color={C.muted} style={styles.fieldIcon} />
+            <TextInput style={styles.input} value={receivername} onChangeText={setreceivername} placeholder="Receiver's name" placeholderTextColor="#8A97A8" />
+          </View>
+          <FieldError message={fieldError("receivername", receivername)} />
+
+          <Text style={styles.label}>Mobile number</Text>
+          <View style={styles.inputWrapper}>
+            <Ionicons name="call-outline" size={19} color={C.muted} style={styles.fieldIcon} />
+            <TextInput style={styles.input} value={rmobilenumber} onChangeText={(t) => Rsetmobilenumber(t.replace(/[^0-9]/g, ""))} keyboardType="phone-pad" maxLength={10} placeholder="07XXXXXXXX" placeholderTextColor="#8A97A8" />
+          </View>
+          <FieldError message={fieldError("rmobilenumber", rmobilenumber)} />
+
+          <Text style={styles.label}>Email</Text>
+          <View style={styles.inputWrapper}>
+            <Ionicons name="mail-outline" size={19} color={C.muted} style={styles.fieldIcon} />
+            <TextInput 
+              style={styles.input} 
+              value={remail} 
+              onChangeText={(text) => RsetEmail(text.replace(/\s/g, "").toLowerCase())} 
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardType="email-address"
+              placeholder="name@example.com"
+              placeholderTextColor="#8A97A8"
             />
-          )}                    */}
- 
-        </ScrollView>
-        
-      </View>
+          </View>
+          <FieldError message={fieldError("remail", remail)} />
+        </View>
 
-      <TouchableOpacity style={styles.submitButton} onPress={handlesenderD}>
-        <LinearGradient
-            colors={["#173C79","#155B8A","#159B79",]}
-            start={{x: 0, y: 0,}}
-            end={{x: 1, y: 1,}}
-            style={styles.submitGradient}
-        >
-        <Text style={styles.submitText}>Next</Text>
-        </LinearGradient>
-    </TouchableOpacity>
+        <GradientButton label="Next" icon="arrow-forward" onPress={handlesenderD} />
+      </ScrollView>
+
+      <LocationSheet
+        visible={sheet === 'pickup'}
+        title="Pick up location"
+        subtitle={drop ? `Places with a bus to ${drop}` : "All pickup points"}
+        options={pickupOptions}
+        selected={pickup}
+        loading={loadingRoutes}
+        emptyText={drop ? `No bus goes to ${drop}` : "No schedules found"}
+        onSelect={selectPickup}
+        onClear={() => { setPickup(""); setSheet(null); }}
+        onClose={() => setSheet(null)}
+      />
+      <LocationSheet
+        visible={sheet === 'drop'}
+        title="Delivery location"
+        subtitle={pickup ? `Places a bus goes from ${pickup}` : "All delivery points"}
+        options={dropOptions}
+        selected={drop}
+        loading={loadingRoutes}
+        emptyText={pickup ? `No bus leaves ${pickup}` : "No schedules found"}
+        onSelect={selectDrop}
+        onClear={() => { setDrop(""); setSheet(null); }}
+        onClose={() => setSheet(null)}
+      />
 
         {isSearching ? (
                   <TextInput
@@ -422,10 +502,35 @@ const JetLinkInterface: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    backgroundColor:"#fff"
+  noticeText: { flex: 1, fontSize: 13, fontWeight: '600', color: '#8A4B00' },
+  notice: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: C.amberSoft, borderRadius: 12, padding: 12, marginTop: 10, marginBottom: 6 },
+  dateValue: { flex: 1, fontSize: 15, fontWeight: '700', color: C.ink },
+  swapBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#FFFFFF', borderWidth: 1.5, borderColor: '#E3E9F1', alignItems: 'center', justifyContent: 'center', marginLeft: 8 },
+  divider: { height: 1, backgroundColor: '#E3E9F1' },
+  placeholder: { color: '#8A97A8', fontWeight: '600' },
+  selectValue: { fontSize: 17, fontWeight: '800', color: C.ink, marginTop: 3, letterSpacing: 0.3 },
+  selectRow: { paddingVertical: 10 },
+  dash: { width: 2, flex: 1, minHeight: 36, backgroundColor: '#DCE3EC', marginVertical: 4 },
+  dot: { width: 12, height: 12, borderRadius: 6 },
+  routeLine: { alignItems: 'center', marginRight: 14, paddingVertical: 18 },
+  routeBox: { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: '#E3E9F1', backgroundColor: '#F7F9FC', borderRadius: 18, paddingVertical: 6, paddingLeft: 14, paddingRight: 10 },
+  unit: { fontSize: 14, fontWeight: '700', color: C.muted },
+  fieldIcon: { marginRight: 10 },
+  readOnly: { backgroundColor: '#EEF2F7' },
+  sectionTitle: { fontSize: 15, fontWeight: '800', color: C.ink },
+  sectionHead: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingBottom: 12, marginBottom: 14, borderBottomWidth: 1, borderBottomColor: C.line },
+  section: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 22,
+    padding: 16,
+    paddingBottom: 10,
+    elevation: 3,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
   },
+  container: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: 'row',
@@ -472,35 +577,11 @@ const styles = StyleSheet.create({
       
   },
 
-  label: {
-    color: '#4B6CF5',
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 5,
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 2,
-    backgroundColor: '#F2F4F5',
-    borderColor: '#ECEEF2',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    height: 45,
-    marginBottom: 15,
-  },
-  input: {
-    flex: 1,
-    height: '100%',
-    color: '#333',
-  },
+  label: { color: C.muted, fontSize: 13, fontWeight: '700', marginBottom: 6, marginLeft: 2 },
+  inputWrapper: { flexDirection: 'row', alignItems: 'center', minHeight: 52, borderWidth: 1.5, borderColor: '#E3E9F1', backgroundColor: '#F7F9FC', borderRadius: 14, paddingHorizontal: 14, marginBottom: 4 },
+  input: { flex: 1, fontSize: 15, fontWeight: '600', color: C.ink, paddingVertical: 12 },
 
-  input1: {
-    flex: 1,
-    height: '100%',
-    color: '#333',
-    marginTop:20,
-  },
+  input1: { flex: 1, fontSize: 15, fontWeight: '600', color: C.muted },
 
   inputIcon: {
     fontSize: 18,

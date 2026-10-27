@@ -8,7 +8,9 @@ import {
   TouchableOpacity, 
   SafeAreaView, 
   TextInput,
+  ScrollView,
 } from 'react-native';
+import { ScreenHeader, FeatureCard, Pill, C, ui } from "../../../components/JetUI";
 import { Ionicons, 
   MaterialCommunityIcons, 
   Feather, 
@@ -62,48 +64,27 @@ const ParcelService = () => {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
        {/* Header Section */}
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-        style={styles.submitGradient1}
-      >
-        <View style={styles.header}>
-            
-        
-          <TouchableOpacity >
-            <Text style={styles.title}>JetLink</Text>
-          </TouchableOpacity>
-                  
-        </View>
-      </LinearGradient> 
+      <ScreenHeader eyebrow="Parcel service" title="Parcels" />
 
-      
-      
-        
-        {/* Action Buttons */}
-        <TouchableOpacity style={styles.card} onPress={handleSearch}>
-          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-              <Feather name="gift" size={50} color="#F59E0B" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Booking</Text>
-            <Text style={styles.text2}>Send a parcel on the next available bus </Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.card1} onPress={handleSearch1}>
-          <View style={[styles.iconWrap, { backgroundColor: "#FF000018" }]}>
-              <MaterialCommunityIcons name="map-marker-radius" size={50} color="#FF0000" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Tracking</Text>
-            <Text style={styles.text2}>Follow your parcel live from pickup to hand-off</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
-      
+      <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+        <FeatureCard
+          icon={<Feather name="package" size={28} color="#FFFFFF" />}
+          iconBg={C.blue}
+          title="Send a parcel"
+          subtitle="Send a parcel on the next available bus"
+          cta="Book now"
+          tag={<Pill text="Fast delivery" bg={C.greenSoft} color={C.green} />}
+          onPress={handleSearch}
+        />
+        <FeatureCard
+          icon={<MaterialCommunityIcons name="map-marker-radius" size={28} color={C.red} />}
+          iconBg={C.redSoft}
+          title="Track a parcel"
+          subtitle="Follow your parcel live from pickup to hand-off"
+          cta="Track now"
+          onPress={handleSearch1}
+        />
+      </ScrollView>
 
       {isSearching ? (
                   <TextInput
@@ -213,7 +194,7 @@ const ParcelService = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.bg,
   },
   header: {
     flexDirection: 'row',

@@ -9,6 +9,7 @@ import {
   SafeAreaView, 
   Image ,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import { 
   Ionicons, 
@@ -20,6 +21,7 @@ import {
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient'; 
 import AlertBadge from "../../../components/AlertBadge";
+import { ScreenHeader, RowCard, IconBox, C, ui } from "../../../components/JetUI";
 
 const ParcelService = () => { 
     const router = useRouter();
@@ -79,51 +81,42 @@ const ParcelService = () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-       
-          <View style={styles.header}> 
-              <TouchableOpacity><Text style={styles.title}>Payment History</Text></TouchableOpacity>
-          </View>
-        </LinearGradient>
-        
-        <TouchableOpacity style={styles.card} onPress={handleSearch}>
-          <View style={[styles.iconWrap, { backgroundColor: "#32CD3218" }]}>
-              <Fontisto name={"bus"} size={40} color="#32CD32" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Parcel</Text>
-            <Text style={styles.text2}>Manage payment history </Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
+        <ScreenHeader eyebrow="Finance" title="Payment history" />
 
-        <TouchableOpacity style={styles.card1} onPress={handleSearch1}>
-          <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
-              <Fontisto name={"bus"} size={40} color="#8B5CF6" />
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          <View style={[ui.card, ui.rowCard]}>
+            <IconBox bg={C.blueSoft} size={48}>
+              <Ionicons name="receipt-outline" size={24} color={C.blue} />
+            </IconBox>
+            <View style={{ flex: 1, marginLeft: 14 }}>
+              <Text style={ui.rowTitle}>Choose a service</Text>
+              <Text style={ui.rowSub}>See receipts and income for each</Text>
+            </View>
           </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Tour</Text>
-            <Text style={styles.text2}>Manage payment history</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card2} onPress={handleSearch2}>
-          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-              <Fontisto name={"bus"} size={40} color="#F59E0B" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Ticket</Text>
-            <Text style={styles.text2}>Manage payment history</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
-        
+          <RowCard
+            icon={<Feather name="package" size={26} color={C.green} />}
+            iconBg={C.greenSoft}
+            title="Parcel"
+            subtitle="Parcel delivery payments"
+            onPress={handleSearch}
+          />
+          <RowCard
+            icon={<MaterialCommunityIcons name="map-marker-path" size={26} color={C.purple} />}
+            iconBg={C.purpleSoft}
+            title="Tour"
+            subtitle="Tour package payments"
+            onPress={handleSearch1}
+          />
+          <RowCard
+            icon={<MaterialCommunityIcons name="ticket-outline" size={26} color={C.amber} />}
+            iconBg={C.amberSoft}
+            title="Ticket"
+            subtitle="Daily bus ticket payments"
+            onPress={handleSearch2}
+          />
+        </ScrollView>
+
       {isSearching ? (
         <TextInput
           style={styles.searchBarInput}
@@ -239,7 +232,7 @@ const ParcelService = () => {
 const styles = StyleSheet.create({
   container:{
     flex:1,
-    backgroundColor:"#fff"
+    backgroundColor:C.bg
   },
 
   header: {

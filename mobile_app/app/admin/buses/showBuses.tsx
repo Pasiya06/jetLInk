@@ -9,10 +9,12 @@ import {
   SafeAreaView,
   FlatList,
   Alert,
+  ScrollView,
 } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome, Feather, Fontisto } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
+import { ScreenHeader, SearchBox, SectionLabel, Pill, EmptyState, GradientButton, C, ui } from "../../../components/JetUI";
 
 interface Bus {
   _id: string; 
@@ -171,11 +173,14 @@ const BusScreen: React.FC = () => {
     >
       
       <View style={styles.profileCircle}>
-        <Fontisto name={"bus"} size={25} color="#32CD32" />
+        <Fontisto name={"bus"} size={20} color={C.amber} />
       </View>
-      <Text style={styles.friendName}>{item.busNumber}</Text>
-      <TouchableOpacity style={styles.iconButton}>
-        <MaterialIcons name="location-on" size={32} color="#32CD32" 
+      <View style={{ flex: 1, marginLeft: 12 }}>
+        <Text style={styles.friendName}>{item.busNumber}</Text>
+        <Text style={styles.friendSub}>{String(params.busTypeTopic || item.busType || "Bus")}</Text>
+      </View>
+      <TouchableOpacity style={styles.iconButton} accessibilityLabel={`Show location of ${item.busNumber}`}>
+        <MaterialIcons name="location-on" size={22} color={C.green} 
         onPress={() =>
         router.push({
           pathname: "/admin/buses/loaction",
@@ -202,8 +207,8 @@ const BusScreen: React.FC = () => {
       }
       />    
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => deleteBus(item._id)}>
-        <Ionicons name="trash" size={30} color="red" />
+      <TouchableOpacity style={styles.deleteButton} onPress={() => deleteBus(item._id)} accessibilityLabel={`Delete ${item.busNumber}`}>
+        <Ionicons name="trash-outline" size={21} color={C.red} />
       </TouchableOpacity>
       
     </TouchableOpacity>
@@ -217,42 +222,31 @@ const BusScreen: React.FC = () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-        <LinearGradient
-                colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-                style={styles.submitGradient1}
-          >
-          <View style={styles.header}>          
-            <TouchableOpacity><Text style={styles.title}>{params.busTypeTopic}</Text></TouchableOpacity>          
-          </View>
-        </LinearGradient>
-        
-              
-        
-        <View style={styles.card}>
-          <Text style={styles.cardtitle}>Manage all buses</Text>
-          <FlatList style={styles.svw}
+        <ScreenHeader eyebrow="Manage all buses" title={String(params.busTypeTopic || "Buses")} />
+
+        <View style={[ui.body, { paddingHorizontal: 16 }]}>
+          <SearchBox value={searchQuery} onChangeText={setSearchQuery} placeholder="Search by bus number" />
+          <SectionLabel style={{ marginTop: 18, marginBottom: 10 }} right={<Pill text={`${filteredBusData.length} listed`} />}>
+            Buses
+          </SectionLabel>
+          <FlatList
+            style={{ flex: 1 }}
             data={filteredBusData}
             renderItem={renderBusItem}
             keyExtractor={(item) => item._id}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingVertical: 10 }}
+            contentContainerStyle={{ paddingBottom: 250 }}
+            ListEmptyComponent={
+              <EmptyState
+                icon={<Fontisto name="bus" size={26} color={C.amber} />}
+                title="No buses yet"
+                subtitle="Tap Add bus to register one."
+              />
+            }
           />
-
-          
-
         </View>
-        <TouchableOpacity style={styles.searchButton} onPress={handleSearch}>
-          <LinearGradient
-            colors={["#173C79","#155B8A","#159B79",]}
-            start={{x: 0, y: 0,}}
-            end={{x: 1, y: 1,}}
-            style={styles.submitGradient}
-          >
-            <Text style={styles.searchButtonText}>Add Bus</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+
+        <GradientButton label="Add bus" icon="add" onPress={handleSearch} style={styles.addButton} />
 
         {isSearching ? (
               <TextInput
@@ -358,7 +352,7 @@ const BusScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container:{
     flex:1,
-    backgroundColor:"#fff"
+    backgroundColor:C.bg
   },
 
   header: {
@@ -418,45 +412,56 @@ const styles = StyleSheet.create({
   },
  
   friendRow: {
-    marginLeft: 15,
-    marginRight: 15,
-    
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
-    
-   
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4, },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+    paddingVertical: 10,
+    paddingLeft: 12,
+    paddingRight: 10,
+    borderRadius: 18,
+    marginBottom: 10,
+    elevation: 3,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
   },
 
   profileCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 18,
-    borderWidth: 2,
-    borderColor: '#32CD32',
+    width: 44,
+    height: 44,
+    borderRadius: 14,
+    backgroundColor: C.amberSoft,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   friendName: {
-    flex: 1,
-    marginLeft: 10,
-    fontSize: 18,
-    color: '#0047AB',
-    fontWeight: '500',
+    fontSize: 16,
+    color: C.ink,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
+  friendSub: { fontSize: 12, color: C.muted, fontWeight: '500', marginTop: 1 },
 
-  iconButton: { 
-    marginRight: 10 
+  iconButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 13,
+    backgroundColor: C.greenSoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
   },
+  deleteButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 13,
+    backgroundColor: '#FDF1F1',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  addButton: { position: 'absolute', left: 20, right: 20, bottom: 165 },
 
   searchButton: {
     justifyContent: "space-around",

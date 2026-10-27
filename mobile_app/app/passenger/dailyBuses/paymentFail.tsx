@@ -87,12 +87,12 @@ export default function PaymentSuccessScreen() {
       <Stack.Screen options={{ title: "", headerShown: false }} />
 
     <LinearGradient
-      colors={['#fff8f8', '#ff0000']}
+      colors={['#173C79', '#155B8A', '#159B79']}
       style={styles.container}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
     >
-      {/* Success Icon */}
+      {/* Failed Icon */}
       <Animated.View
         style={[
           styles.iconWrapper,
@@ -101,7 +101,7 @@ export default function PaymentSuccessScreen() {
       >
         <View style={styles.iconCircleOuter}>
           <View style={styles.iconCircleInner}>
-            <Entypo name="cross" size={64} color="#fff" />
+            <Entypo name="cross" size={58} color="#FFFFFF" />
           </View>
         </View>
       </Animated.View>
@@ -147,33 +147,16 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   iconCircleOuter: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: 'rgba(134, 133, 133, 0.15)',
+    width: 128,
+    height: 128,
+    borderRadius: 64,
+    backgroundColor: 'rgba(255,255,255,0.18)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconCircleInner: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: '#ff0000',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#000000',
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#000000',
-    marginBottom: 18,
-    textAlign: 'center',
-  },
+  iconCircleInner: { width: 94, height: 94, borderRadius: 47, backgroundColor: '#E5484D', alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 26, fontWeight: '800', color: '#FFFFFF', marginBottom: 6 },
+  subtitle: { fontSize: 14, color: 'rgba(255,255,255,0.88)', marginBottom: 18, textAlign: 'center', lineHeight: 20 },
   amount: {
     fontSize: 34,
     fontWeight: '800',
@@ -218,26 +201,21 @@ const styles = StyleSheet.create({
   },
   primaryButton: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
-    paddingVertical: 14,
+    backgroundColor: '#FFFFFF',
+    height: 54,
     paddingHorizontal: 32,
-    borderRadius: 14,
+    borderRadius: 27,
     alignItems: 'center',
     justifyContent: 'center',
     width: width - 48,
     marginBottom: 12,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 14,
+    elevation: 6,
   },
-  primaryButtonText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#1E3C72',
-  },
-  secondaryButton: {
-    paddingVertical: 12,
-  },
-  secondaryButtonText: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.85)',
-    fontWeight: '500',
-  },
+  primaryButtonText: { fontSize: 16, fontWeight: '800', color: '#173C79' },
+  secondaryButton: { paddingVertical: 12, paddingHorizontal: 20 },
+  secondaryButtonText: { fontSize: 15, color: '#FFFFFF', fontWeight: '700' },
 });

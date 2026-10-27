@@ -8,6 +8,7 @@ import {
   TouchableOpacity, 
   SafeAreaView, 
   TextInput,
+  ScrollView,
 } from 'react-native';
 import { Ionicons, 
   MaterialCommunityIcons, 
@@ -16,6 +17,7 @@ import { Ionicons,
   FontAwesome5} from '@expo/vector-icons'; 
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
+import { ScreenHeader, FeatureCard, C, ui } from "../../../components/JetUI";
 
 const ParcelService = () => {
     const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -52,42 +54,27 @@ const ParcelService = () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-       
-        <View style={styles.header}> 
-            <TouchableOpacity><Text style={styles.title}>Staff</Text></TouchableOpacity>
-        </View>
-      </LinearGradient>
-      
-        <TouchableOpacity style={styles.card} onPress={handleSearch}>
-          <View style={[styles.iconWrap, { backgroundColor: "#32CD3218" }]}>
-              <MaterialCommunityIcons name="currency-usd" size={58} color="#32CD32" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Package</Text>
-            <Text style={styles.text2}>Manage tour packages</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
+        <ScreenHeader eyebrow="Tours" title="Staff" />
 
-        <TouchableOpacity style={styles.card1} onPress={handleSearch1}>
-          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-              <FontAwesome5 name="route" size={58} color="#F59E0B" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>History</Text>
-            <Text style={styles.text2}>Manage tour history</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          <FeatureCard
+            icon={<Feather name="package" size={28} color={C.green} />}
+            iconBg={C.greenSoft}
+            title="Packages"
+            subtitle="Create and edit tour packages"
+            cta="Manage packages"
+            onPress={handleSearch}
+          />
+          <FeatureCard
+            icon={<FontAwesome5 name="route" size={26} color={C.amber} />}
+            iconBg={C.amberSoft}
+            title="Tour history"
+            subtitle="Past and completed tours"
+            cta="View history"
+            onPress={handleSearch1}
+          />
+        </ScrollView>
 
-        
-        
       {isSearching ? (
         <TextInput
           style={styles.searchBarInput}
@@ -203,7 +190,7 @@ const ParcelService = () => {
 const styles = StyleSheet.create({
   container:{
     flex:1,
-    backgroundColor:"#fff"
+    backgroundColor:C.bg
   },
 
   header: {

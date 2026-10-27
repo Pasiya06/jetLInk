@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   FlatList,
+  ScrollView,
 } from 'react-native';
 import {Ionicons, 
   MaterialCommunityIcons, 
@@ -20,6 +21,7 @@ import {Ionicons,
   FontAwesome} from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
+import { ScreenHeader, SearchBox, SectionLabel, Pill, EmptyState, Avatar, C, ui } from "../../../components/JetUI";
 
 
 interface pasenger {
@@ -121,7 +123,7 @@ const deletePassenger = async (id: string) => {
     <TouchableOpacity
       onPress={() =>
         router.push({
-          pathname: "/admin/regpassengers/searchByNIC",
+          pathname: "/admin/regpassengers/index2",
           params: {
             id: item.id,
             pfirstName: item.firstName,
@@ -142,16 +144,31 @@ const deletePassenger = async (id: string) => {
       }
     >
     <View style={styles.friendRow}>
-      <View style={styles.profileCircle}>
-        <Entypo name="user" size={14}color="#32CD32"/>
+      <Avatar name={`${item.firstName} ${item.lastName}`} size={44} />
+      <View style={{ flex: 1, marginLeft: 12 }}>
+        <Text style={styles.friendName} numberOfLines={1}>{item.firstName} {item.lastName}</Text>
+        <Text style={styles.friendSub} numberOfLines={1}>
+          {item.NIC ? `NIC ${item.NIC}` : item.email || item.phoneNumber || "Passenger"}
+        </Text>
       </View>
-      <Text style={styles.friendName}>{item.firstName} {item.lastName}</Text>
-      
-      <TouchableOpacity onPress={()=>deletePassenger(item.id)}>
-        <Ionicons name="trash" size={30} color="red"/>
+
+      <TouchableOpacity
+        style={styles.deleteButton}
+        onPress={()=>deletePassenger(item.id)}
+        accessibilityLabel={`Remove ${item.firstName} ${item.lastName}`}
+      >
+        <Ionicons name="trash-outline" size={21} color={C.red}/>
       </TouchableOpacity>
     </View>
     </TouchableOpacity>
+  );
+
+  const shownPassengers = passengerData.filter((p) =>
+    [p.firstName, p.lastName, p.NIC, p.email, p.phoneNumber]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase()
+      .includes(searchQuery.trim().toLowerCase())
   );
 
   return (
@@ -159,42 +176,30 @@ const deletePassenger = async (id: string) => {
     <>
     <Stack.Screen options={{ title: "", headerShown: false }} />
     <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-        style={styles.submitGradient1}
-      >
-      
-        <View style={styles.header}>
-        
-                  
-          <TouchableOpacity >
-            <Text style={styles.title}>Jetlink</Text>
-          </TouchableOpacity>
-                  
-          
-        </View>
-      </LinearGradient>
-      
-            
-      
-              
-     
-        
-      <View style={styles.card}>
-        <Text style={styles.cardtitle}>Manage all passengers</Text>
-        <FlatList style={styles.svw}
-          data={passengerData}
+      <ScreenHeader eyebrow="Manage all passengers" title="Passengers" />
+
+      <View style={[ui.body, { paddingHorizontal: 16 }]}>
+        <SearchBox value={searchQuery} onChangeText={setSearchQuery} placeholder="Name, NIC, email or phone" />
+        <SectionLabel style={{ marginTop: 18, marginBottom: 10 }} right={<Pill text={`${shownPassengers.length} registered`} />}>
+          Registered
+        </SectionLabel>
+        <FlatList
+          style={{ flex: 1 }}
+          data={shownPassengers}
           renderItem={renderBusItem}
           keyExtractor={(item)=>item.id}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingVertical: 10 }}
-          />
+          contentContainerStyle={{ paddingBottom: 190 }}
+          ListEmptyComponent={
+            <EmptyState
+              icon={<Ionicons name="people-outline" size={28} color={C.amber} />}
+              title={passengerData.length ? "No matches" : "No passengers yet"}
+              subtitle={passengerData.length ? "Try a different name or NIC." : "Registered passengers will appear here."}
+            />
+          }
+        />
       </View>
 
-      
-      
         {isSearching ? (
               <TextInput
                 style={styles.searchBarInput}
@@ -299,7 +304,7 @@ const deletePassenger = async (id: string) => {
 const styles = StyleSheet.create({
   container:{
     flex:1,
-    backgroundColor:"#fff"
+    backgroundColor:C.bg
   },
 
   header: {
@@ -356,23 +361,19 @@ const styles = StyleSheet.create({
   },
  
   friendRow: {
-    marginLeft: 15,
-    marginRight: 15,
-    
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    borderRadius: 16,
-    marginBottom: 12,
-    borderWidth: 0.5,
-    borderColor: '#32CD32',
-   
-    elevation: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4, },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
+    paddingVertical: 10,
+    paddingLeft: 12,
+    paddingRight: 10,
+    borderRadius: 18,
+    marginBottom: 10,
+    elevation: 3,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
   },
 
   profileCircle: {
@@ -385,12 +386,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  friendName: {
-    flex: 1,
-    marginLeft: 10,
-    fontSize: 18,
-    color: '#0047AB',
-    fontWeight: '500',
+  friendName: { fontSize: 16, color: C.ink, fontWeight: '800' },
+  friendSub: { fontSize: 12, color: C.muted, fontWeight: '500', marginTop: 1 },
+  deleteButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 13,
+    backgroundColor: '#FDF1F1',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   iconButton: { 

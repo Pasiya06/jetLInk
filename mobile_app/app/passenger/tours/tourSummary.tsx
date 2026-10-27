@@ -14,6 +14,8 @@ import {
 } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
+import { C, GRADIENT } from "../../../components/JetUI";
+import { TIER_COLORS, getTier } from "../../../components/TourPackageCard";
 
 import {
   Ionicons,
@@ -129,36 +131,49 @@ export default function PackageDetails() {
         {/*  HEADER  */}
 
         <LinearGradient
-            colors={["#173C79","#155B8A","#159B79",]}
+            colors={GRADIENT}
             start={{x: 0, y: 0,}}
             end={{x: 1, y: 1,}}
             style={styles.submitGradient1}
         >
             <View style={styles.header}>
-                            
-                <TouchableOpacity >
-                    <Text style={styles.headertitle}>Tour Summary</Text>
-                </TouchableOpacity>
-                            
+                <Text style={styles.eyebrow}>Review your tour</Text>
+                <Text style={styles.headertitle}>Tour summary</Text>
             </View>
         </LinearGradient> 
 
+        <ScrollView
+          style={styles.scroll}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
 
-        {/*  SECTION HEADER  */}
+        {/*  PACKAGE  */}
 
         <View style={styles.card}>
-          <View style={styles.cardHeader}>
-                <View style={styles.packageTypeBadge}>
-                <Text style={styles.packageTypeText}>
+          <View style={[styles.cardStrip, { backgroundColor: TIER_COLORS[getTier(String(params.packageType || ""))].border }]} />
+          <View style={styles.cardBody}>
+            <View style={styles.cardHeader}>
+                <View
+                  style={[
+                    styles.packageTypeBadge,
+                    {
+                      backgroundColor: TIER_COLORS[getTier(String(params.packageType || ""))].pale,
+                      borderColor: TIER_COLORS[getTier(String(params.packageType || ""))].border,
+                    },
+                  ]}
+                >
+                <Text style={[styles.packageTypeText, { color: TIER_COLORS[getTier(String(params.packageType || ""))].main }]}>
                     {params.packageType ||"PACKAGE"}
                 </Text>
                 </View>
-                
-                
+                <Text style={styles.wholeBus}>Whole bus</Text>
             </View>
         
             <Text style={styles.packageName}>
-                Rs {params.maxPrice}
+                <Text style={styles.currency}>Rs </Text>
+                {Number(params.maxPrice || 0).toLocaleString()}
             </Text>
         
             {!!params.description && (
@@ -169,52 +184,71 @@ export default function PackageDetails() {
         
             <View style={styles.detailsRow}>
                 <View style={styles.detailItem}>
-                <Ionicons name="navigate-outline" size={16} color="#12966F"/>
-                <Text style={styles.detailText}>
+                <Ionicons name="navigate" size={16} color={C.blue}/>
+                <Text style={styles.detailText} numberOfLines={1}>
                     {params.totalDistance || "No distance"}
                 </Text>
                 </View>
         
                 <View style={styles.detailItem}>
-                <Ionicons name="time-outline" size={16} color="#12966F" />
-                <Text style={styles.detailText}>
+                <Ionicons name="time" size={16} color={C.blue} />
+                <Text style={styles.detailText} numberOfLines={1}>
                     {params.tripDuration || "No duration"}
                 </Text>
                 </View>
         
                 <View style={styles.detailItem}>
-                <Ionicons name="people-outline" size={16} color="#12966F"/>
-                <Text style={styles.detailText}>
+                <Ionicons name="people" size={16} color={C.blue}/>
+                <Text style={styles.detailText} numberOfLines={1}>
                     {params.maxPassengers || 0}
                 </Text>
                 </View>
-                
             </View>
+          </View>
         </View>
 
-        <View style={styles.card1} >
-          <View style={styles.svw1}>          
-            <View style={styles.detailRow}>        
-              <View style={[styles.iconWrap, { backgroundColor: '#F5A62320' }]}>
-                <Ionicons name="calendar-outline" size={18} color='#F5A623' />
-              </View>
-              <View style={styles.detailTextWrap}>
-                <Text style={styles.detailLabel}>Date</Text>
-                <Text style={styles.detailValue}>{params.date}</Text>
-              </View>
-            </View>
-          </View>      
-      </View>
+        {/*  TRIP  */}
 
-      <View style={styles.card2} >
-        <View style={styles.svw}>
-          <Text style={styles.inputLabel}>Pick up Location</Text>  
+        <View style={styles.card1} >
+          <View style={styles.detailRow}>        
+            <View style={[styles.iconWrap, { backgroundColor: C.amberSoft }]}>
+              <Ionicons name="calendar" size={18} color={C.amber} />
+            </View>
+            <View style={styles.detailTextWrap}>
+              <Text style={styles.detailLabel}>Tour date</Text>
+              <Text style={styles.detailValue}>{params.date}</Text>
+            </View>
+          </View>
+          {!!params.busNumber && (
+            <>
+              <View style={styles.rowDivider} />
+              <View style={styles.detailRow}>        
+                <View style={[styles.iconWrap, { backgroundColor: C.blueSoft }]}>
+                  <Fontisto name="bus" size={15} color={C.blue} />
+                </View>
+                <View style={styles.detailTextWrap}>
+                  <Text style={styles.detailLabel}>Bus</Text>
+                  <Text style={styles.detailValue}>{params.busNumber}</Text>
+                </View>
+              </View>
+            </>
+          )}
+        </View>
+
+        {/*  PICKUP  */}
+
+        <View style={styles.card2} >
+          <Text style={styles.cardTitle}>Pickup details</Text>
+
+          <Text style={styles.inputLabel}>Pickup location</Text>  
           <View style={styles.inputWrapper}>                
+            <Ionicons name="location" size={18} color={C.green} />
             <View style={styles.inputInnerWrapper}>
              <TextInput 
               style={styles.input} 
               value={pickup}  
               placeholder="GALLE"
+              placeholderTextColor="#8A97A8"
               onChangeText={(text) => setPickup(text.replace(/\s/g, "").toUpperCase())}
               autoCapitalize="characters"
               autoCorrect={false}
@@ -223,19 +257,20 @@ export default function PackageDetails() {
           </View>
           <FieldError message={fieldError("pickup", pickup)} />
 
-          <Text style={styles.inputLabel}>Time</Text>
-          <View style={styles.inputWrapper}>
+          <Text style={styles.inputLabel}>Pickup time</Text>
+          <TouchableOpacity style={styles.inputWrapper} activeOpacity={0.8} onPress={() => setShowTimePicker(true)}>
+            <Ionicons name="time" size={18} color={C.blue} />
             <TextInput style={styles.input}
-              
               value={selectedTime}
-              placeholder="00:00"
+              placeholder="Choose a time"
+              placeholderTextColor="#8A97A8"
               editable={false}
+              pointerEvents="none"
             />
-
-            <TouchableOpacity onPress={() => setShowTimePicker(true)}>
-              <Ionicons name="time-outline" size={24} color="black" />
-            </TouchableOpacity>
-          </View>
+            <View style={styles.timeBtn}>
+              <Ionicons name="chevron-down" size={18} color={C.blue} />
+            </View>
+          </TouchableOpacity>
           <FieldError message={fieldError("selectedTime", selectedTime)} /> 
 
           {showTimePicker && (
@@ -246,30 +281,22 @@ export default function PackageDetails() {
               onChange={onTimeChange}
             />
           )}                
-
-          
-
         </View>
-      </View>
+        </ScrollView>
 
-        {/* <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-
-          
-        </ScrollView> */}
-
-        <TouchableOpacity style={styles.submitButton} onPress={tourinterface} >
-          <LinearGradient
-            colors={["#173C79","#155B8A","#159B79",]}
-            start={{x: 0, y: 0,}}
-            end={{x: 1, y: 1,}}
-            style={styles.submitGradient}
-          >
-          <Text style={styles.submitText}>Pay</Text>
-          </LinearGradient>
-        </TouchableOpacity>
+        <View style={styles.ctaWrap}>
+          <TouchableOpacity style={styles.submitButton} onPress={tourinterface} activeOpacity={0.9}>
+            <LinearGradient
+              colors={GRADIENT}
+              start={{x: 0, y: 0,}}
+              end={{x: 1, y: 1,}}
+              style={styles.ctaGradient}
+            >
+            <Ionicons name="card" size={20} color="#FFFFFF" />
+            <Text style={styles.submitText}>Pay Rs {Number(params.maxPrice || 0).toLocaleString()}</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
 
         {isSearching ? (
           <TextInput
@@ -387,50 +414,64 @@ function StatCard({value,label,}: {value: string;label: string;}) {
 
 const styles = StyleSheet.create({
 
+  eyebrow: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "rgba(255,255,255,0.85)",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+    marginBottom: 2,
+  },
+  scroll: { flex: 1, marginTop: -56 },
+  cardStrip: { height: 5, width: "100%" },
+  cardBody: { padding: 18 },
+  wholeBus: { fontSize: 12, fontWeight: "600", color: C.muted },
+  currency: { fontSize: 15, fontWeight: "700", color: C.muted },
+  rowDivider: { height: 1, backgroundColor: C.line, marginLeft: 52 },
+  cardTitle: { fontSize: 17, fontWeight: "800", color: C.ink, marginBottom: 2 },
+  timeBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 12,
+    backgroundColor: C.blueSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ctaWrap: { paddingHorizontal: 20, paddingTop: 10, marginBottom: 165 },
+  ctaGradient: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+  },
+
   container: {
     flex: 1,
-    backgroundColor: "#F3F5F8",
+    backgroundColor: "#F3F6FA",
   },
 
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    paddingBottom: 70,   
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
+    paddingTop: 54,
+    paddingHorizontal: 24,
+    paddingBottom: 76,
   },
 
-  submitGradient1: {
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
+  submitGradient1: { borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
 
-  headertitle: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#ffffff',
-    letterSpacing: 0.5,
-  },
+  headertitle: { fontSize: 28, fontWeight: "800", color: "#FFFFFF" },
 
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 16,
-    marginTop: -50,
-    marginLeft: 20,
-    marginRight: 20,
+    borderRadius: 22,
+    overflow: "hidden",
+    marginHorizontal: 16,
     marginBottom: 14,
-    elevation: 3,
-    shadowColor: "#000",
+    elevation: 4,
+    shadowColor: "#0F1B2D",
     shadowOpacity: 0.08,
-    shadowRadius: 8,
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
   },
 
   cardHeader: {
@@ -439,71 +480,41 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  packageTypeBadge: {
-    backgroundColor: "#EAF4F2",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-  },
+  packageTypeBadge: { borderWidth: 1, paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999 },
 
-  packageTypeText: {
-    fontSize: 9,
-    fontWeight: "800",
-    color: "#12966F",
-  },
+  packageTypeText: { fontSize: 11, fontWeight: "800", letterSpacing: 0.6, textTransform: "uppercase" },
 
-  packageName: {
-    marginTop: 12,
-    fontSize: 19,
-    fontWeight: "800",
-    color: "#344054",
-  },
+  packageName: { marginTop: 10, fontSize: 26, fontWeight: "800", color: C.navy, letterSpacing: -0.4 },
 
-  description1: {
-    marginTop: 10,
-    fontSize: 12,
-    lineHeight: 18,
-    color: "#667085",
-  },
+  description1: { marginTop: 4, fontSize: 13.5, lineHeight: 20, color: C.muted },
 
-  detailsRow: {
-    marginTop: 15,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#EAECF0",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
+  detailsRow: { marginTop: 14, flexDirection: "row", gap: 8 },
 
   detailItem: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
-    flex: 1,
+    gap: 6,
+    backgroundColor: "#F7F9FC",
+    borderRadius: 12,
+    paddingVertical: 9,
+    paddingHorizontal: 9,
   },
 
-  detailText: {
-    marginLeft: 5,
-    fontSize: 10,
-    color: "#475467",
-  },
+  detailText: { fontSize: 12.5, fontWeight: "700", color: C.ink, flexShrink: 1 },
 
   card1: {
-    marginLeft: 20,
-    marginRight: 20,
-    flex: 1,
-    maxHeight: '10%',
-    backgroundColor: '#FFF',
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    marginTop: 10,   
-    alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    marginHorizontal: 16,
+    marginBottom: 14,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 22,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    elevation: 3,
+    shadowColor: "#0F1B2D",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
   },
 
   svw1: {
@@ -511,57 +522,29 @@ const styles = StyleSheet.create({
     alignItems: 'center', 
   },
 
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    marginLeft: 20,
-  },
+  detailRow: { flexDirection: "row", alignItems: "center", paddingVertical: 10 },
 
   detailTextWrap: {
     marginLeft: 12,
     flex: 1,
   },
 
-  detailLabel: {
-    fontSize: 12,
-    color: '#8A8A8A',
-    fontWeight: '500',
-    marginBottom: 2,
-  },
+  detailLabel: { fontSize: 12, color: C.muted, fontWeight: "600", marginBottom: 2 },
 
-  detailValue: {
-    fontSize: 15,
-    color: '#1A1A1A',
-    fontWeight: '600',
-  },
+  detailValue: { fontSize: 16, color: C.ink, fontWeight: "800" },
 
-  iconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 5,
-  },
+  iconWrap: { width: 40, height: 40, borderRadius: 13, justifyContent: "center", alignItems: "center" },
 
   card2: {
-    marginLeft: 20,
-    marginRight: 20,
-    flex: 1,
-    maxHeight: '25%',
-    backgroundColor: '#FFF',
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    marginTop: 20,   
-    alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    marginHorizontal: 16,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 22,
+    padding: 16,
+    elevation: 3,
+    shadowColor: "#0F1B2D",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
   },
 
   svw: {
@@ -570,31 +553,24 @@ const styles = StyleSheet.create({
   },
 
   inputWrapper: {
-    marginLeft: 20,
-    marginRight: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F9FAFC',
-    borderWidth: 2,
-    borderColor: '#ECEEF2',
-    borderRadius: 10,
-    paddingHorizontal: 10,
-    height: 45,
-    marginBottom: 15,
+    gap: 10,
+    backgroundColor: '#F7F9FC',
+    borderWidth: 1,
+    borderColor: '#DCE3EC',
+    borderRadius: 16,
+    paddingLeft: 14,
+    paddingRight: 8,
+    height: 54,
+    marginBottom: 4,
   },
 
   inputInnerWrapper: {
     flex: 1,
   },
 
-  inputLabel: {
-    marginLeft: 20,
-    marginRight: 20,
-    fontSize: 16,
-    color: '#000000',
-    fontWeight: '500',
-    marginBottom: 10,
-  },
+  inputLabel: { fontSize: 13, color: C.ink, fontWeight: "700", marginTop: 10, marginBottom: 8 },
 
   statCard: {
     flex: 1,
@@ -621,38 +597,25 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
   },
 
-  scrollContent: {
-    paddingBottom: 100,
-  },
+  scrollContent: { paddingBottom: 20 },
 
-  input: {
-    flex: 1,
-    height: '100%',
-    color: '#333',
-  },
+  input: { flex: 1, height: "100%", color: C.ink, fontSize: 16, fontWeight: "600" },
 
   submitButton: {
-    justifyContent: "space-around",
-    marginLeft: 20,
-    marginRight: 20,  
-    height: 55,
+    height: 56,
     overflow: 'hidden',
-    borderRadius: 25,
-    marginTop: 15,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    elevation: 10,
+    borderRadius: 28,
+    shadowColor: "#155B8A",
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 8,
   },
 
    submitText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '800',
   },
 
 

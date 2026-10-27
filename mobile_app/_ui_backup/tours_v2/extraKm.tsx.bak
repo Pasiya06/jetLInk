@@ -1,0 +1,491 @@
+import React, { useCallback, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Stack, useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import FieldError from "../../../components/FieldError";
+import { useFieldErrors } from "../../../utils/validation";
+
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
+
+type ExtraPayment = { _id?: string; km: number; pricePerKm: number; amount: number; cardLast4?: string; paidAt: string };
+type Booking = {
+  receiptId: string;
+  busNumber: string;
+  date: string;
+  time: string;
+  pickup: string;
+  packageType: string;
+  totalDistance: number | string;
+  tripDuration: string;
+  maxPrice: number;
+  pemail: string;
+};
+
+const lkr = (n: number) => `LKR ${Number(n || 0).toLocaleString()}`;
+
+// Passenger adds extra kilometers to a booked tour and pays per km
+export default function ExtraKmScreen() {
+  const router = useRouter();
+  const params = useLocalSearchParams();
+  const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
+  const receiptId = String(params.receiptId ?? "");
+
+  const [booking, setBooking] = useState<Booking | null>(null);
+  const [pricePerKm, setPricePerKm] = useState(0);
+  const [paidKm, setPaidKm] = useState(0);
+  const [paidAmount, setPaidAmount] = useState(0);
+  const [payments, setPayments] = useState<ExtraPayment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [paying, setPaying] = useState(false);
+
+  const [km, setKm] = useState("");
+  const [nameOnCard, setNameOnCard] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvc, setCvc] = useState("");
+
+  const kmNumber = Number(km);
+  const total = Number.isInteger(kmNumber) && kmNumber > 0 ? kmNumber * pricePerKm : 0;
+
+  const load = useCallback(async () => {
+    if (!receiptId) {
+      setLoadError("Booking not found. Open it again from My Receipts.");
+      setLoading(false);
+      return;
+    }
+    try {
+      setLoading(true);
+      setLoadError("");
+      const [bRes, xRes] = await Promise.all([
+        fetch(`${API_URL}/receipts/${encodeURIComponent(receiptId)}`),
+        fetch(`${API_URL}/receipts/${encodeURIComponent(receiptId)}/extra-km`),
+      ]);
+      const b = await bRes.json();
+      const x = await xRes.json();
+      if (!bRes.ok || !b.success) throw new Error(b.message || "Could not load booking");
+      if (!xRes.ok || !x.success) throw new Error(x.message || "Could not load extra km details");
+      setBooking(b.receipt);
+      setPricePerKm(Number(x.pricePerKm) || 0);
+      setPaidKm(Number(x.extraKm) || 0);
+      setPaidAmount(Number(x.extraKmAmount) || 0);
+      setPayments(Array.isArray(x.payments) ? x.payments : []);
+    } catch (e: any) {
+      setLoadError(e?.message || "Unable to connect to server");
+    } finally {
+      setLoading(false);
+    }
+  }, [receiptId]);
+
+  useFocusEffect(
+    useCallback(() => {
+      load();
+    }, [load])
+  );
+
+  const onCardNumber = (text: string) =>
+    setCardNumber(text.replace(/\D/g, "").substring(0, 16).replace(/(.{4})/g, "$1 ").trim());
+
+  const onExpiry = (text: string) => {
+    const d = text.replace(/\D/g, "").substring(0, 4);
+    setExpiry(d.length > 2 ? `${d.substring(0, 2)}/${d.substring(2)}` : d);
+  };
+
+  const submit = async () => {
+    if (!validateFields([
+      { key: "km", label: "Extra kilometers", value: km, type: "int" },
+      { key: "nameOnCard", label: "Name on card", value: nameOnCard },
+      { key: "cardNumber", label: "Card number", value: cardNumber, type: "card" },
+      { key: "expiry", label: "Expiry date", value: expiry, type: "expiry" },
+      { key: "cvc", label: "CVC", value: cvc, type: "cvc" },
+    ])) return;
+
+    Alert.alert(
+      "Confirm payment",
+      `Pay ${lkr(total)} for ${kmNumber} extra km?`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Pay now",
+          onPress: async () => {
+            try {
+              setPaying(true);
+              const res = await fetch(`${API_URL}/receipts/${encodeURIComponent(receiptId)}/extra-km`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  km: kmNumber,
+                  pemail: booking?.pemail ?? params.pemail,
+                  cardNumber,
+                  expiry,
+                  cvc,
+                }),
+              });
+              const data = await res.json();
+              if (!res.ok || !data.success) {
+                Alert.alert("Payment failed", data.message || "Could not complete the payment");
+                return;
+              }
+              setKm("");
+              setNameOnCard("");
+              setCardNumber("");
+              setExpiry("");
+              setCvc("");
+              await load();
+              Alert.alert("Payment successful", data.message);
+            } catch {
+              Alert.alert("Error", "Unable to connect to server");
+            } finally {
+              setPaying(false);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const navParams = {
+    Pid: params.Pid,
+    Pid1: params.Pid1,
+    pfirstName: params.pfirstName,
+    plastName: params.plastName,
+    pphoneNumber: params.pphoneNumber,
+    pemail: params.pemail,
+  };
+
+  return (
+    <>
+      <Stack.Screen options={{ title: "", headerShown: false }} />
+      <StatusBar barStyle="light-content" />
+      <View style={styles.container}>
+        <LinearGradient colors={["#173C79", "#155B8A", "#159B79"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
+          <Text style={styles.headerTitle}>Extra Kilometers</Text>
+          <Text style={styles.headerSub}>{receiptId}</Text>
+        </LinearGradient>
+
+        {loading && !booking ? (
+          <View style={styles.center}>
+            <ActivityIndicator size="large" color="#159B79" />
+            <Text style={styles.muted}>Loading booking…</Text>
+          </View>
+        ) : loadError ? (
+          <View style={styles.center}>
+            <Ionicons name="alert-circle-outline" size={44} color="#E5484D" />
+            <Text style={styles.errorText}>{loadError}</Text>
+            <TouchableOpacity style={styles.retry} onPress={load}>
+              <Text style={styles.retryText}>Try again</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+            <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+              {/* Booking summary */}
+              <View style={styles.card}>
+                <View style={styles.rowBetween}>
+                  <View style={styles.badge}>
+                    <Ionicons name="bus" size={14} color="#155B8A" />
+                    <Text style={styles.badgeText}>{booking?.busNumber}</Text>
+                  </View>
+                  <Text style={styles.muted}>{booking?.date} · {booking?.time}</Text>
+                </View>
+                <Text style={styles.pkg}>{booking?.packageType}</Text>
+                <Text style={styles.muted}>Pickup: {booking?.pickup}</Text>
+                <View style={styles.divider} />
+                <Info label="Included distance" value={booking?.totalDistance ? `${booking.totalDistance} km` : "—"} />
+                <Info label="Extra km already paid" value={paidKm ? `${paidKm} km (${lkr(paidAmount)})` : "None"} />
+                <Info label="Price per extra km" value={pricePerKm ? lkr(pricePerKm) : "Not available"} strong />
+              </View>
+
+              {pricePerKm <= 0 ? (
+                <View style={[styles.card, styles.notice]}>
+                  <Ionicons name="information-circle-outline" size={22} color="#B45309" />
+                  <Text style={styles.noticeText}>
+                    Extra kilometers aren't available for this package. Please contact JetLink.
+                  </Text>
+                </View>
+              ) : (
+                <View style={styles.card}>
+                  <Text style={styles.section}>Add kilometers</Text>
+                  <Text style={styles.label}>How many extra km?</Text>
+                  <View style={styles.inputWrap}>
+                    <MaterialCommunityIcons name="map-marker-distance" size={20} color="#159B79" />
+                    <TextInput
+                      style={styles.input}
+                      value={km}
+                      onChangeText={(t) => setKm(t.replace(/\D/g, ""))}
+                      placeholder="e.g. 50"
+                      placeholderTextColor="#8A97A8"
+                      keyboardType="number-pad"
+                      maxLength={4}
+                    />
+                    <Text style={styles.unit}>km</Text>
+                  </View>
+                  <FieldError message={fieldError("km", km)} />
+
+                  <View style={styles.totalBox}>
+                    <Text style={styles.totalLabel}>
+                      {total ? `${kmNumber} km × ${lkr(pricePerKm)}` : "Total to pay"}
+                    </Text>
+                    <Text style={styles.total}>{lkr(total)}</Text>
+                  </View>
+
+                  <Text style={[styles.section, { marginTop: 18 }]}>Card details</Text>
+                  <Text style={styles.label}>Name on card</Text>
+                  <View style={styles.inputWrap}>
+                    <Feather name="user" size={18} color="#5B6B7F" />
+                    <TextInput style={styles.input} value={nameOnCard} onChangeText={setNameOnCard} placeholder="Name on card" placeholderTextColor="#8A97A8" />
+                  </View>
+                  <FieldError message={fieldError("nameOnCard", nameOnCard)} />
+
+                  <Text style={styles.label}>Card number</Text>
+                  <View style={styles.inputWrap}>
+                    <Feather name="credit-card" size={18} color="#5B6B7F" />
+                    <TextInput style={styles.input} value={cardNumber} onChangeText={onCardNumber} placeholder="1234 5678 9012 3456" placeholderTextColor="#8A97A8" keyboardType="number-pad" maxLength={19} />
+                  </View>
+                  <FieldError message={fieldError("cardNumber", cardNumber)} />
+
+                  <View style={styles.twoCol}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.label}>Expiry</Text>
+                      <View style={styles.inputWrap}>
+                        <TextInput style={styles.input} value={expiry} onChangeText={onExpiry} placeholder="MM/YY" placeholderTextColor="#8A97A8" keyboardType="number-pad" maxLength={5} />
+                      </View>
+                      <FieldError message={fieldError("expiry", expiry)} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.label}>CVC</Text>
+                      <View style={styles.inputWrap}>
+                        <TextInput style={styles.input} value={cvc} onChangeText={(t) => setCvc(t.replace(/\D/g, ""))} placeholder="123" placeholderTextColor="#8A97A8" keyboardType="number-pad" maxLength={4} secureTextEntry />
+                      </View>
+                      <FieldError message={fieldError("cvc", cvc)} />
+                    </View>
+                  </View>
+
+                  <TouchableOpacity activeOpacity={0.85} onPress={submit} disabled={paying} style={styles.payWrap}>
+                    <LinearGradient colors={["#173C79", "#155B8A", "#159B79"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.payBtn}>
+                      {paying ? (
+                        <ActivityIndicator color="#fff" />
+                      ) : (
+                        <Text style={styles.payText}>{total ? `Pay ${lkr(total)}` : "Pay"}</Text>
+                      )}
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {/* History */}
+              {payments.length > 0 ? (
+                <View style={styles.card}>
+                  <Text style={styles.section}>Extra km payments</Text>
+                  {payments
+                    .slice()
+                    .reverse()
+                    .map((p, i) => (
+                      <View key={p._id ?? i} style={styles.payRow}>
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.payKm}>+{p.km} km</Text>
+                          <Text style={styles.muted}>
+                            {new Date(p.paidAt).toLocaleString("en-GB", { day: "2-digit", month: "short", hour: "numeric", minute: "2-digit", hour12: true })}
+                            {p.cardLast4 ? ` · card •••• ${p.cardLast4}` : ""}
+                          </Text>
+                        </View>
+                        <Text style={styles.payAmount}>{lkr(p.amount)}</Text>
+                      </View>
+                    ))}
+                </View>
+              ) : null}
+            </ScrollView>
+          </KeyboardAvoidingView>
+        )}
+
+        {/* Bottom nav */}
+        <View style={styles.bottomNav}>
+          <TouchableOpacity style={styles.item} onPress={() => router.back()}>
+            <Ionicons name="arrow-back-outline" size={24} color="#8A8A8A" />
+            <Text style={styles.label1}>Back</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={() => router.push({ pathname: "/passenger/receipt/ReceiptList", params: navParams })}>
+            <Ionicons name="receipt-outline" size={24} color="#8A8A8A" />
+            <Text style={styles.label1}>Receipts</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.centerButton} onPress={() => router.push({ pathname: "/passenger/index1", params: navParams })}>
+            <Ionicons name="home-outline" size={28} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={() => router.push({ pathname: "/notifications", params: { role: "passenger" } })}>
+            <Ionicons name="notifications-outline" size={24} color="#8A8A8A" />
+            <Text style={styles.label1}>Alerts</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.item} onPress={() => router.push({ pathname: "/passenger/passengerProfile", params: { role: "passenger", NIC: params.NIC } })}>
+            <Feather name="user" size={24} color="#8A8A8A" />
+            <Text style={styles.label1}>Profile</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.footerGraphic}>
+          <LinearGradient colors={["#173C79", "#155B8A", "#159B79"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.submitGradient} />
+        </View>
+        <View style={styles.footerGraphic1}>
+          <LinearGradient colors={["#173C79", "#155B8A", "#159B79"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.submitGradient} />
+        </View>
+      </View>
+    </>
+  );
+}
+
+function Info({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
+  return (
+    <View style={styles.infoRow}>
+      <Text style={styles.infoLabel}>{label}</Text>
+      <Text style={[styles.infoValue, strong && { color: "#12966F", fontWeight: "800" }]}>{value}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#F3F6FA" },
+  header: {
+    paddingTop: 54,
+    paddingBottom: 44,
+    alignItems: "center",
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+  },
+  headerTitle: { fontSize: 24, fontWeight: "800", color: "#fff" },
+  headerSub: { marginTop: 4, color: "#DCEFF0", fontSize: 13, fontWeight: "600" },
+  center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 10 },
+  muted: { color: "#5B6B7F", fontSize: 12.5 },
+  errorText: { color: "#B4232A", textAlign: "center" },
+  retry: { backgroundColor: "#159B79", paddingHorizontal: 18, paddingVertical: 10, borderRadius: 20 },
+  retryText: { color: "#fff", fontWeight: "700" },
+
+  scroll: { paddingHorizontal: 16, paddingTop: 0, paddingBottom: 240 },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 18,
+    marginTop: 14,
+    elevation: 3,
+    shadowColor: "#0F1B2D",
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+  },
+  rowBetween: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  badge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: "#EAF1FB",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: { color: "#155B8A", fontWeight: "700", fontSize: 12 },
+  pkg: { marginTop: 10, fontSize: 17, fontWeight: "800", color: "#0F1B2D" },
+  divider: { height: 1, backgroundColor: "#F3F6FA", marginVertical: 12 },
+  infoRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 5 },
+  infoLabel: { color: "#5B6B7F", fontSize: 13 },
+  infoValue: { color: "#0F1B2D", fontSize: 13.5, fontWeight: "600" },
+
+  notice: { flexDirection: "row", gap: 10, backgroundColor: "#FFFBEB" },
+  noticeText: { flex: 1, color: "#92400E", fontSize: 13.5, lineHeight: 19 },
+
+  section: { fontSize: 12, fontWeight: "800", color: "#5B6B7F", textTransform: "uppercase", letterSpacing: 1 },
+  label: { marginTop: 12, marginBottom: 6, fontSize: 13, color: "#0F1B2D", fontWeight: "600" },
+  inputWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    minHeight: 50,
+    borderWidth: 1,
+    borderColor: "#E2EAF3",
+    backgroundColor: "#F8FAFC",
+    borderRadius: 13,
+    paddingHorizontal: 12,
+  },
+  input: { flex: 1, fontSize: 15, color: "#0F1B2D", paddingVertical: 10 },
+  unit: { color: "#5B6B7F", fontWeight: "700" },
+  totalBox: {
+    marginTop: 12,
+    padding: 14,
+    borderRadius: 14,
+    backgroundColor: "#E3F5EE",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  totalLabel: { color: "#0B6B53", fontSize: 13, fontWeight: "600", flexShrink: 1 },
+  total: { color: "#0B6B53", fontSize: 20, fontWeight: "800" },
+  twoCol: { flexDirection: "row", gap: 12 },
+  payWrap: { marginTop: 16, borderRadius: 25, overflow: "hidden" },
+  payBtn: { height: 52, alignItems: "center", justifyContent: "center" },
+  payText: { color: "#fff", fontSize: 16, fontWeight: "800" },
+
+  payRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F1F5F9",
+  },
+  payKm: { fontSize: 15, fontWeight: "800", color: "#0F1B2D" },
+  payAmount: { fontSize: 15, fontWeight: "800", color: "#159B79" },
+
+  bottomNav: {
+    position: "absolute",
+    bottom: 15,
+    left: 10,
+    right: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    marginBottom: 60,
+    height: 75,
+    backgroundColor: "#fff",
+    borderRadius: 25,
+    shadowColor: "#000",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: -2 },
+    elevation: 10,
+  },
+  item: { alignItems: "center", justifyContent: "center", flex: 1 },
+  label1: { marginTop: 4, fontSize: 13, color: "#8A8A8A" },
+  centerButton: {
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: "#2F80ED",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: -28,
+    shadowColor: "#2F80ED",
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 12,
+  },
+  submitGradient: { paddingVertical: 16 },
+  footerGraphic: { position: "absolute", bottom: 0, width: "100%", overflow: "hidden" },
+  footerGraphic1: {
+    position: "absolute",
+    bottom: 20,
+    width: "100%",
+    overflow: "hidden",
+    borderTopLeftRadius: 25,
+    borderTopRightRadius: 25,
+  },
+});

@@ -16,6 +16,8 @@ import {
 } from "expo-router";
 
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { C, GRADIENT } from "../../../components/JetUI";
 
 export default function BookTour() {
   const router = useRouter();
@@ -267,7 +269,12 @@ export default function BookTour() {
       <View style={styles.container}>
         {/* HEADER */}
 
-        <View style={styles.header}>
+        <LinearGradient
+          colors={GRADIENT}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.header}
+        >
           <TouchableOpacity
             style={styles.backButton}
             onPress={() => router.back()}
@@ -279,27 +286,71 @@ export default function BookTour() {
             />
           </TouchableOpacity>
 
-          <Text style={styles.headerTitle}>
-            Confirm Booking
-          </Text>
-
-          <View style={{ width: 42 }} />
-        </View>
+          <View style={{ flex: 1, marginLeft: 14 }}>
+            <Text style={styles.eyebrow}>Almost done</Text>
+            <Text style={styles.headerTitle}>
+              Confirm booking
+            </Text>
+          </View>
+        </LinearGradient>
 
         {/* CONTENT */}
 
         <ScrollView
+          style={styles.scroll}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={
             styles.content
           }
         >
+          {/* PRICE */}
+
+          <View style={styles.priceCard}>
+            <View>
+              <Text style={styles.priceLabel}>
+                Total price
+              </Text>
+
+              <Text style={styles.price}>
+                Rs.{" "}
+                {Number(
+                  params.maxPrice || 0
+                ).toLocaleString("en-LK", {
+                  minimumFractionDigits: 2,
+                })}
+              </Text>
+            </View>
+
+            <View style={styles.onlineBadge}>
+              <Ionicons
+                name={
+                  params.isOnline === "true" 
+                    ? "checkmark-circle"
+                    : "storefront"
+                }
+                size={18}
+                color={C.green}
+              />
+
+              <Text style={styles.onlineText}>
+                {params.isOnline === "true" 
+                  ? "Online"
+                  : "Counter"}
+              </Text>
+            </View>
+          </View>
+
           {/* PACKAGE */}
 
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>
-              Package Details
-            </Text>
+            <View style={styles.cardHead}>
+              <View style={[styles.cardIcon, { backgroundColor: C.blueSoft }]}>
+                <Ionicons name="map" size={18} color={C.blue} />
+              </View>
+              <Text style={styles.cardTitle}>
+                Package details
+              </Text>
+            </View>
 
             <InfoRow
               label="Package ID"
@@ -349,9 +400,14 @@ export default function BookTour() {
           {/* BUS */}
 
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>
-              Bus Information
-            </Text>
+            <View style={styles.cardHead}>
+              <View style={[styles.cardIcon, { backgroundColor: C.greenSoft }]}>
+                <Ionicons name="bus" size={18} color={C.green} />
+              </View>
+              <Text style={styles.cardTitle}>
+                Bus information
+              </Text>
+            </View>
 
             <InfoRow
               label="Bus Number"
@@ -382,9 +438,14 @@ export default function BookTour() {
           {/* PASSENGER */}
 
           <View style={styles.card}>
-            <Text style={styles.cardTitle}>
-              Passenger Information
-            </Text>
+            <View style={styles.cardHead}>
+              <View style={[styles.cardIcon, { backgroundColor: C.purpleSoft }]}>
+                <Ionicons name="person" size={18} color={C.purple} />
+              </View>
+              <Text style={styles.cardTitle}>
+                Passenger information
+              </Text>
+            </View>
 
             <InfoRow
               label="Passenger ID"
@@ -416,43 +477,6 @@ export default function BookTour() {
             />
           </View>
 
-          {/* PRICE */}
-
-          <View style={styles.priceCard}>
-            <View>
-              <Text style={styles.priceLabel}>
-                Total Price
-              </Text>
-
-              <Text style={styles.price}>
-                Rs.{" "}
-                {Number(
-                  params.maxPrice || 0
-                ).toLocaleString("en-LK", {
-                  minimumFractionDigits: 2,
-                })}
-              </Text>
-            </View>
-
-            <View style={styles.onlineBadge}>
-              <Ionicons
-                name={
-                  params.isOnline === "true" 
-                    ? "checkmark-circle"
-                    : "storefront"
-                }
-                size={18}
-                color="#0B3D12"
-              />
-
-              <Text style={styles.onlineText}>
-                {params.isOnline === "true" 
-                  ? "Online"
-                  : "Counter"}
-              </Text>
-            </View>
-          </View>
-
           {/* CONFIRM BUTTON */}
 
           <TouchableOpacity
@@ -465,6 +489,12 @@ export default function BookTour() {
             disabled={loading}
             activeOpacity={0.85}
           >
+            <LinearGradient
+              colors={GRADIENT}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.confirmGradient}
+            >
             {loading ? (
               <>
                 <ActivityIndicator
@@ -503,6 +533,7 @@ export default function BookTour() {
                 </Text>
               </>
             )}
+            </LinearGradient>
           </TouchableOpacity>
 
           <Text style={styles.bottomNote}>
@@ -549,69 +580,99 @@ function InfoRow({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#EEF2F8",
+    backgroundColor: "#F3F6FA",
   },
 
   header: {
-    backgroundColor: "#0047AB",
-    paddingTop: 50,
-    paddingBottom: 18,
-    paddingHorizontal: 16,
+    paddingTop: 54,
+    paddingBottom: 76,
+    paddingHorizontal: 20,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
   },
 
   backButton: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor:
-      "rgba(255,255,255,0.15)",
+      "rgba(255,255,255,0.16)",
     alignItems: "center",
     justifyContent: "center",
   },
 
+  eyebrow: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "rgba(255,255,255,0.85)",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+    marginBottom: 2,
+  },
+
   headerTitle: {
     color: "#FFFFFF",
-    fontSize: 20,
+    fontSize: 26,
     fontWeight: "800",
   },
 
+  scroll: { flex: 1, marginTop: -56 },
+
   content: {
-    padding: 16,
+    paddingHorizontal: 16,
     paddingBottom: 40,
   },
 
   card: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 20,
+    borderRadius: 22,
     paddingHorizontal: 18,
-    paddingVertical: 10,
-    marginBottom: 16,
+    paddingTop: 16,
+    paddingBottom: 6,
+    marginBottom: 14,
     elevation: 3,
+    shadowColor: "#0F1B2D",
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+  },
+
+  cardHead: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 4,
+  },
+
+  cardIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   cardTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: "800",
-    color: "#101828",
-    marginBottom: 6,
+    color: "#0F1B2D",
   },
 
   infoRow: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    paddingVertical: 13,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#E4E9F1",
+    borderBottomColor: "#EDF1F6",
   },
 
   infoLabel: {
     flex: 0.9,
-    fontSize: 14,
-    color: "#8A94A6",
+    fontSize: 13.5,
+    color: "#5B6B7F",
     paddingRight: 10,
   },
 
@@ -619,58 +680,74 @@ const styles = StyleSheet.create({
     flex: 1.4,
     fontSize: 14,
     fontWeight: "700",
-    color: "#101828",
+    color: "#0F1B2D",
     textAlign: "right",
   },
 
   priceCard: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 20,
+    borderRadius: 22,
     padding: 20,
-    marginBottom: 18,
+    marginBottom: 14,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    elevation: 3,
+    elevation: 4,
+    shadowColor: "#0F1B2D",
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
   },
 
   priceLabel: {
-    fontSize: 13,
-    color: "#8A94A6",
-    fontWeight: "600",
+    fontSize: 12,
+    color: "#5B6B7F",
+    fontWeight: "700",
+    letterSpacing: 1,
+    textTransform: "uppercase",
   },
 
   price: {
     marginTop: 4,
     fontSize: 28,
     fontWeight: "800",
-    color: "#0047AB",
+    color: "#173C79",
+    letterSpacing: -0.4,
   },
 
   onlineBadge: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#E7F7E7",
+    backgroundColor: "#E3F5EE",
     paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 999,
   },
 
   onlineText: {
     marginLeft: 6,
-    color: "#0B3D12",
+    color: "#0B6B53",
     fontSize: 13,
-    fontWeight: "700",
+    fontWeight: "800",
   },
 
   confirmButton: {
     height: 56,
-    borderRadius: 17,
-    backgroundColor: "#0047AB",
+    borderRadius: 28,
+    overflow: "hidden",
+    marginTop: 6,
+    shadowColor: "#155B8A",
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
+  },
+
+  confirmGradient: {
+    flex: 1,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    elevation: 4,
   },
 
   confirmButtonDisabled: {
@@ -688,6 +765,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 13,
     lineHeight: 19,
-    color: "#8A94A6",
+    color: "#5B6B7F",
   },
 });

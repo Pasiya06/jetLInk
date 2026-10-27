@@ -144,7 +144,7 @@ export default function PackageDetails() {
       <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#12966F"/>
+          <ActivityIndicator size="large" color="#159B79"/>
           <Text style={styles.loadingText}>
             Loading package...
           </Text>
@@ -253,7 +253,7 @@ export default function PackageDetails() {
                 >
                   {/* ICON */}
 
-                  <View style={[styles.timelineIcon, {borderColor:(item.color || "#12966F") + "30",},]}>
+                  <View style={[styles.timelineIcon, {borderColor:(item.color || "#159B79") + "30",},]}>
                     {renderIcon(item)}
                   </View>
 
@@ -293,7 +293,7 @@ export default function PackageDetails() {
             {places.length === 0 && (
 
               <View style={styles.emptyContainer}>
-                <Ionicons name="location-outline" size={45} color="#98A2B3"/>
+                <Ionicons name="location-outline" size={45} color="#5B6B7F"/>
                 <Text style={styles.emptyTitle}>
                   No places added yet
                 </Text>
@@ -440,7 +440,7 @@ const styles = StyleSheet.create({
 
   loadingText: {
     marginTop: 12,
-    color: "#667085",
+    color: "#5B6B7F",
     fontSize: 14,
   },
 
@@ -582,14 +582,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: "800",
-    color: "#344054",
+    color: "#0F1B2D",
   },
 
   addPlaceButton: {
     height: 34,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: "#12966F",
+    backgroundColor: "#159B79",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -673,7 +673,7 @@ const styles = StyleSheet.create({
   placeName: {
     fontSize: 10,
     fontWeight: "800",
-    color: "#344054",
+    color: "#0F1B2D",
   },
 
   placeDescription: {
@@ -686,7 +686,7 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: "#23384A",
+    backgroundColor: "#0F1B2D",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -711,13 +711,13 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 15,
     fontWeight: "700",
-    color: "#344054",
+    color: "#0F1B2D",
   },
 
   emptyText: {
     marginTop: 6,
     fontSize: 12,
-    color: "#98A2B3",
+    color: "#5B6B7F",
     textAlign: "center",
   },
 
@@ -748,26 +748,26 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "800",
-    color: "#344054",
+    color: "#0F1B2D",
   },
 
   inputLabel: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#344054",
+    color: "#0F1B2D",
     marginTop: 10,
     marginBottom: 8,
   },
 
   input: {
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "#F3F6FA",
     borderWidth: 1,
     borderColor: "#E4E7EC",
     borderRadius: 10,
     paddingHorizontal: 14,
     height: 48,
     fontSize: 14,
-    color: "#344054",
+    color: "#0F1B2D",
   },
 
   descriptionInput: {
@@ -795,14 +795,14 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#667085",
+    color: "#5B6B7F",
   },
 
   saveButton: {
     flex: 1,
     height: 48,
     borderRadius: 10,
-    backgroundColor: "#12966F",
+    backgroundColor: "#159B79",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

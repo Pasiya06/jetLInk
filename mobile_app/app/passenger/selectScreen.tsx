@@ -23,6 +23,7 @@ import {
   FontAwesome5 
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { FeatureCard, C } from "../../components/JetUI";
 
 
 
@@ -46,42 +47,41 @@ export default function Index() {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <StatusBar barStyle="light-content" backgroundColor="#0056b3" />
+      <StatusBar barStyle="light-content" backgroundColor="#173C79" />
       <SafeAreaView style={styles.container}>
       <LinearGradient
           colors={["#173C79","#155B8A","#159B79",]}
           start={{x: 0, y: 0,}}
           end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
+          style={styles.hero}
         >
-        <View style={styles.header}>
-          <TouchableOpacity>
-            <Text style={styles.title}>JetLink</Text>
-          </TouchableOpacity>
+        <View style={styles.logo}>
+          <Ionicons name="bus" size={30} color="#FFFFFF" />
         </View>
-        </LinearGradient>
+        <Text style={styles.title}>JetLink</Text>
+        <Text style={styles.heroSub}>Smart bus tickets, parcels and tours</Text>
+      </LinearGradient>
 
-          <TouchableOpacity style={styles.card} onPress={() => router.push("/passenger/index2")} >
-              <View style={[styles.iconWrap, { backgroundColor: "#32CD3218" }]}>
-                  <Ionicons name="person-circle-outline" size={50} color="#32CD32" />
-              </View>
-              <View style={styles.cardText}>
-                <Text style={styles.text1}>Passenger</Text>
-                <Text style={styles.text2}>Book bus tickets, parcels, tours</Text>
-              </View>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
+      <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent} showsVerticalScrollIndicator={false}>
+        <Text style={styles.question}>How would you like to continue?</Text>
 
-          <TouchableOpacity style={styles.card1} onPress={() => router.push("/busStaff/loginindex")} >
-              <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-                  <Fontisto name="bus" size={40} color="#F59E0B" />
-              </View>
-              <View style={styles.cardText}>
-                <Text style={styles.text1}>Bus</Text>
-                <Text style={styles.text2}>Manage parcels, trips, scan tickets</Text>
-              </View>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
+        <FeatureCard
+          icon={<Ionicons name="person-circle-outline" size={32} color="#FFFFFF" />}
+          iconBg={C.blue}
+          title="I'm a passenger"
+          subtitle="Book bus tickets, send parcels and plan tours"
+          cta="Continue as passenger"
+          onPress={() => router.push("/passenger/index2")}
+        />
+
+        <FeatureCard
+          icon={<Fontisto name="bus" size={24} color={C.amber} />}
+          iconBg={C.amberSoft}
+          title="I'm bus staff"
+          subtitle="Manage parcels and trips, and scan tickets"
+          cta="Continue as staff"
+          onPress={() => router.push("/busStaff/loginindex")}
+        />
 
             {/* <TouchableOpacity style={styles.card} onPress={() => router.push("/passenger/tours/paymentSuccessful")} >
               <View style={styles.iconContainer}>
@@ -109,6 +109,8 @@ export default function Index() {
 
         
 
+      </ScrollView>
+
         {/* Footer */}
         <View style={styles.footerGraphic}>
           <LinearGradient
@@ -134,10 +136,13 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F8F9FA',
-  },
+  question: { fontSize: 15, fontWeight: '700', color: '#FFFFFF', textAlign: 'center', marginBottom: 2 },
+  bodyContent: { paddingHorizontal: 16, paddingBottom: 120, gap: 14 },
+  body: { flex: 1, marginTop: -64 },
+  heroSub: { fontSize: 14, fontWeight: '500', color: 'rgba(255,255,255,0.88)', marginTop: 6 },
+  logo: { width: 64, height: 64, borderRadius: 20, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center', marginBottom: 14 },
+  hero: { borderBottomLeftRadius: 32, borderBottomRightRadius: 32, paddingTop: 70, paddingBottom: 96, alignItems: 'center' },
+  container: { flex: 1, backgroundColor: C.bg },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -153,12 +158,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 25,
   },
 
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#ffffff',
-    letterSpacing: 0.5,
-  },
+  title: { fontSize: 32, fontWeight: '800', color: '#FFFFFF', letterSpacing: 0.5 },
   listContainer: {
     paddingHorizontal: 20,
     marginTop: 20,

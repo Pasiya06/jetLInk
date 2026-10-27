@@ -172,18 +172,33 @@ export default function ExtraKmScreen() {
       <StatusBar barStyle="light-content" />
       <View style={styles.container}>
         <LinearGradient colors={["#173C79", "#155B8A", "#159B79"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.header}>
-          <Text style={styles.headerTitle}>Extra Kilometers</Text>
-          <Text style={styles.headerSub}>{receiptId}</Text>
+          <View style={styles.headerRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.eyebrow}>Tour booking</Text>
+              <Text style={styles.headerTitle}>Extra kilometers</Text>
+            </View>
+            <View style={styles.headerIcon}>
+              <MaterialCommunityIcons name="map-marker-distance" size={24} color="#fff" />
+            </View>
+          </View>
+          {receiptId ? (
+            <View style={styles.idChip}>
+              <Ionicons name="receipt-outline" size={13} color="#fff" />
+              <Text style={styles.headerSub}>{receiptId}</Text>
+            </View>
+          ) : null}
         </LinearGradient>
 
         {loading && !booking ? (
-          <View style={styles.center}>
-            <ActivityIndicator size="large" color="#12966F" />
+          <View style={[styles.card, styles.center]}>
+            <ActivityIndicator size="large" color="#155B8A" />
             <Text style={styles.muted}>Loading booking…</Text>
           </View>
         ) : loadError ? (
-          <View style={styles.center}>
-            <Ionicons name="alert-circle-outline" size={44} color="#E5484D" />
+          <View style={[styles.card, styles.center]}>
+            <View style={styles.errorIcon}>
+              <Ionicons name="alert-circle-outline" size={34} color="#B42318" />
+            </View>
             <Text style={styles.errorText}>{loadError}</Text>
             <TouchableOpacity style={styles.retry} onPress={load}>
               <Text style={styles.retryText}>Try again</Text>
@@ -191,18 +206,25 @@ export default function ExtraKmScreen() {
           </View>
         ) : (
           <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-            <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+            <ScrollView style={{ marginTop: -64 }} contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
               {/* Booking summary */}
               <View style={styles.card}>
-                <View style={styles.rowBetween}>
+                <View style={styles.summaryTop}>
+                  <View style={styles.busIcon}>
+                    <Ionicons name="bus" size={22} color="#155B8A" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.pkg}>{booking?.packageType}</Text>
+                    <Text style={styles.muted}>{booking?.date} · {booking?.time}</Text>
+                  </View>
                   <View style={styles.badge}>
-                    <Ionicons name="bus" size={14} color="#155B8A" />
                     <Text style={styles.badgeText}>{booking?.busNumber}</Text>
                   </View>
-                  <Text style={styles.muted}>{booking?.date} · {booking?.time}</Text>
                 </View>
-                <Text style={styles.pkg}>{booking?.packageType}</Text>
-                <Text style={styles.muted}>Pickup: {booking?.pickup}</Text>
+                <View style={styles.pickupChip}>
+                  <Ionicons name="location" size={14} color="#0B6B53" />
+                  <Text style={styles.pickupText}>Pickup: {booking?.pickup}</Text>
+                </View>
                 <View style={styles.divider} />
                 <Info label="Included distance" value={booking?.totalDistance ? `${booking.totalDistance} km` : "—"} />
                 <Info label="Extra km already paid" value={paidKm ? `${paidKm} km (${lkr(paidAmount)})` : "None"} />
@@ -211,23 +233,28 @@ export default function ExtraKmScreen() {
 
               {pricePerKm <= 0 ? (
                 <View style={[styles.card, styles.notice]}>
-                  <Ionicons name="information-circle-outline" size={22} color="#B45309" />
+                  <Ionicons name="information-circle-outline" size={22} color="#B26A00" />
                   <Text style={styles.noticeText}>
                     Extra kilometers aren't available for this package. Please contact JetLink.
                   </Text>
                 </View>
               ) : (
                 <View style={styles.card}>
-                  <Text style={styles.section}>Add kilometers</Text>
+                  <View style={styles.sectionRow}>
+                    <View style={[styles.sectionIcon, { backgroundColor: "#E3F5EE" }]}>
+                      <MaterialCommunityIcons name="road-variant" size={18} color="#0B6B53" />
+                    </View>
+                    <Text style={styles.section}>Add kilometers</Text>
+                  </View>
                   <Text style={styles.label}>How many extra km?</Text>
                   <View style={styles.inputWrap}>
-                    <MaterialCommunityIcons name="map-marker-distance" size={20} color="#12966F" />
+                    <MaterialCommunityIcons name="map-marker-distance" size={20} color="#155B8A" />
                     <TextInput
                       style={styles.input}
                       value={km}
                       onChangeText={(t) => setKm(t.replace(/\D/g, ""))}
                       placeholder="e.g. 50"
-                      placeholderTextColor="#A3A3A3"
+                      placeholderTextColor="#8A97A8"
                       keyboardType="number-pad"
                       maxLength={4}
                     />
@@ -242,18 +269,23 @@ export default function ExtraKmScreen() {
                     <Text style={styles.total}>{lkr(total)}</Text>
                   </View>
 
-                  <Text style={[styles.section, { marginTop: 18 }]}>Card details</Text>
+                  <View style={[styles.sectionRow, { marginTop: 22 }]}>
+                    <View style={[styles.sectionIcon, { backgroundColor: "#EAF1FB" }]}>
+                      <Feather name="credit-card" size={16} color="#155B8A" />
+                    </View>
+                    <Text style={styles.section}>Card details</Text>
+                  </View>
                   <Text style={styles.label}>Name on card</Text>
                   <View style={styles.inputWrap}>
-                    <Feather name="user" size={18} color="#64748B" />
-                    <TextInput style={styles.input} value={nameOnCard} onChangeText={setNameOnCard} placeholder="Name on card" placeholderTextColor="#A3A3A3" />
+                    <Feather name="user" size={18} color="#5B6B7F" />
+                    <TextInput style={styles.input} value={nameOnCard} onChangeText={setNameOnCard} placeholder="Name on card" placeholderTextColor="#8A97A8" />
                   </View>
                   <FieldError message={fieldError("nameOnCard", nameOnCard)} />
 
                   <Text style={styles.label}>Card number</Text>
                   <View style={styles.inputWrap}>
-                    <Feather name="credit-card" size={18} color="#64748B" />
-                    <TextInput style={styles.input} value={cardNumber} onChangeText={onCardNumber} placeholder="1234 5678 9012 3456" placeholderTextColor="#A3A3A3" keyboardType="number-pad" maxLength={19} />
+                    <Feather name="credit-card" size={18} color="#5B6B7F" />
+                    <TextInput style={styles.input} value={cardNumber} onChangeText={onCardNumber} placeholder="1234 5678 9012 3456" placeholderTextColor="#8A97A8" keyboardType="number-pad" maxLength={19} />
                   </View>
                   <FieldError message={fieldError("cardNumber", cardNumber)} />
 
@@ -261,14 +293,14 @@ export default function ExtraKmScreen() {
                     <View style={{ flex: 1 }}>
                       <Text style={styles.label}>Expiry</Text>
                       <View style={styles.inputWrap}>
-                        <TextInput style={styles.input} value={expiry} onChangeText={onExpiry} placeholder="MM/YY" placeholderTextColor="#A3A3A3" keyboardType="number-pad" maxLength={5} />
+                        <TextInput style={styles.input} value={expiry} onChangeText={onExpiry} placeholder="MM/YY" placeholderTextColor="#8A97A8" keyboardType="number-pad" maxLength={5} />
                       </View>
                       <FieldError message={fieldError("expiry", expiry)} />
                     </View>
                     <View style={{ flex: 1 }}>
                       <Text style={styles.label}>CVC</Text>
                       <View style={styles.inputWrap}>
-                        <TextInput style={styles.input} value={cvc} onChangeText={(t) => setCvc(t.replace(/\D/g, ""))} placeholder="123" placeholderTextColor="#A3A3A3" keyboardType="number-pad" maxLength={4} secureTextEntry />
+                        <TextInput style={styles.input} value={cvc} onChangeText={(t) => setCvc(t.replace(/\D/g, ""))} placeholder="123" placeholderTextColor="#8A97A8" keyboardType="number-pad" maxLength={4} secureTextEntry />
                       </View>
                       <FieldError message={fieldError("cvc", cvc)} />
                     </View>
@@ -289,12 +321,20 @@ export default function ExtraKmScreen() {
               {/* History */}
               {payments.length > 0 ? (
                 <View style={styles.card}>
-                  <Text style={styles.section}>Extra km payments</Text>
+                  <View style={styles.sectionRow}>
+                    <View style={[styles.sectionIcon, { backgroundColor: "#F0EBFE" }]}>
+                      <Ionicons name="time-outline" size={17} color="#6D3FD6" />
+                    </View>
+                    <Text style={styles.section}>Extra km payments</Text>
+                  </View>
                   {payments
                     .slice()
                     .reverse()
                     .map((p, i) => (
                       <View key={p._id ?? i} style={styles.payRow}>
+                        <View style={styles.payIcon}>
+                          <Ionicons name="checkmark" size={16} color="#0B6B53" />
+                        </View>
                         <View style={{ flex: 1 }}>
                           <Text style={styles.payKm}>+{p.km} km</Text>
                           <Text style={styles.muted}>
@@ -349,100 +389,177 @@ function Info({ label, value, strong }: { label: string; value: string; strong?:
   return (
     <View style={styles.infoRow}>
       <Text style={styles.infoLabel}>{label}</Text>
-      <Text style={[styles.infoValue, strong && { color: "#12966F", fontWeight: "800" }]}>{value}</Text>
+      <Text style={[styles.infoValue, strong && { color: "#0B6B53", fontWeight: "800" }]}>{value}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F2F5F8" },
+  container: { flex: 1, backgroundColor: "#F3F6FA" },
   header: {
     paddingTop: 54,
-    paddingBottom: 44,
-    alignItems: "center",
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
+    paddingBottom: 70,
+    paddingHorizontal: 24,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
   },
-  headerTitle: { fontSize: 24, fontWeight: "800", color: "#fff" },
-  headerSub: { marginTop: 4, color: "#DCEFF0", fontSize: 13, fontWeight: "600" },
-  center: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, gap: 10 },
-  muted: { color: "#64748B", fontSize: 12.5 },
-  errorText: { color: "#B4232A", textAlign: "center" },
-  retry: { backgroundColor: "#12966F", paddingHorizontal: 18, paddingVertical: 10, borderRadius: 20 },
+  headerRow: { flexDirection: "row", alignItems: "flex-start" },
+  eyebrow: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "rgba(255,255,255,0.85)",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+    marginBottom: 2,
+  },
+  headerTitle: { fontSize: 28, fontWeight: "800", color: "#fff" },
+  headerIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.16)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  idChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    alignSelf: "flex-start",
+    marginTop: 10,
+    backgroundColor: "rgba(255,255,255,0.16)",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+  },
+  headerSub: { color: "#fff", fontSize: 12.5, fontWeight: "700" },
+  center: { marginHorizontal: 16, marginTop: -50, alignItems: "center", justifyContent: "center", padding: 28, gap: 10 },
+  muted: { color: "#5B6B7F", fontSize: 12.5 },
+  errorIcon: {
+    width: 64,
+    height: 64,
+    borderRadius: 22,
+    backgroundColor: "#FDE2E2",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  errorText: { color: "#B42318", textAlign: "center", fontWeight: "600" },
+  retry: { backgroundColor: "#155B8A", paddingHorizontal: 20, paddingVertical: 11, borderRadius: 22 },
   retryText: { color: "#fff", fontWeight: "700" },
 
   scroll: { paddingHorizontal: 16, paddingTop: 0, paddingBottom: 240 },
   card: {
     backgroundColor: "#fff",
-    borderRadius: 20,
+    borderRadius: 22,
     padding: 18,
     marginTop: 14,
-    elevation: 3,
-    shadowColor: "#1E293B",
-    shadowOpacity: 0.06,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
+    shadowColor: "#0F1B2D",
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
   },
   rowBetween: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  summaryTop: { flexDirection: "row", alignItems: "center", gap: 12 },
+  busIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    backgroundColor: "#EAF1FB",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   badge: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    backgroundColor: "#E6EEF9",
+    backgroundColor: "#EAF1FB",
     paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingVertical: 5,
+    borderRadius: 999,
   },
-  badgeText: { color: "#155B8A", fontWeight: "700", fontSize: 12 },
-  pkg: { marginTop: 10, fontSize: 17, fontWeight: "800", color: "#182B45" },
-  divider: { height: 1, backgroundColor: "#EEF2F6", marginVertical: 12 },
-  infoRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 5 },
-  infoLabel: { color: "#64748B", fontSize: 13 },
-  infoValue: { color: "#182B45", fontSize: 13.5, fontWeight: "600" },
+  badgeText: { color: "#155B8A", fontWeight: "800", fontSize: 12 },
+  pkg: { fontSize: 17, fontWeight: "800", color: "#0F1B2D", marginBottom: 2 },
+  pickupChip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    alignSelf: "flex-start",
+    marginTop: 12,
+    backgroundColor: "#E3F5EE",
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 999,
+  },
+  pickupText: { color: "#0B6B53", fontSize: 12.5, fontWeight: "700" },
+  divider: { height: 1, backgroundColor: "#EDF1F6", marginVertical: 12 },
+  infoRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 6 },
+  infoLabel: { color: "#5B6B7F", fontSize: 13.5 },
+  infoValue: { color: "#0F1B2D", fontSize: 14, fontWeight: "700" },
 
-  notice: { flexDirection: "row", gap: 10, backgroundColor: "#FFFBEB" },
-  noticeText: { flex: 1, color: "#92400E", fontSize: 13.5, lineHeight: 19 },
+  notice: { flexDirection: "row", gap: 10, backgroundColor: "#FFF4DC" },
+  noticeText: { flex: 1, color: "#B26A00", fontSize: 13.5, lineHeight: 19, fontWeight: "600" },
 
-  section: { fontSize: 12, fontWeight: "800", color: "#94A3B8", textTransform: "uppercase", letterSpacing: 1 },
-  label: { marginTop: 12, marginBottom: 6, fontSize: 13, color: "#344054", fontWeight: "600" },
+  sectionRow: { flexDirection: "row", alignItems: "center", gap: 10 },
+  sectionIcon: { width: 34, height: 34, borderRadius: 11, alignItems: "center", justifyContent: "center" },
+  section: { fontSize: 17, fontWeight: "800", color: "#0F1B2D" },
+  label: { marginTop: 14, marginBottom: 7, fontSize: 13, color: "#0F1B2D", fontWeight: "700" },
   inputWrap: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    minHeight: 50,
+    gap: 10,
+    minHeight: 54,
     borderWidth: 1,
-    borderColor: "#E2EAF3",
-    backgroundColor: "#F8FAFC",
-    borderRadius: 13,
-    paddingHorizontal: 12,
+    borderColor: "#DCE3EC",
+    backgroundColor: "#F7F9FC",
+    borderRadius: 16,
+    paddingHorizontal: 14,
   },
-  input: { flex: 1, fontSize: 15, color: "#182B45", paddingVertical: 10 },
-  unit: { color: "#64748B", fontWeight: "700" },
+  input: { flex: 1, fontSize: 16, color: "#0F1B2D", paddingVertical: 10, fontWeight: "600" },
+  unit: { color: "#155B8A", fontWeight: "800" },
   totalBox: {
-    marginTop: 12,
-    padding: 14,
-    borderRadius: 14,
-    backgroundColor: "#E8F7F2",
+    marginTop: 14,
+    padding: 16,
+    borderRadius: 16,
+    backgroundColor: "#E3F5EE",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
-  totalLabel: { color: "#0F766E", fontSize: 13, fontWeight: "600", flexShrink: 1 },
-  total: { color: "#0F766E", fontSize: 20, fontWeight: "800" },
+  totalLabel: { color: "#0B6B53", fontSize: 13, fontWeight: "700", flexShrink: 1 },
+  total: { color: "#0B6B53", fontSize: 22, fontWeight: "800" },
   twoCol: { flexDirection: "row", gap: 12 },
-  payWrap: { marginTop: 16, borderRadius: 25, overflow: "hidden" },
-  payBtn: { height: 52, alignItems: "center", justifyContent: "center" },
-  payText: { color: "#fff", fontSize: 16, fontWeight: "800" },
+  payWrap: {
+    marginTop: 20,
+    borderRadius: 28,
+    overflow: "hidden",
+    shadowColor: "#155B8A",
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
+  },
+  payBtn: { height: 56, alignItems: "center", justifyContent: "center" },
+  payText: { color: "#fff", fontSize: 17, fontWeight: "800" },
 
   payRow: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 10,
+    gap: 12,
+    paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: "#F1F5F9",
+    borderBottomColor: "#EDF1F6",
   },
-  payKm: { fontSize: 15, fontWeight: "800", color: "#182B45" },
-  payAmount: { fontSize: 15, fontWeight: "800", color: "#12966F" },
+  payIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: "#E3F5EE",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  payKm: { fontSize: 15, fontWeight: "800", color: "#0F1B2D" },
+  payAmount: { fontSize: 15, fontWeight: "800", color: "#0B6B53" },
 
   bottomNav: {
     position: "absolute",

@@ -3,6 +3,7 @@ import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, Alert, BackHandler    } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather as Icon, AntDesign, Fontisto, Ionicons } from '@expo/vector-icons';
+import { ScreenHeader, IconBox, GRADIENT, C } from "../../../components/JetUI";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const OTP_LENGTH = 6;
@@ -455,24 +456,17 @@ export const FlatmateLogin: React.FC = () => {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <StatusBar barStyle="light-content" backgroundColor="#7db300" />
       <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-          <View style={styles.header}>
-          
-            <TouchableOpacity >
-              <Text style={styles.title}>JetLink</Text>
-            </TouchableOpacity>
-                  
-          </View>
-        </LinearGradient>
+        <ScreenHeader center eyebrow="Verify it's you" title="JetLink" />
 
         <View style={styles.otpcard}>
                     
-            <Text style={styles.otplabel}>Enter verification code</Text>
+            <View style={styles.otpHead}>
+              <IconBox bg={C.greenSoft} size={64} radius={32}>
+                <Ionicons name="shield-checkmark-outline" size={30} color={C.green} />
+              </IconBox>
+              <Text style={styles.otplabel}>Enter verification code</Text>
+              <Text style={styles.otpHint}>Type the 6-digit code we sent you.</Text>
+            </View>
 
             <View style={styles.otpRow}>
                 {digits.map((digit, index) => (
@@ -507,6 +501,12 @@ export const FlatmateLogin: React.FC = () => {
                 disabled={verifying || otp.length !== OTP_LENGTH}
                 activeOpacity={0.85}
             >
+              <LinearGradient
+                colors={GRADIENT}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={StyleSheet.absoluteFill}
+              />
                 {verifying ? (
                 <ActivityIndicator color="#FFFFFF" />
                 ) : (
@@ -548,10 +548,7 @@ export const FlatmateLogin: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',  
-  },
+  container: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: 'row',
@@ -577,47 +574,54 @@ const styles = StyleSheet.create({
   },
 
   otpcard: {
-    marginTop: -50,
-    marginHorizontal: 20,
+    marginTop: -64,
+    marginHorizontal: 16,
     backgroundColor: "#FFFFFF",
-    borderRadius: 24,
-    padding: 24,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 16,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 5,
+    borderRadius: 26,
+    paddingHorizontal: 20,
+    paddingTop: 28,
+    paddingBottom: 24,
+    shadowColor: "#0F1B2D",
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 6,
   },
 
   otplabel: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#1F2937",
-    marginBottom: 16,   
+    fontSize: 22,
+    fontWeight: "800",
+    color: C.ink,
+    marginTop: 14,
+    textAlign: "center",
   },
+  otpHead: { alignItems: "center", marginBottom: 20 },
+  otpHint: { fontSize: 14, color: C.muted, marginTop: 6, textAlign: "center" },
 
   otpRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 6,
     marginBottom: 8,
   },
 
   otpBox: {
-    width: 46,
+    flex: 1,
+    maxWidth: 48,
     height: 56,
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: "#E2E6F0",
-    backgroundColor: "#F8F9FC",
+    borderWidth: 2,
+    borderColor: "#DCE3EC",
+    backgroundColor: "#FFFFFF",
     textAlign: "center",
     fontSize: 22,
-    fontWeight: "700",
-    color: "#1F2937",
+    fontWeight: "800",
+    color: C.ink,
   },
 
   otpBoxFilled: {
-    borderColor: "#4C6FFF",
-    backgroundColor: "#EEF1FF",
+    borderColor: "#BFD3EA",
+    backgroundColor: "#F2F7FD",
   },
 
   otpBoxError: {
@@ -641,20 +645,20 @@ const styles = StyleSheet.create({
 
   verifyButton: {
     marginTop: 24,
-    backgroundColor: "#32CD32",
-    borderRadius: 999,
-    paddingVertical: 16,
+    height: 54,
+    borderRadius: 27,
+    overflow: "hidden",
     alignItems: "center",
     justifyContent: "center",
-    shadowColor: "#32CD32",
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 4,
+    shadowColor: "#155B8A",
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
   },
 
   verifyButtonDisabled: {
-    backgroundColor: "#32CD321A",
+    opacity: 0.45,
     shadowOpacity: 0,
     elevation: 0,
   },
@@ -662,7 +666,7 @@ const styles = StyleSheet.create({
   verifyButtonText: {
     color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "800",
   },
 
   resendRow: {
@@ -671,20 +675,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 
-  resendText: {
-    color: "#6B7280",
-    fontSize: 13,
-  },
+  resendText: { color: C.muted, fontSize: 14 },
 
-  resendLink: {
-    color: "#3454E8",
-    fontSize: 13,
-    fontWeight: "700",
-  },
+  resendLink: { color: C.blue, fontSize: 14, fontWeight: "700" },
 
-  resendLinkDisabled: {
-    color: "#A5AEC7",
-  },
+  resendLinkDisabled: { color: "#8A97A8" },
   
   submitGradient: {
     paddingVertical: 16,

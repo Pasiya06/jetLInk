@@ -71,13 +71,13 @@ export default function ParcelQRDialog({
         <View style={styles.card}>
           {/* Gradient header */}
           <LinearGradient
-            colors={["#4C6EF5", "#7C3AED"]}
+            colors={["#173C79", "#155B8A", "#159B79"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.header}
           >
             <View style={styles.iconCircle}>
-              <Ionicons name="cube-outline" size={26} color="#4C6EF5" />
+              <Ionicons name="cube-outline" size={26} color="#155B8A" />
             </View>
             <Text style={styles.headerTitle}>Parcel QR Code</Text>
             {parcelId && (
@@ -92,7 +92,7 @@ export default function ParcelQRDialog({
           {/* Body */}
           <View style={styles.body}>
             {loading ? (
-              <ActivityIndicator size="large" color="#4C6EF5" />
+              <ActivityIndicator size="large" color="#155B8A" />
             ) : error ? (
               <View style={styles.errorBox}>
                 <Ionicons name="alert-circle-outline" size={36} color="#EF4444" />
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
   helperText: {
     marginTop: 16,
     fontSize: 13,
-    color: "#6B7280",
+    color: "#5B6B7F",
     textAlign: "center",
   },
   actionsRow: {
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   shareBtn: {
-    backgroundColor: "#4C6EF5",
+    backgroundColor: "#155B8A",
   },
   shareBtnText: {
     color: "#fff",

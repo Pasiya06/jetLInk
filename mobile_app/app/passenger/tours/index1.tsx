@@ -7,7 +7,8 @@ import {
   TextInput, 
   TouchableOpacity, 
   SafeAreaView, 
-  Image 
+  Image,
+  ScrollView,
 } from 'react-native';
 import { 
   Ionicons, 
@@ -18,6 +19,7 @@ import {
   FontAwesome6,
   MaterialIcons,
 } from '@expo/vector-icons';
+import { ScreenHeader, FeatureCard, Pill, C, ui } from "../../../components/JetUI";
   import { LinearGradient } from 'expo-linear-gradient';
 
 
@@ -33,27 +35,16 @@ const ToursScreen: React.FC = () => {
     <Stack.Screen options={{ title: "", headerShown: false }} />
     <SafeAreaView style={styles.container}>
       {/* Navbar Section */}
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-        style={styles.submitGradient1}
-      >
-        <View style={styles.header}>
-   
-          <TouchableOpacity >
-            <Text style={styles.title}>JetLink</Text>
-          </TouchableOpacity>
-                  
-        </View>
-      </LinearGradient>
-       
-      
-        
+      <ScreenHeader eyebrow="Plan a trip" title="Tours" />
 
-        {/* Option 1: Tour Packages */}
-        <TouchableOpacity 
-          style={styles.card } 
+      <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+        <FeatureCard
+          icon={<FontAwesome6 name="person-walking-luggage" size={26} color="#FFFFFF" />}
+          iconBg={C.blue}
+          title="Tour packages"
+          subtitle="Browse packages and book a tour bus"
+          cta="Browse packages"
+          tag={<Pill text="Popular" bg={C.greenSoft} color={C.green} />}
           onPress={() =>
             router.push({
               pathname: "/passenger/tours/PackagesScreen1",
@@ -67,20 +58,13 @@ const ToursScreen: React.FC = () => {
               },
             })
           }
-        >
-          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-            <FontAwesome6 name="person-walking-luggage" size={40} color="#F59E0B" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Tour Packages</Text>
-            <Text style={styles.text2}>Book your tour packages</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
-
-        {/* Option 2: Additional Payment */}
-        <TouchableOpacity 
-          style={styles.card1}
+        />
+        <FeatureCard
+          icon={<MaterialIcons name="payment" size={28} color={C.pink} />}
+          iconBg={C.pinkSoft}
+          title="Additional payment"
+          subtitle="Pay any additional charges for your tour"
+          cta="Pay now"
           onPress={() =>
             router.push({
               pathname: "/passenger/tours/additionalPay",
@@ -94,17 +78,8 @@ const ToursScreen: React.FC = () => {
               },
             })
           }
-        >
-          <View style={[styles.iconWrap, { backgroundColor: "#EF444418" }]}>
-            <MaterialIcons name="payment" size={40} color="#EF4444" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Additional payment</Text>
-            <Text style={styles.text2}>Pay your aditional payment</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
-      
+        />
+      </ScrollView>
 
       {isSearching ? (
                   <TextInput
@@ -207,7 +182,7 @@ const ToursScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.bg,
   },
   header: {
     flexDirection: 'row',

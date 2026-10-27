@@ -22,6 +22,7 @@ import {
 } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient'; 
 import AlertBadge from "../../../components/AlertBadge";
+import { ScreenHeader, SectionLabel, Pill, C as JC, NAV_SPACE } from "../../../components/JetUI";
 
 if (
   Platform.OS === "android" &&
@@ -34,13 +35,13 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 /* ---------- Theme ---------- */
 const C = {
-  brand: "#0056b3",
-  brandSoft: "#e7f0ff",
-  bg: "#eef2f8",
+  brand: "#155B8A",
+  brandSoft: "#EAF1FB",
+  bg: "#F3F6FA",
   card: "#ffffff",
   ink: "#0f1b2d",
-  muted: "#64748b",
-  line: "#d5dde9",
+  muted: "#5B6B7F",
+  line: "#DCE3EC",
   success: "#15803d",
   successSoft: "#dcfce7",
   neutral: "#475569",
@@ -152,29 +153,22 @@ export default function AllReceipts() {
       <StatusBar barStyle="light-content" backgroundColor={C.brand} />
 
       {/* Header */}
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-        start={{x: 0, y: 0,}}
-        end={{x: 1, y: 1,}}
-        style={styles.submitGradient1}
-      >
-      
-        <View style={styles.header}> 
-            <TouchableOpacity><Text style={styles.title}>Tour Payment History</Text></TouchableOpacity>
-        </View>
-      </LinearGradient>
+      <ScreenHeader eyebrow="Payment history" title="Tour payments" />
 
-      <View>
-        {/* Stats */}
-        <View style={styles.statsRow}>
-          <View style={[styles.statCard, { flex: 1.25 }]}>
-            <Text style={styles.statLabel}>Total Income</Text>
+      <View style={styles.summaryWrap}>
+        <View style={styles.summaryCard}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.statLabel}>Total income</Text>
             <Text style={styles.statBig} numberOfLines={1} adjustsFontSizeToFit>
               Rs. {stats.value.toLocaleString()}
             </Text>
-            <Text style={styles.statHint}>{stats.total} Payments</Text>
-          </View>  
+          </View>
+          <View style={styles.countBox}>
+            <Text style={styles.countNum}>{stats.total}</Text>
+            <Text style={styles.countLabel}>{stats.total === 1 ? "payment" : "payments"}</Text>
+          </View>
         </View>
+        <SectionLabel style={{ marginTop: 18 }}>Recent receipts</SectionLabel>
       </View>
 
       {loading ? (
@@ -368,18 +362,8 @@ function ReceiptCard({ item }: { item: Receipt }) {
               {item.pemail || "No email"}
             </Text>
           </View>
+          <Pill text="Paid" bg={JC.greenSoft} color={JC.green} />
         </View>
-      </View>
-
-      {/* Perforation */}
-      <View style={styles.perforation}>
-        <View style={[styles.notch, styles.notchLeft]} />
-        <View style={styles.dashes}>
-          {Array.from({ length: 22 }).map((_, i) => (
-            <View key={i} style={styles.dash} />
-          ))}
-        </View>
-        <View style={[styles.notch, styles.notchRight]} />
       </View>
 
       <View style={styles.stub}>
@@ -395,7 +379,7 @@ function ReceiptCard({ item }: { item: Receipt }) {
             Rs. {Number(item.maxPrice || 0).toLocaleString()}
           </Text>
         </View>
-      </View>  
+      </View>
     </View>
   );
 }
@@ -429,7 +413,32 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
-  list: { padding: 16, paddingTop: 18, paddingBottom: 150 },
+  list: { paddingHorizontal: 16, paddingTop: 10, paddingBottom: NAV_SPACE },
+
+  summaryWrap: { marginTop: -64, paddingHorizontal: 16, marginBottom: 2 },
+  summaryCard: {
+    backgroundColor: C.card,
+    borderRadius: 22,
+    padding: 18,
+    flexDirection: "row",
+    alignItems: "center",
+    elevation: 6,
+    shadowColor: "#0F1B2D",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 18,
+  },
+  countBox: {
+    width: 76,
+    height: 66,
+    borderRadius: 16,
+    backgroundColor: JC.greenSoft,
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 12,
+  },
+  countNum: { fontSize: 22, fontWeight: "800", color: JC.green },
+  countLabel: { fontSize: 11, fontWeight: "700", color: JC.green },
 
   /* Stats */
   statsRow: { flexDirection: "row", gap: 12, marginBottom: 14, marginTop: -20, marginLeft: 20, marginRight: 20, },
@@ -444,11 +453,11 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
 
-  statLabel: { fontSize: 12, color: C.muted, marginBottom: 4 },
+  statLabel: { fontSize: 13, fontWeight: "600", color: C.muted, marginBottom: 4 },
   statBig: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "800",
-    color: C.brand,
+    color: "#173C79",
     letterSpacing: -0.4,
   },
   statHint: { fontSize: 12, color: C.muted, marginTop: 4 },
@@ -457,15 +466,20 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: C.card,
     borderRadius: 20,
-    marginBottom: 18,
-    elevation: 4,
-    shadowColor: "#0b2a5b",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 14,
+    marginBottom: 12,
+    paddingHorizontal: 16,
+    elevation: 3,
+    shadowColor: "#0F1B2D",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
   },
-  cardTop: { 
-    paddingBottom: 20 
+  cardTop: {
+    paddingTop: 14,
+    paddingBottom: 12,
+    borderBottomWidth: 1.5,
+    borderBottomColor: C.line,
+    borderStyle: "dashed",
   },
 
   fieldLabel: { fontSize: 12, color: C.muted, marginBottom: 3 },
@@ -473,22 +487,18 @@ const styles = StyleSheet.create({
   passengerRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
-    marginLeft: 16,
-    paddingTop: 24,
-    borderTopWidth: 1,
-    borderTopColor: "#eef2f7",
+    gap: 12,
   },
   avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     backgroundColor: C.brandSoft,
     alignItems: "center",
     justifyContent: "center",
   },
-  avatarText: { color: C.brand, fontWeight: "800", fontSize: 15 },
-  passengerName: { fontSize: 14, fontWeight: "700", color: C.ink },
+  avatarText: { color: C.brand, fontWeight: "800", fontSize: 16 },
+  passengerName: { fontSize: 15, fontWeight: "800", color: C.ink },
   passengerEmail: { fontSize: 12, color: C.muted, marginTop: 1 },
 
   /* Perforation */
@@ -515,12 +525,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-end",
     gap: 12,
-    paddingHorizontal: 18,
-    paddingTop: 6,
-    paddingBottom: 16,
+    paddingTop: 12,
+    paddingBottom: 14,
   },
-  receiptId: { fontSize: 15, fontWeight: "700", color: C.ink },
-  price: { fontSize: 20, fontWeight: "800", color: C.brand },
+  receiptId: { fontSize: 14, fontWeight: "700", color: C.ink, letterSpacing: 0.3 },
+  price: { fontSize: 18, fontWeight: "800", color: C.brand },
 
  
   /* States */

@@ -22,6 +22,8 @@ import {
 } from "@expo/vector-icons";
 
 import { LinearGradient } from "expo-linear-gradient";
+import { C, ScreenHeader, ui } from "../../../components/JetUI";
+import { TIER_COLORS, getTier } from "../../../components/TourPackageCard";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -117,48 +119,69 @@ export default function PackagesScreen() {
           });
       }}
     >
-      <View style={styles.cardHeader}>
-        <View style={styles.packageTypeBadge}>
-          <Text style={styles.packageTypeText}>
-            {item.packageType ||"PACKAGE"}
-          </Text>
+      <View style={[styles.cardStrip, { backgroundColor: TIER_COLORS[getTier(item.packageType)].border }]} />
+      <View style={styles.cardBody}>
+        <View style={styles.cardHeader}>
+          <View
+            style={[
+              styles.packageTypeBadge,
+              {
+                backgroundColor: TIER_COLORS[getTier(item.packageType)].pale,
+                borderColor: TIER_COLORS[getTier(item.packageType)].border,
+              },
+            ]}
+          >
+            <MaterialCommunityIcons name="star-four-points" size={11} color={TIER_COLORS[getTier(item.packageType)].main} />
+            <Text style={[styles.packageTypeText, { color: TIER_COLORS[getTier(item.packageType)].main }]}>
+              {item.packageType ||"PACKAGE"}
+            </Text>
+          </View>
+          <Text style={styles.wholeBus}>Whole bus</Text>
         </View>
-        
-        
-      </View>
 
-      <Text style={styles.packageName}>
-        Rs {item.maxPrice}
-      </Text>
-
-      {!!item.description && (
-        <Text style={styles.description} numberOfLines={2}>
-          {item.description}
+        <Text style={styles.packageName}>
+          <Text style={styles.currency}>Rs </Text>
+          {Number(item.maxPrice || 0).toLocaleString()}
         </Text>
-      )}
 
-      <View style={styles.detailsRow}>
-        <View style={styles.detailItem}>
-          <Ionicons name="navigate-outline" size={16} color="#12966F"/>
-          <Text style={styles.detailText}>
-            {item.totalDistance || "No distance"}
+        {!!item.description && (
+          <Text style={styles.description} numberOfLines={2}>
+            {item.description}
           </Text>
+        )}
+
+        <View style={styles.detailsRow}>
+          <View style={styles.detailItem}>
+            <Ionicons name="navigate" size={16} color={C.blue}/>
+            <Text style={styles.detailValue} numberOfLines={1}>
+              {item.totalDistance || "No distance"}
+            </Text>
+            <Text style={styles.detailText}>Distance</Text>
+          </View>
+
+          <View style={styles.detailItem}>
+            <Ionicons name="time" size={16} color={C.blue} />
+            <Text style={styles.detailValue} numberOfLines={1}>
+              {item.tripDuration || "No duration"}
+            </Text>
+            <Text style={styles.detailText}>Duration</Text>
+          </View>
+
+          <View style={styles.detailItem}>
+            <Ionicons name="people" size={16} color={C.blue}/>
+            <Text style={styles.detailValue} numberOfLines={1}>
+              {item.maxPassengers || 0}
+            </Text>
+            <Text style={styles.detailText}>Seats</Text>
+          </View>
         </View>
 
-        <View style={styles.detailItem}>
-          <Ionicons name="time-outline" size={16} color="#12966F" />
-          <Text style={styles.detailText}>
-            {item.tripDuration || "No duration"}
-          </Text>
+        <View style={styles.cardFoot}>
+          <Text style={styles.cardCta}>View package</Text>
+          <View style={styles.arrowDot}>
+            <Ionicons name="arrow-forward" size={16} color={C.blue} />
+          </View>
         </View>
-
-        <View style={styles.detailItem}>
-          <Ionicons name="people-outline" size={16} color="#12966F"/>
-          <Text style={styles.detailText}>
-            {item.maxPassengers || 0}
-          </Text>
-        </View>
-        
       </View>
 
     </TouchableOpacity>
@@ -171,7 +194,7 @@ export default function PackagesScreen() {
       <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#12966F"/>
+        <ActivityIndicator size="large" color="#159B79"/>
         <Text style={styles.loadingText}>
           Loading packages...
         </Text>
@@ -186,18 +209,15 @@ export default function PackagesScreen() {
       <View style={styles.container}>
       <StatusBar barStyle="light-content"/>
 
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-        start={{x: 0, y: 0,}}
-        end={{x: 1, y: 1,}}
-        style={styles.header}
-      >
-          <View>
-            <Text style={styles.headerTitle}>
-                Tour Packages
-            </Text>
+      <ScreenHeader
+        eyebrow="Tours"
+        title="Tour packages"
+        right={
+          <View style={styles.headerBadge}>
+            <Ionicons name="map" size={22} color="#FFFFFF" />
           </View>
-      </LinearGradient>
+        }
+      />
     
 
       <FlatList
@@ -213,8 +233,10 @@ export default function PackagesScreen() {
         /* EMPTY */
 
         ListEmptyComponent={
-        <View style={styles.emptyContainer}>
-            <Ionicons name="cube-outline" size={60} color="#98A2B3"/>
+        <View style={[ui.card, styles.emptyContainer]}>
+            <View style={styles.emptyIcon}>
+              <Ionicons name="cube-outline" size={34} color={C.blue}/>
+            </View>
             <Text style={styles.emptyTitle}>
             No packages yet
             </Text>
@@ -324,9 +346,49 @@ export default function PackagesScreen() {
 
 const styles = StyleSheet.create({
 
+  headerBadge: {
+    width: 46,
+    height: 46,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.16)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cardStrip: { height: 5, width: "100%" },
+  cardBody: { padding: 18 },
+  wholeBus: { fontSize: 12, fontWeight: "600", color: C.muted },
+  currency: { fontSize: 15, fontWeight: "700", color: C.muted },
+  detailValue: { fontSize: 13.5, fontWeight: "800", color: C.ink, marginTop: 2 },
+  cardFoot: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 14,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: C.line,
+  },
+  cardCta: { fontSize: 14, fontWeight: "700", color: C.blue },
+  arrowDot: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: C.blueSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  emptyIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 24,
+    backgroundColor: C.blueSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
   container: {
     flex: 1,
-    backgroundColor: "#F4F6F8",
+    backgroundColor: "#F3F6FA",
   },
 
   loadingContainer: {
@@ -337,7 +399,7 @@ const styles = StyleSheet.create({
 
   loadingText: {
     marginTop: 10,
-    color: "#667085",
+    color: "#5B6B7F",
     fontSize: 14,
   },
 
@@ -350,7 +412,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: "#EAECF0",
+    borderBottomColor: "#E3E9F1",
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
@@ -364,35 +426,23 @@ const styles = StyleSheet.create({
   headerSubtitle: {
     marginTop: 4,
     fontSize: 12,
-    color: "#667085",
+    color: "#5B6B7F",
   },
 
-  svw: {
-    width: '100%',
-    marginBottom:80,
-    marginTop: 3, 
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25, 
-  },
+  svw: { flex: 1, width: "100%", marginTop: -64, marginBottom: 80 },
 
-  listContent: {
-    padding: 16,
-    paddingBottom: 100,
-  },
+  listContent: { paddingHorizontal: 16, paddingTop: 0, paddingBottom: 140 },
 
   packageCard: {
     backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: 22,
     marginBottom: 14,
-    elevation: 3,
-    shadowColor: "#000",
+    overflow: "hidden",
+    elevation: 4,
+    shadowColor: "#0F1B2D",
     shadowOpacity: 0.08,
-    shadowRadius: 8,
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
   },
 
   cardHeader: {
@@ -402,24 +452,18 @@ const styles = StyleSheet.create({
   },
 
   packageTypeBadge: {
-    backgroundColor: "#EAF4F2",
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    borderWidth: 1,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 20,
+    borderRadius: 999,
   },
 
-  packageTypeText: {
-    fontSize: 9,
-    fontWeight: "800",
-    color: "#12966F",
-  },
+  packageTypeText: { fontSize: 11, fontWeight: "800", letterSpacing: 0.6, textTransform: "uppercase" },
 
-  packageName: {
-    marginTop: 12,
-    fontSize: 19,
-    fontWeight: "800",
-    color: "#344054",
-  },
+  packageName: { marginTop: 12, fontSize: 26, fontWeight: "800", color: C.navy, letterSpacing: -0.4 },
 
   icons: {
     flexDirection: "row",
@@ -429,58 +473,35 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontSize: 11,
     fontWeight: "700",
-    color: "#667085",
+    color: "#5B6B7F",
     letterSpacing: 1,
   },
 
-  description: {
-    marginTop: 10,
-    fontSize: 12,
-    lineHeight: 18,
-    color: "#667085",
-  },
+  description: { marginTop: 6, fontSize: 13.5, lineHeight: 20, color: C.muted },
 
-  detailsRow: {
-    marginTop: 15,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#EAECF0",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
+  detailsRow: { marginTop: 14, flexDirection: "row", gap: 8 },
 
   detailItem: {
-    flexDirection: "row",
-    alignItems: "center",
     flex: 1,
+    backgroundColor: "#F7F9FC",
+    borderRadius: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    gap: 3,
   },
 
-  detailText: {
-    marginLeft: 5,
-    fontSize: 10,
-    color: "#475467",
-  },
+  detailText: { fontSize: 11, fontWeight: "600", color: C.muted },
 
-  emptyList: {
-    flexGrow: 1,
-    justifyContent: "center",
-  },
+  emptyList: { flexGrow: 1, paddingHorizontal: 16 },
 
-  emptyContainer: {
-    alignItems: "center",
-  },
+  emptyContainer: { alignItems: "center", paddingVertical: 32, paddingHorizontal: 24 },
 
-  emptyTitle: {
-    marginTop: 15,
-    fontSize: 17,
-    fontWeight: "700",
-    color: "#344054",
-  },
+  emptyTitle: { marginTop: 14, fontSize: 18, fontWeight: "800", color: C.ink },
 
   emptyText: {
     marginTop: 6,
     fontSize: 13,
-    color: "#98A2B3",
+    color: "#5B6B7F",
   },
 
   modalOverlay: {
@@ -509,18 +530,18 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 21,
     fontWeight: "800",
-    color: "#344054",
+    color: "#0F1B2D",
   },
 
   input: {
     height: 48,
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "#F3F6FA",
     borderWidth: 1,
-    borderColor: "#E4E7EC",
+    borderColor: "#E3E9F1",
     borderRadius: 10,
     paddingHorizontal: 14,
     fontSize: 14,
-    color: "#344054",
+    color: "#0F1B2D",
     marginBottom: 10,
   },
 
@@ -540,7 +561,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 48,
     borderWidth: 1,
-    borderColor: "#D0D5DD",
+    borderColor: "#DCE3EC",
     borderRadius: 10,
     justifyContent: "center",
     alignItems: "center",
@@ -549,14 +570,14 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#667085",
+    color: "#5B6B7F",
   },
 
   saveButton: {
     flex: 1,
     height: 48,
     borderRadius: 10,
-    backgroundColor: "#12966F",
+    backgroundColor: "#159B79",
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",

@@ -15,6 +15,7 @@ import { Ionicons,
   Fontisto, 
   FontAwesome, Feather } from '@expo/vector-icons'; 
 import { LinearGradient } from 'expo-linear-gradient';
+import { ScreenHeader, C, ui } from "../../../components/JetUI";
 
 const ParcelService = () => {
     const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -51,29 +52,29 @@ const ParcelService = () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-       
-        <View style={styles.header}> 
-            <TouchableOpacity><Text style={styles.title}>{params.parcelId}</Text></TouchableOpacity>
-        </View>
-      </LinearGradient>
+        <ScreenHeader eyebrow="Delivered parcel" title={String(params.parcelId ?? "Parcel")} />
 
         <ScrollView
-        style={styles.scroll}
+        style={ui.body}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         >
+        <View style={styles.banner}>
+          <View style={styles.bannerIcon}>
+            <Ionicons name="checkmark-done" size={22} color="#FFFFFF" />
+          </View>
+          <View style={{ flex: 1, marginLeft: 12 }}>
+            <Text style={styles.bannerTitle}>Delivered</Text>
+            <Text style={styles.bannerSub} numberOfLines={1}>{params.pickup} → {params.drop}</Text>
+          </View>
+        </View>
+
         {/* Sender */}
         <View style={styles.card}>
             <Text style={styles.sectionHeader}>Sender</Text>
             <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#6366f1" }]}>
-            <Ionicons name="person" size={18} color="#fff" />
+            <View style={styles.iconWrap}>
+            <Ionicons name="person" size={18} color={C.blue} />
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Name</Text>
@@ -82,8 +83,8 @@ const ParcelService = () => {
             </View>
 
             <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#6366f1" }]}>
-            <Ionicons name="call" size={18} color="#fff" />
+            <View style={styles.iconWrap}>
+            <Ionicons name="call" size={18} color={C.blue} />
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Mobile Number</Text>
@@ -92,8 +93,8 @@ const ParcelService = () => {
             </View>
 
             <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#6366f1" }]}>
-                <Ionicons name="mail" size={18} color="#fff" />
+            <View style={styles.iconWrap}>
+                <Ionicons name="mail" size={18} color={C.blue} />
             </View>
             <View style={styles.infoTextWrap}>
                 <Text style={styles.infoLabel}>Email</Text>
@@ -107,8 +108,8 @@ const ParcelService = () => {
         <View style={styles.card}>
             <Text style={styles.sectionHeader}>Receiver</Text>
             <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#059669" }]}>
-            <Ionicons name="person" size={18} color="#fff" />
+            <View style={styles.iconWrap}>
+            <Ionicons name="person" size={18} color={C.blue} />
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Name</Text>
@@ -117,8 +118,8 @@ const ParcelService = () => {
             </View>
 
             <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#059669" }]}>
-            <Ionicons name="call" size={18} color="#fff" />
+            <View style={styles.iconWrap}>
+            <Ionicons name="call" size={18} color={C.blue} />
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Mobile Number</Text>
@@ -127,8 +128,8 @@ const ParcelService = () => {
             </View>
 
             <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#059669" }]}>
-            <Ionicons name="mail" size={18} color="#fff" />
+            <View style={styles.iconWrap}>
+            <Ionicons name="mail" size={18} color={C.blue} />
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Email</Text>
@@ -143,8 +144,8 @@ const ParcelService = () => {
             <Text style={styles.sectionHeader}>Shipment</Text>
 
             <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="scale" size={18} color="#fff" />
+            <View style={styles.iconWrap}>
+            <Ionicons name="scale" size={18} color={C.blue} />
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Weight</Text>
@@ -153,8 +154,8 @@ const ParcelService = () => {
             </View>
 
             <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="location" size={18} color="#fff" />
+            <View style={styles.iconWrap}>
+            <Ionicons name="location" size={18} color={C.blue} />
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Pickup</Text>
@@ -163,8 +164,8 @@ const ParcelService = () => {
             </View>
 
             <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="flag" size={18} color="#fff" />
+            <View style={styles.iconWrap}>
+            <Ionicons name="flag" size={18} color={C.blue} />
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Drop-off</Text>
@@ -173,8 +174,8 @@ const ParcelService = () => {
             </View>
 
             <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="calendar" size={18} color="#fff" />
+            <View style={styles.iconWrap}>
+            <Ionicons name="calendar" size={18} color={C.blue} />
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Date</Text>
@@ -183,8 +184,8 @@ const ParcelService = () => {
             </View>
 
             <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="time" size={18} color="#fff" />
+            <View style={styles.iconWrap}>
+            <Ionicons name="time" size={18} color={C.blue} />
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Time</Text>
@@ -193,8 +194,8 @@ const ParcelService = () => {
             </View>
 
             <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <Ionicons name="bus" size={18} color="#fff" />
+            <View style={styles.iconWrap}>
+            <Ionicons name="bus" size={18} color={C.blue} />
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Bus Number</Text>
@@ -203,8 +204,8 @@ const ParcelService = () => {
             </View>
 
             <View style={styles.infoRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c" }]}>
-            <MaterialCommunityIcons name="currency-usd" size={18} color="#fff" />
+            <View style={styles.iconWrap}>
+            <MaterialCommunityIcons name="currency-usd" size={18} color={C.blue} />
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Total Fare</Text>
@@ -315,10 +316,22 @@ const ParcelService = () => {
 };
 
 const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    backgroundColor:"#fff"
+  bannerSub: { fontSize: 13, fontWeight: '600', color: C.muted, marginTop: 2 },
+  bannerTitle: { fontSize: 17, fontWeight: '800', color: C.green },
+  bannerIcon: { width: 46, height: 46, borderRadius: 23, backgroundColor: '#159B79', alignItems: 'center', justifyContent: 'center' },
+  banner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 22,
+    padding: 16,
+    elevation: 6,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 18,
   },
+  container: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: 'row',
@@ -344,42 +357,25 @@ const styles = StyleSheet.create({
   },
 
   scroll: { flex: 1,marginTop: -50,  },
-  scrollContent: { padding: 16, paddingBottom: 150, gap: 16 },
+  scrollContent: { paddingHorizontal: 16, paddingBottom: 200, gap: 14 },
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 20,
-    padding: 18,
-    elevation: 2,
-    shadowColor: "#000",
+    backgroundColor: '#FFFFFF',
+    borderRadius: 22,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 4,
+    elevation: 3,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.06,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-    marginBottom: 16,
+    shadowRadius: 12,
   },
-  sectionHeader: {
-    fontSize: 13,
-    fontWeight: "700",
-    color: "#94a3b8",
-    letterSpacing: 0.8,
-    textTransform: "uppercase",
-    marginBottom: 12,
-  },
-  infoRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 14,
-  },
-  iconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
+  sectionHeader: { fontSize: 13, fontWeight: '800', color: C.muted, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 },
+  infoRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 11, borderBottomWidth: 1, borderBottomColor: C.line },
+  iconWrap: { width: 38, height: 38, borderRadius: 12, backgroundColor: C.blueSoft, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
   infoTextWrap: { flex: 1 },
-  infoLabel: { fontSize: 12, color: "#94a3b8", marginBottom: 2 },
-  infoValue: { fontSize: 15, color: "#1e293b", fontWeight: "600" },
+  infoLabel: { fontSize: 12, fontWeight: '600', color: C.muted },
+  infoValue: { fontSize: 15, fontWeight: '800', color: C.ink, marginTop: 1 },
   
    
   bottomNav: {

@@ -7,7 +7,8 @@ import {
   TextInput, 
   TouchableOpacity, 
   SafeAreaView, 
-  Image 
+  Image,
+  ScrollView,
 } from 'react-native';
 import { 
   Ionicons, 
@@ -16,6 +17,7 @@ import {
   FontAwesome,
   FontAwesome5,
 } from '@expo/vector-icons';
+import { ScreenHeader, FeatureCard, Pill, C, ui } from "../../../components/JetUI";
   import { LinearGradient } from 'expo-linear-gradient';
 
 
@@ -67,48 +69,28 @@ const ToursScreen: React.FC = () => {
     <Stack.Screen options={{ title: "", headerShown: false }} />
     <SafeAreaView style={styles.container}>
       {/* Navbar Section */}
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-        style={styles.submitGradient1}
-      >
-        <View style={styles.header}>
-   
-          <TouchableOpacity >
-            <Text style={styles.title}>JetLink</Text>
-          </TouchableOpacity>
-                  
-        </View>
-      </LinearGradient>
-       
-      
-        
+      <ScreenHeader eyebrow="Your tickets" title="Tickets" />
 
-        
-        <TouchableOpacity style={styles.card } onPress={handleSearch}>
-          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-            <FontAwesome name="road" size={50} color="#F59E0B" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Normal Way</Text>
-            <Text style={styles.text2}>Manage your normal way ticket</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
-
-        
-        <TouchableOpacity style={styles.card1} onPress={handleSearch1}>
-          <View style={[styles.iconWrap, { backgroundColor: "#EF444418" }]}>
-            <MaterialCommunityIcons name="highway" size={50} color="#EF4444" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>High Way</Text>
-            <Text style={styles.text2}>Manage your high way ticket</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
-      
+      <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+        <FeatureCard
+          icon={<FontAwesome name="road" size={28} color={C.amber} />}
+          iconBg={C.amberSoft}
+          title="Normal Way"
+          subtitle="Active and used normal way tickets"
+          cta="View tickets"
+          tag={<Pill text="Local roads" bg={C.amberSoft} color="#8A4B00" />}
+          onPress={handleSearch}
+        />
+        <FeatureCard
+          icon={<MaterialCommunityIcons name="highway" size={30} color={C.purple} />}
+          iconBg={C.purpleSoft}
+          title="High Way"
+          subtitle="Active and used highway tickets"
+          cta="View tickets"
+          tag={<Pill text="Expressway" bg={C.purpleSoft} color="#5A2FBF" />}
+          onPress={handleSearch1}
+        />
+      </ScrollView>
 
       {isSearching ? (
                   <TextInput
@@ -211,7 +193,7 @@ const ToursScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.bg,
   },
   header: {
     flexDirection: 'row',

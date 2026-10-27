@@ -26,6 +26,7 @@ import {
 } from '@expo/vector-icons';
 
 import { LinearGradient } from 'expo-linear-gradient';
+import { ScreenHeader, EmptyState, ParcelRow, C } from "../../../components/JetUI";
 
 interface parcel {
   _id: string;
@@ -328,33 +329,14 @@ const JetLinkInterface: React.FC = () => {
       }
     >
 
-      <View style={styles.friendRow}>
-        <View style={styles.icon}>
-          <View style={[styles.iconWrap, {backgroundColor: "#F59E0B18",},]}>
-            <Feather name="gift" size={50} color="#F59E0B"/>
-          </View>
-
-          <View>
-            <Text style={styles.friendName1}>
-              {item.parcelId}
-            </Text>
-
-            <Text style={styles.friendName}>
-              {item.pickup} - {item.drop}
-            </Text>
-
-            <Text style={styles.friendName}>
-              {item.date} - {item.time}
-            </Text>
-
-            <Text style={styles.friendName}>
-              {item.Bnumber}
-            </Text>
-          </View>
-        </View>
-
-        <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC"/>
-      </View>
+      <ParcelRow
+        id={item.parcelId}
+        from={item.pickup}
+        to={item.drop}
+        date={item.date}
+        time={item.time}
+        bus={item.Bnumber}
+      />
     </TouchableOpacity>
   );
 
@@ -374,33 +356,15 @@ const JetLinkInterface: React.FC = () => {
 
   const renderDeliveredParcel = (item: parcel) => (
     <TouchableOpacity onPress={() => openDeliveredParcel(item)}>
-      <View style={styles.friendRow}>
-        <View style={styles.icon}>
-          <View style={[styles.iconWrap, {backgroundColor: "#F59E0B18",},]}>
-            <Feather name="gift" size={50} color="#F59E0B"/>
-          </View>
-
-          <View>
-            <Text style={styles.friendName1}>
-              {item.parcelId}
-            </Text>
-
-            <Text style={styles.friendName}>
-              {item.pickup} - {item.drop}
-            </Text>
-
-            <Text style={styles.friendName}>
-              {item.date} - {item.time}
-            </Text>
-
-            <Text style={styles.friendName}>
-              {item.Bnumber}
-            </Text>
-          </View>
-        </View>
-
-        <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC"/>
-      </View>
+      <ParcelRow
+        id={item.parcelId}
+        from={item.pickup}
+        to={item.drop}
+        date={item.date}
+        time={item.time}
+        bus={item.Bnumber}
+        delivered
+      />
     </TouchableOpacity>
   );
 
@@ -423,19 +387,7 @@ const JetLinkInterface: React.FC = () => {
       <Stack.Screen options={{title: "", headerShown: false,}}/>
       <SafeAreaView style={styles.container}>
 
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}>
-          <View style={styles.header}>
-            <TouchableOpacity>
-              <Text style={styles.title}>
-                Parcel
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
+        <ScreenHeader eyebrow="Your parcels" title="Parcels" />
 
         <View style={styles.card}>
           <View style={styles.tabContainer}>
@@ -443,6 +395,7 @@ const JetLinkInterface: React.FC = () => {
               style={[styles.tabButton, isactiveTab && styles.activeTabButton,]}
               onPress={() => setIsactiveTab(true)}
             >
+              <Ionicons name="time-outline" size={17} color={isactiveTab ? "#FFFFFF" : C.blue} />
               <Text style={[styles.tabButtonText, isactiveTab && styles.activeTabButtonText,]}>
                 Pending
               </Text>
@@ -452,6 +405,7 @@ const JetLinkInterface: React.FC = () => {
               style={[styles.tabButton, !isactiveTab && styles.activeTabButton,]}
               onPress={() => setIsactiveTab(false)}
             >
+              <Ionicons name="checkmark-done" size={17} color={!isactiveTab ? "#FFFFFF" : C.blue} />
               <Text style={[styles.tabButtonText, !isactiveTab && styles.activeTabButtonText,]}>
                 Delivered
               </Text>
@@ -474,12 +428,11 @@ const JetLinkInterface: React.FC = () => {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{paddingVertical: 10, paddingBottom: 180,}}
               ListEmptyComponent={
-                <View style={styles.emptyContainer}>
-                  <Feather name="gift" size={55} color="#C7C7CC"/>
-                  <Text style={styles.emptyText}>
-                    No pending parcels
-                  </Text>
-                </View>
+                <EmptyState
+                  icon={<Feather name="gift" size={26} color={C.amber} />}
+                  title="No pending parcels"
+                  subtitle="Parcels you send will appear here."
+                />
               }
             />
           )}
@@ -528,27 +481,11 @@ const JetLinkInterface: React.FC = () => {
 
               ListEmptyComponent={
 
-                <View
-                  style={
-                    styles.emptyContainer
-                  }
-                >
-
-                  <Feather
-                    name="gift"
-                    size={55}
-                    color="#C7C7CC"
-                  />
-
-                  <Text
-                    style={
-                      styles.emptyText
-                    }
-                  >
-                    No delivered parcels
-                  </Text>
-
-                </View>
+                <EmptyState
+                  icon={<Ionicons name="checkmark-done" size={28} color={C.amber} />}
+                  title="No delivered parcels"
+                  subtitle="Delivered parcels are listed here by date."
+                />
 
               }
 
@@ -882,10 +819,7 @@ const JetLinkInterface: React.FC = () => {
 
 const styles = StyleSheet.create({
 
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
+  container: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: 'row',
@@ -910,98 +844,44 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
-  card: {
-    width: '100%',
-    flex: 1,
-    maxHeight: '100%',
-    backgroundColor: '#FFF',
-    borderTopLeftRadius: 55,
-    borderTopRightRadius: 55,
-    marginTop: -50,
-    alignSelf: 'center',
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
+  card: { flex: 1, marginTop: -64, paddingHorizontal: 16 },
 
   tabContainer: {
-    marginLeft: 25,
-    marginRight: 25,
-    backgroundColor: '#F2F4F5',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 18,
     flexDirection: 'row',
     padding: 6,
-    marginTop: 22,
-    marginBottom: 12,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 5
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    gap: 6,
+    height: 58,
+    marginBottom: 6,
+    elevation: 6,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 18,
   },
 
   tabButton: {
     flex: 1,
-    paddingVertical: 10,
-    borderRadius: 8,
+    flexDirection: 'row',
+    gap: 8,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
-  activeTabButton: {
-    backgroundColor: '#32CD32',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
+  activeTabButton: { backgroundColor: C.blue },
 
-  tabButtonText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#0056b3',
-  },
+  tabButtonText: { fontSize: 15, fontWeight: '700', color: C.blue },
 
 
-  activeTabButtonText: {
-    color: '#FFF',
-  },
+  activeTabButtonText: { color: '#FFFFFF' },
 
-  svw: {
-    width: '100%',
-    marginBottom: 150,
-    marginTop: 3,
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
+  svw: { flex: 1, width: '100%' },
 
-  dateHeader: {
-    marginLeft: 20,
-    marginRight: 20,
-    marginTop: 8,
-    marginBottom: 8,
-    paddingHorizontal: 5,
-    paddingVertical: 5,
-  },
+  dateHeader: { marginTop: 14, marginBottom: 8, marginHorizontal: 4 },
 
-  dateHeaderText: {
-    fontSize: 17,
-    fontWeight: '800',
-    color: '#0047AB',
-    letterSpacing: 0.8,
-  },
+  dateHeaderText: { fontSize: 13, fontWeight: '700', color: C.muted, letterSpacing: 0.5 },
 
   friendRow: {
     backgroundColor: '#ffffff',

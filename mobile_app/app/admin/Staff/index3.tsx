@@ -24,6 +24,7 @@ import AlertBadge from "../../../components/AlertBadge";
 
 import FieldError from "../../../components/FieldError";
 import { useFieldErrors } from "../../../utils/validation";
+import { ScreenHeader, Avatar, Pill, GradientButton, C } from "../../../components/JetUI";
 const AddBus = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -109,26 +110,39 @@ const AddBus = () => {
     <>
     <Stack.Screen options={{ title: "", headerShown: false }} />
     <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-        style={styles.submitGradient1}
-      >
-      
-      <View style={styles.header}> 
-          <TouchableOpacity>
-            <Text style={styles.title}>Drivers</Text>
-            </TouchableOpacity>
-      </View>
-      </LinearGradient>
+      <ScreenHeader eyebrow="Add a new" title={"Driver"} />
     
       <View style={styles.card}>
 
-        <ScrollView style={styles.svw}>           
+        <ScrollView
+          style={styles.svw}
+          contentContainerStyle={styles.formContent}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.previewCard}>
+            <Avatar name={`${firstName} ${lastName}`.trim() || "Driver"} size={56} />
+            <View style={{ flex: 1, marginLeft: 14 }}>
+              <Text style={styles.previewName} numberOfLines={1}>
+                {`${firstName} ${lastName}`.trim() || "New driver"}
+              </Text>
+              <Text style={styles.previewSub} numberOfLines={1}>
+                {email || phoneNumber || "Fill in the details below"}
+              </Text>
+            </View>
+            <Pill text="Driver" bg={C.greenSoft} color={C.green} />
+          </View>
+
+          <View style={styles.section}>
+            <View style={styles.sectionHead}>
+              <Ionicons name="person-outline" size={18} color={C.blue} />
+              <Text style={styles.sectionTitle}>Personal details</Text>
+            </View>
+           
               
             <Text style={styles.inputLabel}>First Name</Text>  
                 <View style={styles.inputWrapper}>
+                  <Ionicons name="person-outline" size={19} color={C.muted} style={styles.fieldIcon} />
                   
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -144,6 +158,7 @@ const AddBus = () => {
 
                 <Text style={styles.inputLabel}>Last Name</Text>  
                 <View style={styles.inputWrapper}>
+                  <Ionicons name="person-outline" size={19} color={C.muted} style={styles.fieldIcon} />
                   
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -159,6 +174,7 @@ const AddBus = () => {
 
                 <Text style={styles.inputLabel}>Phone Number</Text>  
                 <View style={styles.inputWrapper}>
+                  <Ionicons name="call-outline" size={19} color={C.muted} style={styles.fieldIcon} />
                   
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -168,6 +184,7 @@ const AddBus = () => {
                       placeholder="077 1234567"
                       placeholderTextColor="#A3A3A3"
                       keyboardType="phone-pad"
+                      maxLength={10}
                     />
                   </View>
                 </View>
@@ -175,6 +192,7 @@ const AddBus = () => {
 
                 <Text style={styles.inputLabel}>Address</Text>  
                 <View style={styles.inputWrapper}>
+                  <Ionicons name="home-outline" size={19} color={C.muted} style={styles.fieldIcon} />
                   
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -188,8 +206,16 @@ const AddBus = () => {
                 </View>
                 <FieldError message={fieldError("address", address)} />
 
+          </View>
+
+          <View style={styles.section}>
+            <View style={styles.sectionHead}>
+              <Ionicons name="card-outline" size={18} color={C.blue} />
+              <Text style={styles.sectionTitle}>Identity</Text>
+            </View>
                 <Text style={styles.inputLabel}>NIC</Text>  
                 <View style={styles.inputWrapper}>
+                  <Ionicons name="id-card-outline" size={19} color={C.muted} style={styles.fieldIcon} />
                   
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -205,6 +231,7 @@ const AddBus = () => {
 
                 <Text style={styles.inputLabel}>Driving License</Text>  
                 <View style={styles.inputWrapper}>
+                  <Ionicons name="car-outline" size={19} color={C.muted} style={styles.fieldIcon} />
                   
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -220,12 +247,13 @@ const AddBus = () => {
 
                 <Text style={styles.inputLabel}>Birth Day</Text>                
                 <View style={styles.inputWrapper}>
+                  <Ionicons name="calendar-outline" size={19} color={C.muted} style={styles.fieldIcon} />
                   
                   <View style={styles.inputInnerWrapper}>
-                    <Text style={[styles.textInputG, Birthday ? { color: "#0056b3" } : null]}>{Birthday || "DD-MM-YYYY"}</Text>
+                    <Text style={[styles.textInputG, Birthday ? { color: C.ink } : null]}>{Birthday || "DD-MM-YYYY"}</Text>
                   </View>
                   <TouchableOpacity onPress={() => setShowCalendar(true)}>
-                    <FontAwesome5 name="calendar-alt" size={24} color="black" />  
+                    <FontAwesome5 name="calendar-alt" size={20} color={C.blue} />  
                   </TouchableOpacity>
                 </View>
 
@@ -246,8 +274,16 @@ const AddBus = () => {
 
                 
 
+          </View>
+
+          <View style={styles.section}>
+            <View style={styles.sectionHead}>
+              <Ionicons name="lock-closed-outline" size={18} color={C.blue} />
+              <Text style={styles.sectionTitle}>Login details</Text>
+            </View>
                 <Text style={styles.inputLabel}>Email Address</Text>
                 <View style={styles.inputWrapper}>
+                  <Ionicons name="mail-outline" size={19} color={C.muted} style={styles.fieldIcon} />
                   
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -266,6 +302,7 @@ const AddBus = () => {
 
                 <Text style={styles.inputLabel}>Password</Text>
                 <View style={styles.inputWrapper}>
+                  <Ionicons name="key-outline" size={19} color={C.muted} style={styles.fieldIcon} />
                   
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -279,25 +316,17 @@ const AddBus = () => {
                     />
                   </View>
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-                    <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color="#000000" />
+                    <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color={C.muted} />
                   </TouchableOpacity>
                 </View>
                 <FieldError message={fieldError("password", password)} /> 
       
+          </View>
         </ScrollView>
 
     </View>
 
-    <TouchableOpacity style={styles.searchButton} onPress={handleAddBus }>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient}
-        >
-        <Text style={styles.searchButtonText}>Add Driver</Text>
-        </LinearGradient>
-      </TouchableOpacity>
+    <GradientButton label="Add driver" icon="person-add-outline" onPress={handleAddBus} style={styles.saveButton} />
            
 
       {isSearching ? (
@@ -404,11 +433,46 @@ const AddBus = () => {
 };
 
 const styles = StyleSheet.create({
-
-  container:{
-    flex:1,
-    backgroundColor:"#fff"
+  saveButton: { position: 'absolute', left: 20, right: 20, bottom: 165 },
+  fieldIcon: { marginRight: 10 },
+  sectionTitle: { fontSize: 15, fontWeight: '800', color: C.ink },
+  sectionHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingBottom: 12,
+    marginBottom: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: C.line,
   },
+  section: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 22,
+    padding: 16,
+    paddingBottom: 8,
+    elevation: 3,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 12,
+  },
+  previewSub: { fontSize: 13, fontWeight: '500', color: C.muted, marginTop: 2 },
+  previewName: { fontSize: 18, fontWeight: '800', color: C.navy },
+  previewCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 22,
+    padding: 16,
+    elevation: 6,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 18,
+  },
+  formContent: { paddingHorizontal: 16, paddingBottom: 260, gap: 14 },
+
+  container: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: 'row',
@@ -433,40 +497,21 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
-  card: {
-    width: '90%',
-    flex: 1,
-    maxHeight: '60%',
-    backgroundColor: '#FFF',
-    padding: 24,
-    alignItems: 'center',
-    marginTop: -50,   
-    alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
+  card: { flex: 1, marginTop: -64 },
 
-  svw: {
-    width: '100%',
-     
-  },
+  svw: { flex: 1 },
 
   
   inputWrapper: {
-    minHeight: 50,
+    minHeight: 52,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F2F4F5',
-    borderWidth: 1,
-    borderColor: '#32CD32',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 15,
+    backgroundColor: '#F7F9FC',
+    borderWidth: 1.5,
+    borderColor: '#E3E9F1',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    marginBottom: 4,
   },
   input3dIcon: {
     marginRight: 12,
@@ -478,30 +523,11 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25
   },
-  inputInnerWrapper: {
-    flex: 1,
-  },
-  inputLabel: {
-    fontSize: 16,
-    color: '#0056b3',
-    fontWeight: '500',
-    marginBottom: 10,
-  },
-  textInput: {
-    fontSize: 16,
-    color: '#0056b3',
-    fontWeight: '500',
-    padding: 0, 
-  },
-  textInputG: {
-    fontSize: 16,
-    color: '#A3A3A3',
-    fontWeight: '500',
-    padding: 0, 
-  },
-  eyeIcon: {
-    padding: 4,
-  },
+  inputInnerWrapper: { flex: 1 },
+  inputLabel: { fontSize: 13, color: C.muted, fontWeight: '700', marginBottom: 6, marginLeft: 2 },
+  textInput: { fontSize: 15, color: C.ink, fontWeight: '600', paddingVertical: 12 },
+  textInputG: { fontSize: 15, color: '#8A97A8', fontWeight: '600', paddingVertical: 12 },
+  eyeIcon: { padding: 6, marginLeft: 4 },
   underIcon: {
     marginRight: -11,   
   },

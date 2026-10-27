@@ -19,6 +19,7 @@ import {
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView } from 'react-native-reanimated/lib/typescript/Animated';
+import { ScreenHeader, SearchBox, SectionLabel, Pill, EmptyState, ParcelRow, C, ui } from "../../../components/JetUI";
 
 
 
@@ -120,55 +121,53 @@ const JetLinkInterface: React.FC = () => {
           })
         }
       >
-      <View style={styles.friendRow}>
-        <View style={styles.icon}>
-          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-            <Feather name="gift" size={50} color="#F59E0B" />
-          </View>
-          <View>
-            <Text style={styles.friendName1}>{item.parcelId}</Text>
-            <Text style={styles.friendName}>{item.pickup} - {item.drop}</Text>
-            <Text style={styles.friendName}>{item.date} - {item.time}</Text>
-            <Text style={styles.friendName}>{item.Bnumber}</Text>
-          </View>
-        </View>
-        <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC"  />
-        
-      </View>
+      <ParcelRow
+        id={item.parcelId}
+        from={item.pickup}
+        to={item.drop}
+        date={item.date}
+        time={item.time}
+        bus={item.Bnumber}
+      />
       </TouchableOpacity>
     );
   
+    const shownParcels = (parcelData || []).filter((p) =>
+      [p.parcelId, p.pickup, p.drop, p.Bnumber]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(searchQuery.trim().toLowerCase())
+    );
+
     return (
   
       <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
         
-        <LinearGradient
-            colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-            style={styles.submitGradient1}
-        >
-                <View style={styles.header}>
-                    
-                
-                  <TouchableOpacity >
-                    <Text style={styles.title}>JetLink</Text>
-                  </TouchableOpacity>
-                         
-                </View>
-                </LinearGradient> 
-             
-        <View style={styles.card}>
-            <Text style={styles.cardtitle}>Select a parcel for tracking</Text>
-            <FlatList style={styles.svw}
-                data={parcelData}
-                renderItem={renderBusItem}
-                keyExtractor={(item)=>item.parcelId}
-                showsVerticalScrollIndicator={false}
-                contentContainerStyle={{ paddingVertical: 10 }}
-                />    
+        <ScreenHeader eyebrow="Select a parcel" title="Track a parcel" />
+
+        <View style={[ui.body, { paddingHorizontal: 16 }]}>
+          <SearchBox value={searchQuery} onChangeText={setSearchQuery} placeholder="Parcel ID, town or bus number" />
+          <SectionLabel style={{ marginTop: 18, marginBottom: 10 }} right={<Pill text={`${shownParcels.length} parcels`} />}>
+            On the way
+          </SectionLabel>
+          <FlatList
+            style={{ flex: 1 }}
+            data={shownParcels}
+            renderItem={renderBusItem}
+            keyExtractor={(item)=>item.parcelId}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 190 }}
+            ListEmptyComponent={
+              <EmptyState
+                icon={<Feather name="gift" size={26} color={C.amber} />}
+                title="No parcels on the way"
+                subtitle="Parcels picked up by a bus will appear here."
+              />
+            }
+          />
         </View>
 
       {isSearching ? (
@@ -270,10 +269,7 @@ const JetLinkInterface: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    backgroundColor:"#fff"
-  },
+  container: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: 'row',

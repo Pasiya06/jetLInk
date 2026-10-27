@@ -172,7 +172,7 @@ const PassengerTrackScreen: React.FC = () => {
     return (
       <Polyline
         coordinates={routePath}
-        strokeColor="#2F80ED"
+        strokeColor="#155B8A"
         strokeWidth={4}
         lineDashPattern={[1]}
       />
@@ -240,7 +240,7 @@ const PassengerTrackScreen: React.FC = () => {
                   <View
                     style={[
                       styles.statusDot,
-                      { backgroundColor: isOnline ? "#32CD32" : "#FF6B6B" },
+                      { backgroundColor: isOnline ? "#3DDC97" : "#FF6B6B" },
                     ]}
                   />
                 </View>
@@ -254,7 +254,7 @@ const PassengerTrackScreen: React.FC = () => {
               onPress={() => setShowQRDialog(true)}
             >
               <LinearGradient
-                colors={["#2F80ED", "#0047AB"]}
+                colors={["#2F80ED", "#173C79"]}
                 style={styles.floatBtnGradient}
               >
                 <Ionicons name="qr-code-outline" size={22} color="#fff" />
@@ -266,7 +266,7 @@ const PassengerTrackScreen: React.FC = () => {
         {/* ── Map ─────────────────────────────────────────────── */}
         {isLoading ? (
           <View style={styles.loadingBox}>
-            <ActivityIndicator size="large" color="#0047AB" />
+            <ActivityIndicator size="large" color="#173C79" />
             <Text style={styles.loadingText}>Locating your bus...</Text>
           </View>
         ) : (
@@ -295,7 +295,7 @@ const PassengerTrackScreen: React.FC = () => {
 
         {/* ── Floating Locate Button ────────────────────────────── */}
         <TouchableOpacity style={styles.floatBtn} onPress={centerOnBus}>
-          <LinearGradient colors={["#2F80ED", "#0047AB"]} style={styles.floatBtnGradient}>
+          <LinearGradient colors={["#2F80ED", "#173C79"]} style={styles.floatBtnGradient}>
             <MaterialIcons name="my-location" size={22} color="#fff" />
           </LinearGradient>
         </TouchableOpacity>
@@ -449,7 +449,7 @@ const PassengerTrackScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F7FB",
+    backgroundColor: "#F3F6FA",
   },
   header: {
     flexDirection: "row",
@@ -460,7 +460,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 28,
     borderBottomRightRadius: 28,
     elevation: 8,
-    shadowColor: "#0047AB",
+    shadowColor: "#173C79",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 10,
@@ -508,7 +508,7 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: "#32CD32",
+    backgroundColor: "#159B79",
   },
   statusDot: {
     width: 8,
@@ -531,7 +531,7 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 12,
     fontSize: 15,
-    color: "#0047AB",
+    color: "#173C79",
     fontWeight: "500",
   },
   busMarkerRing: {
@@ -546,7 +546,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: "#0047AB",
+    backgroundColor: "#173C79",
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 3,
@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
   statCard: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FAFBFF",
+    backgroundColor: "#F7F9FC",
     borderRadius: 14,
     padding: 10,
     width: "48%",
@@ -597,12 +597,12 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 11,
-    color: "#999",
+    color: "#5B6B7F",
   },
   statValue: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#222",
+    color: "#0F1B2D",
   },
   offlineBox: {
     flexDirection: "row",
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
   contactBtn: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FAFBFF",
+    backgroundColor: "#F7F9FC",
     borderRadius: 14,
     paddingVertical: 10,
     paddingHorizontal: 12,
@@ -651,7 +651,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     elevation: 8,
-    shadowColor: "#0047AB",
+    shadowColor: "#173C79",
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.35,
     shadowRadius: 6,

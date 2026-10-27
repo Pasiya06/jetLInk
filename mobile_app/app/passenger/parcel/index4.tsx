@@ -8,7 +8,8 @@ import {
   TouchableOpacity, 
   SafeAreaView, 
   TextInput,
-  Alert
+  Alert,
+  ScrollView,
 } from 'react-native';
 import { 
   Ionicons, 
@@ -18,6 +19,7 @@ import {
   Feather } from '@expo/vector-icons';
 
 import { LinearGradient } from 'expo-linear-gradient';
+import { ScreenHeader, SectionLabel, GradientButton, IconBox, C, ui } from "../../../components/JetUI";
 
 const ParcelService = () => {
     const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -148,28 +150,23 @@ const ParcelService = () => {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
        
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-        start={{x: 0, y: 0,}}
-        end={{x: 1, y: 1,}}
-        style={styles.submitGradient1}
-      >
-        <View style={styles.header}>
-                      
-          <TouchableOpacity >
-            <Text style={styles.title}>JetLink</Text>
-          </TouchableOpacity>
-                       
-        </View>
-      </LinearGradient> 
+      <ScreenHeader eyebrow="Review & pay" title="Shipment summary" /> 
 
-        <View style={styles.card} >
-          <View style={styles.svw}> 
-            {/* <Text style={styles.cardTitle}>Shipment Summary</Text> */}
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          <View style={[ui.card, styles.card]}>
+            <View style={styles.cardHead}>
+              <IconBox bg={C.amberSoft} size={44}>
+                <Feather name="package" size={22} color={C.amber} />
+              </IconBox>
+              <View style={{ marginLeft: 12 }}>
+                <Text style={styles.cardHeadTitle}>Shipment details</Text>
+                <Text style={styles.cardHeadSub}>Check everything before paying</Text>
+              </View>
+            </View>
             {details.map((item, index) => (
-              <View key={index} style={styles.detailRow}>
-                <View style={[styles.iconWrap, { backgroundColor: `${item.color}20` }]}>
-                  <Ionicons name={item.icon} size={18} color={item.color} />
+              <View key={index} style={[styles.detailRow, index === details.length - 1 && { borderBottomWidth: 0 }]}>
+                <View style={styles.iconWrap}>
+                  <Ionicons name={item.icon} size={18} color={C.blue} />
                 </View>
                 <View style={styles.detailTextWrap}>
                   <Text style={styles.detailLabel}>{item.label}</Text>
@@ -177,17 +174,15 @@ const ParcelService = () => {
                 </View>
               </View>
             ))}
-          </View>      
-        </View>
+          </View>
 
-        <View style={styles.card1} >
-          <View style={styles.svw}>
-
+          <SectionLabel>Payment</SectionLabel>
+          <View style={[ui.card, styles.card1]}>
             {rows.map((row, index) => (
               <View key={index} style={styles.row}>
                 <View style={styles.rowLeft}>
-                  <View style={[styles.iconWrap1, { backgroundColor: `${row.color}20` }]}>
-                    <Ionicons name ={row.icon as any} size={18} color={row.color} />
+                  <View style={styles.iconWrap1}>
+                    <Ionicons name ={row.icon as any} size={17} color={C.muted} />
                   </View>
                   <Text style={styles.label}>{row.label}</Text>
                 </View>
@@ -195,30 +190,17 @@ const ParcelService = () => {
               </View>
             ))}
 
-              <View style={styles.divider} />
+            <View style={styles.divider} />
 
-              <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Total</Text>
-                <Text style={styles.totalValue}>Rs. {total}</Text>
-              </View>
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalValue}>Rs. {total}</Text>
+            </View>
           </View>
-        </View>
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSearch}>
-                    <LinearGradient
-                        colors={["#173C79","#155B8A","#159B79",]}
-                        start={{x: 0, y: 0,}}
-                        end={{x: 1, y: 1,}}
-                        style={styles.submitGradient}
-                    >
-                    <Text style={styles.submitText}>Submit payment</Text>
-                    </LinearGradient>
-                </TouchableOpacity>
+          <GradientButton label={`Pay Rs. ${total}`} icon="card-outline" onPress={handleSearch} />
+        </ScrollView>
 
-
-
-        
-        
       {isSearching ? (
               <TextInput
                 style={styles.searchBarInput}
@@ -329,10 +311,10 @@ const ParcelService = () => {
 };
 
 const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    backgroundColor:"#fff"
-  },
+  cardHeadSub: { fontSize: 12, fontWeight: '500', color: C.muted, marginTop: 2 },
+  cardHeadTitle: { fontSize: 16, fontWeight: '800', color: C.ink },
+  cardHead: { flexDirection: 'row', alignItems: 'center', paddingBottom: 14, marginBottom: 4, borderBottomWidth: 1, borderBottomColor: C.line },
+  container: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: 'row',
@@ -357,45 +339,9 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
-  card: {
-    paddingTop:10,
-    marginLeft: 20,
-    marginRight: 20,
-    flex: 1,
-    maxHeight: '33%',
-    backgroundColor: '#FFF',
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    marginTop: -50,   
-    alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
+  card: { padding: 16, borderRadius: 22 },
 
-  card1: {
-    marginLeft: 20,
-    marginRight: 20,
-    
-    flex: 1,
-    maxHeight: '25%',
-    backgroundColor: '#FFF',
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-around",
-    marginTop: 15,   
-    alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
+  card1: { padding: 16, borderRadius: 22 },
 
   
   cardTitle: {
@@ -405,102 +351,30 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
     marginBottom: 16,
   },
-  row: {
-    marginLeft: 20,
-    marginRight: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 14,
-  },
-  rowLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  iconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  label: {
-    marginLeft: 20,
-    fontSize: 14,
-    color: '#4A4A4A',
-    fontWeight: '500',
-  },
-  value: {
-    fontSize: 14,
-    color: '#1A1A1A',
-    fontWeight: '600',
-  },
-  divider: {
-    marginLeft: 20,
-    marginRight: 20,
-    height: 1,
-    backgroundColor: '#515151a0',
-    marginVertical: 8,
-  },
-  totalRow: {
-    
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  totalLabel: {
-    marginLeft: 20,
-    
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1A1A1A',
-  },
-  totalValue: {
-    marginRight: 20,
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#4A90E2',
-  },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8 },
+  rowLeft: { flexDirection: 'row', alignItems: 'center' },
+  iconWrap: { width: 38, height: 38, borderRadius: 12, backgroundColor: C.blueSoft, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
+  label: { fontSize: 14, fontWeight: '600', color: C.muted },
+  value: { fontSize: 15, fontWeight: '800', color: C.ink },
+  divider: { height: 1, backgroundColor: C.line, marginVertical: 10 },
+  totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  totalLabel: { fontSize: 16, fontWeight: '800', color: C.ink },
+  totalValue: { fontSize: 22, fontWeight: '800', color: C.blue },
 
   svw: {
     width: '100%',
       
   },
 
-  detailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    marginLeft: 20,
-  },
+  detailRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: C.line },
 
-  iconWrap1: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  iconWrap1: { width: 32, height: 32, borderRadius: 10, backgroundColor: '#F3F6FA', alignItems: 'center', justifyContent: 'center', marginRight: 10 },
 
-  detailTextWrap: {
-    marginLeft: 12,
-    flex: 1,
-  },
+  detailTextWrap: { flex: 1 },
 
-  detailLabel: {
-    fontSize: 12,
-    color: '#8A8A8A',
-    fontWeight: '500',
-    marginBottom: 2,
-  },
+  detailLabel: { fontSize: 12, fontWeight: '600', color: C.muted },
 
-  detailValue: {
-    fontSize: 15,
-    color: '#1A1A1A',
-    fontWeight: '600',
-  },
+  detailValue: { fontSize: 15, fontWeight: '800', color: C.ink, marginTop: 2 },
 
   
   inputWrapper: {

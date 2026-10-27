@@ -185,7 +185,7 @@ export default function SearchPassengerByNIC() {
                 <Ionicons
                   name="card-outline"
                   size={20}
-                  color={focused ? "#0057D9" : "#8A94A6"}
+                  color={focused ? "#155B8A" : "#5B6B7F"}
                 />
                 <TextInput
                   style={styles.input}
@@ -216,10 +216,10 @@ export default function SearchPassengerByNIC() {
               >
                 <LinearGradient
                   colors={
-                    nic.length === 0 ? ["#B8C4D6", "#B8C4D6"] : ["#0057D9", "#159B79"]
+                    nic.length === 0 ? ["#B8C4D6", "#B8C4D6"] : ["#173C79", "#155B8A", "#159B79"]
                   }
                   start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
+                  end={{ x: 1, y: 1 }}
                   style={styles.searchBtn}
                 >
                   {loading ? (
@@ -238,7 +238,7 @@ export default function SearchPassengerByNIC() {
             {!loading && !passenger && !error && (
               <View style={styles.emptyState}>
                 <View style={styles.emptyIcon}>
-                  <Ionicons name="people-outline" size={40} color="#0057D9" />
+                  <Ionicons name="people-outline" size={40} color="#155B8A" />
                 </View>
                 <Text style={styles.emptyTitle}>Look up a passenger</Text>
                 <Text style={styles.emptyText}>
@@ -269,13 +269,13 @@ export default function SearchPassengerByNIC() {
                 style={[styles.resultCard, { opacity: fade, transform: [{ translateY: slide }] }]}
               >
                 <LinearGradient
-                  colors={["#EAF2FF", "#E8F7F2"]}
+                  colors={["#EAF1FB", "#E3F5EE"]}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 1 }}
                   style={styles.profileTop}
                 >
                   <LinearGradient
-                    colors={["#0057D9", "#159B79"]}
+                    colors={["#173C79", "#155B8A", "#159B79"]}
                     style={styles.avatar}
                   >
                     <Text style={styles.avatarText}>{initials || "?"}</Text>
@@ -286,7 +286,7 @@ export default function SearchPassengerByNIC() {
                   <View style={styles.badgeRow}>
                     {passenger.passengerId != null && (
                       <View style={styles.idBadge}>
-                        <Ionicons name="pricetag" size={12} color="#0057D9" />
+                        <Ionicons name="pricetag" size={12} color="#155B8A" />
                         <Text style={styles.idBadgeText}>ID #{passenger.passengerId}</Text>
                       </View>
                     )}
@@ -303,16 +303,16 @@ export default function SearchPassengerByNIC() {
                     style={styles.actionBtn}
                     onPress={() => Linking.openURL(`tel:${passenger.phoneNumber}`)}
                   >
-                    <Ionicons name="call" size={18} color="#159B79" />
-                    <Text style={[styles.actionText, { color: "#159B79" }]}>Call</Text>
+                    <Ionicons name="call" size={18} color="#0B6B53" />
+                    <Text style={[styles.actionText, { color: "#0B6B53" }]}>Call</Text>
                   </TouchableOpacity>
                   <View style={styles.actionDivider} />
                   <TouchableOpacity
                     style={styles.actionBtn}
                     onPress={() => Linking.openURL(`mailto:${passenger.email}`)}
                   >
-                    <Ionicons name="mail" size={18} color="#0057D9" />
-                    <Text style={[styles.actionText, { color: "#0057D9" }]}>Email</Text>
+                    <Ionicons name="mail" size={18} color="#155B8A" />
+                    <Text style={[styles.actionText, { color: "#155B8A" }]}>Email</Text>
                   </TouchableOpacity>
                 </View>
 
@@ -330,7 +330,7 @@ export default function SearchPassengerByNIC() {
                     icon="mail-outline"
                     label="Email"
                     value={passenger.email}
-                    color="#0057D9"
+                    color="#155B8A"
                     onPress={() => Linking.openURL(`mailto:${passenger.email}`)}
                   />
                   <InfoRow
@@ -356,7 +356,7 @@ export default function SearchPassengerByNIC() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F3F6FB" },
+  container: { flex: 1, backgroundColor: "#F3F6FA" },
 
   header: {
     paddingTop: Platform.OS === "android" ? (StatusBar.currentHeight ?? 24) + 12 : 12,
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   brand: { color: "#fff", fontSize: 18, fontWeight: "700", letterSpacing: 0.5 },
-  headerTitle: { color: "#fff", fontSize: 26, fontWeight: "800", marginTop: 22 },
+  headerTitle: { color: "#fff", fontSize: 28, fontWeight: "800", marginTop: 22 },
   headerSub: { color: "rgba(255,255,255,0.8)", fontSize: 14, marginTop: 4 },
 
   searchCard: {
@@ -390,7 +390,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     elevation: 6,
   },
-  inputLabel: { fontSize: 13, fontWeight: "600", color: "#5B6475", marginBottom: 8 },
+  inputLabel: { fontSize: 13, fontWeight: "600", color: "#5B6B7F", marginBottom: 8 },
   inputWrap: {
     flexDirection: "row",
     alignItems: "center",
@@ -402,8 +402,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     height: 52,
   },
-  inputWrapFocused: { borderColor: "#0057D9", backgroundColor: "#fff" },
-  input: { flex: 1, fontSize: 16, color: "#1A2233", letterSpacing: 1, fontWeight: "600" },
+  inputWrapFocused: { borderColor: "#155B8A", backgroundColor: "#fff" },
+  input: { flex: 1, fontSize: 16, color: "#0F1B2D", letterSpacing: 1, fontWeight: "600" },
   searchBtn: {
     height: 52,
     borderRadius: 14,
@@ -419,13 +419,13 @@ const styles = StyleSheet.create({
     width: 84,
     height: 84,
     borderRadius: 42,
-    backgroundColor: "#E6EEFC",
+    backgroundColor: "#EAF1FB",
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 16,
   },
-  emptyTitle: { fontSize: 18, fontWeight: "700", color: "#1A2233" },
-  emptyText: { fontSize: 14, color: "#7A8499", textAlign: "center", marginTop: 6, lineHeight: 20 },
+  emptyTitle: { fontSize: 18, fontWeight: "700", color: "#0F1B2D" },
+  emptyText: { fontSize: 14, color: "#5B6B7F", textAlign: "center", marginTop: 6, lineHeight: 20 },
 
   errorCard: {
     flexDirection: "row",
@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
     borderColor: "#fff",
   },
   avatarText: { color: "#fff", fontSize: 30, fontWeight: "800" },
-  name: { fontSize: 22, fontWeight: "800", color: "#1A2233", marginTop: 12, textAlign: "center" },
+  name: { fontSize: 22, fontWeight: "800", color: "#173C79", marginTop: 12, textAlign: "center" },
   badgeRow: { flexDirection: "row", gap: 8, marginTop: 10 },
   idBadge: {
     flexDirection: "row",
@@ -484,7 +484,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     borderRadius: 20,
   },
-  idBadgeText: { color: "#0057D9", fontWeight: "700", fontSize: 12 },
+  idBadgeText: { color: "#155B8A", fontWeight: "700", fontSize: 12 },
   activeBadge: {
     flexDirection: "row",
     alignItems: "center",
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   activeDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: "#159B79" },
-  activeText: { color: "#159B79", fontWeight: "700", fontSize: 12 },
+  activeText: { color: "#0B6B53", fontWeight: "700", fontSize: 12 },
 
   actions: {
     flexDirection: "row",
@@ -517,7 +517,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#8A94A6",
+    color: "#5B6B7F",
     textTransform: "uppercase",
     letterSpacing: 1,
     marginBottom: 6,
@@ -538,6 +538,6 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   rowText: { flex: 1 },
-  rowLabel: { fontSize: 12, color: "#8A94A6", fontWeight: "600" },
-  rowValue: { fontSize: 15, color: "#1A2233", fontWeight: "600", marginTop: 2 },
+  rowLabel: { fontSize: 12, color: "#5B6B7F", fontWeight: "600" },
+  rowValue: { fontSize: 15, color: "#0F1B2D", fontWeight: "600", marginTop: 2 },
 });

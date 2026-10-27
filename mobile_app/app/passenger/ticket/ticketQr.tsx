@@ -9,7 +9,8 @@ import {
   TouchableOpacity, 
   SafeAreaView, 
   TextInput,
-  Alert
+  Alert,
+  ScrollView,
 } from 'react-native';
 import {  
   Ionicons, 
@@ -20,6 +21,7 @@ import {
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import QRCode from 'react-native-qrcode-svg';
+import { ScreenHeader, GradientButton, C, ui } from "../../../components/JetUI";
 
 const ParcelService = () => {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -139,103 +141,86 @@ const ParcelService = () => {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
        
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-          <View style={styles.header}>    
-            <TouchableOpacity >
-              <Text style={styles.title}>JetLink</Text>
-            </TouchableOpacity>          
-          </View>
-        </LinearGradient> 
+        <ScreenHeader eyebrow="Active ticket" title="Your ticket" />
 
-        <View style={styles.card} >
-          <View style={styles.svw}> 
-            {error && (
-                <Text style={styles.errorText}>{error}</Text>
-            )}
-            
-            <Text style={styles.title}>Your Ticket</Text>
-            {qrToken && (
-                <View style={styles.qrWrapper}>
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          {error ? (
+            <View style={styles.errorBox}>
+              <Ionicons name="alert-circle-outline" size={18} color={C.red} />
+              <Text style={styles.errorText}>{error}</Text>
+            </View>
+          ) : null}
+
+          <View style={styles.pass}>
+          <View style={styles.passTop}>
+            <View style={styles.passRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.passLabel}>From</Text>
+                <Text style={styles.passPlace} numberOfLines={1}>{pickup}</Text>
+              </View>
+              <View style={styles.passIcon}>
+                <Ionicons name="bus" size={18} color="#FFFFFF" />
+              </View>
+              <View style={{ flex: 1, alignItems: "flex-end" }}>
+                <Text style={styles.passLabel}>To</Text>
+                <Text style={styles.passPlace} numberOfLines={1}>{drop}</Text>
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.perf}>
+            <View style={styles.notchL} />
+            <View style={styles.perfLine} />
+            <View style={styles.notchR} />
+          </View>
+
+          <View style={styles.qrBox}>
+            {qrToken ? (
+              <View style={styles.qrFrame}>
                 <QRCode
                   value={String(qrToken)}
-                  size={220}
+                  size={200}
                   getRef={(ref) => {
                     qrRef.current = ref;
                   }}
                 />
               </View>
-            )}
-            
-          </View>      
-        </View>
-
-        <View style={styles.card1} >
-          <View style={styles.svw1}> 
-            <View  style={styles.detailRow}>
-              <View style={[styles.iconWrap, { backgroundColor: "#FFA50020" }]}>
-                <Fontisto name="bus" size={22} color="#FFA500"  />
-              </View>
-              <View style={styles.detailTextWrap}>
-                <Text style={styles.detailLabel}>Bus Number</Text>
-                <Text style={styles.detailValue}>{params.bNumber}</Text>
-              </View>
+            ) : null}
+            <View style={styles.qrHint}>
+              <Ionicons name="scan-outline" size={16} color={C.muted} />
+              <Text style={styles.qrHintText}>Show this code to the conductor</Text>
             </View>
-
-            <View  style={styles.detailRow}>
-              <View style={[styles.iconWrap, { backgroundColor: "#7ED32120" }]}>
-                <Ionicons name="calendar-outline" size={22} color="#7ED321"  />
-              </View>
-              <View style={styles.detailTextWrap}>
-                <Text style={styles.detailLabel}>Date</Text>
-                <Text style={styles.detailValue}>{params.date}</Text>
-              </View>
-            </View>
-
-            <View  style={styles.detailRow}>
-              <View style={[styles.iconWrap, { backgroundColor: "#8B5CF620" }]}>
-                <Ionicons name="time-outline" size={22} color="#8B5CF6"  />
-              </View>
-              <View style={styles.detailTextWrap}>
-                <Text style={styles.detailLabel}>Time</Text>
-                <Text style={styles.detailValue}>{params.time}</Text>
-              </View>
-            </View>
-
-            <View style={styles.detailRow}>
-            <View style={[styles.iconWrap, { backgroundColor: "#ea580c20" }]}>
-            <MaterialCommunityIcons name="car-seat" size={18} color="#ea580c" />
-            </View>
-            <View style={styles.detailTextWrap}>
-            <Text style={styles.detailLabel}>Seat Numbers</Text>
-            <Text style={styles.detailValue}>{seatNumber()}</Text>
-            </View>
-            </View>
-
           </View>
-        </View>
 
-        
+          <View style={styles.perf}>
+            <View style={styles.notchL} />
+            <View style={styles.perfLine} />
+            <View style={styles.notchR} />
+          </View>
 
-        <TouchableOpacity style={styles.submitButton} onPress={shareQR}> 
-          <LinearGradient
-              colors={["#173C79","#155B8A","#159B79",]}
-              start={{x: 0, y: 0,}}
-              end={{x: 1, y: 1,}}
-              style={styles.submitGradient}
-          >
-              <Text style={styles.submitText}>Share QR Code</Text>
-          </LinearGradient>
-        </TouchableOpacity> 
+          <View style={styles.grid}>
+            <View style={styles.gridItem}>
+              <Text style={styles.gridLabel}>Bus number</Text>
+              <Text style={styles.gridValue}>{params.bNumber}</Text>
+            </View>
+            <View style={styles.gridItem}>
+              <Text style={styles.gridLabel}>Seats</Text>
+              <Text style={styles.gridValue}>{seatNumber()}</Text>
+            </View>
+            <View style={styles.gridItem}>
+              <Text style={styles.gridLabel}>Date</Text>
+              <Text style={styles.gridValue}>{params.date}</Text>
+            </View>
+            <View style={styles.gridItem}>
+              <Text style={styles.gridLabel}>Time</Text>
+              <Text style={styles.gridValue}>{params.time}</Text>
+            </View>
+          </View>
+          </View>
 
+          <GradientButton label="Share QR code" icon="share-social-outline" onPress={shareQR} />
+        </ScrollView>
 
-
-        
-        
       {isSearching ? (
               <TextInput
                 style={styles.searchBarInput}
@@ -339,10 +324,37 @@ const ParcelService = () => {
 };
 
 const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    backgroundColor:"#fff"
+  stampText: { fontSize: 13, fontWeight: '800', color: '#5B6B7F', letterSpacing: 1 },
+  stamp: { position: 'absolute', top: 18, right: 18, flexDirection: 'row', alignItems: 'center', gap: 6, borderWidth: 2, borderColor: '#8A97A8', borderRadius: 10, paddingHorizontal: 10, paddingVertical: 4, transform: [{ rotate: '-8deg' }] },
+  errorBox: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#FDF1F1', borderRadius: 12, padding: 12, marginBottom: 12 },
+  gridValue: { fontSize: 15, fontWeight: '800', color: C.ink, marginTop: 2 },
+  gridLabel: { fontSize: 12, fontWeight: '600', color: C.muted },
+  gridItem: { width: '50%' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 20, paddingBottom: 20, rowGap: 14 },
+  qrHintText: { fontSize: 13, fontWeight: '600', color: C.muted },
+  qrHint: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 12 },
+  qrFrame: { padding: 14, borderRadius: 18, borderWidth: 1.5, borderColor: '#E3E9F1', backgroundColor: '#FFFFFF' },
+  qrBox: { alignItems: 'center', paddingVertical: 20, paddingHorizontal: 20 },
+  perfLine: { flex: 1, borderTopWidth: 2, borderTopColor: '#E3E9F1', borderStyle: 'dashed', marginHorizontal: 8 },
+  notchR: { width: 24, height: 24, borderRadius: 12, backgroundColor: C.bg, marginRight: -12 },
+  notchL: { width: 24, height: 24, borderRadius: 12, backgroundColor: C.bg, marginLeft: -12 },
+  perf: { flexDirection: 'row', alignItems: 'center', height: 24 },
+  passIcon: { width: 38, height: 38, borderRadius: 19, backgroundColor: '#159B79', alignItems: 'center', justifyContent: 'center', marginHorizontal: 10 },
+  passPlace: { fontSize: 20, fontWeight: '800', color: C.navy, marginTop: 2 },
+  passLabel: { fontSize: 12, fontWeight: '700', color: C.muted },
+  passRow: { flexDirection: 'row', alignItems: 'center' },
+  passTop: { padding: 20 },
+  pass: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 26,
+    overflow: 'hidden',
+    elevation: 6,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 18,
   },
+  container: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: 'row',
@@ -412,12 +424,7 @@ const styles = StyleSheet.create({
     marginLeft:10
   },
 
-  errorText: {
-    fontSize: 14,
-    color: '#c0392b',
-    textAlign: 'center',
-    marginBottom: 16,
-  },
+  errorText: { flex: 1, fontSize: 13, fontWeight: '600', color: C.red },
 
   
   cardTitle: {

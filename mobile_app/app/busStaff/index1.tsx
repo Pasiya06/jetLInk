@@ -12,6 +12,7 @@ import {
   SafeAreaView,
   StatusBar,
   BackHandler,
+  ScrollView,
 } from "react-native";
 
 // Icons
@@ -33,6 +34,7 @@ import {
   subscribeBusLocation,
   isBusLocationSharing,
 } from "../../services/busLocationService";
+import { ScreenHeader, GradientAction, SectionLabel, Tile, IconBox, C, ui } from "../../components/JetUI";
 // ─── Environment Variables ─────────────────────────────────────────
 const API_URL     = process.env.EXPO_PUBLIC_API_URL;
 const WEATHER_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
@@ -306,39 +308,51 @@ export default function DriverHome() {
       <SafeAreaView style={styles.container}>
 
         {/* ── Header ──────────────────────────────────────────── */}
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-        
-          <View style={styles.header}>
-            
-            
-            <TouchableOpacity >
-              <Text style={styles.title}>Jetlink</Text>
-            </TouchableOpacity>
-            
-            
+        <ScreenHeader eyebrow="Bus staff" title="Jetlink" />
+
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          {/* ── Bus + location card ──────────────────────────── */}
+          <View style={[ui.card, styles.busCard]}>
+            <View style={styles.busRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.title1}>{getGreeting()} · your bus today</Text>
+                <Text style={styles.title2}>{busNum || "No Bus"}</Text>
+              </View>
+              <IconBox bg={C.blueSoft} size={52}>
+                <MaterialIcons name="directions-bus" size={28} color={C.blue} />
+              </IconBox>
+            </View>
+
+            <View style={[styles.statusPill, { backgroundColor: sharingActive ? C.greenSoft : "#FDF1F1" }]}>
+              <View style={[styles.statusDot, { backgroundColor: sharingActive ? "#159B79" : "#E5484D" }]} />
+              <Text style={[styles.statusText, { color: sharingActive ? C.green : C.red }]}>
+                {sharingActive ? "Live location on" : "Location sharing is off"}
+              </Text>
+            </View>
+
+            {/* ── GPS status ───────────────────────────────────── */}
+            <View
+              style={[
+                styles.gpsButton,
+                sharingActive
+                  ? { backgroundColor: "#FDF1F1", borderColor: "#F3C4C4" }
+                  : { backgroundColor: C.greenSoft, borderColor: "#BFE6D6" },
+              ]}
+            >
+              <MaterialIcons
+                name={sharingActive ? "location-off" : "location-on"}
+                size={22}
+                color={sharingActive ? C.red : C.green}
+              />
+              <Text style={[styles.gpsButtonText, { color: sharingActive ? C.red : C.green }]}>
+                {loading
+                  ? "Connecting..."
+                  : sharingActive
+                  ? "Stop Sharing Location"
+                  : "Start Sharing Location"}
+              </Text>
+            </View>
           </View>
-        </LinearGradient>
-
-        {/* ── Welcome Card ────────────────────────────────────── */}
-        <View style={styles.card}>
-          <Text style={styles.title1}>{getGreeting()}, {params.busNum} 👋</Text>
-
-          <View style={styles.iconContainer1}>
-            <Text style={styles.title2}>{busNum || "No Bus"}</Text>
-            <MaterialIcons name="directions-bus" size={30} color="#0047AB" />
-          </View>
-
-          <Text style={styles.subtitle1}>
-            {sharingActive
-              ? `🟢 Sharing live location`
-              : "🔴 Location sharing is OFF"}
-          </Text>
-        </View>
 
         {/* ── Location Status Card ─────────────────────────────── */}
         {/* <View style={styles.locationCard}> */}
@@ -385,97 +399,49 @@ export default function DriverHome() {
           )}
         </View> */}
 
-        {/* ── GPS Toggle Button ────────────────────────────────── */}
-        <View
-          style={[
-            styles.gpsButton,
-            { backgroundColor: sharingActive ? "#FF4444" : "#32CD32" },
-          ]}
-          
-        >
-          <MaterialIcons
-            name={sharingActive ? "location-off" : "location-on"}
-            size={26}
-            color="#fff"
+          {/* ── Main action ──────────────────────────────────── */}
+          <GradientAction
+            icon={<MaterialCommunityIcons name="qrcode-scan" size={24} color="#FFFFFF" />}
+            title="Scan bus ticket"
+            subtitle="Check a passenger's ticket"
+            onPress={loading ? undefined : handleBusTicket}
           />
-          <Text style={styles.gpsButtonText}>
-            {loading
-              ? "Connecting..."
-              : sharingActive
-              ? "Stop Sharing Location"
-              : "Start Sharing Location"}
-          </Text>
-        </View>
 
-        {/* ── Action Cards Row ─────────────────────────────────── */}
-        <View style={styles.listContainer1}>
-          <TouchableOpacity
-            style={styles.card0}
-            onPress={handleBusTicket}
-            disabled={loading}
-          >
-            <View style={[styles.iconContainer, { backgroundColor: "#8B5CF618"  }]}>
-              <FontAwesome5 name="bus-alt" size={24} color="#8B5CF6" />
-            </View>
-            <Text style={styles.cardText}>Scan Bus Ticket</Text>
-            <MaterialCommunityIcons
-              name="chevron-right"
-              size={24}
-              color="#C7C7CC"
+          <SectionLabel>Services</SectionLabel>
+
+          {/* ── Grid Cards ───────────────────────────────────── */}
+          <View style={ui.grid}>
+            <Tile
+              icon={<Feather name="gift" size={21} color={C.amber} />}
+              iconBg={C.amberSoft}
+              title="Parcel"
+              subtitle="Scan, book & track"
+              onPress={loading ? undefined : handleSearch}
             />
-          </TouchableOpacity>
-        </View>
-
-        {/* ── Grid Cards ───────────────────────────────────────── */}
-        <View style={styles.listContainer}>
-          <TouchableOpacity
-            style={styles.card1}
-            onPress={handleSearch}
-            disabled={loading}
-          >
-            <View style={[styles.iconContainer, { backgroundColor: "#ffc40018"  }]}>
-              <Feather name="gift" size={24} color="#ffc400" />
-            </View>
-            <Text style={styles.cardText}>Parcel</Text>
-            <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.card2}
-            onPress={handleTour}
-            disabled={loading}
-          >
-            <View style={[styles.iconContainer, { backgroundColor: "#EC489918"  }]}>
-              <FontAwesome5 name="route" size={24} color="#EC4899" />
-            </View>
-            <Text style={styles.cardText}>Tours</Text>  
-            <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.card1}
-            onPress={handleEmergency}
-            disabled={loading}
-          >
-            <View style={[styles.iconContainer, { backgroundColor: "#ff000018"  }]}>
-              <MaterialCommunityIcons name="alarm-light-outline" size={24} color="#ff0000" />
-            </View>
-            <Text style={styles.cardText}>Emergency</Text>
-            <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.card2}
-            onPress={handleHelp}
-            disabled={loading}
-          >
-            <View style={[styles.iconContainer, { backgroundColor: "#10B98118"  }]}>
-                <FontAwesome5 name="hands-helping" size={24} color="#10B981" />
-              </View>
-              <Text style={styles.cardText}>Help</Text>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
-        </View>
+            <Tile
+              icon={<FontAwesome5 name="route" size={20} color={C.pink} />}
+              iconBg={C.pinkSoft}
+              title="Tours"
+              subtitle="Assigned tour trips"
+              onPress={loading ? undefined : handleTour}
+            />
+            <Tile
+              danger
+              icon={<MaterialCommunityIcons name="alarm-light-outline" size={22} color={C.red} />}
+              iconBg={C.redSoft}
+              title="Emergency"
+              subtitle="Alert the control room"
+              onPress={loading ? undefined : handleEmergency}
+            />
+            <Tile
+              icon={<FontAwesome5 name="hands-helping" size={19} color={C.green} />}
+              iconBg={C.greenSoft}
+              title="Help"
+              subtitle="Support & FAQs"
+              onPress={loading ? undefined : handleHelp}
+            />
+          </View>
+        </ScrollView>
 
         {isSearching ? (
               <TextInput
@@ -583,7 +549,7 @@ export default function DriverHome() {
 const styles = StyleSheet.create({
    container:{
     flex:1,
-    backgroundColor:"#fff"
+    backgroundColor:C.bg
   },
 
   header: {
@@ -636,19 +602,8 @@ const styles = StyleSheet.create({
     marginTop: 5,
     alignItems: "center",
   },
-  title1: {
-    width: "100%",
-    color: "#0047AB",
-    fontSize: 16,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
-  title2: {
-    color: "#0047AB",
-    fontSize: 30,
-    fontWeight: "700",
-    marginRight: 10,
-  },
+  title1: { color: C.muted, fontSize: 13, fontWeight: "600", marginBottom: 2 },
+  title2: { color: C.navy, fontSize: 30, fontWeight: "800", letterSpacing: 0.5 },
   subtitle1: {
     color: "#555",
     fontSize: 14,
@@ -727,23 +682,25 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    width: "90%",
-    alignSelf: "center",
-    padding: 16,
-    borderRadius: 25,
+    height: 48,
+    borderRadius: 14,
+    borderWidth: 1.5,
     marginTop: 14,
-    elevation: 6,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
   },
-  gpsButtonText: {
-    fontSize: 17,
-    fontWeight: "800",
-    color: "#fff",
-    marginLeft: 10,
+  busCard: { padding: 18, borderRadius: 22 },
+  busRow: { flexDirection: "row", alignItems: "center" },
+  statusPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    alignSelf: "flex-start",
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 999,
+    marginTop: 12,
   },
+  statusDot: { width: 8, height: 8, borderRadius: 4, marginRight: 8 },
+  statusText: { fontSize: 13, fontWeight: "700" },
+  gpsButtonText: { fontSize: 15, fontWeight: "700", marginLeft: 8 },
 
   // ── Action Cards ──────────────────────────────────────────────────
   listContainer1: {

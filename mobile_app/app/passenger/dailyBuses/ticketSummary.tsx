@@ -8,7 +8,8 @@ import {
   TouchableOpacity, 
   SafeAreaView, 
   TextInput,
-  Alert
+  Alert,
+  ScrollView,
 } from 'react-native';
 import { 
   Ionicons, 
@@ -21,6 +22,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import FieldError from "../../../components/FieldError";
 import { useFieldErrors } from "../../../utils/validation";
+import { ScreenHeader, SectionLabel, Pill, GradientButton, C, ui } from "../../../components/JetUI";
 const ParcelService = () => {
     const API_URL = process.env.EXPO_PUBLIC_API_URL;
     const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -71,132 +73,98 @@ const ParcelService = () => {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
        
-        <LinearGradient
-            colors={["#173C79","#155B8A","#159B79",]}
-            start={{x: 0, y: 0,}}
-            end={{x: 1, y: 1,}}
-            style={styles.submitGradient1}
-        >
-            <View style={styles.header}>
-                
-            
-                <TouchableOpacity >
-                    <Text style={styles.title}>JetLink</Text>
-                </TouchableOpacity>
-                    
+        <ScreenHeader eyebrow="Review & pay" title="Ticket summary" />
+
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          {/* Trip card */}
+          <View style={[ui.card, styles.tripCard]}>
+            <View style={styles.tripTop}>
+              <Pill text={String(params.busType) === "Highway" ? "Highway" : "Normal"} />
+              <View style={styles.busTag}>
+                <Ionicons name="bus-outline" size={15} color={C.blue} />
+                <Text style={styles.busTagText}>{params.bNumber}</Text>
+              </View>
             </View>
-        </LinearGradient> 
 
-        <View style={styles.card} >
-            <View style={styles.svw1}> 
-                <Text style={styles.sectionHeader}>Ticket Summary</Text>
-                
-                <View style={styles.detailRow}>
-                    <View style={[styles.iconWrap, { backgroundColor: '#F5A62320' }]}>
-                    <Ionicons name="location-outline" size={18} color='#F5A623' />
-                    </View>
-                    <View style={styles.detailTextWrap}>
-                    <Text style={styles.detailLabel}>Pickup Location</Text>
-                    <Text style={styles.detailValue}>{params.pickup}</Text>
-                    </View>
-                    <View style={[styles.iconWrap, { backgroundColor: '#7ED32120' }]}>
-                    <Ionicons name="flag-outline" size={18} color='#7ED321' />
-                    </View>
-                    <View style={styles.detailTextWrap}>
-                    <Text style={styles.detailLabel}>Drop Location</Text>
-                    <Text style={styles.detailValue}>{params.drop}</Text>
-                    </View>
-                </View>
-
-                
-
-                <View style={styles.detailRow}>
-                    <View style={[styles.iconWrap, { backgroundColor: '#9B59B620' }]}>
-                    <Ionicons name="calendar-outline" size={18} color='#9B59B6' />
-                    </View>
-                    <View style={styles.detailTextWrap}>
-                    <Text style={styles.detailLabel}>Date</Text>
-                    <Text style={styles.detailValue}>{params.date}</Text>
-                    </View>
-                    <View style={[styles.iconWrap, { backgroundColor: '#E74C3C20' }]}>
-                    <Ionicons name="time-outline" size={18} color='#E74C3C' />
-                    </View>
-                    <View style={styles.detailTextWrap}>
-                    <Text style={styles.detailLabel}>Time</Text>
-                    <Text style={styles.detailValue}>{params.depaturetime}</Text>
-                    </View>
-                </View>
-
-                <View style={styles.detailRow}>
-                    
-                </View>
-            </View>      
-        </View>
-
-        <View style={styles.card1} >
-            <View style={styles.svw}> 
-                <Text style={styles.label}>No of Ticket</Text>
-                <View style={styles.inputWrapper}>
-                    <TextInput 
-                        style={styles.input} 
-                        value={tikNo} 
-                        onChangeText={settikNo} 
-                        keyboardType="phone-pad" 
-                        maxLength={2} 
-                    />           
-                </View>
-                <FieldError message={fieldError("tikNo", tikNo)} />
+            <View style={styles.routeRow}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.routeLabel}>From</Text>
+                <Text style={styles.routePlace} numberOfLines={1}>{params.pickup}</Text>
+              </View>
+              <View style={styles.routeIcon}>
+                <Ionicons name="arrow-forward" size={18} color="#FFFFFF" />
+              </View>
+              <View style={{ flex: 1, alignItems: "flex-end" }}>
+                <Text style={styles.routeLabel}>To</Text>
+                <Text style={styles.routePlace} numberOfLines={1}>{params.drop}</Text>
+              </View>
             </View>
-        </View>
 
-        <View style={styles.card2} >
-            <View style={styles.svw}>
-
-                <View style={styles.row}>
-                    <View style={styles.rowLeft}>
-                    <View style={[styles.iconWrap1, { backgroundColor: '#F5A62320' }]}>
-                        <Ionicons name ="ticket-outline" size={18} color='#F5A623' />
-                    </View>
-                    <Text style={styles.detailLabel}>Ticket Price</Text>
-                    </View>
-                    <Text style={styles.value}>Rs. {params.ticketPrice}</Text>
-                </View>
-
-                <View style={styles.row}>
-                    <View style={styles.rowLeft}>
-                    <View style={[styles.iconWrap1, { backgroundColor: '#7ED32120' }]}>
-                        <MaterialIcons name="format-list-numbered" size={18} color='#7ED321' />
-                    </View>
-                    <Text style={styles.detailLabel}>No of tickets</Text>
-                    </View>
-                    <Text style={styles.value}>{tikNo || 0}</Text>
-                </View>
-
-                <View style={styles.divider} />
-
-                <View style={styles.totalRow}>
-                    <Text style={styles.totalLabel}>Total</Text>
-                    <Text style={styles.totalValue}>Rs. {total}</Text>
-                </View>
-
+            <View style={styles.tripMeta}>
+              <View style={styles.metaItem}>
+                <Ionicons name="calendar-outline" size={16} color={C.muted} />
+                <Text style={styles.metaText}>{params.date}</Text>
+              </View>
+              <View style={styles.metaItem}>
+                <Ionicons name="time-outline" size={16} color={C.muted} />
+                <Text style={styles.metaText}>{params.depaturetime}</Text>
+              </View>
             </View>
-        </View>
+          </View>
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSearch}>
-            <LinearGradient
-                colors={["#173C79","#155B8A","#159B79",]}
-                start={{x: 0, y: 0,}}
-                end={{x: 1, y: 1,}}
-                style={styles.submitGradient}
+          {/* Ticket count */}
+          <SectionLabel>Passengers</SectionLabel>
+          <View style={[ui.card, styles.countCard]}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.countTitle}>Number of tickets</Text>
+              <Text style={styles.countSub}>One ticket per passenger</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.stepBtn}
+              onPress={() => settikNo(String(Math.max(1, (parseInt(tikNo, 10) || 1) - 1)))}
+              accessibilityLabel="Fewer tickets"
             >
-            <Text style={styles.submitText}>Submit payment</Text>
-            </LinearGradient>
-        </TouchableOpacity>
+              <Ionicons name="remove" size={20} color={C.blue} />
+            </TouchableOpacity>
+            <TextInput
+              style={styles.countInput}
+              value={tikNo}
+              onChangeText={(t) => settikNo(t.replace(/[^0-9]/g, ""))}
+              keyboardType="number-pad"
+              maxLength={2}
+              accessibilityLabel="Number of tickets"
+            />
+            <TouchableOpacity
+              style={[styles.stepBtn, styles.stepBtnPlus]}
+              onPress={() => settikNo(String(Math.min(99, (parseInt(tikNo, 10) || 0) + 1)))}
+              accessibilityLabel="More tickets"
+            >
+              <Ionicons name="add" size={20} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+          <FieldError message={fieldError("tikNo", tikNo)} />
 
+          {/* Price */}
+          <SectionLabel>Payment</SectionLabel>
+          <View style={[ui.card, styles.priceCard]}>
+            <View style={styles.row}>
+              <Text style={styles.priceLabel}>Ticket price</Text>
+              <Text style={styles.value}>Rs. {params.ticketPrice}</Text>
+            </View>
+            <View style={styles.row}>
+              <Text style={styles.priceLabel}>Tickets</Text>
+              <Text style={styles.value}>× {tikNo || 0}</Text>
+            </View>
+            <View style={styles.divider} />
+            <View style={styles.totalRow}>
+              <Text style={styles.totalLabel}>Total</Text>
+              <Text style={styles.totalValue}>Rs. {total}</Text>
+            </View>
+          </View>
 
+          <GradientButton label={`Pay Rs. ${total}`} icon="card-outline" onPress={handleSearch} />
+        </ScrollView>
 
-        
-        
       {isSearching ? (
               <TextInput
                 style={styles.searchBarInput}
@@ -302,10 +270,29 @@ const ParcelService = () => {
 };
 
 const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    backgroundColor:"#fff"
-  },
+  seatChipText: { fontSize: 15, fontWeight: '800', color: C.blue },
+  seatChip: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: C.blueSoft, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 12 },
+  seatsCard: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, padding: 16, borderRadius: 22 },
+  countInput: { width: 46, height: 44, textAlign: 'center', fontSize: 20, fontWeight: '800', color: C.ink, padding: 0 },
+  stepBtnPlus: { backgroundColor: C.blue },
+  stepBtn: { width: 44, height: 44, borderRadius: 14, backgroundColor: C.blueSoft, alignItems: 'center', justifyContent: 'center' },
+  countSub: { fontSize: 12, fontWeight: '500', color: C.muted, marginTop: 2 },
+  countTitle: { fontSize: 15, fontWeight: '800', color: C.ink },
+  countCard: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 22, gap: 8 },
+  priceLabel: { fontSize: 14, fontWeight: '600', color: C.muted },
+  priceCard: { padding: 18, borderRadius: 22 },
+  metaText: { fontSize: 14, fontWeight: '700', color: C.ink },
+  metaItem: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  tripMeta: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 16, paddingTop: 14, borderTopWidth: 1.5, borderTopColor: C.line, borderStyle: 'dashed' },
+  routeIcon: { width: 36, height: 36, borderRadius: 18, backgroundColor: '#159B79', alignItems: 'center', justifyContent: 'center', marginHorizontal: 10 },
+  routePlace: { fontSize: 18, fontWeight: '800', color: C.navy, marginTop: 2 },
+  routeLabel: { fontSize: 12, fontWeight: '700', color: C.muted },
+  routeRow: { flexDirection: 'row', alignItems: 'center', marginTop: 18 },
+  busTagText: { fontSize: 14, fontWeight: '800', color: C.ink, letterSpacing: 0.5 },
+  busTag: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  tripTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  tripCard: { padding: 18, borderRadius: 24 },
+  container: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: 'row',
@@ -400,14 +387,7 @@ const styles = StyleSheet.create({
     
   },
 
-  row: {
-    marginLeft: 20,
-    marginRight: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 14,
-  },
+  row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6 },
 
   rowLeft: {
     flexDirection: 'row',
@@ -430,40 +410,15 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 
-  value: {
-    fontSize: 14,
-    color: '#1A1A1A',
-    fontWeight: '600',
-  },
+  value: { fontSize: 15, fontWeight: '800', color: C.ink },
 
-  divider: {
-    marginLeft: 20,
-    marginRight: 20,
-    height: 1,
-    backgroundColor: '#515151a0',
-    marginVertical: 8,
-  },
+  divider: { height: 1, backgroundColor: C.line, marginVertical: 10 },
 
-  totalRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 8,
-  },
+  totalRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
 
-  totalLabel: {
-    marginLeft: 20,
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1A1A1A',
-  },
+  totalLabel: { fontSize: 16, fontWeight: '800', color: C.ink },
 
-  totalValue: {
-    marginRight: 20,
-    fontSize: 18,
-    fontWeight: '800',
-    color: '#4A90E2',
-  },
+  totalValue: { fontSize: 22, fontWeight: '800', color: C.blue },
 
   svw: {
     width: '100%',  

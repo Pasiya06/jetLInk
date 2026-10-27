@@ -16,6 +16,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TourPackageCard, { TourPackage, packageTitle } from "../../../components/TourPackageCard";
 import PickupTownPicker from "../../../components/PickupTownPicker";
+import { C, ScreenHeader, ui } from "../../../components/JetUI";
 import { packageFitsPickup, roadDistanceKm } from "../../../utils/sriLankaTowns";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -133,7 +134,7 @@ export default function PackagesScreen() {
         <Stack.Screen options={{ title: "", headerShown: false }} />
         <View style={styles.loadingContainer}>
           <StatusBar barStyle="light-content" />
-          <ActivityIndicator size="large" color="#12966F" />
+          <ActivityIndicator size="large" color="#159B79" />
           <Text style={styles.loadingText}>Loading packages...</Text>
         </View>
       </>
@@ -146,43 +147,66 @@ export default function PackagesScreen() {
       <View style={styles.container}>
         <StatusBar barStyle="light-content" backgroundColor="#173C79" />
 
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-            start={{x: 0, y: 0,}}
-            end={{x: 1, y: 1,}}
-          style={styles.header}
-        >
-          <Text style={styles.headerTitle}>Tour Packages</Text>
-
+        <ScreenHeader
+          eyebrow="Tours"
+          title="Tour packages"
+          right={
+            <View style={styles.headerBadge}>
+              <Ionicons name="map" size={22} color="#FFFFFF" />
+            </View>
+          }
+        />
           {/* Pickup town selector */}
           {/* <TouchableOpacity style={styles.pickupBtn} activeOpacity={0.85} onPress={() => setPickerOpen(true)}>
             <View style={styles.pickupIcon}>
-              <Ionicons name="location" size={18} color="#12966F" />
+              <Ionicons name="location" size={18} color="#159B79" />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.pickupLabel}>Pickup town</Text>
-              <Text style={[styles.pickupValue, !pickupTown && { color: "#94A3B8" }]}>
+              <Text style={[styles.pickupValue, !pickupTown && { color: "#5B6B7F" }]}>
                 {pickupTown ?? "Select your town"}
               </Text>
             </View>
-            <Ionicons name="chevron-down" size={20} color="#64748B" />
+            <Ionicons name="chevron-down" size={20} color="#5B6B7F" />
           </TouchableOpacity> */}
-        </LinearGradient>
 
         <SectionList
           sections={sections}
           keyExtractor={(item) => item._id}
           stickySectionHeadersEnabled={false}
+          style={ui.body}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
           refreshing={refreshing}
           onRefresh={() => { setRefreshing(true); getPackages(); }}
           
+          ListHeaderComponent={
+            sections.length > 0 ? (
+              <View style={[ui.card, styles.introCard]}>
+                <View style={styles.introIcon}>
+                  <Ionicons name="bus" size={24} color={C.blue} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.introTitle}>Plan your next trip</Text>
+                  <Text style={styles.introSub}>
+                    {total} package{total === 1 ? "" : "s"} · prices are for the whole bus
+                  </Text>
+                </View>
+              </View>
+            ) : null
+          }
           renderSectionHeader={({ section }) => (
-            <Text style={styles.sectionTitle}>
-              {section.title}
-              <Text style={styles.sectionCount}>  ·  {section.data.length} package{section.data.length === 1 ? "" : "s"}</Text>
-            </Text>
+            <View style={styles.sectionRow}>
+              <View style={styles.sectionIcon}>
+                <Ionicons name="location" size={15} color={C.green} />
+              </View>
+              <Text style={styles.sectionTitle} numberOfLines={1}>{section.title}</Text>
+              <View style={styles.sectionPill}>
+                <Text style={styles.sectionCount}>
+                  {section.data.length} package{section.data.length === 1 ? "" : "s"}
+                </Text>
+              </View>
+            </View>
           )}
           renderItem={({ item }) => (
             <TourPackageCard
@@ -193,8 +217,10 @@ export default function PackagesScreen() {
             />
           )}
           ListEmptyComponent={
-            <View style={styles.emptyContainer}>
-              <Ionicons name="map-outline" size={54} color="#98A2B3" />
+            <View style={[ui.card, styles.emptyContainer]}>
+              <View style={styles.emptyIcon}>
+                <Ionicons name="map-outline" size={34} color={C.blue} />
+              </View>
               <Text style={styles.emptyTitle}>
                 {searchQuery ? "No matching packages" : pickupTown ? `No packages from ${pickupTown}` : "No packages yet"}
               </Text>
@@ -320,9 +346,47 @@ export default function PackagesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F2F5F8" },
-  loadingContainer: { flex: 1, backgroundColor: "#F2F5F8", justifyContent: "center", alignItems: "center" },
-  loadingText: { marginTop: 10, color: "#667085", fontSize: 14 },
+  headerBadge: {
+    width: 46,
+    height: 46,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.16)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  introCard: { flexDirection: "row", alignItems: "center", gap: 14, padding: 16, marginBottom: 4 },
+  introIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 16,
+    backgroundColor: C.blueSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  introTitle: { fontSize: 17, fontWeight: "800", color: C.ink },
+  introSub: { fontSize: 13, fontWeight: "500", color: C.muted, marginTop: 3 },
+  sectionRow: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 18, marginBottom: 12, marginHorizontal: 2 },
+  sectionIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 10,
+    backgroundColor: C.greenSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionPill: { backgroundColor: C.blueSoft, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
+  emptyIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 24,
+    backgroundColor: C.blueSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  container: { flex: 1, backgroundColor: "#F3F6FA" },
+  loadingContainer: { flex: 1, backgroundColor: "#F3F6FA", justifyContent: "center", alignItems: "center" },
+  loadingText: { marginTop: 10, color: "#5B6B7F", fontSize: 14 },
 
   header: {
     paddingTop: 54,
@@ -345,30 +409,30 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#E8F7F2",
+    backgroundColor: "#E3F5EE",
     alignItems: "center",
     justifyContent: "center",
   },
-  pickupLabel: { fontSize: 11, color: "#64748B", fontWeight: "600" },
-  pickupValue: { fontSize: 15, color: "#182B45", fontWeight: "700" },
+  pickupLabel: { fontSize: 11, color: "#5B6B7F", fontWeight: "600" },
+  pickupValue: { fontSize: 15, color: "#0F1B2D", fontWeight: "700" },
 
-  listContent: { paddingHorizontal: 16, paddingTop: 16, paddingBottom: 245 },
+  listContent: { paddingHorizontal: 16, paddingTop: 0, paddingBottom: 245 },
   infoBox: {
     flexDirection: "row",
     gap: 10,
-    backgroundColor: "#E6EEF9",
+    backgroundColor: "#EAF1FB",
     borderRadius: 18,
     padding: 16,
     marginBottom: 6,
   },
   infoText: { flex: 1, color: "#173C79", fontSize: 14, lineHeight: 20 },
-  sectionTitle: { fontSize: 18, fontWeight: "800", color: "#182B45", marginTop: 16, marginBottom: 12 },
-  sectionCount: { fontSize: 16, fontWeight: "500", color: "#64748B" },
+  sectionTitle: { flex: 1, fontSize: 17, fontWeight: "800", color: C.ink },
+  sectionCount: { fontSize: 12, fontWeight: "700", color: C.blue },
 
-  emptyContainer: { alignItems: "center", paddingHorizontal: 24, marginTop: 40 },
-  emptyTitle: { marginTop: 14, fontSize: 18, fontWeight: "800", color: "#344054", textAlign: "center" },
-  emptyText: { marginTop: 6, fontSize: 13, color: "#98A2B3", textAlign: "center", lineHeight: 19 },
-  showAllBtn: { marginTop: 14, backgroundColor: "#12966F", paddingHorizontal: 18, paddingVertical: 10, borderRadius: 20 },
+  emptyContainer: { alignItems: "center", paddingHorizontal: 24, paddingVertical: 32, marginTop: 4 },
+  emptyTitle: { marginTop: 14, fontSize: 18, fontWeight: "800", color: C.ink, textAlign: "center" },
+  emptyText: { marginTop: 6, fontSize: 13, color: "#5B6B7F", textAlign: "center", lineHeight: 19 },
+  showAllBtn: { marginTop: 16, backgroundColor: C.blue, paddingHorizontal: 20, paddingVertical: 11, borderRadius: 22 },
   showAllText: { color: "#fff", fontWeight: "700" },
 
   bottomNav: {

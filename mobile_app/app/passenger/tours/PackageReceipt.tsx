@@ -33,17 +33,17 @@ const { width } = Dimensions.get('window');
 // ------------------------------------------------------------
 
 const C = {
-  blue: "#0047AB",
+  blue: "#173C79",
   blueDeep: "#003580",
   blueSoft: "#E6EFFC",
-  lime: "#32CD32",
+  lime: "#159B79",
   limeDark: "#0B3D12",
   limeSoft: "#E7F7E7",
   page: "#48ee92",
   card: "#FFFFFF",
-  ink: "#101828",
-  body: "#475467",
-  muted: "#8A94A6",
+  ink: "#0F1B2D",
+  body: "#5B6B7F",
+  muted: "#5B6B7F",
   line: "#E4E9F1",
 };
 
@@ -187,7 +187,7 @@ export default function PackageReceipt() {
       <Stack.Screen options={{ headerShown: false }} />
       
       <LinearGradient
-        colors={['#fff8f8', '#3DDC84']}
+        colors={['#173C79', '#155B8A', '#159B79']}
         style={styles.container}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -201,7 +201,7 @@ export default function PackageReceipt() {
         >
           <View style={styles.iconCircleOuter}>
             <View style={styles.iconCircleInner}>
-              <Ionicons name="checkmark" size={64} color="#fff" />
+              <Ionicons name="checkmark" size={60} color="#159B79" />
             </View>
           </View>
         </Animated.View>
@@ -353,38 +353,14 @@ const styles = StyleSheet.create({
   iconWrapper: {
     marginBottom: 24,
   },
-  iconCircleOuter: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: 'rgba(134, 133, 133, 0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconCircleInner: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: '#3DDC84',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#1E3C72',
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: '#1E3C72',
-    marginBottom: 18,
-    textAlign: 'center',
-  },
+  iconCircleOuter: { width: 128, height: 128, borderRadius: 64, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center' },
+  iconCircleInner: { width: 94, height: 94, borderRadius: 47, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 26, fontWeight: '800', color: '#FFFFFF', marginBottom: 6 },
+  subtitle: { fontSize: 14, color: 'rgba(255,255,255,0.88)', marginBottom: 18, textAlign: 'center', lineHeight: 20 },
   amount: {
     fontSize: 34,
     fontWeight: '800',
-    color: '#1E3C72',
+    color: '#173C79',
     marginBottom: 24,
   },
   card: {
@@ -435,36 +411,16 @@ const styles = StyleSheet.create({
   detailValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1E3C72',
+    color: '#173C79',
   },
   divider: {
     height: 1,
     backgroundColor: '#eee',
   },
-  primaryButton: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: width - 48,
-    marginBottom: 12,
-  },
-  primaryButtonText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#1E3C72',
-  },
-  secondaryButton: {
-    paddingVertical: 12,
-  },
-  secondaryButtonText: {
-    fontSize: 14,
-    color: 'rgba(255,255,255,0.85)',
-    fontWeight: '500',
-  },
+  primaryButton: { flexDirection: 'row', backgroundColor: '#FFFFFF', height: 54, paddingHorizontal: 32, borderRadius: 27, alignItems: 'center', justifyContent: 'center', width: width - 48, marginBottom: 12, shadowColor: '#0F1B2D', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.18, shadowRadius: 14, elevation: 6 },
+  primaryButtonText: { fontSize: 16, fontWeight: '800', color: '#173C79' },
+  secondaryButton: { paddingVertical: 12, paddingHorizontal: 20 },
+  secondaryButtonText: { fontSize: 15, color: '#FFFFFF', fontWeight: '700' },
 
   // ---------- ticket ----------
   ticketWrap: {width: "100%", paddingHorizontal: 16, marginBottom: 20, },

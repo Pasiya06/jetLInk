@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import { Feather, FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { ScreenHeader, SearchBox, SectionLabel, Pill, EmptyState, Avatar, C, ui } from "../../../components/JetUI";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -78,9 +79,7 @@ const FriendsScreen: React.FC = () => {
     const initials = `${item.firstName?.charAt(0) ?? ""}${item.lastName?.charAt(0) ?? ""}`.toUpperCase();
     return (
       <View style={styles.friendRow}>
-        <View style={styles.profileCircle}>
-          <Text style={styles.initials}>{initials || "?"}</Text>
-        </View>
+        <Avatar name={`${item.firstName ?? ""} ${item.lastName ?? ""}`} size={46} />
 
         <View style={{ flex: 1, marginLeft: 12 }}>
           <Text style={styles.friendName} numberOfLines={1}>
@@ -94,7 +93,7 @@ const FriendsScreen: React.FC = () => {
           accessibilityLabel={`Email ${item.firstName}`}
           onPress={() => Linking.openURL(`mailto:${item.email}`)}
         >
-          <MaterialCommunityIcons name="email-outline" size={24} color="#FFA500" />
+          <MaterialCommunityIcons name="email-outline" size={21} color={C.blue} />
         </TouchableOpacity>
       </View>
     );
@@ -114,43 +113,20 @@ const FriendsScreen: React.FC = () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79", "#155B8A", "#159B79"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.header}
-        >
-          <Text style={styles.title}>Jetlink</Text>
-        </LinearGradient>
+        <ScreenHeader eyebrow="Passengers on JetLink" title="Friends" />
 
-        {/* Sub-header: title or search */}
-        <View style={styles.subHeader}>
-          {isSearching ? (
-            <TextInput
-              style={styles.searchBarInput}
-              placeholder="Search passengers..."
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              autoFocus={true}
-            />
-          ) : (
-            <Text style={styles.subHeaderTitle}>
-              Friends{!loading && !error ? `  ·  ${friends.length}` : ""}
-            </Text>
-          )}
-          <TouchableOpacity
-            onPress={() => {
-              if (isSearching) setSearchQuery("");
-              setIsSearching(!isSearching);
-            }}
-          >
-            <FontAwesome name={isSearching ? "close" : "search"} size={22} color="#173C79" />
-          </TouchableOpacity>
-        </View>
+        <View style={[ui.body, { paddingHorizontal: 16 }]}>
+        <SearchBox value={searchQuery} onChangeText={setSearchQuery} placeholder="Search by name or email" />
+        <SectionLabel
+          style={{ marginTop: 18, marginBottom: 10 }}
+          right={!loading && !error ? <Pill text={`${shown.length} ${shown.length === 1 ? "person" : "people"}`} /> : null}
+        >
+          People
+        </SectionLabel>
 
         {loading ? (
           <View style={styles.center}>
-            <ActivityIndicator size="large" color="#159B79" />
+            <ActivityIndicator size="large" color={C.blue} />
             <Text style={styles.muted}>Loading passengers…</Text>
           </View>
         ) : error ? (
@@ -168,20 +144,21 @@ const FriendsScreen: React.FC = () => {
             renderItem={renderFriendItem}
             keyExtractor={(item) => item._id}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingVertical: 6, paddingBottom: 200, flexGrow: 1 }}
+            contentContainerStyle={{ paddingBottom: 200, flexGrow: 1 }}
             refreshControl={
               <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); loadFriends(); }} />
             }
             ListEmptyComponent={
-              <View style={styles.center}>
-                <Ionicons name="people-outline" size={48} color="#98A2B3" />
-                <Text style={styles.muted}>
-                  {searchQuery ? "No passengers match your search." : "No other passengers yet."}
-                </Text>
-              </View>
+              <EmptyState
+                icon={<Ionicons name="people-outline" size={28} color={C.amber} />}
+                title={searchQuery ? "No matches" : "No other passengers yet"}
+                subtitle={searchQuery ? "No passengers match your search." : "Other passengers will appear here."}
+              />
             }
           />
         )}
+
+        </View>
 
         {/* Bottom nav */}
         <View style={styles.bottomNav}>
@@ -218,7 +195,7 @@ const FriendsScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#FFF' },
+  container: { flex: 1, backgroundColor: C.bg },
   header: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -247,7 +224,7 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 
-  list: { flex: 1, paddingHorizontal: 15 },
+  list: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 10 },
   muted: { color: '#64748B', fontSize: 14, textAlign: 'center' },
   errorText: { color: '#B4232A', textAlign: 'center' },
@@ -255,19 +232,19 @@ const styles = StyleSheet.create({
   retryText: { color: '#fff', fontWeight: '700' },
 
   friendRow: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF',
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
-    borderRadius: 16,
-    marginBottom: 12,
-    borderWidth: 0.5,
-    borderColor: '#32CD32',
+    paddingVertical: 10,
+    paddingLeft: 12,
+    paddingRight: 10,
+    borderRadius: 18,
+    marginBottom: 10,
     elevation: 3,
-    shadowColor: '#000000',
+    shadowColor: '#0F1B2D',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
   },
   profileCircle: {
     width: 42,
@@ -280,9 +257,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   initials: { color: '#159B79', fontWeight: '800', fontSize: 15 },
-  friendName: { fontSize: 16.5, color: '#0047AB', fontWeight: '600' },
-  friendEmail: { fontSize: 12.5, color: '#64748B', marginTop: 2 },
-  iconButton: { marginLeft: 10, padding: 4 },
+  friendName: { fontSize: 16, fontWeight: '800', color: C.ink },
+  friendEmail: { fontSize: 12, fontWeight: '500', color: C.muted, marginTop: 1 },
+  iconButton: { width: 44, height: 44, borderRadius: 13, backgroundColor: C.blueSoft, alignItems: 'center', justifyContent: 'center' },
 
   bottomNav: {
     position: "absolute",

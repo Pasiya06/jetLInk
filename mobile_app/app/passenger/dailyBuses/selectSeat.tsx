@@ -11,6 +11,7 @@ import {
   TextInput,
   ScrollView,
 } from 'react-native';
+import { ScreenHeader, C, ui } from "../../../components/JetUI";
 import { Ionicons, 
   MaterialCommunityIcons, 
   Feather, 
@@ -142,29 +143,37 @@ export default function SeatSelectionScreen() {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
        {/* Header Section */}
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-        style={styles.submitGradient1}
-      >
-        <View style={styles.header}>
-            
-        
-          <TouchableOpacity >
-            <Text style={styles.title}>Select Seat</Text>
-          </TouchableOpacity>
-                  
-        </View>
-      </LinearGradient> 
+      <ScreenHeader eyebrow={`${params.pickuploca ?? ""} → ${params.dropoffloca ?? ""}`} title="Select seats" /> 
 
       <ScrollView
+        style={ui.body}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        
+        {/* Trip strip */}
+        <View style={[ui.card, styles.tripCard]}>
+          <View style={styles.tripItem}>
+            <Ionicons name="bus-outline" size={18} color={C.blue} />
+            <Text style={styles.tripValue}>{params.bNumber}</Text>
+          </View>
+          <View style={styles.tripDivider} />
+          <View style={styles.tripItem}>
+            <Ionicons name="time-outline" size={18} color={C.blue} />
+            <Text style={styles.tripValue}>{params.depaturetime}</Text>
+          </View>
+          <View style={styles.tripDivider} />
+          <View style={styles.tripItem}>
+            <Ionicons name="calendar-outline" size={18} color={C.blue} />
+            <Text style={styles.tripValue} numberOfLines={1}>{params.date}</Text>
+          </View>
+        </View>
+
         {/* Seat map */}
         <View style={styles.seatMapCard}>
+          <View style={styles.busFront}>
+            <MaterialCommunityIcons name="steering" size={22} color={C.muted} />
+            <Text style={styles.busFrontText}>Front</Text>
+          </View>
 
           {rows.map((row, rowIndex) => (
             <View key={rowIndex} style={styles.seatRow}>
@@ -180,13 +189,32 @@ export default function SeatSelectionScreen() {
 
           {/* Legend */}
           <View style={styles.legendRow}>
-            <LegendItem color="#6C63FF" label="Selected" />
-            <LegendItem color="#fff" borderColor="#D8D8E8" label="Available" />
-            <LegendItem color="#E4E4EC" label="Booked" />
+            <LegendItem color="#155B8A" label="Selected" />
+            <LegendItem color="#fff" borderColor="#C9D4E2" label="Available" />
+            <LegendItem color="#E3E8EF" label="Booked" />
           </View>
         </View>
 
         
+          {selectedSeats.length > 0 ? (
+            <View style={[ui.card, styles.selectedCard]}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.selectedLabel}>Selected seats</Text>
+                <Text style={styles.selectedSeats} numberOfLines={2}>
+                  {selectedSeats.map((x) => x.id).join(", ")}
+                </Text>
+              </View>
+              {Number(params.ticketPrice) > 0 ? (
+                <View style={{ alignItems: "flex-end" }}>
+                  <Text style={styles.selectedLabel}>Total</Text>
+                  <Text style={styles.selectedTotal}>
+                    Rs. {(Number(params.ticketPrice) * selectedSeats.length).toLocaleString()}
+                  </Text>
+                </View>
+              ) : null}
+            </View>
+          ) : null}
+
           <TouchableOpacity
             activeOpacity={0.85}
             onPress={handleConfirm}
@@ -195,11 +223,11 @@ export default function SeatSelectionScreen() {
             <LinearGradient
               colors={
                 selectedSeats.length > 0
-                  ? ['#4B6CF5', '#27AE60']
-                  : ['#C9CDD6', '#C9CDD6']
+                  ? ['#173C79', '#155B8A', '#159B79']
+                  : ['#C9D2DE', '#C9D2DE']
               }
               start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
+              end={{ x: 1, y: 1 }}
               style={styles.confirmButton}
             >
               <Text style={styles.confirmButtonText}>
@@ -388,10 +416,17 @@ function LegendItem({
 const SEAT_SIZE = 40;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
+  selectedTotal: { fontSize: 18, fontWeight: '800', color: C.blue, marginTop: 2 },
+  selectedSeats: { fontSize: 16, fontWeight: '800', color: C.navy, marginTop: 2 },
+  selectedLabel: { fontSize: 12, fontWeight: '700', color: C.muted },
+  selectedCard: { flexDirection: 'row', alignItems: 'center', padding: 16, borderRadius: 20 },
+  busFrontText: { fontSize: 12, fontWeight: '700', color: C.muted },
+  busFront: { alignSelf: 'stretch', flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-end', gap: 6, paddingHorizontal: 8, paddingBottom: 12, marginBottom: 14, borderBottomWidth: 1, borderBottomColor: C.line },
+  tripDivider: { width: 1, height: 22, backgroundColor: C.line },
+  tripValue: { fontSize: 13, fontWeight: '800', color: C.ink, flexShrink: 1 },
+  tripItem: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  tripCard: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 10, borderRadius: 20 },
+  container: { flex: 1, backgroundColor: C.bg },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -415,23 +450,19 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
 
-  scrollContent: {
-    
-    padding: 20,
-    paddingBottom: 200,
-  },
+  scrollContent: { paddingHorizontal: 16, paddingBottom: 200, gap: 14 },
   
   seatMapCard: {
-    
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    padding: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    paddingVertical: 18,
+    paddingHorizontal: 12,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
+    shadowColor: '#0F1B2D',
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
     shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
+    elevation: 3,
   },
   
   seatRow: {
@@ -445,38 +476,22 @@ const styles = StyleSheet.create({
   seat: {
     width: SEAT_SIZE,
     height: SEAT_SIZE,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#E1E1EA',
-    backgroundColor: '#fff',
+    borderRadius: 11,
+    borderWidth: 1.5,
+    borderColor: '#C9D4E2',
+    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 4,
   },
-  seatSelected: {
-    backgroundColor: '#6C63FF',
-    borderColor: '#6C63FF',
-  },
-  seatBooked: {
-    backgroundColor: '#EDEDF3',
-    borderColor: '#EDEDF3',
-  },
-  seatText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#4A4A5A',
-  },
+  seatSelected: { backgroundColor: '#155B8A', borderColor: '#155B8A' },
+  seatBooked: { backgroundColor: '#E3E8EF', borderColor: '#E3E8EF' },
+  seatText: { fontSize: 13, fontWeight: '700', color: '#0F1B2D' },
   seatTextSelected: {
     color: '#fff',
   },
-  seatTextBooked: {
-    color: '#B7B7C4',
-  },
-  legendRow: {
-    flexDirection: 'row',
-    marginTop: 12,
-    gap: 20,
-  },
+  seatTextBooked: { color: '#A3AEBD' },
+  legendRow: { flexDirection: 'row', marginTop: 10, paddingTop: 14, gap: 18, borderTopWidth: 1, borderTopColor: C.line, alignSelf: 'stretch', justifyContent: 'center' },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -487,25 +502,17 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginRight: 6,
   },
-  legendLabel: {
-    fontSize: 12,
-    color: '#6A6A7A',
-  },
+  legendLabel: { fontSize: 12, fontWeight: '600', color: C.muted },
   
   confirmButton: {
-    marginTop:20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 16,
+    height: 54,
+    borderRadius: 27,
     gap: 8,
   },
-  confirmButtonText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '700',
-  },
+  confirmButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: '800' },
   
   
    bottomNav: {

@@ -29,19 +29,19 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 /* ---------- Theme ---------- */
 const C = {
-  brand: "#0056b3",
-  brandDark: "#003b7d",
-  brandSoft: "#e7f0ff",
-  bg: "#eef2f8",
+  brand: "#155B8A",
+  brandDark: "#173C79",
+  brandSoft: "#EAF1FB",
+  bg: "#F3F6FA",
   card: "#ffffff",
-  ink: "#0f1b2d",
-  muted: "#64748b",
-  line: "#d5dde9",
-  success: "#15803d",
-  successSoft: "#dcfce7",
-  neutral: "#475569",
-  neutralSoft: "#e8edf3",
-  danger: "#dc3545",
+  ink: "#0F1B2D",
+  muted: "#5B6B7F",
+  line: "#DCE3EC",
+  success: "#0B6B53",
+  successSoft: "#E3F5EE",
+  neutral: "#5B6B7F",
+  neutralSoft: "#EDF1F6",
+  danger: "#B42318",
 };
 
 interface Receipt {
@@ -168,22 +168,26 @@ export default function ReceiptList() {
         end={{x: 1, y: 1,}}
         style={styles.submitGradient1}>
         <View style={styles.header}>
-          <TouchableOpacity>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.eyebrow}>Tours</Text>
             <Text style={styles.title}>
-              Tour Receipt
+              Additional payment
             </Text>
-          </TouchableOpacity>
+          </View>
+          <View style={styles.headerIcon}>
+            <Ionicons name="wallet-outline" size={24} color="#fff" />
+          </View>
         </View>
       </LinearGradient>
 
       {loading ? (
-        <View style={styles.center}>
+        <View style={[styles.center, styles.stateCard]}>
           <ActivityIndicator size="large" color={C.brand} />
           <Text style={styles.infoText}>Loading your receipts…</Text>
         </View>
       ) : error ? (
-        <View style={styles.center}>
-          <View style={[styles.stateIcon, { backgroundColor: "#fde8ea" }]}>
+        <View style={[styles.center, styles.stateCard]}>
+          <View style={[styles.stateIcon, { backgroundColor: "#FDE2E2" }]}>
             <Ionicons name="cloud-offline-outline" size={36} color={C.danger} />
           </View>
           <Text style={styles.stateTitle}>Couldn&apos;t load receipts</Text>
@@ -203,8 +207,21 @@ export default function ReceiptList() {
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => <ReceiptCard item={item} />}
           showsVerticalScrollIndicator={false}
+          style={styles.listView}
           contentContainerStyle={
             receipts.length === 0 ? styles.emptyContainer : styles.list
+          }
+          ListHeaderComponent={
+            receipts.length > 0 ? (
+              <View style={styles.introCard}>
+                <View style={styles.introIcon}>
+                  <Ionicons name="information-circle" size={22} color={C.brand} />
+                </View>
+                <Text style={styles.introText}>
+                  Choose a booked tour to add extra kilometers or view its package.
+                </Text>
+              </View>
+            ) : null
           }
           refreshControl={
             <RefreshControl
@@ -215,7 +232,7 @@ export default function ReceiptList() {
             />
           }
           ListEmptyComponent={
-            <View style={styles.center}>
+            <View style={[styles.center, styles.stateCard, { marginTop: 0 }]}>
               <View style={styles.stateIcon}>
                 <Ionicons name="receipt-outline" size={36} color={C.brand} />
               </View>
@@ -402,9 +419,16 @@ function ReceiptCard({ item }: { item: Receipt }) {
       {/* Top: pickup + status */}
       <View style={styles.cardTop}>
         <View style={styles.topRow}>
-          <View style={styles.busBadge}>
-            <Ionicons name="bus" size={14} color={C.brand} />
-            <Text style={styles.busBadgeText}>{item.busNumber || "—"}</Text>
+          <View style={styles.badgeRow}>
+            <View style={styles.busBadge}>
+              <Ionicons name="bus" size={14} color={C.brand} />
+              <Text style={styles.busBadgeText}>{item.busNumber || "—"}</Text>
+            </View>
+            {!!item.packageType && (
+              <View style={styles.typeBadge}>
+                <Text style={styles.typeBadgeText} numberOfLines={1}>{item.packageType}</Text>
+              </View>
+            )}
           </View>
 
           <View
@@ -499,7 +523,7 @@ function ReceiptCard({ item }: { item: Receipt }) {
             })
           }
         >
-          <Ionicons name="add-circle-outline" size={16} color="#fff" />
+          <Ionicons name="add-circle" size={17} color="#fff" />
           <Text style={styles.extraButtonText}>Add extra km</Text>
         </TouchableOpacity>
       </View>
@@ -520,7 +544,7 @@ function Meta({
   if (!text) return null;
   return (
     <View style={styles.meta}>
-      <Ionicons name={icon} size={14} color={C.muted} />
+      <Ionicons name={icon} size={14} color={C.brand} />
       <Text style={styles.metaText}>{text}</Text>
     </View>
   );
@@ -572,69 +596,119 @@ function Detail({
 const NOTCH = 22;
 
 const styles = StyleSheet.create({
+
+  eyebrow: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "rgba(255,255,255,0.85)",
+    letterSpacing: 1,
+    textTransform: "uppercase",
+    marginBottom: 2,
+  },
+  headerIcon: {
+    width: 46,
+    height: 46,
+    borderRadius: 16,
+    backgroundColor: "rgba(255,255,255,0.16)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  listView: { flex: 1, marginTop: -56 },
+  stateCard: {
+    marginHorizontal: 16,
+    marginTop: -56,
+    backgroundColor: "#fff",
+    borderRadius: 22,
+    elevation: 3,
+    shadowColor: "#0F1B2D",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+  },
+  introCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 14,
+    marginBottom: 16,
+    elevation: 3,
+    shadowColor: "#0F1B2D",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+  },
+  introIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 13,
+    backgroundColor: C.brandSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  introText: { flex: 1, color: C.ink, fontSize: 13.5, fontWeight: "600", lineHeight: 19 },
+  badgeRow: { flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 1 },
+  typeBadge: {
+    backgroundColor: "#FFF4DC",
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 12,
+    flexShrink: 1,
+  },
+  typeBadgeText: { color: "#B26A00", fontWeight: "800", fontSize: 12, textTransform: "uppercase" },
   extraRow: {
     flexDirection: "row",
     alignItems: "center",
     gap: 10,
-    marginHorizontal: 18,
-    marginTop: 4,
-    paddingTop: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#EEF2F6",
+    marginHorizontal: 14,
+    marginTop: 2,
+    padding: 12,
+    borderRadius: 16,
+    backgroundColor: "#F7F9FC",
   },
-  extraText: { fontSize: 13, color: "#0f1b2d", fontWeight: "600", marginTop: 2 },
+  extraText: { fontSize: 13, color: "#0F1B2D", fontWeight: "600", marginTop: 2 },
   extraButton: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 5,
-    backgroundColor: "#12966F",
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 16,
+    gap: 6,
+    backgroundColor: C.brand,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 999,
   },
-  extraButtonText: { color: "#fff", fontWeight: "700", fontSize: 12.5 },
+  extraButtonText: { color: "#fff", fontWeight: "800", fontSize: 13 },
 
   container: { flex: 1, backgroundColor: C.bg },
 
   /* Header */
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: 50,
-    paddingHorizontal: 20,
-    paddingBottom: 40,
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
+    flexDirection: "row",
+    alignItems: "flex-start",
+    paddingTop: 54,
+    paddingHorizontal: 24,
+    paddingBottom: 76,
   },
 
-  submitGradient1: {
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
-  },
+  submitGradient1: { borderBottomLeftRadius: 28, borderBottomRightRadius: 28 },
 
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#ffffff',
-    letterSpacing: 0.5,
-  },
+  title: { fontSize: 28, fontWeight: "800", color: "#ffffff" },
  
 
   /* List */
-  list: { padding: 16, paddingTop: 20, paddingBottom: 150 },
-  emptyContainer: { flexGrow: 1, justifyContent: "center", padding: 20 },
+  list: { paddingHorizontal: 16, paddingTop: 0, paddingBottom: 220 },
+  emptyContainer: { flexGrow: 1, paddingHorizontal: 16, paddingBottom: 220 },
 
   /* Card */
   card: {
     backgroundColor: C.card,
-    borderRadius: 20,
-    marginBottom: 18,
-    paddingBottom: 20,
+    borderRadius: 22,
+    marginBottom: 16,
+    paddingBottom: 14,
     elevation: 4,
-    shadowColor: "#0b2a5b",
+    shadowColor: "#0F1B2D",
     shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 14,
   },
   cardTop: { padding: 18, paddingBottom: 20 },
@@ -774,7 +848,6 @@ const styles = StyleSheet.create({
 
   /* States */
   center: {
-    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     padding: 28,
@@ -782,7 +855,7 @@ const styles = StyleSheet.create({
   stateIcon: {
     width: 72,
     height: 72,
-    borderRadius: 36,
+    borderRadius: 24,
     backgroundColor: C.brandSoft,
     alignItems: "center",
     justifyContent: "center",
@@ -808,7 +881,7 @@ const styles = StyleSheet.create({
     backgroundColor: C.brand,
     paddingHorizontal: 24,
     paddingVertical: 13,
-    borderRadius: 14,
+    borderRadius: 999,
     marginTop: 22,
   },
   primaryButtonText: { color: "#fff", fontWeight: "700", fontSize: 14 },

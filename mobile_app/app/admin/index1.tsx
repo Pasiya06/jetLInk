@@ -27,6 +27,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from 'expo-linear-gradient';
 import { BiTrip } from "react-icons/bi";
 import AlertBadge from "../../components/AlertBadge";
+import { ScreenHeader, GradientAction, SectionLabel, Tile, Avatar, C, ui } from "../../components/JetUI";
 
 
 
@@ -106,138 +107,113 @@ export default function Index() {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-        
-          <View style={styles.header}>
-            
-            
-            <TouchableOpacity >
-              <Text style={styles.title}>Jetlink</Text>
-            </TouchableOpacity>
-            
-            
+        <ScreenHeader eyebrow="Admin" title="Jetlink" />
+
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          <View style={[ui.card, styles.welcomeCard]}>
+            <Avatar name={`${params.firstName ?? ""} ${params.lastName ?? ""}`} size={54} />
+            <View style={{ flex: 1, marginLeft: 14 }}>
+              <Text style={styles.title1}>{getGreeting()}</Text>
+              <Text style={styles.title2} numberOfLines={1} adjustsFontSizeToFit>
+                {params.firstName} {params.lastName}
+              </Text>
+              <Text style={styles.subtitle1}>Welcome to the Jetlink bus panel</Text>
+            </View>
           </View>
-        </LinearGradient>
-        
-       
-        <View style={styles.card}>
-          <View>
-            <Text style={styles.title1}>{getGreeting()}</Text>                    
-          </View> 
-        
-          <View style={styles.iconContainer1}>
-            <Text style={styles.title2}>{params.firstName} {params.lastName}</Text>
-            <MaterialIcons name="waving-hand" size={30} color={"#FFA500"} />
-          </View>
-                          
-          <View>
-            <Text style={styles.subtitle1}>Welcome to Jetlink Bus Panel</Text>
-          </View>
-        </View>
 
-        
-        <View style={styles.listContainer}>
+          <GradientAction
+            icon={<Foundation name="dollar" size={28} color="#FFFFFF" />}
+            title="Payment history"
+            subtitle="Parcel, tour and ticket income"
+            onPress={() => router.push({
+              pathname: "/admin/PaymentHistory/paymentHistory",
+              params: {
+                Aid: params.Aid,
+                firstName: params.firstName,
+                lastName: params.lastName,
+                email: params.email,
+              },
+            })}
+          />
 
-          <TouchableOpacity style={styles.card3} onPress={() => router.push({
-                pathname: "/admin/PaymentHistory/paymentHistory", 
+          <SectionLabel>Manage</SectionLabel>
+
+          <View style={ui.grid}>
+            <Tile
+              compact
+              icon={<FontAwesome5 name="bus-alt" size={20} color={C.purple} />}
+              iconBg={C.purpleSoft}
+              title="Buses"
+              onPress={() => router.push({
+                pathname: "/admin/buses/busAndSchedule",
                 params: {
                   Aid: params.Aid,
                   firstName: params.firstName,
                   lastName: params.lastName,
                   email: params.email,
                 },
-              })} >
-                
-              <View style={[styles.iconContainer, { backgroundColor: "#32CD3218"  }]}>
-                <Foundation name="dollar" size={34} color="#32CD32" />
-              </View>
-              <Text style={styles.cardText}>Payment History</Text>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.card1} onPress={() => router.push({
-                pathname: "/admin/buses/busAndSchedule", 
+              })}
+            />
+            <Tile
+              compact
+              icon={<Feather name="gift" size={21} color={C.amber} />}
+              iconBg={C.amberSoft}
+              title="Parcel"
+              onPress={() => router.push({
+                pathname: "/admin/Parcelhistory/parcelDetails",
                 params: {
                   Aid: params.Aid,
                   firstName: params.firstName,
                   lastName: params.lastName,
                   email: params.email,
                 },
-              })} >
-                
-              <View style={[styles.iconContainer, { backgroundColor: "#8B5CF618"  }]}>
-                <FontAwesome5 name="bus-alt" size={24} color="#8B5CF6" />
-              </View>
-              <Text style={styles.cardText}>Buses</Text>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.card2} onPress={() => router.push({
-                pathname: "/admin/Parcelhistory/parcelDetails", 
+              })}
+            />
+            <Tile
+              compact
+              icon={<FontAwesome5 name="route" size={20} color={C.pink} />}
+              iconBg={C.pinkSoft}
+              title="Tours"
+              onPress={tourinterface}
+            />
+            <Tile
+              compact
+              icon={<SimpleLineIcons name="people" size={20} color={C.green} />}
+              iconBg={C.greenSoft}
+              title="Passengers"
+              onPress={() => router.push({
+                pathname: "/admin/regpassengers/index1",
                 params: {
                   Aid: params.Aid,
                   firstName: params.firstName,
                   lastName: params.lastName,
                   email: params.email,
                 },
-              })} >
-          
-              <View style={[styles.iconContainer, { backgroundColor: "#ffc40018"  }]}>
-                <Feather name="gift" size={24} color="#ffc400" />
-              </View>
-              <Text style={styles.cardText}>Parcel</Text>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.card1} onPress={tourinterface} >
-              <View style={[styles.iconContainer, { backgroundColor: "#EC489918"  }]}>
-                <FontAwesome5 name="route" size={24} color="#EC4899" />
-              </View>
-              <Text style={styles.cardText}>Tours</Text>  
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />            
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.card2} onPress={() => router.push({
-                pathname: "/admin/regpassengers/index1", 
+              })}
+            />
+            <Tile
+              compact
+              icon={<Ionicons name="briefcase-outline" size={21} color={C.blue} />}
+              iconBg={C.blueSoft}
+              title="Staff"
+              onPress={() => router.push({
+                pathname: "/admin/Staff/index1",
                 params: {
                   Aid: params.Aid,
                   firstName: params.firstName,
                   lastName: params.lastName,
                   email: params.email,
                 },
-              })} >
-                
-              <View style={[styles.iconContainer, { backgroundColor: "#10B98118"  }]}>
-                <SimpleLineIcons name="people" size={24} color="#10B981" />
-              </View>
-              
-              <Text style={styles.cardText}>Passengers</Text>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />              
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.card1} onPress={() => router.push({
-                pathname: "/admin/Staff/index1", 
-                params: {
-                  Aid: params.Aid,
-                  firstName: params.firstName,
-                  lastName: params.lastName,
-                  email: params.email,
-                },
-              })} >
-              <View style={[styles.iconContainer, { backgroundColor: "#84CC1618"  }]}>
-                <SimpleLineIcons name="people" size={24} color="#84CC16" />
-              </View>
-              <Text style={styles.cardText}>Staff</Text> 
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />             
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.card2} onPress={() => router.push({
-                pathname: "/admin/emergency/EmergencyBuses", 
+              })}
+            />
+            <Tile
+              compact
+              danger
+              icon={<MaterialCommunityIcons name="alarm-light-outline" size={22} color={C.red} />}
+              iconBg={C.redSoft}
+              title="Emergency"
+              onPress={() => router.push({
+                pathname: "/admin/emergency/EmergencyBuses",
                 params: {
                   Aid: params.Aid,
                   firstName: params.firstName,
@@ -245,14 +221,10 @@ export default function Index() {
                   email: params.email,
                   busNo:busNo,
                 },
-              })} >
-              <View style={[styles.iconContainer, { backgroundColor: "#ff000018"  }]}>
-                <MaterialCommunityIcons name="alarm-light-outline" size={24} color="#ff0000" />
-              </View>
-              <Text style={styles.cardText}>Emergency</Text>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
-        </View>
+              })}
+            />
+          </View>
+        </ScrollView>
 
         {isSearching ? (
               <TextInput
@@ -348,7 +320,7 @@ export default function Index() {
 const styles = StyleSheet.create({
    container:{
     flex:1,
-    backgroundColor:"#fff"
+    backgroundColor:C.bg
   },
 
   header: {
@@ -428,26 +400,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
 
-  title1: {
-    width: '100%',    
-    color: '#0047AB',
-    fontSize: 16,
-    fontWeight: '700',
-  },
+  title1: { color: C.muted, fontSize: 13, fontWeight: '600' },
 
-  title2: {
-    color: '#0047AB',
-    fontSize: 20,
-    fontWeight: '700',
-    marginRight: 15,
-  },
+  title2: { color: C.navy, fontSize: 20, fontWeight: '800', marginTop: 1 },
 
-  subtitle1: {
-    color: '#555',
-    fontSize: 14,
-    fontWeight: '500',
-    marginTop: 8,
-  },
+  subtitle1: { color: C.muted, fontSize: 12, fontWeight: '500', marginTop: 2 },
+  welcomeCard: { flexDirection: 'row', alignItems: 'center', padding: 18, borderRadius: 22 },
 
   listContainer: {
     paddingHorizontal: 20,

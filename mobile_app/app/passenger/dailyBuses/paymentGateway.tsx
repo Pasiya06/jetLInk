@@ -8,7 +8,8 @@ import {
   TouchableOpacity, 
   SafeAreaView, 
   TextInput,
-  Alert 
+  Alert,
+  ScrollView,
 } from 'react-native';
 import { 
   Ionicons, 
@@ -21,6 +22,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import FieldError from "../../../components/FieldError";
 import { useFieldErrors } from "../../../utils/validation";
+import { ScreenHeader, GradientButton, C, ui } from "../../../components/JetUI";
 const JetLinkInterface: React.FC = () => {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const params = useLocalSearchParams();
@@ -170,52 +172,56 @@ const JetLinkInterface: React.FC = () => {
       <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-          <View style={styles.header}>
-
-            <TouchableOpacity >
-              <Text style={styles.title}>JetLink</Text>
-            </TouchableOpacity>
-                  
-          </View>
-        </LinearGradient> 
+        <ScreenHeader eyebrow="Secure payment" title="Pay for ticket" /> 
              
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+        {/* Amount */}
+        <LinearGradient
+          colors={["#173C79", "#155B8A", "#159B79"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.amountCard}
+        >
+          <Text style={styles.amountLabel}>Amount to pay</Text>
+          <Text style={styles.amountValue}>Rs. {params.totalFare}</Text>
+          <View style={styles.amountMeta}>
+            <Ionicons name="bus-outline" size={15} color="rgba(255,255,255,0.9)" />
+            <Text style={styles.amountMetaText} numberOfLines={1}>
+              {params.pickup} → {params.drop} · {params.date}
+            </Text>
+          </View>
+        </LinearGradient>
+
         <View style={styles.card}>
          {/* Tabs */}
             <View style={styles.tabRow}>
               <TouchableOpacity
-                style={styles.tabItem}
+                style={[styles.tabItem, activeTab1 === 'card' && styles.tabItemActive]}
                 onPress={() => setActiveTab1('card')}
               >
                 <Ionicons
                   name="card-outline"
                   size={16}
-                  color={activeTab1 === 'card' ? '#1E6091' : '#A3A3A3'}
+                  color={activeTab1 === 'card' ? '#FFFFFF' : C.blue}
                 />
                 <Text style={[styles.tabText, activeTab1 === 'card' && styles.tabTextActive]}>
                   Card Payment
                 </Text>
-                {activeTab1 === 'card' && <View style={styles.tabUnderline} />}
+                
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.tabItem}
+                style={[styles.tabItem, activeTab1 === 'qr' && styles.tabItemActive]}
                 onPress={() => setActiveTab1('qr')}
               >
                 <MaterialCommunityIcons
                   name="qrcode"
                   size={16}
-                  color={activeTab === 'qr' ? '#1E6091' : '#A3A3A3'}
+                  color={activeTab1 === 'qr' ? '#FFFFFF' : C.blue}
                 />
-                <Text style={[styles.tabText, activeTab === 'qr' && styles.tabTextActive]}>
+                <Text style={[styles.tabText, activeTab1 === 'qr' && styles.tabTextActive]}>
                   QR Payment
                 </Text>
-                {activeTab === 'qr' && <View style={styles.tabUnderline} />}
               </TouchableOpacity>
             </View>
 
@@ -225,7 +231,7 @@ const JetLinkInterface: React.FC = () => {
                 <View style={styles.brandRow}>
                   {cardBrands.map((brand, index) => (
                     <View key={index} style={styles.brandChip}>
-                      <MaterialCommunityIcons name={brand.icon as any} size={16} color="#5A5A5A" />
+                      <MaterialCommunityIcons name={brand.icon as any} size={22} color={C.muted} />
                     </View>
                   ))}
                 </View>
@@ -233,6 +239,7 @@ const JetLinkInterface: React.FC = () => {
                 {/* Name on card */}
                 <Text style={styles.inputLabel}>Name on card</Text>
                 <View style={styles.inputWrapper}>
+                    <Ionicons name="person-outline" size={18} color={C.muted} style={{ marginRight: 8 }} />
                   <TextInput
                     style={styles.textInput}
                     value={nameOnCard}
@@ -246,6 +253,7 @@ const JetLinkInterface: React.FC = () => {
                 {/* Card number */}
                 <Text style={styles.inputLabel}>Card number</Text>
                 <View style={styles.inputWrapper}>
+                    <Ionicons name="card-outline" size={18} color={C.muted} style={{ marginRight: 8 }} />
                   <TextInput
                     style={styles.textInput}
                     value={cardNumber}
@@ -263,6 +271,7 @@ const JetLinkInterface: React.FC = () => {
                   <View style={styles.halfInput}>
                     <Text style={styles.inputLabel}>Expiry</Text>
                     <View style={styles.inputWrapper}>
+                    <Ionicons name="calendar-outline" size={18} color={C.muted} style={{ marginRight: 8 }} />
                       <TextInput
                         style={styles.textInput}
                         value={expiry}
@@ -279,6 +288,7 @@ const JetLinkInterface: React.FC = () => {
                   <View style={styles.halfInput}>
                     <Text style={styles.inputLabel}>CVC</Text>
                     <View style={styles.inputWrapper}>
+                    <Ionicons name="lock-closed-outline" size={18} color={C.muted} style={{ marginRight: 8 }} />
                       <TextInput
                         style={styles.textInput}
                         value={cvc}
@@ -303,22 +313,14 @@ const JetLinkInterface: React.FC = () => {
               </>
             ) : (
               <View style={styles.qrPlaceholder}>
-                <MaterialCommunityIcons name="qrcode-scan" size={120} color="#D0D0D0" />
+                <MaterialCommunityIcons name="qrcode-scan" size={110} color="#C9D4E2" />
                 <Text style={styles.qrText}>Scan to pay with your banking app</Text>
               </View>
             )}
         </View>
-     
-        <TouchableOpacity style={styles.submitButton} onPress={handlePayment}>
-            <LinearGradient
-                colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-                style={styles.submitGradient}
-            >
-            <Text style={styles.submitText}>Pay</Text>
-            </LinearGradient>
-        </TouchableOpacity>
+
+        <GradientButton label={`Pay Rs. ${params.totalFare ?? ""}`} icon="lock-closed-outline" onPress={handlePayment} />
+        </ScrollView>
 
       {isSearching ? (
         <TextInput
@@ -425,10 +427,13 @@ const JetLinkInterface: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    backgroundColor:"#fff"
-  },
+  tabItemActive: { backgroundColor: C.blue },
+  amountMetaText: { flex: 1, fontSize: 13, fontWeight: '600', color: 'rgba(255,255,255,0.9)' },
+  amountMeta: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 },
+  amountValue: { fontSize: 32, fontWeight: '800', color: '#FFFFFF', marginTop: 4 },
+  amountLabel: { fontSize: 13, fontWeight: '600', color: 'rgba(255,255,255,0.85)' },
+  amountCard: { borderRadius: 24, padding: 20 },
+  container: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: 'row',
@@ -454,19 +459,14 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    width: '90%',
-    flex: 1,
-    maxHeight: '50%',
-    backgroundColor: '#FFF',
-    padding: 20,
-    marginTop: -50,   
-    alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 24,
+    padding: 18,
+    elevation: 4,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
   },
 
   svw: {
@@ -477,32 +477,13 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 25, 
   },
 
-  tabRow: {
-    flexDirection: 'row',
-    marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
-  },
+  tabRow: { flexDirection: 'row', backgroundColor: C.bg, borderRadius: 16, padding: 5, gap: 6, marginBottom: 16 },
 
-  tabItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingBottom: 12,
-    marginRight: 24,
-  },
+  tabItem: { flex: 1, height: 44, borderRadius: 12, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
 
-  tabText: {
-    fontSize: 14,
-    color: '#A3A3A3',
-    fontWeight: '500',
-    marginLeft: 6,
-  },
+  tabText: { fontSize: 14, fontWeight: '700', color: C.blue },
 
-  tabTextActive: {
-    color: '#1E6091',
-    fontWeight: '700',
-  },
+  tabTextActive: { color: '#FFFFFF' },
 
   tabUnderline: {
     position: 'absolute',
@@ -514,51 +495,19 @@ const styles = StyleSheet.create({
     borderRadius: 2,
   },
 
-  brandRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
+  brandRow: { flexDirection: 'row', gap: 8, marginBottom: 14 },
 
-  brandChip: {
-    width: 40,
-    height: 30,
-    borderRadius: 8,
-    backgroundColor: '#F5F6FA',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+  brandChip: { width: 48, height: 34, borderRadius: 10, borderWidth: 1.5, borderColor: '#E3E9F1', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' },
 
-  inputLabel: {
-    fontSize: 13,
-    color: '#5A5A5A',
-    fontWeight: '600',
-    marginBottom: 8,
-  },
+  inputLabel: { fontSize: 13, fontWeight: '700', color: C.muted, marginBottom: 6, marginTop: 4 },
 
-  inputWrapper: {
-    backgroundColor: '#F5F6FA',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 16,
-  },
+  inputWrapper: { flexDirection: 'row', alignItems: 'center', height: 52, borderRadius: 14, borderWidth: 1.5, borderColor: '#E3E9F1', backgroundColor: '#F7F9FC', paddingHorizontal: 14 },
 
-  textInput: {
-    fontSize: 15,
-    color: '#1A1A1A',
-    fontWeight: '500',
-    padding: 0,
-  },
+  textInput: { flex: 1, fontSize: 15, fontWeight: '600', color: C.ink },
 
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
+  row: { flexDirection: 'row', gap: 12 },
 
-  halfInput: {
-    width: '48%',
-  },
+  halfInput: { flex: 1 },
 
   submitButton: {
     
@@ -586,29 +535,13 @@ const styles = StyleSheet.create({
   },
 
 
-  secureText: {
-    textAlign: 'center',
-    fontSize: 11,
-    color: '#A3A3A3',
-    marginTop: 14,
-  },
+  secureText: { fontSize: 12, color: C.muted, textAlign: 'center', marginTop: 14 },
 
-  secureBold: {
-    fontWeight: '700',
-    color: '#5A5A5A',
-  },
+  secureBold: { fontWeight: '800', color: C.ink },
 
-  qrPlaceholder: {
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
+  qrPlaceholder: { alignItems: 'center', paddingVertical: 28, gap: 12 },
 
-  qrText: {
-    fontSize: 13,
-    color: '#A3A3A3',
-    marginTop: 12,
-    textAlign: 'center',
-  },
+  qrText: { fontSize: 14, fontWeight: '600', color: C.muted },
 
   bottomNav: {
     position: "absolute",

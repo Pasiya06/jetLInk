@@ -9,6 +9,7 @@ import {
   SafeAreaView, 
   Image ,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import { 
   Ionicons, 
@@ -20,6 +21,7 @@ import {
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient'; 
 import AlertBadge from "../../../components/AlertBadge";
+import { ScreenHeader, RowCard, IconBox, C, ui } from "../../../components/JetUI";
 
 const ParcelService = () => {
     const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -82,54 +84,48 @@ const ParcelService = () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
-       
-          <View style={styles.header}> 
-              <TouchableOpacity><Text style={styles.title}>Select Bus Type</Text></TouchableOpacity>
-          </View>
-        </LinearGradient>
-      
-      
-        
-        
-        <TouchableOpacity style={styles.card} onPress={handleSearch}>
-          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-              <Fontisto name={"bus"} size={50} color="#F59E0B" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Normal Way</Text>
-            <Text style={styles.text2}>Manage normal way buses </Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
+        <ScreenHeader eyebrow="Fleet" title="Select bus type" />
 
-        <TouchableOpacity style={styles.card1} onPress={handleSearch1}>
-          <View style={[styles.iconWrap, { backgroundColor: "#8B5CF618" }]}>
-              <Fontisto name={"bus"} size={50} color="#8B5CF6" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>High Way</Text>
-            <Text style={styles.text2}>Manage high way buses </Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          <View style={ui.grid}>
+            <TouchableOpacity style={[ui.card, localStyles.typeCard]} onPress={handleSearch} activeOpacity={0.85}>
+              <IconBox bg={C.amberSoft} size={56}>
+                <MaterialCommunityIcons name="bus-side" size={30} color={C.amber} />
+              </IconBox>
+              <View>
+                <Text style={ui.tileTitle}>Normal Way</Text>
+                <Text style={ui.tileSub}>Manage normal way buses</Text>
+              </View>
+              <View style={localStyles.openRow}>
+                <Text style={ui.featureCta}>Open</Text>
+                <Ionicons name="arrow-forward" size={16} color={C.blue} />
+              </View>
+            </TouchableOpacity>
 
-        <TouchableOpacity style={styles.card2} onPress={handleSearch2}>
-          <View style={[styles.iconWrap, { backgroundColor: "#32CD3218" }]}>
-              <Fontisto name={"bus"} size={50} color="#32CD32" />
+            <TouchableOpacity style={[ui.card, localStyles.typeCard]} onPress={handleSearch1} activeOpacity={0.85}>
+              <IconBox bg={C.purpleSoft} size={56}>
+                <MaterialCommunityIcons name="bus-side" size={30} color={C.purple} />
+              </IconBox>
+              <View>
+                <Text style={ui.tileTitle}>High Way</Text>
+                <Text style={ui.tileSub}>Manage high way buses</Text>
+              </View>
+              <View style={localStyles.openRow}>
+                <Text style={ui.featureCta}>Open</Text>
+                <Ionicons name="arrow-forward" size={16} color={C.blue} />
+              </View>
+            </TouchableOpacity>
           </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Tour</Text>
-            <Text style={styles.text2}>Manage tour buses </Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
-        
+
+          <RowCard
+            icon={<MaterialCommunityIcons name="bus-side" size={28} color={C.green} />}
+            iconBg={C.greenSoft}
+            title="Tour"
+            subtitle="Manage tour buses"
+            onPress={handleSearch2}
+          />
+        </ScrollView>
+
       {isSearching ? (
               <TextInput
                 style={styles.searchBarInput}
@@ -236,7 +232,7 @@ const ParcelService = () => {
 const styles = StyleSheet.create({
   container:{
     flex:1,
-    backgroundColor:"#fff"
+    backgroundColor:C.bg
   },
 
   header: {
@@ -470,3 +466,13 @@ const styles = StyleSheet.create({
 });
 
 export default ParcelService;
+const localStyles = StyleSheet.create({
+  typeCard: {
+    width: "48.3%",
+    height: 196,
+    padding: 18,
+    borderRadius: 22,
+    justifyContent: "space-between",
+  },
+  openRow: { flexDirection: "row", alignItems: "center", gap: 6 },
+});

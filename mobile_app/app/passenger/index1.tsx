@@ -26,6 +26,7 @@ import {
 } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LinearGradient } from 'expo-linear-gradient';
+import { ScreenHeader, SectionLabel, Tile, Avatar, C, ui } from "../../components/JetUI";
 
 
 
@@ -106,171 +107,130 @@ export default function Index() {
       <StatusBar barStyle="light-content" backgroundColor="#0056b3" />
       <SafeAreaView style={styles.container}>
         {/* Header Section */}
-        <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-                        style={styles.submitGradient1}
-                    >
-                <View style={styles.header}>
-                    
-                
-                  <TouchableOpacity >
-                    <Text style={styles.title}>JetLink</Text>
-                  </TouchableOpacity>
-                         
-                </View>
-                </LinearGradient> 
+        <ScreenHeader eyebrow="Passenger" title="JetLink" />
 
-        
-       
-        
-        <View style={styles.card}>
-          <View>
-            <Text style={styles.title1}>{getGreeting()}</Text>
-          </View>  
-          <View style={styles.iconContainer1}>
-            <Text style={styles.title2}>{params.pfirstName} {params.plastName}</Text>
-            <MaterialIcons name="waving-hand" size={30} color={"#FFA500"} />
-          </View>
-          
-          <View>
-            <Text style={styles.subtitle1}>Welcome to Jetlink Bus Panel</Text>
-          </View>
-        </View>
-
-        {/* List Section */}
-        
-        <View style={styles.listContainer}>
-          
-          <TouchableOpacity style={styles.card1} 
-            onPress={() =>
-            router.push({
-              pathname: "/passenger/dailyBuses/searchBus",
-              params: {
-                Pid: params.Pid,
-                Pid1: params.Pid1,
-                pfirstName: params.pfirstName,
-                plastName:params.plastName,
-                pphoneNumber: params.pphoneNumber,
-                address: params.address,
-                NIC: params.NIC,
-                pemail: params.pemail,
-              },
-          })
-      }
-          
-      >
-              <View style={[styles.iconContainer, { backgroundColor: "#8B5CF618"  }]}>
-                <FontAwesome5 name="bus-alt" size={24} color="#8B5CF6" />
-              </View>
-              <Text style={styles.cardText}>Buses</Text>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.card2} 
-            onPress={() =>
-            router.push({
-              pathname: "/passenger/parcel/index1",
-              params: {
-                Pid: params.Pid,
-                Pid1: params.Pid1,
-                pfirstName: params.pfirstName,
-                plastName:params.plastName,
-                pphoneNumber: params.pphoneNumber,
-                pemail: params.pemail,
-              },
-          })
-      } 
-            >
-              <View style={[styles.iconContainer, { backgroundColor: "#ffc40018"  }]}>
-                <Feather name="gift" size={24} color="#ffc400" />
-              </View>
-              <Text style={styles.cardText}>Parcel</Text>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.card1} onPress={tourinterface} >
-              <View style={[styles.iconContainer, { backgroundColor: "#EF444418"  }]}>
-                <FontAwesome5 name="route" size={24} color="#EF4444" />
-              </View>
-              <Text style={styles.cardText}>Tours</Text>  
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.card2} 
-            onPress={() => 
-              router.push({ 
-                pathname: "/passenger/friend/index1", 
-                params: { 
-                  Pid: params.Pid, 
-                  Pid1: params.Pid1, 
-                  pfirstName: params.pfirstName, 
-                  plastName: params.plastName, 
-                  pphoneNumber: params.pphoneNumber, 
-                  pemail: params.pemail, 
-                  NIC: params.NIC 
-                } 
-              })
-            } 
-          >
-              <View style={[styles.iconContainer, { backgroundColor: "#10B98118"  }]}>
-                <SimpleLineIcons name="people" size={24} color="#10B981" />
-              </View>
-              
-              <Text style={styles.cardText}>Friend</Text>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.card2} 
-            onPress={() =>
-              router.push({
-                pathname: "/passenger/receipt/index1",
-                params: {
-                  Pid: params.Pid,
-                  Pid1: params.Pid1,
-                  pfirstName: params.pfirstName,
-                  plastName:params.plastName,
-                  pphoneNumber: params.pphoneNumber,
-                  pemail: params.pemail,
-                },
-              })
-            } 
-          > 
-            <View style={[styles.iconContainer, { backgroundColor: "#84CC1618"  }]}>
-              <FontAwesome5 name="receipt" size={24} color="#84CC16" />
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          <View style={[ui.card, styles.welcomeCard]}>
+            <Avatar name={`${params.pfirstName ?? ""} ${params.plastName ?? ""}`} size={56} />
+            <View style={{ flex: 1, marginLeft: 14 }}>
+              <Text style={styles.title1}>{getGreeting()}</Text>
+              <Text style={styles.title2} numberOfLines={1} adjustsFontSizeToFit>
+                {params.pfirstName} {params.plastName}
+              </Text>
+              <Text style={styles.subtitle1}>Welcome to the Jetlink bus panel</Text>
             </View>
-            <Text style={styles.cardText}>Receipt</Text> 
-            <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
+          </View>
 
-          <TouchableOpacity 
-            style={styles.card2} 
-            onPress={() =>
-              router.push({
-                pathname: "/passenger/ticket/normalwayAndHighway",
-                params: {
-                  Pid: params.Pid,
-                  Pid1: params.Pid1,
-                  pfirstName: params.pfirstName,
-                  plastName:params.plastName,
-                  pphoneNumber: params.pphoneNumber,
-                  pemail: params.pemail,
-                },
-              })
-            } 
-          >
-              <View style={[styles.iconContainer, { backgroundColor: "#EC489918"  }]}>
-                <Ionicons name="ticket-outline" size={24} color="#EC4899" />
-              </View>
-              <Text style={styles.cardText}>Tickets</Text>
-              <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-          </TouchableOpacity>
-        </View>
+          <SectionLabel>What do you need?</SectionLabel>
 
-        
+          <View style={ui.grid}>
+            <Tile
+              icon={<FontAwesome5 name="bus-alt" size={20} color={C.purple} />}
+              iconBg={C.purpleSoft}
+              title="Buses"
+              subtitle="Search & book seats"
+              onPress={() =>
+                router.push({
+                  pathname: "/passenger/dailyBuses/searchBus",
+                  params: {
+                    Pid: params.Pid,
+                    Pid1: params.Pid1,
+                    pfirstName: params.pfirstName,
+                    plastName:params.plastName,
+                    pphoneNumber: params.pphoneNumber,
+                    address: params.address,
+                    NIC: params.NIC,
+                    pemail: params.pemail,
+                  },
+                })
+              }
+            />
+            <Tile
+              icon={<Feather name="gift" size={21} color={C.amber} />}
+              iconBg={C.amberSoft}
+              title="Parcel"
+              subtitle="Send a parcel"
+              onPress={() =>
+                router.push({
+                  pathname: "/passenger/parcel/index1",
+                  params: {
+                    Pid: params.Pid,
+                    Pid1: params.Pid1,
+                    pfirstName: params.pfirstName,
+                    plastName:params.plastName,
+                    pphoneNumber: params.pphoneNumber,
+                    pemail: params.pemail,
+                  },
+                })
+              }
+            />
+            <Tile
+              icon={<FontAwesome5 name="route" size={20} color="#B42335" />}
+              iconBg="#FDE8EA"
+              title="Tours"
+              subtitle="Book a tour bus"
+              onPress={tourinterface}
+            />
+            <Tile
+              icon={<SimpleLineIcons name="people" size={20} color={C.green} />}
+              iconBg={C.greenSoft}
+              title="Friend"
+              subtitle="Find a friend's bus"
+              onPress={() =>
+                router.push({
+                  pathname: "/passenger/friend/index1",
+                  params: {
+                    Pid: params.Pid,
+                    Pid1: params.Pid1,
+                    pfirstName: params.pfirstName,
+                    plastName: params.plastName,
+                    pphoneNumber: params.pphoneNumber,
+                    pemail: params.pemail,
+                    NIC: params.NIC
+                  }
+                })
+              }
+            />
+            <Tile
+              icon={<FontAwesome5 name="receipt" size={19} color={C.lime} />}
+              iconBg={C.limeSoft}
+              title="Receipt"
+              subtitle="Your receipts"
+              onPress={() =>
+                router.push({
+                  pathname: "/passenger/receipt/index1",
+                  params: {
+                    Pid: params.Pid,
+                    Pid1: params.Pid1,
+                    pfirstName: params.pfirstName,
+                    plastName:params.plastName,
+                    pphoneNumber: params.pphoneNumber,
+                    pemail: params.pemail,
+                  },
+                })
+              }
+            />
+            <Tile
+              icon={<Ionicons name="ticket-outline" size={22} color={C.pink} />}
+              iconBg={C.pinkSoft}
+              title="Tickets"
+              subtitle="Active & used"
+              onPress={() =>
+                router.push({
+                  pathname: "/passenger/ticket/normalwayAndHighway",
+                  params: {
+                    Pid: params.Pid,
+                    Pid1: params.Pid1,
+                    pfirstName: params.pfirstName,
+                    plastName:params.plastName,
+                    pphoneNumber: params.pphoneNumber,
+                    pemail: params.pemail,
+                  },
+                })
+              }
+            />
+          </View>
+        </ScrollView>
 
         {isSearching ? (
               <TextInput
@@ -349,7 +309,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: C.bg,
   },
   header: {
     flexDirection: 'row',
@@ -404,26 +364,12 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
 
-   title1: {
-    width: '100%',    
-    color: '#0047AB',
-    fontSize: 16,
-    fontWeight: '700',
-  },
+  title1: { color: C.muted, fontSize: 13, fontWeight: '600' },
 
-  title2: {
-    color: '#0047AB',
-    fontSize: 25,
-    fontWeight: '700',
-    marginRight: 15,
-  },
+  title2: { color: C.navy, fontSize: 20, fontWeight: '800', marginTop: 1 },
 
-  subtitle1: {
-    color: '#555',
-    fontSize: 14,
-    fontWeight: '500',
-    marginTop: 8,
-  },
+  subtitle1: { color: C.muted, fontSize: 12, fontWeight: '500', marginTop: 2 },
+  welcomeCard: { flexDirection: 'row', alignItems: 'center', padding: 18, borderRadius: 22 },
 
   listContainer: {
     paddingHorizontal: 20,

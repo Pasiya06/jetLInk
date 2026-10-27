@@ -7,7 +7,8 @@ import {
   TextInput, 
   TouchableOpacity, 
   SafeAreaView, 
-  Image 
+  Image,
+  ScrollView,
 } from 'react-native';
 import { 
   Ionicons, 
@@ -16,6 +17,7 @@ import {
   FontAwesome,
   FontAwesome5,
 } from '@expo/vector-icons';
+import { ScreenHeader, FeatureCard, C, ui } from "../../../components/JetUI";
   import { LinearGradient } from 'expo-linear-gradient';
 
 
@@ -31,26 +33,16 @@ const ToursScreen: React.FC = () => {
     <Stack.Screen options={{ title: "", headerShown: false }} />
     <SafeAreaView style={styles.container}>
       {/* Navbar Section */}
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-        style={styles.submitGradient1}
-      >
-        <View style={styles.header}>
-   
-          <TouchableOpacity >
-            <Text style={styles.title}>JetLink</Text>
-          </TouchableOpacity>
-                  
-        </View>
-      </LinearGradient>
-       
-      
-        
+      <ScreenHeader eyebrow="Your bookings" title="Receipts" />
 
-        {/* Option 1: Tour Packages */}
-        <TouchableOpacity style={styles.card } onPress={() =>
+      <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+        <FeatureCard
+          icon={<Feather name="package" size={28} color={C.amber} />}
+          iconBg={C.amberSoft}
+          title="Parcel receipts"
+          subtitle="Pending and delivered parcel bookings"
+          cta="View receipts"
+          onPress={() =>
             router.push({
               pathname: "/passenger/receipt/parcelReceipt",
               params: {
@@ -61,42 +53,30 @@ const ToursScreen: React.FC = () => {
                 pphoneNumber: params.pphoneNumber,
                 pemail: params.pemail,
               },
-          })
-      }>
-          <View style={[styles.iconWrap, { backgroundColor: "#F59E0B18" }]}>
-            <Feather name="gift" size={50} color="#F59E0B" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Parcel</Text>
-            <Text style={styles.text2}>Receipt for parcel booking</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
-
-        {/* Option 2: Additional Payment */}
-        <TouchableOpacity style={styles.card1 } onPress={() =>
-          router.push({
-            pathname: "/passenger/receipt/ReceiptList",
-            params: {
-              Pid: params.Pid,
-              Pid1: params.Pid1,
-              pfirstName: params.pfirstName,
-              plastName:params.plastName,
-              pphoneNumber: params.pphoneNumber,
-              pemail: params.pemail,
-            },
-          })
-        }>
-          <View style={[styles.iconWrap, { backgroundColor: "#EF444418" }]}>
-            <FontAwesome5 name="route" size={50} color="#EF4444" />
-          </View>
-          <View style={styles.cardText}>
-            <Text style={styles.text1}>Tours</Text>
-            <Text style={styles.text2}>Receipt for tour booking</Text>
-          </View>
-          <MaterialCommunityIcons name="chevron-right" size={24} color="#C7C7CC" />
-        </TouchableOpacity>
-      
+            })
+          }
+        />
+        <FeatureCard
+          icon={<FontAwesome5 name="route" size={26} color={C.pink} />}
+          iconBg={C.pinkSoft}
+          title="Tour receipts"
+          subtitle="Your tour package bookings"
+          cta="View receipts"
+          onPress={() =>
+            router.push({
+              pathname: "/passenger/receipt/ReceiptList",
+              params: {
+                Pid: params.Pid,
+                Pid1: params.Pid1,
+                pfirstName: params.pfirstName,
+                plastName:params.plastName,
+                pphoneNumber: params.pphoneNumber,
+                pemail: params.pemail,
+              },
+            })
+          }
+        />
+      </ScrollView>
 
       {isSearching ? (
                   <TextInput
@@ -199,7 +179,7 @@ const ToursScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: C.bg,
   },
   header: {
     flexDirection: 'row',

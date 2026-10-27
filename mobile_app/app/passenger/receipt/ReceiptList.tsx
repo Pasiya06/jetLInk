@@ -17,6 +17,7 @@ import {
 import { router, Stack, useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons, FontAwesome, Feather } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
+import { ScreenHeader } from "../../../components/JetUI";
 
 if (
   Platform.OS === "android" &&
@@ -29,16 +30,16 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 /* ---------- Theme ---------- */
 const C = {
-  brand: "#0056b3",
-  brandDark: "#003b7d",
-  brandSoft: "#e7f0ff",
-  bg: "#eef2f8",
+  brand: "#155B8A",
+  brandDark: "#173C79",
+  brandSoft: "#EAF1FB",
+  bg: "#F3F6FA",
   card: "#ffffff",
   ink: "#0f1b2d",
-  muted: "#64748b",
-  line: "#d5dde9",
-  success: "#15803d",
-  successSoft: "#dcfce7",
+  muted: "#5B6B7F",
+  line: "#DCE3EC",
+  success: "#0B6B53",
+  successSoft: "#E3F5EE",
   neutral: "#475569",
   neutralSoft: "#e8edf3",
   danger: "#dc3545",
@@ -162,20 +163,9 @@ export default function ReceiptList() {
       <StatusBar barStyle="light-content" backgroundColor={C.brand} />
 
       {/* Header */}
-      <LinearGradient
-        colors={["#173C79","#155B8A","#159B79",]}
-        start={{x: 0, y: 0,}}
-        end={{x: 1, y: 1,}}
-        style={styles.submitGradient1}>
-        <View style={styles.header}>
-          <TouchableOpacity>
-            <Text style={styles.title}>
-              Tour Receipt
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </LinearGradient>
+      <ScreenHeader eyebrow="Your bookings" title="Tour receipts" />
 
+      <View style={styles.bodyWrap}>
       {loading ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color={C.brand} />
@@ -235,6 +225,8 @@ export default function ReceiptList() {
           }
         />
       )}
+      </View>
+
       {isSearching ? (
           <TextInput 
             style={styles.searchBarInput}
@@ -573,6 +565,7 @@ function Detail({
 const NOTCH = 22;
 
 const styles = StyleSheet.create({
+  bodyWrap: { flex: 1, marginTop: -64 },
   extraRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -623,7 +616,7 @@ const styles = StyleSheet.create({
  
 
   /* List */
-  list: { padding: 16, paddingTop: 20, paddingBottom: 150 },
+  list: { paddingHorizontal: 16, paddingTop: 0, paddingBottom: 190 },
   emptyContainer: { flexGrow: 1, justifyContent: "center", padding: 20 },
 
   /* Card */

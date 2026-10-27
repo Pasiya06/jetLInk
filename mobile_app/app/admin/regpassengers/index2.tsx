@@ -7,10 +7,12 @@ import {
   TextInput,
   TouchableOpacity,
   SafeAreaView,
+  ScrollView,
 } from 'react-native';
 import { Ionicons, Feather, FontAwesome } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
+import { ScreenHeader, SectionLabel, Avatar, C, ui } from "../../../components/JetUI";
 
 const ToursScreen: React.FC = () => {
   const router = useRouter();
@@ -22,7 +24,7 @@ const ToursScreen: React.FC = () => {
   const InfoRow = ({ icon, label, value }: { icon: any; label: string; value?: string }) => (
     <View style={styles.row}>
       <View style={styles.iconWrap}>
-        <Ionicons name={icon} size={18} color="#4A6FA5" />
+        <Ionicons name={icon} size={19} color={C.blue} />
       </View>
       <View style={styles.rowText}>
         <Text style={styles.label}>{label}</Text>
@@ -38,41 +40,32 @@ const ToursScreen: React.FC = () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-        <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
-        >
+        <ScreenHeader eyebrow="Passenger profile" title="Passenger" />
 
-          <View style={styles.header}>
-            <Text style={styles.title}>Jetlink</Text>
-          </View>
-        </LinearGradient>
-
-        <View style={styles.card}>
-          <View style={styles.header1}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {firstInitial}{lastInitial}
-              </Text>
-            </View>
+        <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
+          <View style={[ui.card, styles.profileCard]}>
+            <Avatar name={`${params.pfirstName ?? ""} ${params.plastName ?? ""}`} size={84} />
             <Text style={styles.fullName}>
               {params.pfirstName} {params.plastName}
             </Text>
             <View style={styles.badge}>
-              <Ionicons name="checkmark-circle" size={13} color="#2F9E44" />
-              <Text style={styles.badgeText}>Registered Passenger</Text>
+              <Ionicons name="checkmark-circle" size={14} color={C.green} />
+              <Text style={styles.badgeText}>Registered passenger</Text>
             </View>
           </View>
 
-          <View style={styles.svw}>
+          <SectionLabel>Contact details</SectionLabel>
+          <View style={[ui.card, styles.infoCard]}>
             <InfoRow icon="call-outline" label="Phone" value={params.phoneNumber as string} />
-            <InfoRow icon="location-outline" label="Address" value={params.address as string} />
-            <InfoRow icon="card-outline" label="NIC" value={params.NIC as string} />
             <InfoRow icon="mail-outline" label="Email" value={params.pemail as string} />
+            <InfoRow icon="location-outline" label="Address" value={params.address as string} />
           </View>
-        </View>
+
+          <SectionLabel>Identity</SectionLabel>
+          <View style={[ui.card, styles.infoCard]}>
+            <InfoRow icon="card-outline" label="NIC" value={params.NIC as string} />
+          </View>
+        </ScrollView>
 
         {isSearching ? (
           <TextInput
@@ -171,9 +164,9 @@ const ToursScreen: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: "#fff" },
+  infoCard: { paddingHorizontal: 16, paddingVertical: 4 },
+  profileCard: { alignItems: 'center', paddingVertical: 24, paddingHorizontal: 16, borderRadius: 24 },
+  container: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: 'row',
@@ -236,29 +229,20 @@ const styles = StyleSheet.create({
     fontWeight: '700' 
   },
 
-  fullName: { 
-    fontSize: 18, 
-    fontWeight: '700', 
-    color: '#1E293B' 
-  },
+  fullName: { fontSize: 22, fontWeight: '800', color: C.navy, marginTop: 12, textAlign: 'center' },
 
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EAF7EC',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginTop: 8,
-    gap: 4,
+    backgroundColor: C.greenSoft,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    marginTop: 10,
+    gap: 6,
   },
 
-  badgeText: { 
-    fontSize: 11, 
-    color: '#2F9E44', 
-    fontWeight: '600', 
-    marginLeft: 4 
-  },
+  badgeText: { fontSize: 12, color: C.green, fontWeight: '700' },
 
   svw: { 
     width: '100%', 
@@ -272,15 +256,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: C.line,
   },
 
   iconWrap: {
-    width: 36, 
-    height: 36, 
-    borderRadius: 18,
-    backgroundColor: '#EAF0FB',
-    justifyContent: 'center', 
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    backgroundColor: C.blueSoft,
+    justifyContent: 'center',
     alignItems: 'center',
     marginRight: 14,
   },
@@ -289,19 +273,9 @@ const styles = StyleSheet.create({
     flex: 1 
   },
 
-  label: { 
-    fontSize: 12, 
-    color: '#94A3B8', 
-    marginBottom: 2, 
-    textTransform: 'uppercase', 
-    letterSpacing: 0.5 
-  },
+  label: { fontSize: 12, color: C.muted, fontWeight: '600', marginBottom: 2 },
 
-  value: { 
-    fontSize: 15, 
-    color: '#1E293B', 
-    fontWeight: '500' 
-  },
+  value: { fontSize: 15, color: C.ink, fontWeight: '700' },
 
   searchBarInput: {
     position: "absolute",

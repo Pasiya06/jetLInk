@@ -20,6 +20,7 @@ import {
   FontAwesome
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { ScreenHeader, SectionLabel, Pill, EmptyState, C, ui } from "../../../components/JetUI";
 
 
 
@@ -110,10 +111,10 @@ const JetLinkInterface: React.FC = () => {
                     <View style={styles.friendRow}>
                         <View style={styles.topRow}>
                         <View style={styles.busNoPill}>
-                            <Ionicons name="bus" size={14} color="#4B7BEC" />
+                            <Ionicons name="bus" size={14} color="#155B8A" />
                             <Text style={styles.busNoText}>{item.busNo}</Text>
                         </View>
-                        <Text style={styles.dateText}>{params.date}</Text>
+                        <Text style={styles.priceText}>{item.ticketPrice ? `Rs. ${item.ticketPrice}` : ""}</Text>
                         </View>
                 
                         {/* Route visual */}
@@ -140,7 +141,7 @@ const JetLinkInterface: React.FC = () => {
                         {/* Stops row */}
                         <View style={styles.infoRow}>
                         <View style={styles.iconWrap}>
-                            <Ionicons name="location-outline" size={16} color="#4B7BEC" />
+                            <Ionicons name="location-outline" size={16} color="#155B8A" />
                         </View>
                         <View style={{ flex: 1 }}>
                             <Text style={styles.infoLabel}>Stops</Text>
@@ -192,10 +193,10 @@ const JetLinkInterface: React.FC = () => {
                     <View style={styles.friendRow}>
                         <View style={styles.topRow}>
                         <View style={styles.busNoPill}>
-                            <Ionicons name="bus" size={14} color="#4B7BEC" />
+                            <Ionicons name="bus" size={14} color="#155B8A" />
                             <Text style={styles.busNoText}>{item.busNo}</Text>
                         </View>
-                        <Text style={styles.dateText}>{params.date}</Text>
+                        <Text style={styles.priceText}>{item.ticketPrice ? `Rs. ${item.ticketPrice}` : ""}</Text>
                         </View>
                 
                         {/* Route visual */}
@@ -222,7 +223,7 @@ const JetLinkInterface: React.FC = () => {
                         {/* Stops row */}
                         <View style={styles.infoRow}>
                         <View style={styles.iconWrap}>
-                            <Ionicons name="location-outline" size={16} color="#4B7BEC" />
+                            <Ionicons name="location-outline" size={16} color="#155B8A" />
                         </View>
                         <View style={{ flex: 1 }}>
                             <Text style={styles.infoLabel}>Stops</Text>
@@ -244,32 +245,41 @@ const JetLinkInterface: React.FC = () => {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
         
-        <LinearGradient
-            colors={["#173C79","#155B8A","#159B79",]}
-          start={{x: 0, y: 0,}}
-          end={{x: 1, y: 1,}}
-            style={styles.submitGradient1}
-        >
-            <View style={styles.header}>
-                    
-                
-                <TouchableOpacity >
-                  <Text style={styles.title}>JetLink</Text>
-                </TouchableOpacity>
-                         
-            </View>
-        </LinearGradient> 
+        <ScreenHeader eyebrow={params.routeType === "Highway" ? "Highway buses" : "Normal buses"} title="Choose a bus" /> 
              
-        <View style={styles.card}>
-          <Text style={styles.cardtitle}>Select time table</Text>
-          <FlatList style={styles.svw}
+        <View style={[ui.body, { paddingHorizontal: 16 }]}>
+          <View style={[ui.card, styles.summary]}>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.summaryLabel}>Your trip</Text>
+              <View style={styles.summaryRoute}>
+                <Text style={styles.summaryPlace} numberOfLines={1}>{params.pickup}</Text>
+                <Ionicons name="arrow-forward" size={16} color="#159B79" style={{ marginHorizontal: 6 }} />
+                <Text style={[styles.summaryPlace, { flexShrink: 1 }]} numberOfLines={1}>{params.drop}</Text>
+              </View>
+              <View style={styles.summaryMeta}>
+                <Ionicons name="calendar-outline" size={14} color={C.muted} />
+                <Text style={styles.summaryMetaText}>{params.date}</Text>
+              </View>
+            </View>
+            <Pill text={`${busschedData.length} ${busschedData.length === 1 ? "bus" : "buses"}`} bg={C.greenSoft} color={C.green} />
+          </View>
+
+          <SectionLabel style={{ marginTop: 18, marginBottom: 6 }}>Select a time table</SectionLabel>
+          <FlatList
+            style={{ flex: 1 }}
             data={busschedData}
             renderItem={renderBusItem}
             keyExtractor={(item)=>item.scheduleId}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingVertical: 10 }}
-            />
-
+            contentContainerStyle={{ paddingBottom: 190 }}
+            ListEmptyComponent={
+              <EmptyState
+                icon={<Ionicons name="bus-outline" size={28} color={C.amber} />}
+                title="No buses found"
+                subtitle="Try another route, bus type or date."
+              />
+            }
+          />
         </View>
 
       {isSearching ? (
@@ -375,10 +385,14 @@ const JetLinkInterface: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  container:{
-    flex:1,
-    backgroundColor:"#fff"
-  },
+  summaryMetaText: { fontSize: 13, fontWeight: '600', color: C.muted },
+  summaryMeta: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 6 },
+  summaryPlace: { fontSize: 17, fontWeight: '800', color: C.navy },
+  summaryRoute: { flexDirection: 'row', alignItems: 'center', marginTop: 4 },
+  summaryLabel: { fontSize: 12, fontWeight: '700', color: C.muted, letterSpacing: 0.3 },
+  summary: { flexDirection: 'row', alignItems: 'center', padding: 18, borderRadius: 22 },
+  priceText: { fontSize: 16, fontWeight: '800', color: '#173C79' },
+  container: { flex: 1, backgroundColor: C.bg },
 
   header: {
     flexDirection: 'row',
@@ -435,15 +449,14 @@ const styles = StyleSheet.create({
 
   friendRow: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 18,
-    padding: 18,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    shadowColor: '#000',
+    borderRadius: 20,
+    padding: 16,
+    marginVertical: 6,
+    shadowColor: '#0F1B2D',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    elevation: 8,
+    shadowOpacity: 0.07,
+    shadowRadius: 12,
+    elevation: 3,
   },
 
   topRow: {
@@ -455,19 +468,19 @@ const styles = StyleSheet.create({
   busNoPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EAF1FF',
+    backgroundColor: '#EAF1FB',
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 20,
     gap: 6,
   },
   busNoText: {
-    color: '#4B7BEC',
+    color: '#155B8A',
     fontWeight: '700',
     fontSize: 13,
   },
   dateText: {
-    color: '#8A94A6',
+    color: '#5B6B7F',
     fontSize: 13,
     fontWeight: '500',
   },
@@ -484,13 +497,13 @@ const styles = StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#4B7BEC',
+    backgroundColor: '#155B8A',
   },
   connector: {
     width: 2,
     flex: 1,
     minHeight: 30,
-    backgroundColor: '#D8E2F5',
+    backgroundColor: '#DCE3EC',
     marginVertical: 4,
   },
   dotOutline: {
@@ -498,7 +511,7 @@ const styles = StyleSheet.create({
     height: 10,
     borderRadius: 5,
     borderWidth: 2,
-    borderColor: '#4B7BEC',
+    borderColor: '#155B8A',
     backgroundColor: '#FFFFFF',
   },
   routeDetails: {
@@ -510,18 +523,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
   },
-  locationText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: '#1A1F36',
-    flex: 1,
-    marginRight: 8,
-  },
-  timeText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#4B7BEC',
-  },
+  locationText: { fontSize: 15, fontWeight: '800', color: '#0F1B2D', flex: 1, marginRight: 8 },
+  timeText: { fontSize: 14, fontWeight: '800', color: '#155B8A' },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -534,19 +537,19 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#EAF1FF',
+    backgroundColor: '#EAF1FB',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
   },
   infoLabel: {
     fontSize: 11,
-    color: '#8A94A6',
+    color: '#5B6B7F',
     fontWeight: '600',
   },
   infoValue: {
     fontSize: 13,
-    color: '#1A1F36',
+    color: '#0F1B2D',
     fontWeight: '500',
   },
 
@@ -579,7 +582,7 @@ const styles = StyleSheet.create({
     //flex: 1,
     // marginLeft: 10,
     fontSize: 14,
-    color: '#0047AB',
+    color: '#173C79',
     fontWeight: '500',
   },
 
@@ -587,7 +590,7 @@ const styles = StyleSheet.create({
     //flex: 1,
     //marginRight: 100,
     fontSize: 14,
-    color: '#0047AB',
+    color: '#173C79',
     fontWeight: '500',
   },
 

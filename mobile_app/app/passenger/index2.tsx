@@ -20,6 +20,7 @@ import { saveSession } from '../../services/notificationService';
 
 import FieldError from "../../components/FieldError";
 import { useFieldErrors } from "../../utils/validation";
+import { C } from "../../components/JetUI";
 // Retrieve the base API URL from Expo environment variables
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -243,22 +244,21 @@ const loginPassenger = async () => {
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
-      <StatusBar barStyle="light-content" backgroundColor="#7db300" />
+      <StatusBar barStyle="light-content" backgroundColor="#173C79" />
       <SafeAreaView style={styles.container}>
         <LinearGradient
           colors={["#173C79","#155B8A","#159B79",]}
           start={{x: 0, y: 0,}}
           end={{x: 1, y: 1,}}
-          style={styles.submitGradient1}
+          style={styles.hero}
         >
-        <View style={styles.header}>
-            
-        
-          <TouchableOpacity >
-            <Text style={styles.title}>JetLink</Text>
-          </TouchableOpacity>
-                  
-        </View>
+          <View style={styles.logo}>
+            <Ionicons name="bus" size={26} color="#FFFFFF" />
+          </View>
+          <Text style={styles.title}>{isLoginTab ? "Welcome back" : "Create account"}</Text>
+          <Text style={styles.heroSub}>
+            {isLoginTab ? "Log in to book tickets, parcels and tours" : "Join JetLink in under a minute"}
+          </Text>
         </LinearGradient>
         
        
@@ -290,7 +290,7 @@ const loginPassenger = async () => {
                 <Text style={styles.inputLabel}>First Name</Text>  
                 <View style={styles.inputWrapper}>
                   <View style={[styles.iconWrap, ]}>
-                    <Ionicons name="person" size={18} color="#000000" />
+                    <Ionicons name="person" size={18} color={C.blue} />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -298,7 +298,7 @@ const loginPassenger = async () => {
                       value={firstName}
                       onChangeText={setFirstName}
                       placeholder="Deshith"
-                      placeholderTextColor="#A3A3A3"
+                      placeholderTextColor="#8A97A8"
                     />
                   </View>
                 </View>
@@ -307,7 +307,7 @@ const loginPassenger = async () => {
                 <Text style={styles.inputLabel}>Last Name</Text>  
                 <View style={styles.inputWrapper}>
                   <View style={[styles.iconWrap, ]}>
-                      <Ionicons name="person" size={18} color="#000000" />
+                      <Ionicons name="person" size={18} color={C.blue} />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -315,7 +315,7 @@ const loginPassenger = async () => {
                       value={lastName}
                       onChangeText={setLastName}
                       placeholder="Sandakelum"
-                      placeholderTextColor="#A3A3A3"
+                      placeholderTextColor="#8A97A8"
                     />
                   </View>
                 </View>
@@ -324,7 +324,7 @@ const loginPassenger = async () => {
                 <Text style={styles.inputLabel}>Phone Number</Text>  
                 <View style={styles.inputWrapper}>
                   <View style={[styles.iconWrap, ]}>
-                      <Feather name="phone" size={18} color="#000000" />
+                      <Feather name="phone" size={18} color={C.blue} />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -332,7 +332,7 @@ const loginPassenger = async () => {
                       value={phoneNumber}
                       onChangeText={setPhoneNumber}
                       placeholder="077 1234567"
-                      placeholderTextColor="#A3A3A3"
+                      placeholderTextColor="#8A97A8"
                       keyboardType="phone-pad"
                       maxLength={10}
                     />
@@ -344,7 +344,7 @@ const loginPassenger = async () => {
                 <View style={styles.inputWrapper}>
                   
                   <View style={[styles.iconWrap, ]}>
-                      <Entypo name="location" size={18} color="#000000" />
+                      <Entypo name="location" size={18} color={C.blue} />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -352,7 +352,7 @@ const loginPassenger = async () => {
                       value={address}
                       onChangeText={setAdress}
                       placeholder="15/2 Galle road, Colombo"
-                      placeholderTextColor="#A3A3A3"
+                      placeholderTextColor="#8A97A8"
                     />
                   </View>
                 </View>
@@ -361,7 +361,7 @@ const loginPassenger = async () => {
                 <Text style={styles.inputLabel}>NIC</Text>  
                 <View style={styles.inputWrapper}>
                   <View style={[styles.iconWrap, ]}>
-                      <AntDesign name="idcard" size={18} color="#000000" />
+                      <AntDesign name="idcard" size={18} color={C.blue} />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -369,7 +369,7 @@ const loginPassenger = async () => {
                       value={NIC}
                       onChangeText={(text) => setNIC(text.toUpperCase())}
                       placeholder="123456789012 or 123456789V"
-                      placeholderTextColor="#A3A3A3"
+                      placeholderTextColor="#8A97A8"
                       maxLength={12}
                       autoCapitalize="characters"
                     />
@@ -380,14 +380,14 @@ const loginPassenger = async () => {
                 <Text style={styles.inputLabel}>Email Address</Text>
                 <View style={styles.inputWrapper}>
                   <View style={[styles.iconWrap, ]}>
-                    <Fontisto name="email" size={18} color="#000000" />
+                    <Fontisto name="email" size={18} color={C.blue} />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
                       style={styles.textInput}
                       value={email}
                       placeholder="ABC@gmail.com"
-                      placeholderTextColor="#A3A3A3"
+                      placeholderTextColor="#8A97A8"
                       keyboardType="email-address"
                       onChangeText={(text) => setEmail(text.replace(/\s/g, "").toLowerCase())} 
                       autoCapitalize="none"
@@ -400,7 +400,7 @@ const loginPassenger = async () => {
                 <Text style={styles.inputLabel}>Password</Text>
                 <View style={styles.inputWrapper}>
                   <View style={[styles.iconWrap, ]}>
-                    <EvilIcons name="lock" size={28} color="#000000" />
+                    <Ionicons name="lock-closed-outline" size={18} color={C.blue} />
                   </View>
                   <View style={styles.inputInnerWrapper}>
                     <TextInput
@@ -408,13 +408,13 @@ const loginPassenger = async () => {
                       value={password}
                       onChangeText={setPassword}
                       placeholder="Abc@123"
-                      placeholderTextColor="#A3A3A3"
+                      placeholderTextColor="#8A97A8"
                       secureTextEntry={!showPassword}
                       autoCapitalize="none"
                     />
                   </View>
                   <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-                    <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color="#A3A3A3" />
+                    <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color={C.muted} />
                   </TouchableOpacity>
                 </View>
                 <FieldError message={fieldError("password", password)} />
@@ -427,6 +427,12 @@ const loginPassenger = async () => {
             {/* Footer Actions */}
               <View style={styles.footerContainer}>
                 <TouchableOpacity style={styles.primaryButton} onPress={isLoginTab ? loginPassenger : registerPassenger}>
+                  <LinearGradient
+                    colors={["#173C79", "#155B8A", "#159B79"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={StyleSheet.absoluteFill}
+                  />
                   <Text style={styles.primaryButtonText}>
                     {isLoginTab ? 'Login' : 'Register'}
                   </Text>
@@ -460,14 +466,14 @@ const loginPassenger = async () => {
               <Text style={styles.inputLabel}>Email Address</Text>
               <View style={styles.inputWrapper}>
                 <View style={[styles.iconWrap, ]}>
-                    <Fontisto name="email" size={18} color="#000000" />
+                    <Fontisto name="email" size={18} color={C.blue} />
                 </View>
                 <View style={styles.inputInnerWrapper}>
                   <TextInput
                     style={styles.textInput}
                     value={email1}
                     placeholder="ABC@gmail.com"
-                    placeholderTextColor="#A3A3A3"
+                    placeholderTextColor="#8A97A8"
                     keyboardType="email-address"
                     onChangeText={(text) => setEmail1(text.replace(/\s/g, "").toLowerCase())} 
                     autoCapitalize="none"
@@ -480,7 +486,7 @@ const loginPassenger = async () => {
               <Text style={styles.inputLabel}>Password</Text>
               <View style={styles.inputWrapper}>
                 <View style={[styles.iconWrap, ]}>
-                  <EvilIcons name="lock" size={28} color="#000000" />
+                  <Ionicons name="lock-closed-outline" size={18} color={C.blue} />
                 </View>
                 <View style={styles.inputInnerWrapper}>
                   <TextInput
@@ -488,13 +494,13 @@ const loginPassenger = async () => {
                     value={password1}
                     onChangeText={setPassword1}
                     placeholder="Abc@123"
-                    placeholderTextColor="#A3A3A3"
+                    placeholderTextColor="#8A97A8"
                     secureTextEntry={!showPassword}
                     autoCapitalize="none"
                   />
                 </View>
                 <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-                  <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color="#A3A3A3" />
+                  <Icon name={showPassword ? 'eye' : 'eye-off'} size={20} color={C.muted} />
                 </TouchableOpacity>
               </View>
               <FieldError message={fieldError("password1", password1)} />
@@ -507,6 +513,12 @@ const loginPassenger = async () => {
             </View>
             
                 <TouchableOpacity style={styles.primaryButton1} onPress={isLoginTab ? loginPassenger : registerPassenger}>
+                  <LinearGradient
+                    colors={["#173C79", "#155B8A", "#159B79"]}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                    style={StyleSheet.absoluteFill}
+                  />
                   <Text style={styles.primaryButtonText}>
                     {isLoginTab ? 'Login' : 'Register'}
                   </Text>
@@ -543,10 +555,10 @@ const loginPassenger = async () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
+  heroSub: { fontSize: 14, fontWeight: '500', color: 'rgba(255,255,255,0.88)', marginTop: 4 },
+  logo: { width: 56, height: 56, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.18)', alignItems: 'center', justifyContent: 'center', marginBottom: 12 },
+  hero: { borderBottomLeftRadius: 32, borderBottomRightRadius: 32, paddingTop: 56, paddingBottom: 92, alignItems: 'center' },
+  container: { flex: 1, backgroundColor: C.bg },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -562,187 +574,62 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 25,
     borderBottomRightRadius: 25,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#ffffff',
-    letterSpacing: 0.5,
-  },
+  title: { fontSize: 28, fontWeight: '800', color: '#FFFFFF' },
   card: {
-    width: '90%',
     flex: 1,
-    maxHeight: '80%',
-    backgroundColor: '#FFF',
-    padding: 24,
-    alignItems: 'center',
-    marginTop: -50,   
-    alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    marginTop: -64,
+    marginHorizontal: 16,
+    marginBottom: 110,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 26,
+    padding: 18,
+    elevation: 6,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
   },
 
   card1: {
-    width: '90%',
-    flex: 1,
-    maxHeight: '55%',
-    backgroundColor: '#FFF',
-    padding: 24,
-    alignItems: 'center',
-    marginTop: -50,   
-    alignSelf: 'center',
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
+    marginTop: -64,
+    marginHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 26,
+    padding: 18,
+    elevation: 6,
+    shadowColor: '#0F1B2D',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.12,
+    shadowRadius: 18,
   },
 
-  iconWrap: {
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
+  iconWrap: { width: 26, alignItems: 'center', marginRight: 8 },
 
-  tabContainer: {
-    width: '100%',
-    backgroundColor: '#F2F4F5',
-    borderRadius: 12,
-    flexDirection: 'row',
-    padding: 6,
-    marginTop: 12,
-    marginBottom: 12,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
-  tabButton: {
-    flex: 1,
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  activeTabButton: {
-    backgroundColor: '#4B6CF5',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  tabButtonText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#000000',
-  },
-  activeTabButtonText: {
-    color: '#FFF',
-  },
-  svw: {
-    width: '100%'
-  },
-  formContainer: {
-    width: '100%',
-    marginTop: 14,
-    paddingBottom: 20,
-  },
-  inputWrapper: {
-    minHeight: 50,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F2F4F5',
-    borderWidth: 1,
-    borderColor: '#ECEEF2',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginBottom: 15,
-  },
+  tabContainer: { flexDirection: 'row', backgroundColor: C.bg, borderRadius: 16, padding: 5, gap: 6, marginBottom: 18 },
+  tabButton: { flex: 1, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  activeTabButton: { backgroundColor: C.blue },
+  tabButtonText: { fontSize: 15, fontWeight: '700', color: C.blue },
+  activeTabButtonText: { color: '#FFFFFF' },
+  svw: { flex: 1 },
+  formContainer: { width: '100%' },
+  inputWrapper: { flexDirection: 'row', alignItems: 'center', minHeight: 52, borderWidth: 1.5, borderColor: '#E3E9F1', backgroundColor: '#F7F9FC', borderRadius: 14, paddingHorizontal: 12 },
   
-  inputInnerWrapper: {
-    flex: 1,
-  },
-  inputLabel: {
-    fontSize: 16,
-    color: '#4B6CF5',
-    fontWeight: '500',
-    marginBottom: 10,
-  },
-  textInput: {
-    fontSize: 16,
-    color: '#000000',
-    fontWeight: '500',
-    padding: 0, 
-  },
+  inputInnerWrapper: { flex: 1 },
+  inputLabel: { fontSize: 13, fontWeight: '700', color: C.muted, marginBottom: 6, marginLeft: 2, marginTop: 4 },
+  textInput: { fontSize: 15, fontWeight: '600', color: C.ink, paddingVertical: 12 },
  
-  eyeIcon: {
-    padding: 4,
-  },
+  eyeIcon: { padding: 6 },
   
-  rowJustify: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-end',
-    marginTop: 8,
-    marginBottom: 15,
-  },
+  rowJustify: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10 },
   
   
-  forgotPasswordText: {
-    fontSize: 12,
-    color: '#4B6CF5',
-    fontWeight: '500',
-  },
-  footerContainer: {
-    width: '100%',
-    marginTop: 'auto', 
-    paddingBottom: 10,
-  },
-  primaryButton: {
-    width: '100%',
-    backgroundColor: '#4B6CF5',
-    padding: 14,
-    alignItems: 'center',   
-    alignSelf: 'center',
-    marginTop: 10,
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
+  forgotPasswordText: { fontSize: 14, fontWeight: '700', color: C.blue },
+  footerContainer: { paddingTop: 12 },
+  primaryButton: { height: 54, borderRadius: 27, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', elevation: 4 },
 
-  primaryButton1: {
-    width: '100%',
-    backgroundColor: '#4B6CF5',
-    padding: 14,
-    alignItems: 'center',   
-    alignSelf: 'center',
-    marginTop: 10,
-    borderRadius: 20,
-    elevation: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-  },
+  primaryButton1: { height: 54, borderRadius: 27, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', marginTop: 18, elevation: 4 },
 
-  primaryButtonText: {
-    color: '#FFF',
-    fontSize: 16,
-    fontWeight: '500',
-  },
+  primaryButtonText: { fontSize: 16, fontWeight: '800', color: '#FFFFFF' },
   submitGradient: {
     paddingVertical: 16,
     alignItems: 'center',
