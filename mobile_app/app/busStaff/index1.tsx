@@ -2,8 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
-  Image, 
-  Alert,
+  Image,
   StyleSheet,
   TextInput,
   Text,
@@ -14,6 +13,8 @@ import {
   BackHandler,
   ScrollView,
 } from "react-native";
+import SearchPanel from "../../components/SearchPanel";
+import { Alert } from "../../components/JetAlert";
 
 // Icons
 import {
@@ -443,17 +444,16 @@ export default function DriverHome() {
           </View>
         </ScrollView>
 
-        {isSearching ? (
-              <TextInput
-                style={styles.searchBarInput}
-                placeholder="Search..."
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoFocus={true}
-              />
-            ) : (
-              <Text style={styles.subHeaderTitle}>{params.busNumber}</Text>
-          )}
+        {!isSearching && <Text style={styles.subHeaderTitle}>{params.busNumber}</Text>}
+
+        <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"staff"}
+          params={params}
+        />
 
         <View style={styles.bottomNav}>
         
@@ -467,10 +467,10 @@ export default function DriverHome() {
                     </Text>
                   </TouchableOpacity>
         
-                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
                     <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
                     <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-                      Routes
+                      Search
                     </Text>
                   </TouchableOpacity>
         

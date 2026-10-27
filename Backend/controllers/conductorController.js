@@ -1,5 +1,19 @@
 import Conductor from "../models/Conductor.js";
 
+// Renumber 1, 2, 3... after a delete without breaking the unique index.
+// Step 1 moves every id to a temporary negative number, step 2 sets the final number.
+// bulkWrite skips schema validation, so older records with missing fields don't fail.
+const renumberIds = async (Model, field) => {
+  const docs = await Model.find().sort({ [field]: 1, _id: 1 }).select("_id").lean();
+  if (!docs.length) return;
+  await Model.bulkWrite(
+    docs.map((d, i) => ({ updateOne: { filter: { _id: d._id }, update: { $set: { [field]: -(i + 1) } } } }))
+  );
+  await Model.bulkWrite(
+    docs.map((d, i) => ({ updateOne: { filter: { _id: d._id }, update: { $set: { [field]: i + 1 } } } }))
+  );
+};
+
 // Conductor Login - Send OTP
 export const conductorLogin = async (req, res) => {
   try {
@@ -142,16 +156,20 @@ export const deleteConductor = async (req, res) => {
 
     try {
 
-        await Conductor.findByIdAndDelete(req.params.id);
+        const deleted = await Conductor.findByIdAndDelete(req.params.id);
 
-        const conductors = await Conductor.find().sort({ conductorId: 1 });
+        if (!deleted) {
+            return res.status(404).json({
+                success: false,
+                message: "Conductor not found",
+            });
+        }
 
-        for (let i = 0; i < conductors.length; i++) {
-
-            conductors[i].conductorId = i + 1;
-
-            await conductors[i].save();
-
+        // Renumber conductorId values (already deleted, so don't fail the request if this goes wrong)
+        try {
+            await renumberIds(Conductor, "conductorId");
+        } catch (renumberError) {
+            console.error("Conductor renumber error:", renumberError);
         }
 
         res.json({
@@ -159,11 +177,13 @@ export const deleteConductor = async (req, res) => {
             message: "Conductor Deleted",
         });
 
-    } catch {
+    } catch (error) {
+
+        console.error("Delete conductor error:", error);
 
         res.status(500).json({
             success: false,
-            message: "Server Error",
+            message: error.message || "Server Error",
         });
 
     }

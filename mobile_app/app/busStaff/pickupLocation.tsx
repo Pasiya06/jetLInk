@@ -8,8 +8,8 @@ import {
   StatusBar,
   Linking,
   Platform,
-  Alert,
 } from "react-native";
+import { Alert } from "../../components/JetAlert";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";

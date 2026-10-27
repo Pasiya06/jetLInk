@@ -13,7 +13,10 @@ import {
   LayoutAnimation,
   UIManager,
   TextInput,
+  Modal,
 } from "react-native";
+import SearchPanel, { filterBySearch } from "../../../components/SearchPanel";
+import QRCode from "react-native-qrcode-svg";
 import { router, Stack, useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons, FontAwesome, Feather } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -72,7 +75,13 @@ interface Receipt {
   pemail: string;
   extraKm?: number;
   extraKmAmount?: number;
+  status?: "active" | "gone";
+  tripEnd?: string;
+  scanned?: boolean;
+  scannedAt?: string | null;
 }
+
+type ListTab = "active" | "gone";
 
 /* ---------- Screen ---------- */
 export default function ReceiptList() {
@@ -90,6 +99,12 @@ export default function ReceiptList() {
   const [activeTab, setActiveTab] = useState('');
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [listTab, setListTab] = useState<ListTab>("active");
+  const [qrFor, setQrFor] = useState<Receipt | null>(null);
+
+  const activeReceipts = receipts.filter((r) => (r.status || "active") === "active");
+  const goneReceipts = receipts.filter((r) => r.status === "gone");
+  const shown = listTab === "active" ? activeReceipts : goneReceipts;
    
   const fetchReceipts = useCallback(
     async (refresh = false) => {
@@ -166,6 +181,30 @@ export default function ReceiptList() {
       <ScreenHeader eyebrow="Your bookings" title="Tour receipts" />
 
       <View style={styles.bodyWrap}>
+      {/* Active / Gone tabs */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tabButton, listTab === "active" && styles.activeTabButton]}
+          onPress={() => setListTab("active")}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="ticket-outline" size={17} color={listTab === "active" ? "#FFFFFF" : C.brand} />
+          <Text style={[styles.tabButtonText, listTab === "active" && styles.activeTabButtonText]}>
+            Active ({activeReceipts.length})
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabButton, listTab === "gone" && styles.activeTabButton]}
+          onPress={() => setListTab("gone")}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="checkmark-done" size={17} color={listTab === "gone" ? "#FFFFFF" : C.brand} />
+          <Text style={[styles.tabButtonText, listTab === "gone" && styles.activeTabButtonText]}>
+            Gone ({goneReceipts.length})
+          </Text>
+        </TouchableOpacity>
+      </View>
+
       {loading ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color={C.brand} />
@@ -189,12 +228,12 @@ export default function ReceiptList() {
         </View>
       ) : (
         <FlatList
-          data={receipts}
+          data={filterBySearch(shown, searchQuery)}
           keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <ReceiptCard item={item} />}
+          renderItem={({ item }) => <ReceiptCard item={item} onShowQr={() => setQrFor(item)} />}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={
-            receipts.length === 0 ? styles.emptyContainer : styles.list
+            shown.length === 0 ? styles.emptyContainer : styles.list
           }
           refreshControl={
             <RefreshControl
@@ -209,9 +248,13 @@ export default function ReceiptList() {
               <View style={styles.stateIcon}>
                 <Ionicons name="receipt-outline" size={36} color={C.brand} />
               </View>
-              <Text style={styles.stateTitle}>No receipts yet</Text>
+              <Text style={styles.stateTitle}>
+                {listTab === "active" ? "No active tours" : "No past tours"}
+              </Text>
               <Text style={styles.infoText}>
-                Receipts for your parcels and trips will show up here.
+                {listTab === "active"
+                  ? "Tours you book will show up here with their QR code."
+                  : "Tours that are scanned or finished will show up here."}
               </Text>
               <TouchableOpacity
                 style={styles.primaryButton}
@@ -227,15 +270,17 @@ export default function ReceiptList() {
       )}
       </View>
 
-      {isSearching ? (
-          <TextInput 
-            style={styles.searchBarInput}
-            placeholder="Search..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus={true}
-          />
-        ) : null}
+      <TourQrModal receipt={qrFor} onClose={() => setQrFor(null)} />
+
+      <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"passenger"}
+          params={params}
+          listLabel="tour receipts"
+        />
 
         <View style={styles.bottomNav}>
 
@@ -245,7 +290,7 @@ export default function ReceiptList() {
             onPress={() => {
               setActiveTab("home");
               if (isSearching) {
-                setIsSearching(false);
+                setIsSearching(false); setSearchQuery("");
               }
 
               else {
@@ -276,11 +321,11 @@ export default function ReceiptList() {
 
           <TouchableOpacity
             style={styles.item}
-            onPress={() => {setActiveTab("routes"); setIsSearching(!isSearching);}}
+            onPress={() => {setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching);}}
           >
             <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab === "routes" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[styles.label1, activeTab === "routes" && styles.activeLabel,]}>
-              Routes
+              Search
             </Text>
           </TouchableOpacity>
 
@@ -356,7 +401,7 @@ export default function ReceiptList() {
 }
 
 /* ---------- Ticket card ---------- */
-function ReceiptCard({ item }: { item: Receipt }) {
+function ReceiptCard({ item, onShowQr }: { item: Receipt; onShowQr: () => void }) {
   const [open, setOpen] = useState(false);
   const params = useLocalSearchParams();
   const toggle = () => {
@@ -365,6 +410,7 @@ function ReceiptCard({ item }: { item: Receipt }) {
   };
 
   const price = `Rs. ${Number(item.maxPrice || 0).toLocaleString()}`;
+  const isGone = item.status === "gone";
 
   return (
     <TouchableOpacity 
@@ -399,6 +445,17 @@ function ReceiptCard({ item }: { item: Receipt }) {
             <Text style={styles.busBadgeText}>{item.busNumber || "—"}</Text>
           </View>
 
+          <View
+            style={[
+              styles.status,
+              { backgroundColor: isGone ? C.neutralSoft : C.successSoft },
+            ]}
+          >
+            <View style={[styles.statusDot, { backgroundColor: isGone ? C.neutral : C.success }]} />
+            <Text style={[styles.statusText, { color: isGone ? C.neutral : C.success }]}>
+              {isGone ? (item.scanned ? "Boarded" : "Ended") : "Active"}
+            </Text>
+          </View>
         </View>
 
         <Text style={styles.fieldLabel}>Pickup</Text>
@@ -441,7 +498,22 @@ function ReceiptCard({ item }: { item: Receipt }) {
         </View>
       </View>
 
-      
+      {/* QR code (active tours only) */}
+      {!isGone ? (
+        <TouchableOpacity style={styles.qrButton} onPress={onShowQr} activeOpacity={0.85}>
+          <Ionicons name="qr-code-outline" size={18} color="#FFFFFF" />
+          <Text style={styles.qrButtonText}>Show QR code</Text>
+        </TouchableOpacity>
+      ) : (
+        <View style={styles.goneRow}>
+          <Ionicons name={item.scanned ? "checkmark-circle" : "flag-outline"} size={16} color={C.neutral} />
+          <Text style={styles.goneText}>
+            {item.scanned
+              ? `QR scanned${item.scannedAt ? ` on ${new Date(item.scannedAt).toLocaleDateString()}` : ""}`
+              : `Tour ended${item.tripEnd ? ` on ${item.tripEnd}` : ""}`}
+          </Text>
+        </View>
+      )}
 
       {/* Expandable details */}
       {open && (
@@ -478,6 +550,77 @@ function ReceiptCard({ item }: { item: Receipt }) {
         />
       </TouchableOpacity>
     </TouchableOpacity>
+  );
+}
+
+/* ---------- Tour QR modal ---------- */
+function TourQrModal({ receipt, onClose }: { receipt: Receipt | null; onClose: () => void }) {
+  const [qrToken, setQrToken] = useState("");
+  const [qrLoading, setQrLoading] = useState(false);
+  const [qrError, setQrError] = useState("");
+
+  const loadQr = useCallback(async () => {
+    if (!receipt) return;
+    try {
+      setQrLoading(true);
+      setQrError("");
+      setQrToken("");
+      const res = await fetch(`${API_URL}/receipts/receiptId/${encodeURIComponent(receipt.receiptId)}/qr`);
+      const data = await res.json();
+      if (!res.ok || !data.qrToken) throw new Error(data.error || "Could not create QR code.");
+      setQrToken(data.qrToken);
+    } catch (err) {
+      setQrError(err instanceof Error ? err.message : "Could not create QR code.");
+    } finally {
+      setQrLoading(false);
+    }
+  }, [receipt]);
+
+  useEffect(() => {
+    if (receipt) loadQr();
+  }, [receipt, loadQr]);
+
+  return (
+    <Modal visible={!!receipt} transparent animationType="fade" onRequestClose={onClose}>
+      <View style={styles.qrBackdrop}>
+        <View style={styles.qrCard}>
+          <Text style={styles.qrTitle}>Tour QR code</Text>
+          <Text style={styles.qrSub}>
+            {receipt?.receiptId}  ·  {receipt?.date}
+          </Text>
+
+          <View style={styles.qrFrame}>
+            {qrLoading ? (
+              <ActivityIndicator size="large" color={C.brand} />
+            ) : qrToken ? (
+              <QRCode value={qrToken} size={210} />
+            ) : (
+              <View style={{ alignItems: "center", padding: 10 }}>
+                <Ionicons name="alert-circle-outline" size={32} color={C.danger} />
+                <Text style={styles.qrErrorText}>{qrError}</Text>
+              </View>
+            )}
+          </View>
+
+          <View style={styles.qrHint}>
+            <Ionicons name="scan-outline" size={16} color={C.muted} />
+            <Text style={styles.qrHintText}>Show this code to the bus conductor when you board</Text>
+          </View>
+
+          <View style={styles.qrBtnRow}>
+            {!!qrError && (
+              <TouchableOpacity style={styles.qrSecondaryBtn} onPress={loadQr} activeOpacity={0.85}>
+                <Ionicons name="refresh" size={16} color={C.brand} />
+                <Text style={styles.qrSecondaryText}>Retry</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity style={styles.qrCloseBtn} onPress={onClose} activeOpacity={0.85}>
+              <Text style={styles.qrCloseText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </Modal>
   );
 }
 
@@ -545,6 +688,83 @@ const NOTCH = 22;
 
 const styles = StyleSheet.create({
   bodyWrap: { flex: 1, marginTop: -64 },
+  tabContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    flexDirection: "row",
+    padding: 6,
+    gap: 6,
+    height: 58,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    elevation: 6,
+    shadowColor: "#0F1B2D",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 18,
+  },
+  tabButton: { flex: 1, flexDirection: "row", gap: 8, borderRadius: 13, alignItems: "center", justifyContent: "center" },
+  activeTabButton: { backgroundColor: C.brand },
+  tabButtonText: { fontSize: 15, fontWeight: "700", color: C.brand },
+  activeTabButtonText: { color: "#FFFFFF" },
+
+  qrButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    marginHorizontal: 18,
+    marginBottom: 6,
+    height: 46,
+    borderRadius: 14,
+    backgroundColor: C.brand,
+  },
+  qrButtonText: { color: "#FFFFFF", fontWeight: "800", fontSize: 15 },
+  goneRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    marginHorizontal: 18,
+    marginBottom: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    backgroundColor: C.neutralSoft,
+  },
+  goneText: { color: C.neutral, fontWeight: "600", fontSize: 13 },
+
+  qrBackdrop: { flex: 1, backgroundColor: "rgba(15,27,45,0.55)", alignItems: "center", justifyContent: "center", padding: 20 },
+  qrCard: { width: "100%", maxWidth: 360, backgroundColor: "#FFFFFF", borderRadius: 24, padding: 22, alignItems: "center" },
+  qrTitle: { fontSize: 20, fontWeight: "800", color: C.ink },
+  qrSub: { fontSize: 13, color: C.muted, marginTop: 4, fontWeight: "600" },
+  qrFrame: {
+    width: 250,
+    height: 250,
+    marginTop: 18,
+    borderRadius: 18,
+    borderWidth: 1,
+    borderColor: C.line,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+  },
+  qrErrorText: { marginTop: 8, color: C.danger, textAlign: "center", fontSize: 13, fontWeight: "600" },
+  qrHint: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 14 },
+  qrHintText: { color: C.muted, fontSize: 12.5, flexShrink: 1 },
+  qrBtnRow: { flexDirection: "row", gap: 10, marginTop: 18, alignSelf: "stretch" },
+  qrSecondaryBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    height: 48,
+    paddingHorizontal: 18,
+    borderRadius: 14,
+    backgroundColor: C.brandSoft,
+  },
+  qrSecondaryText: { color: C.brand, fontWeight: "800" },
+  qrCloseBtn: { flex: 1, height: 48, borderRadius: 14, backgroundColor: C.brandDark, alignItems: "center", justifyContent: "center" },
+  qrCloseText: { color: "#FFFFFF", fontWeight: "800", fontSize: 15 },
   extraRow: {
     flexDirection: "row",
     alignItems: "center",

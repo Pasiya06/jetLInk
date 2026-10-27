@@ -10,6 +10,8 @@ import {
   SafeAreaView, 
   TextInput 
 } from 'react-native';
+import { BusStatusNotice, isBusBlocked, showBusBlockedAlert } from "../../../components/BusStatus";
+import SearchPanel, { filterBySearch } from "../../../components/SearchPanel";
 import { 
   Ionicons, 
   Feather, 
@@ -36,8 +38,36 @@ interface Bussched {
   busNo?:string;
   busType:string;
   ticketPrice:string;
+  busStatus?:string;
+  busEmergency?:boolean;
+  busEmergencyAt?:string;
 }
 
+
+// ---- Hide buses that already left today ----
+// "08:30 AM" / "8:30 pm" / "20:30" -> minutes after midnight (null if unreadable)
+const timeToMinutes = (value?: string): number | null => {
+  const m = /(\d{1,2})[:.](\d{2})\s*(am|pm|a\.m\.|p\.m\.)?/i.exec(String(value || "").replace(/\u202f|\u00a0/g, " "));
+  if (!m) return null;
+  let h = Number(m[1]);
+  const min = Number(m[2]);
+  const ap = (m[3] || "").toLowerCase().replace(/\./g, "");
+  if (ap === "pm" && h < 12) h += 12;
+  if (ap === "am" && h === 12) h = 0;
+  return h > 23 || min > 59 ? null : h * 60 + min;
+};
+
+// True when the travel date is today and the bus's pickup (departure) time has already passed.
+// The date picker saves dates with toLocaleDateString(), so comparing with today's
+// toLocaleDateString() on the same phone works for any date format.
+const leftAlreadyToday = (depaturetime?: string, travelDate?: string): boolean => {
+  const now = new Date();
+  const today = now.toLocaleDateString();
+  const day = String(travelDate || "").trim();
+  if (day && day !== today) return false; // another day -> every time is fine
+  const dep = timeToMinutes(depaturetime);
+  return dep !== null && dep <= now.getHours() * 60 + now.getMinutes();
+};
 
 const JetLinkInterface: React.FC = () => {
   const params = useLocalSearchParams();
@@ -56,7 +86,8 @@ const JetLinkInterface: React.FC = () => {
           (schedule: any) => 
             schedule.pickuploca === params.pickup &&
             schedule.dropoffloca === params.drop &&
-            schedule.busType === params.routeType
+            schedule.busType === params.routeType &&
+            !leftAlreadyToday(schedule.depaturetime, String(params.date || ""))
         );
   
         setBusschedData(filteredSchedules);
@@ -74,7 +105,8 @@ const JetLinkInterface: React.FC = () => {
         if (params.routeType === "NormalWay") {
             return (
                 <TouchableOpacity
-                    onPress={() => 
+                    activeOpacity={isBusBlocked(item) ? 1 : 0.7}
+                    onPress={() => isBusBlocked(item) ? showBusBlockedAlert(item) :
                         router.push({
                             pathname: "/passenger/dailyBuses/ticketSummary",
                             params: {
@@ -108,7 +140,8 @@ const JetLinkInterface: React.FC = () => {
                         })
                     }
                 >
-                    <View style={styles.friendRow}>
+                    <View style={[styles.friendRow, isBusBlocked(item) && { opacity: 0.85, borderColor: C.redBorder, borderWidth: 1 }]}>
+                        <BusStatusNotice item={item} />
                         <View style={styles.topRow}>
                         <View style={styles.busNoPill}>
                             <Ionicons name="bus" size={14} color="#155B8A" />
@@ -156,7 +189,8 @@ const JetLinkInterface: React.FC = () => {
         if (params.routeType === "Highway") {
             return (
                 <TouchableOpacity
-                    onPress={() => 
+                    activeOpacity={isBusBlocked(item) ? 1 : 0.7}
+                    onPress={() => isBusBlocked(item) ? showBusBlockedAlert(item) :
                         router.push({
                             pathname: "/passenger/dailyBuses/selectSeat",
                             params: {
@@ -190,7 +224,8 @@ const JetLinkInterface: React.FC = () => {
                         })
                     }
                 >
-                    <View style={styles.friendRow}>
+                    <View style={[styles.friendRow, isBusBlocked(item) && { opacity: 0.85, borderColor: C.redBorder, borderWidth: 1 }]}>
+                        <BusStatusNotice item={item} />
                         <View style={styles.topRow}>
                         <View style={styles.busNoPill}>
                             <Ionicons name="bus" size={14} color="#155B8A" />
@@ -267,7 +302,7 @@ const JetLinkInterface: React.FC = () => {
           <SectionLabel style={{ marginTop: 18, marginBottom: 6 }}>Select a time table</SectionLabel>
           <FlatList
             style={{ flex: 1 }}
-            data={busschedData}
+            data={filterBySearch(busschedData, searchQuery)}
             renderItem={renderBusItem}
             keyExtractor={(item)=>item.scheduleId}
             showsVerticalScrollIndicator={false}
@@ -282,22 +317,22 @@ const JetLinkInterface: React.FC = () => {
           />
         </View>
 
-      {isSearching ? (
-            <TextInput
-            style={styles.searchBarInput}
-            placeholder="Search..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus={true}
-            />
-        ) : null}
+      <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"passenger"}
+          params={params}
+          listLabel="buses"
+        />
           
         
             <View style={styles.bottomNav}>
         
               
               <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                      setIsSearching(false); 
+                      setIsSearching(false); setSearchQuery(""); 
                     }
         
                     else {
@@ -323,10 +358,10 @@ const JetLinkInterface: React.FC = () => {
                 </Text>
               </TouchableOpacity>
         
-              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
                 <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
                 <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-                  Routes
+                  Search
                 </Text>
               </TouchableOpacity>
         

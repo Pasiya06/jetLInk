@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Platform,
 } from "react-native";
+import { Alert } from "./JetAlert";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import QRCode from "react-native-qrcode-svg";
@@ -43,7 +44,7 @@ export default function ParcelQRDialog({
 
       const isAvailable = await Sharing.isAvailableAsync();
       if (!isAvailable) {
-        alert("Sharing isn't available on this device");
+        Alert.alert("Sharing not available", "Sharing isn't available on this device.");
         return;
       }
 

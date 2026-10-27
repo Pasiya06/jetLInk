@@ -8,9 +8,11 @@ import {
   TouchableOpacity,
   SafeAreaView,
   FlatList,
-  Alert,
   ScrollView,
 } from 'react-native';
+import { BusStatusNotice, isBusBlocked } from "../../../components/BusStatus";
+import SearchPanel from "../../../components/SearchPanel";
+import { Alert } from "../../../components/JetAlert";
 import { Ionicons, MaterialIcons, FontAwesome, Feather, Fontisto } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
@@ -33,6 +35,9 @@ interface Bus {
   emissionDate?: string;
   busType?: string;
   isOnline:string;
+  status?: string;
+  emergency?: boolean;
+  emergencyAt?: string;
 }
 
 const BusScreen: React.FC = () => {
@@ -178,6 +183,11 @@ const BusScreen: React.FC = () => {
       <View style={{ flex: 1, marginLeft: 12 }}>
         <Text style={styles.friendName}>{item.busNumber}</Text>
         <Text style={styles.friendSub}>{String(params.busTypeTopic || item.busType || "Bus")}</Text>
+        {isBusBlocked(item) && (
+          <View style={{ marginTop: 8 }}>
+            <BusStatusNotice item={item} note="Passengers can't book this bus until the emergency is resolved." />
+          </View>
+        )}
       </View>
       <TouchableOpacity style={styles.iconButton} accessibilityLabel={`Show location of ${item.busNumber}`}>
         <MaterialIcons name="location-on" size={22} color={C.green} 
@@ -248,15 +258,15 @@ const BusScreen: React.FC = () => {
 
         <GradientButton label="Add bus" icon="add" onPress={handleSearch} style={styles.addButton} />
 
-        {isSearching ? (
-              <TextInput
-                style={styles.searchBarInput}
-                placeholder="Search..."
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoFocus={true}
-              />
-            ) : null}
+        <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"admin"}
+          params={params}
+          listLabel="buses"
+        />
         
 
         <View style={styles.bottomNav}>
@@ -264,7 +274,7 @@ const BusScreen: React.FC = () => {
           
 
           <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                  setIsSearching(false); 
+                  setIsSearching(false); setSearchQuery(""); 
                 }
 
                 else {
@@ -284,10 +294,10 @@ const BusScreen: React.FC = () => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
             <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-              Routes
+              Search
             </Text>
           </TouchableOpacity>
 

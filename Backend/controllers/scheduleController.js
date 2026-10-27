@@ -1,4 +1,19 @@
 import Schedule from "../models/Schedule.js";
+import Counter from "../models/Counter.js";
+import { getEmergencyBusMap, busKey } from "../utils/busAvailability.js";
+
+// Add the bus accident / breakdown status to each schedule
+const withBusStatus = (schedules, emergencyMap) =>
+  schedules.map((sch) => {
+    const obj = typeof sch.toObject === "function" ? sch.toObject() : sch;
+    const problem = emergencyMap.get(busKey(obj.busNo));
+    return {
+      ...obj,
+      busStatus: problem ? problem.status : "normal",
+      busEmergency: !!problem,
+      busEmergencyAt: problem ? problem.emergencyAt : null,
+    };
+  });
 
 // Create a new schedule
 export const addSchedule = async (req, res) => {
@@ -20,11 +35,11 @@ export const addSchedule = async (req, res) => {
 // Get all schedules
 export const getSchedules = async (req, res) => {
   try {
-    const schedules = await Schedule.find();
+    const [schedules, emergencyMap] = await Promise.all([Schedule.find(), getEmergencyBusMap()]);
 
     res.json({
       success: true,
-      data: schedules,
+      data: withBusStatus(schedules, emergencyMap),
     });
   } catch (error) {
     res.status(500).json({

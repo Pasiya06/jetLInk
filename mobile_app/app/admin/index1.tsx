@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Image, TextInput } from 'react-native';
+import SearchPanel from "../../components/SearchPanel";
+import { Alert } from "../../components/JetAlert";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
-  Alert,
   StyleSheet,
   ScrollView,
   Text,
@@ -226,17 +227,16 @@ export default function Index() {
           </View>
         </ScrollView>
 
-        {isSearching ? (
-              <TextInput
-                style={styles.searchBarInput}
-                placeholder="Search..."
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoFocus={true}
-              />
-            ) : (
-              <Text style={styles.subHeaderTitle}>{params.busNumber}</Text>
-          )}
+        {!isSearching && <Text style={styles.subHeaderTitle}>{params.busNumber}</Text>}
+
+        <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"admin"}
+          params={params}
+        />
 
         <View style={styles.bottomNav}>
         
@@ -250,10 +250,10 @@ export default function Index() {
                     </Text>
                   </TouchableOpacity>
         
-                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+                  <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
                     <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
                     <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-                      Routes
+                      Search
                     </Text>
                   </TouchableOpacity>
         

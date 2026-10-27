@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, Alert, BackHandler    } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, BackHandler    } from 'react-native';
+import { Alert } from "../../components/JetAlert";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather as Icon, AntDesign, Fontisto, Ionicons } from '@expo/vector-icons';
 
@@ -70,7 +71,7 @@ const verify = async () => {
     const busResponse = await fetch(`${API_URL}/buses/check/${busNum}`);
     const bus = await busResponse.json();
     if (!bus.exists) {
-      alert("Invalid Bus Number");
+      Alert.alert("Invalid bus number", "We couldn't find a bus with this number. Please check it and try again.");
       return;
     }
      
@@ -79,21 +80,21 @@ const verify = async () => {
     const dResponse = await fetch(`${API_URL}/buses/check1/${DNIC}`);
     const d = await dResponse.json();
     if (d.exists) {
-      alert("Driver login with another bus");
+      Alert.alert("Driver already on another bus", "This driver is already logged in with a different bus.");
       return;
     }
 
     const cResponse = await fetch(`${API_URL}/buses/check2/${CNIC}`);
     const c = await cResponse.json();
     if (c.exists) {
-      alert("Conductor login with another bus");
+      Alert.alert("Conductor already on another bus", "This conductor is already logged in with a different bus.");
       return;
     }
 
     const driverResponse = await fetch(`${API_URL}/drivers/check/${DNIC}`);
     const driver = await driverResponse.json();
     if (!driver.exists) {
-      alert(driver.message || "Invalid Driver NIC");
+      Alert.alert("Invalid driver NIC", String(driver.message || "No driver was found with this NIC."));
       return;
     }
 
@@ -105,7 +106,7 @@ const verify = async () => {
     const conductorResponse = await fetch(`${API_URL}/conductors/check/${CNIC}`);
     const conductor = await conductorResponse.json();
     if (!conductor.exists) {
-      alert(conductor.message ||"Invalid Conductor NIC");
+      Alert.alert("Invalid conductor NIC", String(conductor.message || "No conductor was found with this NIC."));
       return;
     }
 
@@ -137,7 +138,7 @@ const verify = async () => {
   
   catch (error) {
     console.log(error);
-    alert("Server connection failed");
+    Alert.alert("Connection failed", "Couldn't reach the server. Please check your internet connection and try again.");
   }
 
 };

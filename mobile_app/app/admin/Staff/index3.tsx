@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Image } from 'react-native';
+import SearchPanel from "../../../components/SearchPanel";
+import { Alert } from "../../../components/JetAlert";
 import { 
   View, 
   Text, 
@@ -60,7 +62,7 @@ const AddBus = () => {
 
 
   if (!firstName || !lastName || !phoneNumber) {
-    alert("Please fill required fields");
+    Alert.alert("Missing details", "Please fill in all the required fields.");
     return;
   }
 
@@ -80,7 +82,7 @@ const AddBus = () => {
 
     if (data.success) {
 
-      alert("Driver Added Successfully");
+      Alert.alert("Driver added", "The driver was added successfully.");
 
       router.push({
         pathname: "/admin/Staff/index2",
@@ -94,13 +96,13 @@ const AddBus = () => {
 
     } else {
 
-      alert(data.message);
+      Alert.alert("Couldn't add driver", String(data.message || "Please check the details and try again."));
 
     }
 
   } catch (err) {
 
-    alert("Server Connection Failed");
+    Alert.alert("Connection failed", "Couldn't reach the server. Please check your internet connection and try again.");
 
   }
 
@@ -329,22 +331,21 @@ const AddBus = () => {
     <GradientButton label="Add driver" icon="person-add-outline" onPress={handleAddBus} style={styles.saveButton} />
            
 
-      {isSearching ? (
-          <TextInput
-            style={styles.searchBarInput}
-            placeholder="Search..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus={true}
-          />
-        ) : null}
+      <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"admin"}
+          params={params}
+        />
   
 
     <View style={styles.bottomNav}>
 
       
       <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-              setIsSearching(false); 
+              setIsSearching(false); setSearchQuery(""); 
             }
 
             else {
@@ -364,10 +365,10 @@ const AddBus = () => {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+      <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
         <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
         <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-          Routes
+          Search
         </Text>
       </TouchableOpacity>
 

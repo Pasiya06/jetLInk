@@ -10,6 +10,8 @@ import {
   Image,
   ScrollView 
 } from 'react-native';
+import SearchPanel from "../../../components/SearchPanel";
+import { Alert } from "../../../components/JetAlert";
 import { 
     Ionicons,  
     Feather, 
@@ -56,7 +58,7 @@ const ToursScreen: React.FC = () => {
 
     try{
         if (!chassisNo || !engineNo  || !colour || !serviceDate  || !licenseDate || !emissionDate) {
-            alert("Please fill required fields");
+            Alert.alert("Missing details", "Please fill in all the required fields.");
             return;
         }
         await updateBus(params.Bid as string,{
@@ -69,7 +71,7 @@ const ToursScreen: React.FC = () => {
             emissionDate
         });
 
-        alert("Updated Successfully");
+        Alert.alert("Updated successfully", "Your changes have been saved.");
 
         router.push({
               pathname: "/admin/buses/showBuses",
@@ -87,7 +89,7 @@ const ToursScreen: React.FC = () => {
     }
     catch(err){
 
-        alert("Update Failed");
+        Alert.alert("Update failed", "Your changes couldn't be saved. Please try again.");
 
     }
 
@@ -314,22 +316,21 @@ const ToursScreen: React.FC = () => {
         </LinearGradient>
       </TouchableOpacity>
 
-      {isSearching ? (
-          <TextInput
-            style={styles.searchBarInput}
-            placeholder="Search..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus={true}
-          />
-        ) : null}
+      <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"admin"}
+          params={params}
+        />
 
       <View style={styles.bottomNav}>
 
       
 
       <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-              setIsSearching(false); 
+              setIsSearching(false); setSearchQuery(""); 
             }
 
             else {
@@ -365,10 +366,10 @@ const ToursScreen: React.FC = () => {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+      <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
         <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
         <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-          Routes
+          Search
         </Text>
       </TouchableOpacity>
 

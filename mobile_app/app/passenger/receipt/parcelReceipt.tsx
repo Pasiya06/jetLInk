@@ -17,6 +17,7 @@ import {
   TextInput,
   Alert,
 } from 'react-native';
+import SearchPanel, { filterBySearch } from "../../../components/SearchPanel";
 
 import {
   Ionicons,
@@ -416,7 +417,7 @@ const JetLinkInterface: React.FC = () => {
 
             <FlatList
               style={styles.svw}
-              data={ dateWiseParcels}
+              data={filterBySearch(dateWiseParcels, searchQuery)}
               renderItem={renderDateWiseParcel}
               keyExtractor={( item, index) => {
                 if (item.type === "date") {
@@ -441,9 +442,7 @@ const JetLinkInterface: React.FC = () => {
             <FlatList
               style={styles.svw}
 
-              data={
-                dateWiseDeliveredParcels
-              }
+              data={filterBySearch(dateWiseDeliveredParcels, searchQuery)}
 
               renderItem={
                 renderDateWiseDeliveredParcel
@@ -500,27 +499,15 @@ const JetLinkInterface: React.FC = () => {
             SEARCH
         ========================================== */}
 
-        {isSearching ? (
-
-          <TextInput
-            style={
-              styles.searchBarInput
-            }
-
-            placeholder="Search..."
-
-            value={
-              searchQuery
-            }
-
-            onChangeText={
-              setSearchQuery
-            }
-
-            autoFocus={true}
-          />
-
-        ) : null}
+        <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"passenger"}
+          params={params}
+          listLabel="parcels"
+        />
 
 
         {/* ==========================================
@@ -544,7 +531,7 @@ const JetLinkInterface: React.FC = () => {
 
               if (isSearching) {
 
-                setIsSearching(false);
+                setIsSearching(false); setSearchQuery("");
 
               }
 
@@ -650,7 +637,7 @@ const JetLinkInterface: React.FC = () => {
                   styles.activeLabel,
               ]}
             >
-              Routes
+              Search
             </Text>
 
           </TouchableOpacity>

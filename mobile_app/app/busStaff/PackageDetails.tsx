@@ -9,11 +9,14 @@ import {
   StatusBar,
   TextInput,
   Modal,
-  Alert,
   ActivityIndicator,
 } from "react-native";
+import SearchPanel from "../../components/SearchPanel";
+import { Alert } from "../../components/JetAlert";
 
 import { LinearGradient } from "expo-linear-gradient";
+import { C, GRADIENT, NAV_SPACE } from "../../components/JetUI";
+import AlertBadge from "../../components/AlertBadge";
 
 import {
   Ionicons,
@@ -21,7 +24,6 @@ import {
   Feather ,  
   FontAwesome, 
 } from "@expo/vector-icons";
-import AlertBadge from "../../components/AlertBadge";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -116,26 +118,6 @@ export default function PackageDetails() {
     );
   };
 
-  const tourinterface = () => {
-    router.push({
-      pathname: "/passenger/tours/selectBus",
-      params: {
-        packageId: params.packageId,
-        description: params.description,
-        packageType: params.packageType,
-        totalDistance: params.totalDistance,
-        tripDuration: params.tripDuration,
-        maxPassengers: params.maxPassengers,
-        maxPrice: params.maxPrice,
-        Pid: params.Pid,
-        Pid1: params.Pid1,
-        pfirstName: params.pfirstName,
-        plastName:params.plastName,
-        pphoneNumber: params.pphoneNumber,
-        pemail: params.pemail,
-      },
-    });
-  };
 
 
   /*  LOADING SCREEN */
@@ -145,7 +127,7 @@ export default function PackageDetails() {
       <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#12966F"/>
+          <ActivityIndicator size="large" color="#159B79"/>
           <Text style={styles.loadingText}>
             Loading package...
           </Text>
@@ -163,81 +145,94 @@ export default function PackageDetails() {
         {/*  HEADER  */}
 
         <LinearGradient
-          colors={["#173C79","#155B8A","#159B79",]}
+          colors={GRADIENT}
           start={{x: 0, y: 0,}}
           end={{x: 1, y: 1,}}
           style={styles.header}
         >
-          {/* <View style={styles.decorCircle}/> */}
+          <View style={styles.decorCircle}/>
 
-          {/* BRAND */}
+          {/* BRAND + PACKAGE TYPE */}
 
-          <View style={styles.brandContainer}>
-            <View style={styles.brandDot}/>
-            <Text style={styles.brandText}>
-              JetLink
-            </Text>
+          <View style={styles.headerTop}>
+            <View style={styles.brandContainer}>
+              <View style={styles.brandDot}/>
+              <Text style={styles.brandText}>
+                JetLink Tours
+              </Text>
+            </View>
+
+            <View style={styles.goldenBadge}>
+              <MaterialCommunityIcons name="crown" size={14} color="#FFE58A" />
+              <Text style={styles.goldenText}>
+                {packageData?.packageType || "PACKAGE"}
+              </Text>
+            </View>
           </View>
 
+          <Text style={styles.category}>WHOLE BUS PRICE</Text>
           <Text style={styles.title}>
-           Rs {packageData?.maxPrice}
+            <Text style={styles.titleCurrency}>Rs </Text>
+            {Number(packageData?.maxPrice || 0).toLocaleString()}
           </Text>
-
-          {/* PACKAGE TYPE */}
-
-          <View style={styles.goldenBadge}>
-            <View style={styles.badgeDot}/>
-            <Text style={styles.goldenText}>
-              {packageData?.packageType || "PACKAGE"}
-            </Text>
-          </View>
 
           {/* DESCRIPTION */}
 
-          <Text style={styles.description}>
-            {packageData?.description}
-          </Text>
+          {!!packageData?.description && (
+            <Text style={styles.description} numberOfLines={3}>
+              {packageData?.description}
+            </Text>
+          )}
+        </LinearGradient>
+
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={styles.scroll}
+          contentContainerStyle={styles.scrollContent}
+        >
 
           {/*  STATS  */}
 
           <View style={styles.statsRow}>
             <StatCard
+              icon="map-marker-multiple"
               value={places.length.toString()}
-              label="PLACES INCLUDED"
+              label="Places"
             />
 
             <StatCard
+              icon="map-marker-distance"
               value={packageData?.totalDistance || "0 km"}
-              label="TOTAL DISTANCE"
+              label="Distance"
             />
 
             <StatCard
+              icon="clock-outline"
               value={ packageData?.tripDuration || "0h"}
-              label="TRIP DURATION"
+              label="Duration"
             />
 
             <StatCard
+              icon="account-group"
               value={packageData?.maxPassengers ?.toString() || "0"}
-              label="MAX PASSENGERS"
+              label="Seats"
             />
           </View>
-        </LinearGradient>
 
+          {/*  SECTION HEADER  */}
 
-        {/*  SECTION HEADER  */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>
+              Places included
+            </Text>
+            <View style={styles.sectionPill}>
+              <Text style={styles.sectionPillText}>
+                {places.length} stop{places.length === 1 ? "" : "s"}
+              </Text>
+            </View>
+          </View>
 
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>
-            Places Included
-          </Text>
-        </View>
-
-        {/*  PLACES  */}
-
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
+          {/*  PLACES  */}
 
           <View style={styles.placesSection}>
             <View style={styles.timelineContainer}>
@@ -254,21 +249,23 @@ export default function PackageDetails() {
                 >
                   {/* ICON */}
 
-                  <View style={[styles.timelineIcon, {borderColor:(item.color || "#12966F") + "30",},]}>
+                  <View style={[styles.timelineIcon, {backgroundColor:(item.color || "#159B79") + "1A", borderColor:(item.color || "#159B79") + "40",},]}>
                     {renderIcon(item)}
                   </View>
 
                   {/* CARD */}
 
-                  <TouchableOpacity style={ styles.placeCard}>
+                  <View style={ styles.placeCard}>
                     <View style={styles.placeTextContainer}>
                       <Text style={styles.placeName}>
                         {item.name}
                       </Text>
 
-                      <Text style={styles.placeDescription} numberOfLines={2}>
-                        {item.description}
-                      </Text>
+                      {!!item.description && (
+                        <Text style={styles.placeDescription} numberOfLines={2}>
+                          {item.description}
+                        </Text>
+                      )}
                     </View>
 
                     {/* NUMBER */}
@@ -278,12 +275,7 @@ export default function PackageDetails() {
                         {index + 1}
                       </Text>
                     </View>
-                  </TouchableOpacity>
-
-
-                  {/* DELETE */}
-
-                  
+                  </View>
                 </View>
               )
             )}
@@ -294,14 +286,15 @@ export default function PackageDetails() {
             {places.length === 0 && (
 
               <View style={styles.emptyContainer}>
-                <Ionicons name="location-outline" size={45} color="#98A2B3"/>
+                <View style={styles.emptyIcon}>
+                  <Ionicons name="location-outline" size={30} color={C.blue}/>
+                </View>
                 <Text style={styles.emptyTitle}>
                   No places added yet
                 </Text>
 
                 <Text style={styles.emptyText}>
-                  Tap Add Place to add your
-                  first destination.
+                  No places have been added to this package.
                 </Text>
               </View>
             )}
@@ -309,22 +302,20 @@ export default function PackageDetails() {
           </View>
         </ScrollView>
 
-        
 
-        {isSearching ? (
-          <TextInput
-            style={styles.searchBarInput}
-            placeholder="Search..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus={true}
-          />
-        ) : null}
+        <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"staff"}
+          params={params}
+        />
           
         <View style={styles.bottomNav}>
           
           <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                  setIsSearching(false); 
+                  setIsSearching(false); setSearchQuery(""); 
                 }
     
                 else {
@@ -351,10 +342,10 @@ export default function PackageDetails() {
             </Text>
           </TouchableOpacity>
     
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
             <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-              Routes
+              Search
             </Text>
           </TouchableOpacity>
     
@@ -406,7 +397,6 @@ export default function PackageDetails() {
                     </Text>
                   </TouchableOpacity>
         </View>
-
       {/* Bottom Graphic Design Element */}
       <View style={styles.footerGraphic}>
         <LinearGradient
@@ -434,10 +424,13 @@ export default function PackageDetails() {
 
 /* STAT CARD */
 
-function StatCard({value,label,}: {value: string;label: string;}) {
+function StatCard({icon,value,label,}: {icon: React.ComponentProps<typeof MaterialCommunityIcons>["name"];value: string;label: string;}) {
   return (
     <View style={styles.statCard}>
-      <Text style={styles.statValue}>
+      <View style={styles.statIcon}>
+        <MaterialCommunityIcons name={icon} size={18} color={C.blue} />
+      </View>
+      <Text style={styles.statValue} numberOfLines={1}>
         {value}
       </Text>
 
@@ -452,43 +445,71 @@ function StatCard({value,label,}: {value: string;label: string;}) {
 
 const styles = StyleSheet.create({
 
+  headerTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
+  titleCurrency: { fontSize: 20, fontWeight: "700", color: "rgba(255,255,255,0.85)" },
+  scroll: { marginTop: -46 },
+  statIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    backgroundColor: C.blueSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionPill: { backgroundColor: C.blueSoft, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
+  sectionPillText: { fontSize: 12, fontWeight: "700", color: C.blue },
+  emptyIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 20,
+    backgroundColor: C.blueSoft,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  ctaGradient: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+  },
+
   container: {
     flex: 1,
-    backgroundColor: "#F3F5F8",
+    backgroundColor: "#F3F6FA",
   },
 
   loadingContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#F3F5F8",
+    backgroundColor: "#F3F6FA",
   },
 
   loadingText: {
     marginTop: 12,
-    color: "#667085",
+    color: "#5B6B7F",
     fontSize: 14,
   },
 
   header: {
-    minHeight: 220,
-    paddingTop: 55,
+    paddingTop: 54,
     paddingHorizontal: 24,
-    paddingBottom: 25,
+    paddingBottom: 70,
     overflow: "hidden",
-    borderBottomLeftRadius: 25,
-    borderBottomRightRadius: 25,
+    borderBottomLeftRadius: 28,
+    borderBottomRightRadius: 28,
   },
 
   decorCircle: {
     position: "absolute",
-    width: 180,
-    height: 180,
-    borderRadius: 90,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
     borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.15)",
-    right: -70,
-    top: -40,
+    borderColor: "rgba(255,255,255,0.14)",
+    right: -80,
+    top: -60,
   },
 
   brandContainer: {
@@ -504,26 +525,18 @@ const styles = StyleSheet.create({
     marginRight: 6,
   },
 
-  brandText: {
-    color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "700",
-  },
+  brandText: { color: "#FFFFFF", fontSize: 14, fontWeight: "700", letterSpacing: 0.3 },
 
   goldenBadge: {
-    position: "absolute",
-    right: 25,
-    top: 55,
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 20,
-    backgroundColor:
-      "rgba(255,255,255,0.15)",
+    gap: 5,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 999,
+    backgroundColor: "rgba(255,255,255,0.16)",
     borderWidth: 1,
-    borderColor:
-      "rgba(255,255,255,0.15)",
+    borderColor: "rgba(255,255,255,0.22)",
   },
 
   badgeDot: {
@@ -534,88 +547,50 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
 
-  goldenText: {
-    fontSize: 7,
-    fontWeight: "800",
-    color: "#DCE8B0",
-    letterSpacing: 0.5,
-  },
+  goldenText: { fontSize: 12, fontWeight: "800", color: "#FFE58A", letterSpacing: 0.8, textTransform: "uppercase" },
 
-  category: {
-    marginTop: 32,
-    color: "#B7C8D8",
-    fontSize: 8,
-    fontWeight: "800",
-    letterSpacing: 2,
-  },
+  category: { marginTop: 22, color: "rgba(255,255,255,0.8)", fontSize: 12, fontWeight: "700", letterSpacing: 1.2 },
 
-  title: {
-    color: "#FFFFFF",
-    fontSize: 28,
-    fontWeight: "800",
-    marginTop: 8,
-  },
+  title: { color: "#FFFFFF", fontSize: 34, fontWeight: "800", marginTop: 4, letterSpacing: -0.5 },
 
-  description: {
-    color: "#D5E1EA",
-    fontSize: 10,
-    lineHeight: 16,
-    marginTop: 12,
-    maxWidth: "90%",
-  },
+  description: { color: "rgba(255,255,255,0.88)", fontSize: 14, lineHeight: 20, marginTop: 10, maxWidth: "95%" },
 
   statsRow: {
     flexDirection: "row",
-    marginTop: 18,
     gap: 8,
+    backgroundColor: "#FFFFFF",
+    borderRadius: 22,
+    padding: 10,
+    marginHorizontal: 16,
+    shadowColor: "#0F1B2D",
+    shadowOpacity: 0.08,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
   },
 
-  statCard: {
-    flex: 1,
-    minHeight: 45,
-    borderRadius: 8,
-    paddingHorizontal: 9,
-    paddingVertical: 8,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    borderWidth: 1,
-    borderColor: "rgba(255,255,255,0.12)",
-  },
+  statCard: { flex: 1, alignItems: "center", paddingVertical: 8, paddingHorizontal: 2 },
 
-  statValue: {
-    color: "#FFFFFF",
-    fontSize: 13,
-    fontWeight: "800",
-  },
+  statValue: { color: C.ink, fontSize: 14, fontWeight: "800", marginTop: 8 },
 
-  statLabel: {
-    color: "#C7D6DF",
-    fontSize: 6,
-    fontWeight: "700",
-    marginTop: 5,
-    letterSpacing: 0.4,
-  },
+  statLabel: { color: C.muted, fontSize: 11, fontWeight: "600", marginTop: 2 },
 
   sectionHeader: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent:
-      "space-between",
-    marginBottom: 10,
-    marginTop: 20,
-    marginHorizontal: 24,
+    justifyContent: "space-between",
+    marginBottom: 12,
+    marginTop: 22,
+    marginHorizontal: 20,
   },
 
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "#344054",
-  },
+  sectionTitle: { fontSize: 18, fontWeight: "800", color: C.ink },
 
   addPlaceButton: {
     height: 34,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: "#12966F",
+    backgroundColor: "#159B79",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -628,16 +603,9 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 
-  scrollContent: {
-    paddingBottom: 100,
-  },
+  scrollContent: { paddingBottom: NAV_SPACE },
 
-  placesSection: {
-    backgroundColor: "#F4F6F8",
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 25,
-  },
+  placesSection: { paddingHorizontal: 16, paddingBottom: 40 },
 
   timelineContainer: {
     position: "relative",
@@ -646,48 +614,40 @@ const styles = StyleSheet.create({
   timelineLine: {
     position: "absolute",
     width: 2,
-    backgroundColor: "#D7DEE5",
-    left: 14,
-    top: 15,
-    bottom: 20,
+    backgroundColor: "#DCE3EC",
+    left: 19,
+    top: 24,
+    bottom: 30,
   },
 
-  placeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 13,
-  },
+  placeRow: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
 
   timelineIcon: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: "#EAF0F4",
+    width: 40,
+    height: 40,
+    borderRadius: 14,
+    backgroundColor: C.blueSoft,
     justifyContent: "center",
     alignItems: "center",
-    marginRight: 10,
+    marginRight: 12,
     zIndex: 2,
     borderWidth: 1,
   },
 
   placeCard: {
     flex: 1,
-    minHeight: 57,
+    minHeight: 62,
     backgroundColor: "#FFFFFF",
-    borderRadius: 10,
-    paddingHorizontal: 13,
-    paddingVertical: 10,
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent:
-      "space-between",
-    shadowColor: "#000",
+    justifyContent: "space-between",
+    shadowColor: "#0F1B2D",
     shadowOpacity: 0.06,
-    shadowRadius: 7,
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
     elevation: 2,
   },
 
@@ -696,32 +656,20 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
 
-  placeName: {
-    fontSize: 10,
-    fontWeight: "800",
-    color: "#344054",
-  },
+  placeName: { fontSize: 16, fontWeight: "800", color: C.ink },
 
-  placeDescription: {
-    marginTop: 4,
-    fontSize: 7,
-    color: "#8A96A3",
-  },
+  placeDescription: { marginTop: 3, fontSize: 13, lineHeight: 18, color: C.muted },
 
   numberCircle: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: "#23384A",
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: C.blueSoft,
     justifyContent: "center",
     alignItems: "center",
   },
 
-  numberText: {
-    color: "#FFFFFF",
-    fontSize: 8,
-    fontWeight: "800",
-  },
+  numberText: { color: C.blue, fontSize: 12, fontWeight: "800" },
 
   deleteButton: {
     marginLeft: 8,
@@ -729,23 +677,15 @@ const styles = StyleSheet.create({
   },
 
   emptyContainer: {
-    paddingVertical: 70,
+    paddingVertical: 36,
     alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 20,
   },
 
-  emptyTitle: {
-    marginTop: 12,
-    fontSize: 15,
-    fontWeight: "700",
-    color: "#344054",
-  },
+  emptyTitle: { marginTop: 12, fontSize: 16, fontWeight: "800", color: C.ink },
 
-  emptyText: {
-    marginTop: 6,
-    fontSize: 12,
-    color: "#98A2B3",
-    textAlign: "center",
-  },
+  emptyText: { marginTop: 6, fontSize: 13, color: C.muted, textAlign: "center" },
 
   modalOverlay: {
     flex: 1,
@@ -774,26 +714,26 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "800",
-    color: "#344054",
+    color: "#0F1B2D",
   },
 
   inputLabel: {
     fontSize: 12,
     fontWeight: "700",
-    color: "#344054",
+    color: "#0F1B2D",
     marginTop: 10,
     marginBottom: 8,
   },
 
   input: {
-    backgroundColor: "#F5F7FA",
+    backgroundColor: "#F3F6FA",
     borderWidth: 1,
-    borderColor: "#E4E7EC",
+    borderColor: "#E3E9F1",
     borderRadius: 10,
     paddingHorizontal: 14,
     height: 48,
     fontSize: 14,
-    color: "#344054",
+    color: "#0F1B2D",
   },
 
   descriptionInput: {
@@ -813,7 +753,7 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: "#D0D5DD",
+    borderColor: "#DCE3EC",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -821,14 +761,14 @@ const styles = StyleSheet.create({
   cancelButtonText: {
     fontSize: 14,
     fontWeight: "700",
-    color: "#667085",
+    color: "#5B6B7F",
   },
 
   saveButton: {
     flex: 1,
     height: 48,
     borderRadius: 10,
-    backgroundColor: "#12966F",
+    backgroundColor: "#159B79",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -843,27 +783,23 @@ const styles = StyleSheet.create({
 
   submitButton: {
     bottom: 180,
-    justifyContent: "space-around",
     marginLeft: 20,
-    marginRight: 20,  
-    height: 55,
+    marginRight: 20,
+    height: 56,
     overflow: 'hidden',
-    borderRadius: 25,
+    borderRadius: 28,
     marginTop: 15,
-    shadowColor: "#000",
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    shadowOffset: {
-      width: 0,
-      height: -2,
-    },
-    elevation: 10,
+    shadowColor: "#155B8A",
+    shadowOpacity: 0.28,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 8,
   },
 
    submitText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 17,
+    fontWeight: '800',
   },
 
 

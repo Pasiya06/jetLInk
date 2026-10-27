@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { JetAlertHost } from "../components/JetAlert";
 import {
   initNotifications,
   addNotificationListeners,
@@ -48,6 +49,12 @@ export default function RootLayout() {
     };
   }, []);
 
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <>
+      <Stack screenOptions={{ headerShown: false }} />
+      {/* Themed pop-up used by every Alert.alert in the app */}
+      <JetAlertHost />
+    </>
+  );
 }
 

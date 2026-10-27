@@ -11,6 +11,7 @@ import {
   checkBusAvailable,
   getExtraKm,
   payExtraKm,
+  verifyTourQR,
 } from "../controllers/tourController.js";
 
 const router = express.Router();
@@ -26,6 +27,9 @@ router.get("/booked-buses", getBookedBuses);
 
 // Is one bus still free for a trip? (checked before payment)
 router.get("/check-bus", checkBusAvailable);
+
+// Bus staff scan a passenger's tour QR
+router.post("/verify", verifyTourQR);
 
 // Extra kilometers for a booked tour (passenger pays per km)
 router.get("/:receiptId/extra-km", getExtraKm);

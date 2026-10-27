@@ -14,6 +14,9 @@ import {
   LayoutAnimation,
   UIManager,
 } from "react-native";
+import { Feather as BookedIcon } from "@expo/vector-icons";
+import { formatEmergencyTime as formatDateTime } from "../../../utils/emergencyTime";
+import SearchPanel, { filterBySearch } from "../../../components/SearchPanel";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { 
   Ionicons, 
@@ -74,6 +77,7 @@ interface Receipt {
   plastName: string;
   pphoneNumber: string;
   pemail: string;
+  createdAt?: string;
 }
 
 /* ---------- Screen ---------- */
@@ -194,7 +198,7 @@ export default function AllReceipts() {
         </View>
       ) : (
         <FlatList
-          data={filtered}
+          data={filterBySearch(filtered, searchQuery)}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => <ReceiptCard item={item} />}
           showsVerticalScrollIndicator={false}
@@ -230,15 +234,15 @@ export default function AllReceipts() {
         />
       )}
 
-      {isSearching ? (
-        <TextInput
-          style={styles.searchBarInput}
-          placeholder="Search..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          autoFocus={true}
+      <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"admin"}
+          params={params}
+          listLabel="payments"
         />
-      ) : null}
       
       <View style={styles.bottomNav}>
         <TouchableOpacity 
@@ -246,7 +250,7 @@ export default function AllReceipts() {
           onPress={() => { 
             setActiveTab("home"); 
             if (isSearching) {
-              setIsSearching(false); 
+              setIsSearching(false); setSearchQuery(""); 
             }
 
             else {
@@ -268,10 +272,10 @@ export default function AllReceipts() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
           <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
           <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-            Routes
+            Search
           </Text>
         </TouchableOpacity>
 
@@ -364,6 +368,11 @@ function ReceiptCard({ item }: { item: Receipt }) {
           </View>
           <Pill text="Paid" bg={JC.greenSoft} color={JC.green} />
         </View>
+        {/* When the booking was confirmed */}
+        <View style={styles.bookedRow}>
+          <BookedIcon name="clock" size={13} color="#64748b" />
+          <Text style={styles.bookedText}>Booked on {formatDateTime(item.createdAt)}</Text>
+        </View>
       </View>
 
       <View style={styles.stub}>
@@ -388,6 +397,8 @@ function ReceiptCard({ item }: { item: Receipt }) {
 const NOTCH = 22;
 
 const styles = StyleSheet.create({
+  bookedRow: { flexDirection: "row", alignItems: "center", gap: 6, marginLeft: 16, marginTop: 10 },
+  bookedText: { fontSize: 12.5, color: "#475569", fontWeight: "600" },
   container: { flex: 1, backgroundColor: C.bg },
 
   header: {

@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import SearchPanel from "../../../components/SearchPanel";
 import { Feather, FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenHeader, SearchBox, SectionLabel, Pill, EmptyState, Avatar, C, ui } from "../../../components/JetUI";
@@ -159,6 +160,16 @@ const FriendsScreen: React.FC = () => {
         )}
 
         </View>
+
+        <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"passenger"}
+          params={params}
+          listLabel="passengers"
+        />
 
         {/* Bottom nav */}
         <View style={styles.bottomNav}>

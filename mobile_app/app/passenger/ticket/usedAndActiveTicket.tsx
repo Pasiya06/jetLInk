@@ -15,8 +15,9 @@ import {
   TouchableOpacity,
   SafeAreaView,
   TextInput,
-  Alert,
 } from 'react-native';
+import SearchPanel, { filterBySearch } from "../../../components/SearchPanel";
+import { Alert } from "../../../components/JetAlert";
 
 import {
   Ionicons,
@@ -437,7 +438,7 @@ const JetLinkInterface: React.FC = () => {
           {isactiveTab && (
             <FlatList
               style={styles.svw}
-              data={dateWiseTickets}
+              data={filterBySearch(dateWiseTickets, searchQuery)}
               renderItem={renderDateWiseItem}
               keyExtractor={(item, index) => {
                 if (
@@ -463,7 +464,7 @@ const JetLinkInterface: React.FC = () => {
           {!isactiveTab && (
             <FlatList
               style={styles.svw}
-              data={dateWiseTickets1}
+              data={filterBySearch(dateWiseTickets1, searchQuery)}
               renderItem={renderDateWiseItem2}
               keyExtractor={(item, index) => {
                 if (
@@ -487,15 +488,15 @@ const JetLinkInterface: React.FC = () => {
           )}
         </View>
 
-        {isSearching ? (
-          <TextInput 
-            style={styles.searchBarInput}
-            placeholder="Search..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus={true}
-          />
-        ) : null}
+        <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"passenger"}
+          params={params}
+          listLabel="tickets"
+        />
 
         <View style={styles.bottomNav}>
 
@@ -505,7 +506,7 @@ const JetLinkInterface: React.FC = () => {
             onPress={() => {
               setActiveTab("home");
               if (isSearching) {
-                setIsSearching(false);
+                setIsSearching(false); setSearchQuery("");
               }
 
               else {
@@ -536,11 +537,11 @@ const JetLinkInterface: React.FC = () => {
 
           <TouchableOpacity
             style={styles.item}
-            onPress={() => {setActiveTab("routes"); setIsSearching(!isSearching);}}
+            onPress={() => {setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching);}}
           >
             <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab === "routes" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[styles.label1, activeTab === "routes" && styles.activeLabel,]}>
-              Routes
+              Search
             </Text>
           </TouchableOpacity>
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, Alert, BackHandler    } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, BackHandler    } from 'react-native';
+import { Alert } from "../../components/JetAlert";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather as Icon, EvilIcons, Fontisto, Ionicons } from '@expo/vector-icons';
 import axios from "axios";

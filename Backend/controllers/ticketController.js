@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import cron from "node-cron";
 import Ticket from "../models/Ticket.js";
 import { notify } from "./notificationController.js";
+import { getBusBlockReason } from "../utils/busAvailability.js";
 
 export const createTicket = async (req, res) => {
   try {
@@ -20,7 +21,12 @@ export const createTicket = async (req, res) => {
       totalFare,
     } = req.body;
 
-    
+    // Bus had an accident / broke down -> no new bookings
+    const blockReason = await getBusBlockReason(bNumber);
+    if (blockReason) {
+      return res.status(409).json({ success: false, message: blockReason });
+    }
+
 
     const ticket = new Ticket({
       pickup,

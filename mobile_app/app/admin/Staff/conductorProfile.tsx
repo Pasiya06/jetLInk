@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
 } from 'react-native';
+import SearchPanel from "../../../components/SearchPanel";
 import { Ionicons, Feather, FontAwesome, FontAwesome5 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
@@ -148,15 +149,14 @@ const ToursScreen: React.FC = () => {
 
         </View>
 
-        {isSearching ? (
-          <TextInput
-            style={styles.searchBarInput}
-            placeholder="Search..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus={true}
-          />
-        ) : null}
+        <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"admin"}
+          params={params}
+        />
 
         <View style={styles.bottomNav}>
           <TouchableOpacity
@@ -164,7 +164,7 @@ const ToursScreen: React.FC = () => {
             onPress={() => {
               setActiveTab("home");
               if (isSearching) {
-                setIsSearching(false);
+                setIsSearching(false); setSearchQuery("");
               } else {
                 router.push({
                   pathname: "/admin/Staff/index5",
@@ -182,9 +182,9 @@ const ToursScreen: React.FC = () => {
             <Text style={[styles.label1, activeTab === "home" && styles.activeLabel]}>Back</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
             <FontAwesome name={isSearching ? "close" : "search"} size={22} color={activeTab === "routes" ? "#0057D9" : "#8A8A8A"} />
-            <Text style={[styles.label1, activeTab === "routes" && styles.activeLabel]}>Routes</Text>
+            <Text style={[styles.label1, activeTab === "routes" && styles.activeLabel]}>Search</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.centerButton} onPress={() => {setActiveTab("tickets"); router.push({

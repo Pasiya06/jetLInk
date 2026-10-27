@@ -2,7 +2,6 @@ import React, { useState, useCallback } from 'react';
 import { Stack, useRouter, useFocusEffect, useLocalSearchParams } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
-  Alert ,
   StyleSheet,
   View,
   Text,
@@ -12,6 +11,8 @@ import {
   FlatList,
   ScrollView,
 } from 'react-native';
+import SearchPanel from "../../../components/SearchPanel";
+import { Alert } from "../../../components/JetAlert";
 import {Ionicons, 
   MaterialCommunityIcons, 
   Fontisto, 
@@ -200,15 +201,15 @@ const deletePassenger = async (id: string) => {
         />
       </View>
 
-        {isSearching ? (
-              <TextInput
-                style={styles.searchBarInput}
-                placeholder="Search..."
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoFocus={true}
-              />
-            ) : null}
+        <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"admin"}
+          params={params}
+          listLabel="passengers"
+        />
         
 
         <View style={styles.bottomNav}>
@@ -216,7 +217,7 @@ const deletePassenger = async (id: string) => {
           
 
           <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                  setIsSearching(false); 
+                  setIsSearching(false); setSearchQuery(""); 
                 }
 
                 else {
@@ -236,10 +237,10 @@ const deletePassenger = async (id: string) => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
             <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-              Routes
+              Search
             </Text>
           </TouchableOpacity>
 

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Stack,useRouter,useLocalSearchParams} from "expo-router";
-import { 
-  Alert ,
+import {
   StyleSheet, 
   View, 
   Text, 
@@ -11,6 +10,8 @@ import {
   StatusBar,
   ScrollView 
 } from 'react-native';
+import SearchPanel from "../../components/SearchPanel";
+import { Alert } from "../../components/JetAlert";
 import { 
   Ionicons, 
   Feather ,  
@@ -80,7 +81,7 @@ const JetLinkInterface: React.FC = () => {
 
 
   if (!sendername || !smobilenumber  || !receivername || !remail || !rmobilenumber || !weight || !pickup || !drop ) {
-    alert("Please fill required fields");
+    Alert.alert("Missing details", "Please fill in all the required fields.");
     return;
   }
 
@@ -363,22 +364,21 @@ const JetLinkInterface: React.FC = () => {
                           </LinearGradient>
                       </TouchableOpacity>
 
-        {isSearching ? (
-                  <TextInput
-                    style={styles.searchBarInput}
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                    autoFocus={true}
-                  />
-                ) : null}
+        <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"staff"}
+          params={params}
+        />
           
         
             <View style={styles.bottomNav}>
         
               
               <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                      setIsSearching(false); 
+                      setIsSearching(false); setSearchQuery(""); 
                     }
         
                     else {
@@ -406,10 +406,10 @@ const JetLinkInterface: React.FC = () => {
                 </Text>
               </TouchableOpacity>
         
-              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
                 <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
                 <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-                  Routes
+                  Search
                 </Text>
               </TouchableOpacity>
         

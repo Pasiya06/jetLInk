@@ -9,10 +9,12 @@ import {
   StatusBar,
   TextInput,
   Modal,
-  Alert,
   ActivityIndicator,
   FlatList,
 } from "react-native";
+import { BusStatusNotice, isBusBlocked, showBusBlockedAlert } from "../../../components/BusStatus";
+import SearchPanel from "../../../components/SearchPanel";
+import { Alert } from "../../../components/JetAlert";
 
 import { LinearGradient } from "expo-linear-gradient";
 import { C, GRADIENT } from "../../../components/JetUI";
@@ -54,6 +56,9 @@ interface Bus {
   emissionDate?: string;
   busType?: string;
   isOnline:string;
+  status?: string;
+  emergency?: boolean;
+  emergencyAt?: string;
 }
 
 // Accept only real dates in MM/DD/YYYY format.
@@ -173,8 +178,9 @@ export default function PackageDetails() {
   
   
   const renderBusItem = ({ item }: { item: Bus }) => (
-    <TouchableOpacity style={styles.friendRow}
-      onPress={() =>
+    <TouchableOpacity style={[styles.friendRow, isBusBlocked(item) && styles.blockedRow]}
+      activeOpacity={isBusBlocked(item) ? 1 : 0.7}
+      onPress={() => isBusBlocked(item) ? showBusBlockedAlert(item) :
         router.push({
           pathname: "/passenger/tours/tourSummary",
           params: {
@@ -210,12 +216,24 @@ export default function PackageDetails() {
       <View style={{ flex: 1, marginLeft: 14 }}>
         <Text style={styles.friendName}>{item.busNumber}</Text>
         <View style={styles.busMeta}>
-          <View style={styles.availPill}>
-            <View style={styles.availDot} />
-            <Text style={styles.availText}>Available</Text>
-          </View>
+          {isBusBlocked(item) ? (
+            <View style={[styles.availPill, { backgroundColor: C.redSoft }]}>
+              <View style={[styles.availDot, { backgroundColor: C.red }]} />
+              <Text style={[styles.availText, { color: C.red }]}>Not available</Text>
+            </View>
+          ) : (
+            <View style={styles.availPill}>
+              <View style={styles.availDot} />
+              <Text style={styles.availText}>Available</Text>
+            </View>
+          )}
           <Text style={styles.busMetaText}>Tour bus</Text>
         </View>
+        {isBusBlocked(item) && (
+          <View style={{ marginTop: 8 }}>
+            <BusStatusNotice item={item} />
+          </View>
+        )}
       </View>
       <View style={styles.arrowDot}>
         <Ionicons name="chevron-forward" size={18} color={C.blue} />
@@ -378,20 +396,20 @@ export default function PackageDetails() {
             />
           )}
         
-        {isSearching ? (
-          <TextInput
-            style={styles.searchBarInput}
-            placeholder="Search..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus={true}
-          />
-        ) : null}
+        <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"passenger"}
+          params={params}
+          listLabel="buses"
+        />
           
         <View style={styles.bottomNav}>
           
           <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                  setIsSearching(false); 
+                  setIsSearching(false); setSearchQuery(""); 
                 }
     
                 else {
@@ -413,10 +431,10 @@ export default function PackageDetails() {
             </Text>
           </TouchableOpacity>
     
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
             <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-              Routes
+              Search
             </Text>
           </TouchableOpacity>
     
@@ -493,6 +511,7 @@ function StatCard({value,label,}: {value: string;label: string;}) {
 /* STYLES */
 
 const styles = StyleSheet.create({
+  blockedRow: { borderWidth: 1, borderColor: C.redBorder, alignItems: "flex-start" },
 
   headerTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },
   dateCard: {

@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   Animated,
 } from "react-native";
+import SearchPanel from "../../../components/SearchPanel";
 import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
@@ -300,15 +301,14 @@ const PassengerTrackScreen: React.FC = () => {
           </LinearGradient>
         </TouchableOpacity>
 
-        {isSearching ? (
-          <TextInput
-            style={styles.searchBarInput}
-            placeholder="Search..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus={true}
-          />
-        ) : null}
+        <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"passenger"}
+          params={params}
+        />
 
         <View style={styles.bottomNav}>
           <TouchableOpacity
@@ -316,7 +316,7 @@ const PassengerTrackScreen: React.FC = () => {
             onPress={() => {
               setActiveTab("home");
               if (isSearching) {
-                setIsSearching(false);
+                setIsSearching(false); setSearchQuery("");
               } else {
                 router.push({
                   pathname: "/passenger/parcel/pickupParcel",
@@ -346,7 +346,7 @@ const PassengerTrackScreen: React.FC = () => {
             style={styles.item}
             onPress={() => {
               setActiveTab("routes");
-              setIsSearching(!isSearching);
+              if (isSearching) setSearchQuery(""); setIsSearching(!isSearching);
             }}
           >
             <FontAwesome
@@ -355,7 +355,7 @@ const PassengerTrackScreen: React.FC = () => {
               color={activeTab === "routes" ? "#0057D9" : "#8A8A8A"}
             />
             <Text style={[styles.label1, activeTab === "routes" && styles.activeLabel]}>
-              Routes
+              Search
             </Text>
           </TouchableOpacity>
 

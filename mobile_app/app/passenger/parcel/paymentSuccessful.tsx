@@ -7,9 +7,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   Animated,
-  Dimensions,
-  Alert
-} from 'react-native';
+  Dimensions} from 'react-native';
+import { Alert } from "../../../components/JetAlert";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Stack,useRouter, useLocalSearchParams } from 'expo-router';

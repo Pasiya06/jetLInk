@@ -6,13 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
   Share,
   Platform,
   StatusBar,
   Animated,
   Dimensions,
 } from "react-native";
+import { Alert } from "../../../components/JetAlert";
 
 import {
   Stack,

@@ -14,6 +14,7 @@ import {
   LayoutAnimation,
   UIManager,
 } from "react-native";
+import SearchPanel, { filterBySearch } from "../../../components/SearchPanel";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons, FontAwesome, Feather } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -69,7 +70,13 @@ interface Receipt {
   plastName: string;
   pphoneNumber: string;
   pemail: string;
+  status?: "active" | "gone";
+  tripEnd?: string;
+  scanned?: boolean;
+  scannedAt?: string | null;
 }
+
+type ListTab = "active" | "gone";
 
 type Filter = "all" | "online" | "offline";
 
@@ -83,6 +90,7 @@ export default function AllReceipts() {
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+  const [listTab, setListTab] = useState<ListTab>("active");
   const [activeTab, setActiveTab] = useState('');
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -136,6 +144,7 @@ export default function AllReceipts() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return receipts.filter((r) => {
+      if ((r.status || "active") !== listTab) return false;
       if (filter === "online" && !r.isOnline) return false;
       if (filter === "offline" && r.isOnline) return false;
       if (!q) return true;
@@ -152,7 +161,10 @@ export default function AllReceipts() {
         .filter(Boolean)
         .some((v) => String(v).toLowerCase().includes(q));
     });
-  }, [receipts, query, filter]);
+  }, [receipts, query, filter, listTab]);
+
+  const activeCount = receipts.filter((r) => (r.status || "active") === "active").length;
+  const goneCount = receipts.length - activeCount;
 
   
 
@@ -175,6 +187,30 @@ export default function AllReceipts() {
           </TouchableOpacity>
         </View>
       </LinearGradient>
+
+      {/* Active / Gone tabs */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tabButton, listTab === "active" && styles.activeTabButton]}
+          onPress={() => setListTab("active")}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="ticket-outline" size={17} color={listTab === "active" ? "#FFFFFF" : C.brand} />
+          <Text style={[styles.tabButtonText, listTab === "active" && styles.activeTabButtonText]}>
+            Active ({activeCount})
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tabButton, listTab === "gone" && styles.activeTabButton]}
+          onPress={() => setListTab("gone")}
+          activeOpacity={0.85}
+        >
+          <Ionicons name="checkmark-done" size={17} color={listTab === "gone" ? "#FFFFFF" : C.brand} />
+          <Text style={[styles.tabButtonText, listTab === "gone" && styles.activeTabButtonText]}>
+            Gone ({goneCount})
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       {loading ? (
         <View style={styles.center}>
@@ -199,7 +235,7 @@ export default function AllReceipts() {
         </View>
       ) : (
         <FlatList
-          data={filtered}
+          data={filterBySearch(filtered, searchQuery)}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => <ReceiptCard item={item} />}
           showsVerticalScrollIndicator={false}
@@ -223,26 +259,28 @@ export default function AllReceipts() {
                 />
               </View>
               <Text style={styles.stateTitle}>
-                {receipts.length ? "No matches" : "No receipts yet"}
+                {receipts.length ? (listTab === "active" ? "No active tours" : "No past tours") : "No receipts yet"}
               </Text>
               <Text style={styles.infoText}>
                 {receipts.length
-                  ? "Try a different search or filter."
+                  ? (listTab === "active"
+                      ? "Upcoming and ongoing tours will appear here."
+                      : "Scanned or finished tours will appear here.")
                   : "New receipts will appear here."}
               </Text>
             </View>
           }
         />
       )}
-      {isSearching ? (
-        <TextInput
-          style={styles.searchBarInput}
-          placeholder="Search..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          autoFocus={true}
+      <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"admin"}
+          params={params}
+          listLabel="tour receipts"
         />
-      ) : null}
       
       <View style={styles.bottomNav}>
 
@@ -251,7 +289,7 @@ export default function AllReceipts() {
           onPress={() => { 
             setActiveTab("home"); 
             if (isSearching) {
-              setIsSearching(false); 
+              setIsSearching(false); setSearchQuery(""); 
             }
 
             else {
@@ -273,10 +311,10 @@ export default function AllReceipts() {
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
           <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
           <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-            Routes
+            Search
           </Text>
         </TouchableOpacity>
 
@@ -355,6 +393,7 @@ function ReceiptCard({ item }: { item: Receipt }) {
 
   const passenger =
     `${item.pfirstName ?? ""} ${item.plastName ?? ""}`.trim() || "N/A";
+  const isGone = item.status === "gone";
 
   return (
     <View style={styles.card}>
@@ -364,7 +403,17 @@ function ReceiptCard({ item }: { item: Receipt }) {
             <Ionicons name="bus" size={14} color={C.brand} />
             <Text style={styles.busBadgeText}>{item.busNumber || "—"}</Text>
           </View>
-          
+          <View
+            style={[
+              styles.status,
+              { backgroundColor: isGone ? C.neutralSoft : C.successSoft },
+            ]}
+          >
+            <View style={[styles.statusDot, { backgroundColor: isGone ? C.neutral : C.success }]} />
+            <Text style={[styles.statusText, { color: isGone ? C.neutral : C.success }]}>
+              {item.scanned ? "Boarded" : isGone ? "Ended" : "Active"}
+            </Text>
+          </View>
         </View>
 
         <Text style={styles.fieldLabel}>Pickup</Text>
@@ -564,7 +613,27 @@ const styles = StyleSheet.create({
   },
   headerSubtitle: { fontSize: 13, color: "#cfe0ff", marginTop: 2 },
 
-  list: { padding: 16, paddingTop: 18, paddingBottom: 150 },
+  list: { padding: 16, paddingTop: 6, paddingBottom: 150 },
+  tabContainer: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 18,
+    flexDirection: "row",
+    padding: 6,
+    gap: 6,
+    height: 58,
+    marginHorizontal: 16,
+    marginTop: -28,
+    marginBottom: 6,
+    elevation: 6,
+    shadowColor: "#0F1B2D",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 18,
+  },
+  tabButton: { flex: 1, flexDirection: "row", gap: 8, borderRadius: 13, alignItems: "center", justifyContent: "center" },
+  activeTabButton: { backgroundColor: C.brand },
+  tabButtonText: { fontSize: 15, fontWeight: "700", color: C.brand },
+  activeTabButtonText: { color: "#FFFFFF" },
 
   /* Stats */
   statsRow: { flexDirection: "row", gap: 12, marginBottom: 14 },

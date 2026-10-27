@@ -11,6 +11,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Feather as BookedIcon } from "@expo/vector-icons";
+import { formatEmergencyTime as formatDateTime } from "../../../utils/emergencyTime";
+import SearchPanel, { filterBySearch } from "../../../components/SearchPanel";
 import { LinearGradient } from "expo-linear-gradient";
 import { 
   Ionicons, 
@@ -125,6 +128,11 @@ export default function AllParcelsScreen() {
               </Text>
             </View>
           </View>
+          {/* When the booking was confirmed */}
+          <View style={styles.bookedRow}>
+            <BookedIcon name="clock" size={13} color="#64748b" />
+            <Text style={styles.bookedText}>Booked on {formatDateTime(item.createdAt)}</Text>
+          </View>
         </View>
 
         <View style={styles.perforation}>
@@ -206,7 +214,7 @@ export default function AllParcelsScreen() {
           </View>
         ) : (
           <FlatList
-            data={visible}
+            data={filterBySearch(visible, searchQuery)}
             keyExtractor={(item) => item._id}
             renderItem={renderItem}
             contentContainerStyle={styles.listContent}
@@ -226,15 +234,15 @@ export default function AllParcelsScreen() {
           />
         )}
 
-        {isSearching ? (
-          <TextInput
-            style={styles.searchBarInput}
-            placeholder="Search..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus={true}
-          />
-        ) : null}
+        <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"admin"}
+          params={params}
+          listLabel="payments"
+        />
         
         <View style={styles.bottomNav}>
           <TouchableOpacity 
@@ -242,7 +250,7 @@ export default function AllParcelsScreen() {
             onPress={() => { 
               setActiveTab("home"); 
               if (isSearching) {
-                setIsSearching(false); 
+                setIsSearching(false); setSearchQuery(""); 
               }
   
               else {
@@ -264,10 +272,10 @@ export default function AllParcelsScreen() {
             </Text>
           </TouchableOpacity>
   
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
             <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-              Routes
+              Search
             </Text>
           </TouchableOpacity>
   
@@ -340,6 +348,8 @@ export default function AllParcelsScreen() {
 // ---------- Styles ----------
 const NOTCH = 22;
 const styles = StyleSheet.create({
+  bookedRow: { flexDirection: "row", alignItems: "center", gap: 6, marginLeft: 16, marginTop: 10 },
+  bookedText: { fontSize: 12.5, color: "#475569", fontWeight: "600" },
   container: { flex: 1, backgroundColor: "#F3F4F8" },
 
   header: {

@@ -10,6 +10,7 @@ import {
   Image,
   ScrollView,
 } from 'react-native';
+import SearchPanel from "../../../components/SearchPanel";
 import { 
   Ionicons, 
   MaterialCommunityIcons, 
@@ -81,22 +82,21 @@ const ToursScreen: React.FC = () => {
         />
       </ScrollView>
 
-      {isSearching ? (
-                  <TextInput
-                    style={styles.searchBarInput}
-                    placeholder="Search..."
-                    value={searchQuery}
-                    onChangeText={setSearchQuery}
-                    autoFocus={true}
-                  />
-                ) : null}
+      <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"passenger"}
+          params={params}
+        />
           
         
             <View style={styles.bottomNav}>
         
               
               <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                      setIsSearching(false); 
+                      setIsSearching(false); setSearchQuery(""); 
                     }
         
                     else {
@@ -118,10 +118,10 @@ const ToursScreen: React.FC = () => {
                 </Text>
               </TouchableOpacity>
         
-              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+              <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
                 <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
                 <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-                  Routes
+                  Search
                 </Text>
               </TouchableOpacity>
         
@@ -475,7 +475,7 @@ export default ToursScreen;
 //         <TouchableOpacity 
 //           onPress={() => {
 //             if (isSearching) {
-//               setIsSearching(false); // Close search bar if open
+//               setIsSearching(false); setSearchQuery(""); // Close search bar if open
 //             } else {
               
 

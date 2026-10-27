@@ -10,6 +10,8 @@ import {
   Image,
   ScrollView 
 } from 'react-native';
+import SearchPanel from "../../../components/SearchPanel";
+import { Alert } from "../../../components/JetAlert";
 import { Ionicons, 
   MaterialCommunityIcons, 
   Feather, 
@@ -73,7 +75,7 @@ const DriverScreen: React.FC = () => {
             password,
         });
 
-        alert("Updated Successfully");
+        Alert.alert("Updated successfully", "Your changes have been saved.");
 
         router.push({
               pathname: "/admin/Staff/index2",
@@ -89,7 +91,7 @@ const DriverScreen: React.FC = () => {
     }
     catch(err){
 
-        alert("Update Failed");
+        Alert.alert("Update failed", "Your changes couldn't be saved. Please try again.");
 
     }
 
@@ -318,22 +320,21 @@ const DriverScreen: React.FC = () => {
 
       <GradientButton label="Update driver" icon="checkmark-circle-outline" onPress={handledriverUpdate} style={styles.saveButton} />
 
-      {isSearching ? (
-          <TextInput
-            style={styles.searchBarInput}
-            placeholder="Search..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            autoFocus={true}
-          />
-        ) : null}
+      <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"admin"}
+          params={params}
+        />
 
       <View style={styles.bottomNav}>
 
       
 
       <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-              setIsSearching(false); 
+              setIsSearching(false); setSearchQuery(""); 
             }
 
             else {
@@ -354,10 +355,10 @@ const DriverScreen: React.FC = () => {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+      <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
         <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
         <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-          Routes
+          Search
         </Text>
       </TouchableOpacity>
 

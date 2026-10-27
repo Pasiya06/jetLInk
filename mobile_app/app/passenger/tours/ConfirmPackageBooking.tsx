@@ -4,10 +4,10 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   ScrollView,
 } from "react-native";
+import { Alert } from "../../../components/JetAlert";
 
 import {
   Stack,

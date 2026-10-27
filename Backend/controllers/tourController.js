@@ -3,6 +3,7 @@ import Receipt from "../models/Tour.js";
 import { notify } from "./notificationController.js";
 import Package from "../models/Package.js";
 import { validateCard } from "./paymentController.js";
+import { getBusBlockReason } from "../utils/busAvailability.js";
 
 
 /* =====================================
@@ -82,6 +83,35 @@ const checkTourDate = (date) => {
   return null;
 };
 
+/* =====================================
+   TOUR STATUS: "active" or "gone"
+   Gone = QR already scanned by bus staff, or the last trip day has passed.
+===================================== */
+
+const tourEndDay = (r) => {
+  const start = toDayNumber(r.date);
+  if (start == null) return null;
+  return start + parseTripDays(r.tripDuration) - 1;
+};
+
+export const getTourStatus = (r) => {
+  if (r.scanned) return "gone";
+  const end = tourEndDay(r);
+  if (end != null && end < todayDayNumber()) return "gone";
+  return "active";
+};
+
+// Receipt + status fields for the app
+const withStatus = (r) => {
+  const obj = typeof r.toObject === "function" ? r.toObject() : r;
+  const end = tourEndDay(obj);
+  return {
+    ...obj,
+    status: getTourStatus(obj),
+    tripEnd: end != null ? dayNumberToString(end) : "",
+  };
+};
+
 // GET /api/receipts/booked-buses?date=MM/DD/YYYY&tripDuration=2D%20/%201N
 // → bus numbers that are already booked on any day of this trip
 export const getBookedBuses = async (req, res) => {
@@ -120,6 +150,11 @@ export const checkBusAvailable = async (req, res) => {
     const dateError = checkTourDate(date);
     if (dateError) {
       return res.status(400).json({ success: false, available: false, message: dateError });
+    }
+
+    const blockReason = await getBusBlockReason(busNumber);
+    if (blockReason) {
+      return res.status(200).json({ success: true, available: false, message: blockReason });
     }
 
     const clashes = await findBookedBuses(date, parseTripDays(tripDuration), busNumber);
@@ -185,6 +220,11 @@ export const createReceipt = async (req, res) => {
     if (dateError) {
       return res.status(400).json({ success: false, message: dateError });
     }
+    const blockReason = await getBusBlockReason(busNumber);
+    if (blockReason) {
+      return res.status(409).json({ success: false, message: blockReason });
+    }
+
     const clashes = await findBookedBuses(date, parseTripDays(tripDuration), busNumber);
     if (clashes.length) {
       return res.status(409).json({
@@ -273,7 +313,7 @@ export const getAllReceipts = async (req, res) => {
     return res.status(200).json({
       success: true,
       count: receipts.length,
-      receipts,
+      receipts: receipts.map(withStatus),
     });
   } catch (error) {
     console.error("Error fetching receipts:", error);
@@ -301,7 +341,7 @@ export const getReceiptById = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      receipt,
+      receipt: withStatus(receipt),
     });
   } catch (error) {
     console.error("Get receipt error:", error);
@@ -331,7 +371,7 @@ export const getReceiptsByEmail = async (req, res) => {
     return res.status(200).json({ 
       success: true, 
       count: receipts.length, 
-      receipts, 
+      receipts: receipts.map(withStatus), 
     }); 
   }
 
@@ -362,7 +402,7 @@ export const getReceiptsByBusNumber = async (req, res) => {
     return res.status(200).json({ 
       success: true, 
       count: receipts.length, 
-      receipts, 
+      receipts: receipts.map(withStatus), 
     }); 
   }
 
@@ -385,6 +425,15 @@ export const generateTourQR = async (req, res) => {
     if (!tour) {
       return res.status(404).json({
         error: "Receipt not found",
+      });
+    }
+
+    // No QR for a tour that's already scanned or finished
+    if (getTourStatus(tour) === "gone") {
+      return res.status(400).json({
+        error: tour.scanned
+          ? "This QR code has already been scanned."
+          : "This tour has already ended.",
       });
     }
 
@@ -421,6 +470,83 @@ export const generateTourQR = async (req, res) => {
 /* =====================================
    EXTRA KILOMETERS (paid by passenger)
 ===================================== */
+
+// POST /api/receipts/verify  { qrToken, busNumber }
+// Bus staff scan the passenger's tour QR. A QR can be scanned only once.
+export const verifyTourQR = async (req, res) => {
+  const { qrToken, busNumber } = req.body;
+
+  let decoded;
+  try {
+    decoded = jwt.verify(qrToken, process.env.QR_SECRET);
+  } catch {
+    return res.json({ valid: false, reason: "Invalid or expired QR" });
+  }
+
+  try {
+    if (!decoded?.receiptId) {
+      return res.json({ valid: false, reason: "Not a tour QR code" });
+    }
+
+    const tour = await Receipt.findOne({ receiptId: decoded.receiptId });
+    if (!tour) {
+      return res.json({ valid: false, reason: "Booking not found" });
+    }
+
+    if (busNumber && tour.busNumber !== busNumber) {
+      return res.json({
+        valid: false,
+        reason: `This booking is for bus ${tour.busNumber}`,
+      });
+    }
+
+    if (tour.scanned) {
+      return res.json({ valid: false, reason: "QR already scanned" });
+    }
+
+    const start = toDayNumber(tour.date);
+    const end = tourEndDay(tour);
+    const today = todayDayNumber();
+
+    if (end != null && end < today) {
+      return res.json({ valid: false, reason: "This tour has ended" });
+    }
+
+    tour.scanned = true;
+    tour.scannedAt = new Date();
+    tour.scannedBy = busNumber || "";
+    await tour.save();
+
+    await notify({
+      title: `✅ Tour ${tour.receiptId} boarded`,
+      body: `${tour.pfirstName || ""} ${tour.plastName || ""} boarded bus ${tour.busNumber}.`,
+      type: "tour",
+      audience: ["admin"],
+      busNumber: tour.busNumber,
+      data: { receiptId: tour.receiptId },
+    });
+
+    res.json({
+      valid: true,
+      // Scanned before the first trip day (allowed, but staff are warned)
+      early: start != null && start > today,
+      tour: {
+        receiptId: tour.receiptId,
+        passengerName: `${tour.pfirstName || ""} ${tour.plastName || ""}`.trim(),
+        pphoneNumber: tour.pphoneNumber,
+        packageType: tour.packageType,
+        date: tour.date,
+        tripEnd: end != null ? dayNumberToString(end) : "",
+        time: tour.time,
+        pickup: tour.pickupAddress || tour.pickup,
+        maxPassengers: tour.maxPassengers,
+      },
+    });
+  } catch (error) {
+    console.log("Verify tour QR error:", error);
+    res.status(500).json({ valid: false, reason: "Server error. Please try again." });
+  }
+};
 
 const MAX_EXTRA_KM_PER_PAYMENT = 2000;
 

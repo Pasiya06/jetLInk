@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
-import { ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, Alert, BackHandler    } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, BackHandler    } from 'react-native';
+import { Alert } from "../../components/JetAlert";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather as Icon, AntDesign, Fontisto, Ionicons } from '@expo/vector-icons';
 
@@ -76,7 +77,7 @@ const verify = async () => {
   
   catch (error) {
     console.log(error);
-    alert("Server connection failed");
+    Alert.alert("Connection failed", "Couldn't reach the server. Please check your internet connection and try again.");
   }
 
 };

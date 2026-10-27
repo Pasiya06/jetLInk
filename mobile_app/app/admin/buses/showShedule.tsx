@@ -10,6 +10,9 @@ import {
   SafeAreaView,
   FlatList,
 } from 'react-native';
+import { BusStatusNotice } from "../../../components/BusStatus";
+import SearchPanel, { filterBySearch } from "../../../components/SearchPanel";
+import { Alert } from "../../../components/JetAlert";
 import {Ionicons, 
   MaterialCommunityIcons, 
   Fontisto, 
@@ -32,6 +35,9 @@ interface Bussched {
   stops?:string;
   busNo?:string;
   ticketPrice:string;
+  busStatus?:string;
+  busEmergency?:boolean;
+  busEmergencyAt?:string;
 }
 
 const BusScreen: React.FC = () => {
@@ -106,13 +112,13 @@ const BusScreen: React.FC = () => {
 
     if (result.success) {
 
-      alert("Schedule Deleted");
+      Alert.alert("Schedule deleted", "The schedule was deleted successfully.");
 
       getSchedules();
 
     } else {
 
-      alert(result.message);
+      Alert.alert("Delete failed", String(result.message || "The schedule couldn't be deleted. Please try again."));
 
     }
 
@@ -155,6 +161,7 @@ const BusScreen: React.FC = () => {
       }
     >
     <View style={styles.friendRow}>
+        <BusStatusNotice item={item} note="Passengers can't book this bus until the emergency is resolved." />
         
         <View style={styles.topRow}>
                 <View style={styles.busNoPill}>
@@ -225,7 +232,7 @@ const BusScreen: React.FC = () => {
       <View style={styles.card}>
         <Text style={styles.cardtitle}>Manage {params.busTypeTopic} Schedules</Text>
         <FlatList style={styles.svw}
-          data={busschedData}
+          data={filterBySearch(busschedData, searchQuery)}
           renderItem={renderBusItem}
           keyExtractor={(item)=>item.scheduleId}
           showsVerticalScrollIndicator={false}
@@ -247,20 +254,20 @@ const BusScreen: React.FC = () => {
       </TouchableOpacity>
       
 
-      {isSearching ? (
-                    <TextInput
-                      style={styles.searchBarInput}
-                      placeholder="Search..."
-                      value={searchQuery}
-                      onChangeText={setSearchQuery}
-                      autoFocus={true}
-                    />
-                  ) : null}
+      <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"admin"}
+          params={params}
+          listLabel="schedules"
+        />
 
       <View style={styles.bottomNav}>
       
                 <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                        setIsSearching(false); 
+                        setIsSearching(false); setSearchQuery(""); 
                       }
       
                       else {
@@ -281,10 +288,10 @@ const BusScreen: React.FC = () => {
                   </Text>
                 </TouchableOpacity>
       
-                <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+                <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
                   <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
                   <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-                    Routes
+                    Search
                   </Text>
                 </TouchableOpacity>
       

@@ -146,6 +146,22 @@ const receiptSchema = new mongoose.Schema(
       lowercase: true,
     },
 
+    // Tour QR: set when bus staff scan the passenger's QR code
+    scanned: {
+      type: Boolean,
+      default: false,
+    },
+
+    scannedAt: {
+      type: Date,
+      default: null,
+    },
+
+    scannedBy: {
+      type: String,
+      default: "",
+    },
+
     // Extra kilometers added and paid by the passenger
     extraKm: {
       type: Number,

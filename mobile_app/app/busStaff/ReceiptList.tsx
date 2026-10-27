@@ -14,6 +14,7 @@ import {
   LayoutAnimation,
   UIManager,
 } from "react-native";
+import SearchPanel, { filterBySearch } from "../../components/SearchPanel";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons, FontAwesome, Feather } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -59,6 +60,8 @@ interface Receipt {
   pickupLat?: number | null;
   pickupLng?: number | null;
   pickupAddress?: string;
+  status?: "active" | "gone";
+  scanned?: boolean;
   time: string;
   packageId: string;
   description: string;
@@ -191,6 +194,33 @@ export default function BusReceipts() {
         </View>
       </LinearGradient>
 
+      {/* Scan passenger tour QR */}
+      <TouchableOpacity
+        style={styles.scanBtn}
+        activeOpacity={0.9}
+        onPress={() =>
+          router.push({
+            pathname: "/busStaff/TourQrScan",
+            params: {
+              Cid: params.Cid,
+              conductorId: params.conductorId,
+              conductorNIC: params.conductorNIC,
+              cfirstName: params.cfirstName,
+              clastName: params.clastName,
+              cphoneNumber: params.cphoneNumber,
+              driverId: params.driverId,
+              dfirstName: params.dfirstName,
+              dlastName: params.dlastName,
+              dphoneNumber: params.dphoneNumber,
+              busNo: params.busNo,
+            },
+          })
+        }
+      >
+        <Ionicons name="qr-code-outline" size={20} color="#FFFFFF" />
+        <Text style={styles.scanBtnText}>Scan tour QR</Text>
+      </TouchableOpacity>
+
       {loading ? (
         <View style={styles.center}>
           <ActivityIndicator size="large" color={C.brand} />
@@ -214,7 +244,7 @@ export default function BusReceipts() {
         </View>
       ) : (
         <FlatList
-          data={filtered}
+          data={filterBySearch(filtered, searchQuery)}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => <ReceiptCard item={item} />}
           showsVerticalScrollIndicator={false}
@@ -253,22 +283,22 @@ export default function BusReceipts() {
         />
       )}
 
-      {isSearching ? (
-        <TextInput 
-          style={styles.searchBarInput}
-          placeholder="Search..."
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          autoFocus={true}
+      <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"staff"}
+          params={params}
+          listLabel="tour receipts"
         />
-      ) : null}
 
       <View style={styles.bottomNav}>
     
         <TouchableOpacity style={styles.item} onPress={() => { 
           setActiveTab("home"); 
           if (isSearching) {
-            setIsSearching(false); 
+            setIsSearching(false); setSearchQuery(""); 
           }
   
           else {
@@ -296,10 +326,10 @@ export default function BusReceipts() {
           </Text>
         </TouchableOpacity>
   
-        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+        <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
           <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
           <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-            Routes
+            Search
           </Text>
         </TouchableOpacity>
   
@@ -429,7 +459,27 @@ function ReceiptCard({ item }: { item: Receipt }) {
               {[item.date, item.time].filter(Boolean).join("  ") || "No date"}
             </Text>
           </View>
-          
+          <View
+            style={[
+              styles.status,
+              { backgroundColor: item.scanned ? C.successSoft : item.status === "gone" ? C.neutralSoft : C.brandSoft },
+            ]}
+          >
+            <View
+              style={[
+                styles.statusDot,
+                { backgroundColor: item.scanned ? C.success : item.status === "gone" ? C.neutral : C.brand },
+              ]}
+            />
+            <Text
+              style={[
+                styles.statusText,
+                { color: item.scanned ? C.success : item.status === "gone" ? C.neutral : C.brand },
+              ]}
+            >
+              {item.scanned ? "Boarded" : item.status === "gone" ? "Ended" : "Not boarded"}
+            </Text>
+          </View>
         </View>
 
         <Text style={styles.fieldLabel}>Pickup</Text>
@@ -730,6 +780,23 @@ const styles = StyleSheet.create({
   },
 
   list: { padding: 16, paddingTop: 18, paddingBottom: 150 },
+  scanBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    height: 52,
+    marginHorizontal: 16,
+    marginTop: -26,
+    borderRadius: 16,
+    backgroundColor: "#173C79",
+    elevation: 6,
+    shadowColor: "#0F1B2D",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.18,
+    shadowRadius: 14,
+  },
+  scanBtnText: { color: "#FFFFFF", fontWeight: "800", fontSize: 16 },
   emptyContainer: { flexGrow: 1, justifyContent: "center", padding: 20 },
 
   /* Stats */

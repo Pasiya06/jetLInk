@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
   ActivityIndicator,
-  Alert,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
@@ -12,6 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Alert } from "../../../components/JetAlert";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { createAdmin } from "../../../services/adminService";

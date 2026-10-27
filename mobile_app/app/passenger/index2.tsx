@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import {
-  Alert,
   StyleSheet,
   Text,
   View,
@@ -12,6 +11,7 @@ import {
   ScrollView,
   BackHandler
 } from 'react-native';
+import { Alert } from "../../components/JetAlert";
 
 import { Feather as Icon, EvilIcons, Fontisto, MaterialCommunityIcons, Entypo, AntDesign, Feather, Ionicons  } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -69,7 +69,7 @@ export const FlatmateLogin: React.FC = () => {
 
 
     if (!firstName || !lastName  || !phoneNumber || !address || !NIC || !email || !password ) {
-    alert("Please fill required fields");
+    Alert.alert("Missing details", "Please fill in all the required fields.");
     return;
   }
 
@@ -131,14 +131,14 @@ export const FlatmateLogin: React.FC = () => {
       const data = await response.json();
   
       if (response.ok) {
-        alert("Passenger Registered Successfully");
+        Alert.alert("Registration successful", "Your account has been created. Welcome to JetLink!");
         router.push("/passenger/index2");
       } else {
-        alert(data.message || "Registration failed");
+        Alert.alert("Registration failed", String(data.message || "Please check your details and try again."));
       }
     } catch (error) {
       console.log(error);
-      alert("Server connection failed");
+      Alert.alert("Connection failed", "Couldn't reach the server. Please check your internet connection and try again.");
     }
   };
 //login passenger
@@ -229,11 +229,11 @@ const loginPassenger = async () => {
       return;
     }
 
-    alert(data1.message );
+    Alert.alert("Login failed", String(data1.message || "Please check your details and try again."));
 
   } catch (error) {
     console.log(error);
-    alert("Server connection failed");
+    Alert.alert("Connection failed", "Couldn't reach the server. Please check your internet connection and try again.");
   }
 };
 

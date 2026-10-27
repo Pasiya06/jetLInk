@@ -8,9 +8,10 @@ import {
   TouchableOpacity,
   SafeAreaView,
   FlatList,
-  Alert,
   ScrollView,
 } from 'react-native';
+import SearchPanel from "../../../components/SearchPanel";
+import { Alert } from "../../../components/JetAlert";
 
 import { Ionicons, MaterialIcons, FontAwesome, Feather, Entypo } from '@expo/vector-icons';
 import {getConductors, deleteConductor,} from "../../../services/conductorService";
@@ -181,15 +182,15 @@ useFocusEffect(
 
         <GradientButton label="Add conductor" icon="add" onPress={handleSearch} style={styles.addButton} />
 
-        {isSearching ? (
-              <TextInput
-                style={styles.searchBarInput}
-                placeholder="Search..."
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoFocus={true}
-              />
-            ) : null}
+        <SearchPanel
+          visible={isSearching}
+          query={searchQuery}
+          onChangeQuery={setSearchQuery}
+          onClose={() => { setIsSearching(false); setSearchQuery(""); }}
+          role={"admin"}
+          params={params}
+          listLabel="conductors"
+        />
         
 
         <View style={styles.bottomNav}>
@@ -197,7 +198,7 @@ useFocusEffect(
           
 
           <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("home"); if (isSearching) {
-                  setIsSearching(false); 
+                  setIsSearching(false); setSearchQuery(""); 
                 }
 
                 else {
@@ -217,10 +218,10 @@ useFocusEffect(
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); setIsSearching(!isSearching); }}>
+          <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); if (isSearching) setSearchQuery(""); setIsSearching(!isSearching); }}>
             <FontAwesome name={isSearching ? "close" : "search"} size={24} color={activeTab  === "routes" ? "#0057D9" : "#8A8A8A"}/>
             <Text style={[ styles.label1,activeTab === "routes" && styles.activeLabel,]}>
-              Routes
+              Search
             </Text>
           </TouchableOpacity>
 

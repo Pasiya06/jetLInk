@@ -2,9 +2,16 @@ import jwt from "jsonwebtoken";
 import Parcel from "../models/Parcel.js";
 import Bus from "../models/Bus.js"; // adjust path to match your project
 import { notify } from "./notificationController.js";
+import { getBusBlockReason } from "../utils/busAvailability.js";
 
 export const createParcel = async (req, res) => {
   try {
+    // Bus had an accident / broke down -> no new parcels on it
+    const blockReason = await getBusBlockReason(req.body?.Bnumber || req.body?.busNumber);
+    if (blockReason) {
+      return res.status(409).json({ success: false, message: blockReason });
+    }
+
     // Find the last parcel
     const lastParcel = await Parcel.findOne().sort({ createdAt: -1 });
 
