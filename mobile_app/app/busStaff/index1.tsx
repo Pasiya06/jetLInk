@@ -30,6 +30,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AlertBadge from "../../components/AlertBadge";
 import LatestAlerts from "../../components/LatestAlerts";
+import { ensureStaffSession } from "../../services/notificationService";
 import {
   startBusLocationSharing,
   stopBusLocationSharing,
@@ -86,6 +87,11 @@ export default function DriverHome() {
   // ─── Params ─────────────────────────────────────────────────────
   // busNo is sent from login screen
   const busNum = params.busNo as string;
+
+  // Make sure this phone fetches alerts for THIS bus
+  useEffect(() => {
+    ensureStaffSession(busNum);
+  }, [busNum]);
 
   // ────────────────────────────────────────────────────────────────
   // 1. Get place name using OpenWeather reverse geocoding

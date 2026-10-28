@@ -5,6 +5,7 @@ import { Alert } from "../../components/JetAlert";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather as Icon, AntDesign, Fontisto, Ionicons } from '@expo/vector-icons';
 import { ScreenHeader, IconBox, GRADIENT, C } from "../../components/JetUI";
+import { saveSession } from "../../services/notificationService";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const OTP_LENGTH = 6;
@@ -131,6 +132,9 @@ export const FlatmateLogin: React.FC = () => {
         inputRefs.current[0]?.focus();
         return;
       }
+
+      // Remember the bus on this phone so its alerts (bookings, parcels, tours…) are shown
+      await saveSession({ role: "staff", busNumber: String(params.busNo ?? "").trim().toUpperCase() });
 
       router.push({
         pathname: "/busStaff/index1",

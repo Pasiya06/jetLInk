@@ -601,6 +601,21 @@ async function pollOnce() {
 }
 
 /**
+ * Bus staff home calls this with the bus number from its params, so the
+ * phone always fetches alerts for the bus that is signed in (also for
+ * staff who logged in before this was saved at login).
+ */
+export async function ensureStaffSession(busNumber?: string) {
+  const bus = String(busNumber || "").trim().toUpperCase();
+  if (!bus) return;
+  const session = await getSession();
+  if (session?.role === "staff" && String(session.busNumber || "").toUpperCase() === bus) return;
+  // A different bus or role on this phone: start fresh so old alerts don't pop up
+  await saveSession({ role: "staff", busNumber: bus });
+  historyListeners.forEach((listener) => listener());
+}
+
+/**
  * Passenger screens call this with the email from their params so that
  * passengers who signed in before this update also get their alerts.
  */

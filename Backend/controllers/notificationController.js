@@ -58,12 +58,19 @@ export const getNotifications = async (req, res) => {
       });
     }
 
-    const filter = { audience: role };
+    let filter = { audience: role };
 
-    // Staff see alerts for everyone plus alerts for their own bus
+    // Staff see alerts for every bus, plus EVERYTHING about their own bus
+    // (bookings, parcels, tours, scans, emergencies – also older alerts that
+    // were only sent to the admin)
     if (role === "staff") {
       const bus = busNumber ? String(busNumber).trim().toUpperCase() : null;
-      filter.$or = bus ? [{ busNumber: null }, { busNumber: bus }] : [{ busNumber: null }];
+      filter = {
+        $or: [
+          { audience: "staff", busNumber: null },
+          ...(bus ? [{ busNumber: bus, audience: { $in: ["staff", "admin"] } }] : []),
+        ],
+      };
     }
 
     // Passengers see announcements for everyone plus their own alerts

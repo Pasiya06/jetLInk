@@ -80,6 +80,8 @@ export default function StaffAlertsScreen({
   useBusNames(); // show bus names on the alert cards
 
   const [busNumber, setBusNumber] = useState(busNumberParam ?? "");
+  // Staff without a bus number in the link: wait until the saved bus is read
+  const [busReady, setBusReady] = useState(role !== "staff" || !!busNumberParam);
   const [email, setEmail] = useState<string | null>(isPassenger ? null : "");
   const [alerts, setAlerts] = useState<ServerAlert[]>([]);
   const [loading, setLoading] = useState(true);
@@ -100,7 +102,10 @@ export default function StaffAlertsScreen({
   // Staff: fall back to the bus number saved at login
   useEffect(() => {
     if (role === "staff" && !busNumberParam) {
-      getSession().then((s) => s?.busNumber && setBusNumber(s.busNumber));
+      getSession().then((s) => {
+        if (s?.busNumber) setBusNumber(s.busNumber);
+        setBusReady(true);
+      });
     }
   }, [role, busNumberParam]);
 
@@ -111,6 +116,7 @@ export default function StaffAlertsScreen({
 
   const load = useCallback(async () => {
     if (isPassenger && email === null) return; // still reading the session
+    if (!busReady) return; // still reading the saved bus number
     try {
       const list = await fetchServerAlerts(role, busNumber || undefined, undefined, email || undefined);
       setAlerts(list);
@@ -121,7 +127,7 @@ export default function StaffAlertsScreen({
       setLoading(false);
       setRefreshing(false);
     }
-  }, [role, busNumber, email, isPassenger]);
+  }, [role, busNumber, email, isPassenger, busReady]);
 
   useEffect(() => {
     // Remember what was unread when the screen opened, then mark all as read
