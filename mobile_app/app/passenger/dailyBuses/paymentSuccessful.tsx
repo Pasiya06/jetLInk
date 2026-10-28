@@ -14,7 +14,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Stack,useRouter, useLocalSearchParams } from 'expo-router';
 import QRCode from 'react-native-qrcode-svg';
-import { notifyTicketBooked } from '../../../services/notificationService';
 
 const { width } = Dimensions.get('window');
 
@@ -53,11 +52,7 @@ export default function PaymentSuccessScreen() {
     }
 
     setQrToken(data.qrToken);
-
-    notifyTicketBooked({
-      busNumber: bNumber || "JetLink",
-      fare: amount,
-    }).catch(() => {});
+    // The "Ticket confirmed" alert now comes from the server (see Alerts)
   } catch (error) {
     console.log(error);
     setError("Could not generate QR");

@@ -1,7 +1,45 @@
 import jwt from "jsonwebtoken";
 import Parcel from "../models/Parcel.js";
 import Bus from "../models/Bus.js"; // adjust path to match your project
-import { notify } from "./notificationController.js";
+import { notify, notifyPassengers } from "./notificationController.js";
+
+// Tell the sender and the receiver (if they use JetLink) about their parcel
+const parcelPassengerAlert = async (parcel, stage) => {
+  const id = parcel.parcelId;
+  const route = `${parcel.pickup || "?"} → ${parcel.drop || "?"}`;
+  const bus = parcel.Bnumber || "-";
+  const sender = parcel.Semail;
+  const receiver = parcel.Remail;
+  const same = String(sender || "").toLowerCase() === String(receiver || "").toLowerCase();
+  const base = { type: "parcel", busNumber: parcel.Bnumber, data: { parcelId: id, status: parcel.status } };
+
+  if (stage === "booked") {
+    await notifyPassengers(sender, {
+      ...base,
+      title: `📦 Parcel ${id} booked`,
+      body: `${route} on ${parcel.date || "-"} ${parcel.time || ""}. Bus ${bus}. Show the parcel QR when you hand it over.`,
+    });
+    if (!same) {
+      await notifyPassengers(receiver, {
+        ...base,
+        title: `📦 A parcel is coming to you`,
+        body: `${parcel.sendername || "Someone"} sent you parcel ${id} (${route}) on bus ${bus}, ${parcel.date || ""}.`,
+      });
+    }
+  } else if (stage === "pickup") {
+    await notifyPassengers(same ? [sender] : [sender, receiver], {
+      ...base,
+      title: `🚌 Parcel ${id} is on the way`,
+      body: `Bus ${bus} collected the parcel (${route}). You can track the bus live.`,
+    });
+  } else if (stage === "delivered") {
+    await notifyPassengers(same ? [sender] : [sender, receiver], {
+      ...base,
+      title: `✅ Parcel ${id} delivered`,
+      body: `Delivered to ${parcel.receivername || "the receiver"} at ${parcel.drop || "the destination"}.`,
+    });
+  }
+};
 import { getBusBlockReason } from "../utils/busAvailability.js";
 
 export const createParcel = async (req, res) => {
@@ -35,6 +73,8 @@ export const createParcel = async (req, res) => {
       busNumber: parcel.Bnumber,
       data: { parcelId: parcel.parcelId },
     });
+
+    await parcelPassengerAlert(parcel, "booked");
 
     res.status(201).json({
       success: true,
@@ -147,6 +187,7 @@ export const verifyParcelQR = async (req, res) => {
       parcel.status = "PickedUp";
 
       await parcel.save();
+      await parcelPassengerAlert(parcel, "pickup");
 
       await notify({
         title: `📦 Parcel ${parcel.parcelId} picked up`,
@@ -171,6 +212,7 @@ export const verifyParcelQR = async (req, res) => {
       parcel.status = "Delivered";
 
       await parcel.save();
+      await parcelPassengerAlert(parcel, "delivered");
 
       await notify({
         title: `✅ Parcel ${parcel.parcelId} delivered`,
@@ -296,6 +338,7 @@ export const markParcelDelivered = async (req, res) => {
       parcel.status = "PickedUp";
 
       await parcel.save();
+      await parcelPassengerAlert(parcel, "pickup");
 
       await notify({
         title: `📦 Parcel ${parcel.parcelId} picked up`,
@@ -320,6 +363,7 @@ export const markParcelDelivered = async (req, res) => {
       parcel.status = "Delivered";
 
       await parcel.save();
+      await parcelPassengerAlert(parcel, "delivered");
 
       await notify({
         title: `✅ Parcel ${parcel.parcelId} delivered`,

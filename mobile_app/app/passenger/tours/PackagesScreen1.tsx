@@ -19,6 +19,7 @@ import TourPackageCard, { TourPackage, packageTitle } from "../../../components/
 import PickupTownPicker from "../../../components/PickupTownPicker";
 import { C, ScreenHeader, ui } from "../../../components/JetUI";
 import { packageFitsPickup, roadDistanceKm } from "../../../utils/sriLankaTowns";
+import AlertBadge from "../../../components/AlertBadge";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const PICKUP_KEY = "@jetlink_pickup_town";
@@ -299,7 +300,7 @@ export default function PackagesScreen() {
           </TouchableOpacity>
     
           <TouchableOpacity style={styles.item} onPress={() => { setActiveTab("routes"); router.push({ pathname: "/notifications", params: { role: "passenger" } });}}>
-            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+            <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="passenger" /></View>
             <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
               Alerts
             </Text>

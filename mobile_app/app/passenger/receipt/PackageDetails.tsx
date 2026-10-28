@@ -23,6 +23,7 @@ import {
   Feather ,  
   FontAwesome, 
 } from "@expo/vector-icons";
+import AlertBadge from "../../../components/AlertBadge";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -357,7 +358,7 @@ export default function PackageDetails() {
           </TouchableOpacity>
     
           <TouchableOpacity style={styles.item} onPress={() => { router.push({ pathname: "/notifications", params: { role: "passenger" } });}}>
-            <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+            <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="passenger" /></View>
             <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
               Alerts
             </Text>

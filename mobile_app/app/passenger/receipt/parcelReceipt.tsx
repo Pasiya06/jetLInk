@@ -29,6 +29,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenHeader, EmptyState, ParcelRow, C } from "../../../components/JetUI";
 import { useBusNames, getBusLabel } from "../../../components/BusName";
+import AlertBadge from "../../../components/AlertBadge";
 
 interface parcel {
   _id: string;
@@ -715,7 +716,7 @@ const JetLinkInterface: React.FC = () => {
             }}
           >
 
-            <Ionicons
+            <View><Ionicons
               name="notifications-outline"
               size={24}
               color={
@@ -723,7 +724,7 @@ const JetLinkInterface: React.FC = () => {
                   ? "#0057D9"
                   : "#8A8A8A"
               }
-            />
+            /><AlertBadge role="passenger" /></View>
 
             <Text
               style={[

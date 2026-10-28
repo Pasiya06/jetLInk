@@ -19,6 +19,7 @@ import { router, Stack, useFocusEffect, useLocalSearchParams, useRouter } from "
 import { Ionicons, FontAwesome, Feather } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
 import { useBusNames, getBusLabel } from "../../../components/BusName";
+import AlertBadge from "../../../components/AlertBadge";
 
 if (
   Platform.OS === "android" &&
@@ -341,7 +342,7 @@ export default function ReceiptList() {
             style={styles.item}
             onPress={() => {setActiveTab("routes"); router.push({ pathname: "/notifications", params: { role: "passenger" } });}}
           >
-            <Ionicons name="notifications-outline" size={24} color={ activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+            <View><Ionicons name="notifications-outline" size={24} color={ activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="passenger" /></View>
             <Text style={[styles.label1, activeTab === "alerts" && styles.activeLabel,]}>
               Alerts
             </Text>

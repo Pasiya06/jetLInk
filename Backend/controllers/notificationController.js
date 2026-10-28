@@ -5,7 +5,7 @@ import Notification from "../models/Notification.js";
  * (emergency, new parcel, new ticket...). Never throws, so it can't break
  * the request that triggered it.
  */
-export const notify = async ({ title, body = "", type = "general", audience = ["admin"], busNumber = null, data = {} }) => {
+export const notify = async ({ title, body = "", type = "general", audience = ["admin"], busNumber = null, passengerEmail = null, data = {} }) => {
   try {
     return await Notification.create({
       title,
@@ -13,6 +13,7 @@ export const notify = async ({ title, body = "", type = "general", audience = ["
       type,
       audience,
       busNumber: busNumber ? String(busNumber).trim().toUpperCase() : null,
+      passengerEmail: passengerEmail ? String(passengerEmail).trim().toLowerCase() : null,
       data,
     });
   } catch (error) {
@@ -21,18 +22,34 @@ export const notify = async ({ title, body = "", type = "general", audience = ["
   }
 };
 
+/**
+ * Send an alert to one or more passengers (by email). Duplicate / empty emails
+ * are skipped. Never throws.
+ */
+export const notifyPassengers = async (emails, { title, body = "", type = "general", busNumber = null, data = {} }) => {
+  const list = [...new Set((Array.isArray(emails) ? emails : [emails])
+    .map((e) => String(e || "").trim().toLowerCase())
+    .filter(Boolean))];
+  await Promise.all(
+    list.map((passengerEmail) =>
+      notify({ title, body, type, audience: ["passenger"], busNumber, passengerEmail, data })
+    )
+  );
+};
+
 // GET /api/notifications?role=admin
 // GET /api/notifications?role=staff&busNumber=NB-1234
+// GET /api/notifications?role=passenger&email=someone@mail.com
 // Optional: &since=<ISO date> to get only newer ones, &limit=50
 export const getNotifications = async (req, res) => {
   try {
-    const { role, busNumber, since } = req.query;
+    const { role, busNumber, since, email } = req.query;
     const limit = Math.min(parseInt(req.query.limit, 10) || 50, 200);
 
-    if (!["admin", "staff"].includes(role)) {
+    if (!["admin", "staff", "passenger"].includes(role)) {
       return res.status(400).json({
         success: false,
-        message: "role must be admin or staff",
+        message: "role must be admin, staff or passenger",
       });
     }
 
@@ -42,6 +59,14 @@ export const getNotifications = async (req, res) => {
     if (role === "staff") {
       const bus = busNumber ? String(busNumber).trim().toUpperCase() : null;
       filter.$or = bus ? [{ busNumber: null }, { busNumber: bus }] : [{ busNumber: null }];
+    }
+
+    // Passengers see announcements for everyone plus their own alerts
+    if (role === "passenger") {
+      const mail = email ? String(email).trim().toLowerCase() : null;
+      filter.$or = mail
+        ? [{ passengerEmail: null }, { passengerEmail: mail }]
+        : [{ passengerEmail: null }];
     }
 
     if (since) {
@@ -69,7 +94,7 @@ export const getNotifications = async (req, res) => {
 // Lets the admin send an announcement to staff (or any screen create one).
 export const createNotification = async (req, res) => {
   try {
-    const { title, body, type, audience, busNumber, data } = req.body;
+    const { title, body, type, audience, busNumber, passengerEmail, data } = req.body;
 
     if (!title || !String(title).trim()) {
       return res.status(400).json({
@@ -86,6 +111,7 @@ export const createNotification = async (req, res) => {
       type,
       audience: list,
       busNumber: busNumber ? String(busNumber).trim().toUpperCase() : null,
+      passengerEmail: passengerEmail ? String(passengerEmail).trim().toLowerCase() : null,
       data,
     });
 

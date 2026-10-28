@@ -176,7 +176,8 @@ const loginPassenger = async () => {
 
       // Remember who is signed in so the Profile screen works from any page
       await AsyncStorage.setItem("@jetlink_passenger_nic", String(user.NIC ?? "")).catch(() => {});
-      await saveSession({ role: "passenger" });
+      // Passenger alerts: this phone will now receive this passenger's notifications
+      await saveSession({ role: "passenger", email: String(user.email || "").toLowerCase() });
       
       router.push({
         pathname: "/passenger/index1",

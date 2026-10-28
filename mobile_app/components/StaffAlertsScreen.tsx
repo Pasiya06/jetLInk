@@ -18,10 +18,11 @@ import { Alert } from "./JetAlert";
 import { Stack, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { getBusLabel, useBusNames } from "./BusName";
 import {
+  AlertRole,
   ServerAlert,
   ServerAlertType,
-  StaffRole,
   deleteServerAlert,
   fetchServerAlerts,
   getAlertsLastRead,
@@ -70,13 +71,16 @@ export default function StaffAlertsScreen({
   role,
   busNumber: busNumberParam,
 }: {
-  role: StaffRole;
+  role: AlertRole;
   busNumber?: string;
 }) {
   const router = useRouter();
   const isAdmin = role === "admin";
+  const isPassenger = role === "passenger";
+  useBusNames(); // show bus names on the alert cards
 
   const [busNumber, setBusNumber] = useState(busNumberParam ?? "");
+  const [email, setEmail] = useState<string | null>(isPassenger ? null : "");
   const [alerts, setAlerts] = useState<ServerAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -89,19 +93,26 @@ export default function StaffAlertsScreen({
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [toAdmins, setToAdmins] = useState(false);
+  const [sendTo, setSendTo] = useState<"staff" | "passenger" | "all">("staff");
   const [targetBus, setTargetBus] = useState("");
   const [sending, setSending] = useState(false);
 
   // Staff: fall back to the bus number saved at login
   useEffect(() => {
-    if (!isAdmin && !busNumberParam) {
+    if (role === "staff" && !busNumberParam) {
       getSession().then((s) => s?.busNumber && setBusNumber(s.busNumber));
     }
-  }, [isAdmin, busNumberParam]);
+  }, [role, busNumberParam]);
+
+  // Passenger: their email is saved at login
+  useEffect(() => {
+    if (isPassenger) getSession().then((s) => setEmail(s?.email || ""));
+  }, [isPassenger]);
 
   const load = useCallback(async () => {
+    if (isPassenger && email === null) return; // still reading the session
     try {
-      const list = await fetchServerAlerts(role, busNumber || undefined);
+      const list = await fetchServerAlerts(role, busNumber || undefined, undefined, email || undefined);
       setAlerts(list);
       setError(null);
     } catch (err: any) {
@@ -110,7 +121,7 @@ export default function StaffAlertsScreen({
       setLoading(false);
       setRefreshing(false);
     }
-  }, [role, busNumber]);
+  }, [role, busNumber, email, isPassenger]);
 
   useEffect(() => {
     // Remember what was unread when the screen opened, then mark all as read
@@ -183,8 +194,12 @@ export default function StaffAlertsScreen({
         title: `📢 ${title.trim()}`,
         body: message.trim(),
         type: "general",
-        audience: toAdmins ? ["staff", "admin"] : ["staff"],
-        busNumber: targetBus.trim() || undefined,
+        audience: [
+          ...(sendTo === "passenger" ? [] : (["staff"] as const)),
+          ...(sendTo === "staff" ? [] : (["passenger"] as const)),
+          ...(toAdmins ? (["admin"] as const) : []),
+        ],
+        busNumber: sendTo === "staff" ? targetBus.trim() || undefined : undefined,
       });
       setComposeOpen(false);
       setTitle("");
@@ -192,7 +207,15 @@ export default function StaffAlertsScreen({
       setTargetBus("");
       setToAdmins(false);
       load();
-      Alert.alert("Sent", "Bus staff will see this announcement in their Alerts.");
+      Alert.alert(
+        "Sent",
+        sendTo === "staff"
+          ? "Bus staff will see this announcement in their Alerts."
+          : sendTo === "passenger"
+          ? "Passengers will see this announcement in their Alerts."
+          : "Bus staff and passengers will see this announcement in their Alerts."
+      );
+      setSendTo("staff");
     } catch (err: any) {
       Alert.alert("Error", err?.message || "Could not send the announcement.");
     } finally {
@@ -216,12 +239,16 @@ export default function StaffAlertsScreen({
               <Ionicons name="arrow-back" size={22} color="#fff" />
             </TouchableOpacity>
             <View style={{ flex: 1 }}>
-              <Text style={styles.headerTitle}>{isAdmin ? "Admin Alerts" : "Bus Staff Alerts"}</Text>
+              <Text style={styles.headerTitle}>
+                {isAdmin ? "Admin Alerts" : isPassenger ? "My Alerts" : "Bus Staff Alerts"}
+              </Text>
               <Text style={styles.headerSub}>
                 {isAdmin
                   ? "Emergencies, bookings and parcels across all buses"
+                  : isPassenger
+                  ? "Your tickets, parcels, tours and JetLink news"
                   : busNumber
-                  ? `Alerts for bus ${busNumber}`
+                  ? `Alerts for ${getBusLabel(busNumber)}`
                   : "Alerts for your bus"}
               </Text>
             </View>
@@ -339,7 +366,7 @@ export default function StaffAlertsScreen({
                       {alert.busNumber ? (
                         <View style={styles.busTag}>
                           <Ionicons name="bus-outline" size={11} color="#155B8A" />
-                          <Text style={styles.busTagText}>{alert.busNumber}</Text>
+                          <Text style={styles.busTagText}>{getBusLabel(alert.busNumber)}</Text>
                         </View>
                       ) : null}
                     </View>
@@ -362,7 +389,27 @@ export default function StaffAlertsScreen({
             <View style={styles.sheet}>
               <View style={styles.sheetHandle} />
               <Text style={styles.sheetTitle}>Send announcement</Text>
-              <Text style={styles.muted}>Bus staff will see this in their Alerts.</Text>
+              <Text style={styles.muted}>Choose who should see this in their Alerts.</Text>
+
+              <Text style={styles.inputLabel}>Send to</Text>
+              <View style={{ flexDirection: "row", gap: 8 }}>
+                {([
+                  ["staff", "Bus staff"],
+                  ["passenger", "Passengers"],
+                  ["all", "Everyone"],
+                ] as const).map(([key, label]) => {
+                  const active = sendTo === key;
+                  return (
+                    <TouchableOpacity
+                      key={key}
+                      onPress={() => setSendTo(key)}
+                      style={[styles.chip, active && styles.chipActive, { flex: 1, alignItems: "center" }]}
+                    >
+                      <Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
 
               <Text style={styles.inputLabel}>Title</Text>
               <TextInput
@@ -379,21 +426,25 @@ export default function StaffAlertsScreen({
                 style={[styles.input, { height: 90, textAlignVertical: "top" }]}
                 value={message}
                 onChangeText={setMessage}
-                placeholder="Details for the staff"
+                placeholder="Details for the announcement"
                 placeholderTextColor="#94A3B8"
                 multiline
                 maxLength={400}
               />
 
-              <Text style={styles.inputLabel}>Only for bus (optional)</Text>
-              <TextInput
-                style={styles.input}
-                value={targetBus}
-                onChangeText={(t) => setTargetBus(t.toUpperCase())}
-                placeholder="Leave empty for all buses"
-                placeholderTextColor="#94A3B8"
-                autoCapitalize="characters"
-              />
+              {sendTo === "staff" && (
+                <>
+                  <Text style={styles.inputLabel}>Only for bus (optional)</Text>
+                  <TextInput
+                    style={styles.input}
+                    value={targetBus}
+                    onChangeText={(t) => setTargetBus(t.toUpperCase())}
+                    placeholder="Leave empty for all buses"
+                    placeholderTextColor="#94A3B8"
+                    autoCapitalize="characters"
+                  />
+                </>
+              )}
 
               <TouchableOpacity style={styles.toggleRow} onPress={() => setToAdmins((v) => !v)}>
                 <Ionicons

@@ -1,5 +1,23 @@
 import Bus from "../models/Bus.js";
-import { notify } from "./notificationController.js";
+import { notify, notifyPassengers } from "./notificationController.js";
+import Ticket from "../models/Ticket.js";
+import { getActiveTourEmails } from "./tourController.js";
+
+// Passengers who are booked on this bus: unused tickets + tours that haven't ended
+const passengersOnBus = async (busNumber) => {
+  try {
+    const [tickets, tourEmails] = await Promise.all([
+      Ticket.find({ bNumber: busNumber, used: false }).select("pemail"),
+      getActiveTourEmails(busNumber),
+    ]);
+    return [...tickets.map((t) => t.pemail), ...tourEmails];
+  } catch (error) {
+    console.error("Could not find passengers for bus:", error.message);
+    return [];
+  }
+};
+
+const busDisplay = (bus) => (bus.busName ? `${bus.busName} (${bus.busNumber})` : `Bus ${bus.busNumber}`);
 
 // @desc    Get all buses
 export const getBuses = async (req, res) => {
@@ -300,6 +318,14 @@ export const reportEmergency = async (req, res) => {
       },
     });
 
+    await notifyPassengers(await passengersOnBus(bus.busNumber), {
+      title: `⚠️ ${busDisplay(bus)} is delayed`,
+      body: `Your bus reported a ${status === "accident" ? "accident" : "breakdown"}. We're sorry for the trouble. Please wait for updates or contact JetLink support.`,
+      type: "emergency",
+      busNumber: bus.busNumber,
+      data: { busNumber: bus.busNumber, status },
+    });
+
     return res.status(200).json({
       success: true,
       message: `Emergency reported: ${status}`,
@@ -348,6 +374,14 @@ export const resolveEmergency = async (req, res) => {
       body: `Bus ${bus.busNumber} is back to normal.`,
       type: "emergency",
       audience: ["admin", "staff"],
+      data: { busNumber: bus.busNumber, status: "normal" },
+    });
+
+    await notifyPassengers(await passengersOnBus(bus.busNumber), {
+      title: `✅ ${busDisplay(bus)} is back in service`,
+      body: "The problem has been fixed and your bus is running again.",
+      type: "emergency",
+      busNumber: bus.busNumber,
       data: { busNumber: bus.busNumber, status: "normal" },
     });
 

@@ -16,6 +16,7 @@ import SearchPanel from "../../../components/SearchPanel";
 import { Feather, FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenHeader, SearchBox, SectionLabel, Pill, EmptyState, Avatar, C, ui } from "../../../components/JetUI";
+import AlertBadge from "../../../components/AlertBadge";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -185,7 +186,7 @@ const FriendsScreen: React.FC = () => {
             <Ionicons name="home-outline" size={28} color="#fff" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.item} onPress={() => router.push({ pathname: "/notifications", params: { role: "passenger" } })}>
-            <Ionicons name="notifications-outline" size={24} color="#8A8A8A" />
+            <View><Ionicons name="notifications-outline" size={24} color="#8A8A8A" /><AlertBadge role="passenger" /></View>
             <Text style={styles.label1}>Alerts</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.item} onPress={() => router.push({ pathname: "/passenger/passengerProfile", params: { role: "passenger", NIC: params.NIC } })}>

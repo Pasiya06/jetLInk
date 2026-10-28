@@ -17,6 +17,7 @@ import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons, MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
 import ParcelQRDialog from "@/components/ParcelQRDialog"; // adjust path to wherever you saved it
 import { useBusNames } from "../../../components/BusName";
+import AlertBadge from "../../../components/AlertBadge";
 
 // ─── Types ────────────────────────────────────────────────────────
 interface BusLocationData {
@@ -388,11 +389,11 @@ const PassengerTrackScreen: React.FC = () => {
               router.push({ pathname: "/notifications", params: { role: "passenger" } });
             }}
           >
-            <Ionicons
+            <View><Ionicons
               name="notifications-outline"
               size={24}
               color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}
-            />
+            /><AlertBadge role="passenger" /></View>
             <Text style={[styles.label1, activeTab === "alerts" && styles.activeLabel]}>
               Alerts
             </Text>

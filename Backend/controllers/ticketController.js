@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import cron from "node-cron";
 import Ticket from "../models/Ticket.js";
-import { notify } from "./notificationController.js";
+import { notify, notifyPassengers } from "./notificationController.js";
 import { getBusBlockReason } from "../utils/busAvailability.js";
 
 export const createTicket = async (req, res) => {
@@ -50,6 +50,14 @@ export const createTicket = async (req, res) => {
       body: `${pfirstName || ""} ${plastName || ""} booked ${noOfTicket || 1} seat(s)${seatNumbers ? ` (${seatNumbers})` : ""}: ${pickup || "?"} → ${drop || "?"}, ${date || ""} ${time || ""}.`,
       type: "ticket",
       audience: ["admin", "staff"],
+      busNumber: bNumber,
+      data: { ticketId: ticket.ticketId },
+    });
+
+    await notifyPassengers(pemail, {
+      title: "🎫 Ticket confirmed",
+      body: `Ticket ${ticket.ticketId}: ${pickup || "?"} → ${drop || "?"} on ${date || ""} at ${time || ""}. Bus ${bNumber || "-"}${seatNumbers ? `, seat(s) ${seatNumbers}` : ""}. Total LKR ${Number(totalFare || 0).toLocaleString()}.`,
+      type: "ticket",
       busNumber: bNumber,
       data: { ticketId: ticket.ticketId },
     });
@@ -284,6 +292,14 @@ export const verifyTicket = async (req, res) => {
     ticket.used = true;
     ticket.usedAt = new Date();
     await ticket.save();
+
+    await notifyPassengers(ticket.pemail, {
+      title: "✅ Ticket scanned – have a good trip",
+      body: `Ticket ${ticket.ticketId} (${ticket.pickup} → ${ticket.drop}) was used on bus ${ticket.bNumber}.`,
+      type: "ticket",
+      busNumber: ticket.bNumber,
+      data: { ticketId: ticket.ticketId },
+    });
 
     res.json({
       valid: true,

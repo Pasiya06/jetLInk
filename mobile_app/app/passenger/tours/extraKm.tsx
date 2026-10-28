@@ -18,6 +18,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import FieldError from "../../../components/FieldError";
 import { useFieldErrors } from "../../../utils/validation";
 import { useBusNames, getBusLabel } from "../../../components/BusName";
+import AlertBadge from "../../../components/AlertBadge";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -367,7 +368,7 @@ export default function ExtraKmScreen() {
             <Ionicons name="home-outline" size={28} color="#fff" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.item} onPress={() => router.push({ pathname: "/notifications", params: { role: "passenger" } })}>
-            <Ionicons name="notifications-outline" size={24} color="#8A8A8A" />
+            <View><Ionicons name="notifications-outline" size={24} color="#8A8A8A" /><AlertBadge role="passenger" /></View>
             <Text style={styles.label1}>Alerts</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.item} onPress={() => router.push({ pathname: "/passenger/passengerProfile", params: { role: "passenger", NIC: params.NIC } })}>

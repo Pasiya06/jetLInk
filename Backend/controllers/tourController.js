@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
 import Receipt from "../models/Tour.js";
-import { notify } from "./notificationController.js";
+import { notify, notifyPassengers } from "./notificationController.js";
 import Package from "../models/Package.js";
 import { validateCard } from "./paymentController.js";
 import { getBusBlockReason } from "../utils/busAvailability.js";
@@ -47,6 +47,18 @@ const todayDayNumber = () => {
     day: "2-digit",
   }).format(new Date()); // "MM/DD/YYYY"
   return toDayNumber(parts);
+};
+
+// Emails of passengers with a tour on this bus that hasn't ended yet
+export const getActiveTourEmails = async (busNumber) => {
+  const today = todayDayNumber();
+  const tours = await Receipt.find({ busNumber }).select("pemail date tripDuration");
+  return tours
+    .filter((t) => {
+      const end = tourEndDay(t);
+      return end == null || end >= today;
+    })
+    .map((t) => t.pemail);
 };
 
 // Bus numbers (and their booked dates) that clash with [date, date + days - 1]
@@ -289,6 +301,14 @@ export const createReceipt = async (req, res) => {
       data: { receiptId },
     });
 
+    await notifyPassengers(pemail, {
+      title: "🏝️ Tour booking confirmed",
+      body: `Booking ${receiptId}: ${packageType || "Tour"} package on ${date || "-"}${time ? ` at ${time}` : ""}${pickup ? `, pickup ${pickup}` : ""}. Bus ${busNumber || "-"}.`,
+      type: "tour",
+      busNumber,
+      data: { receiptId },
+    });
+
     res.status(201).json({
       success: true,
       message: "Receipt created successfully",
@@ -526,6 +546,14 @@ export const verifyTourQR = async (req, res) => {
       data: { receiptId: tour.receiptId },
     });
 
+    await notifyPassengers(tour.pemail, {
+      title: "✅ Welcome aboard!",
+      body: `Your tour ${tour.receiptId} has started on bus ${tour.busNumber}. Enjoy the trip!`,
+      type: "tour",
+      busNumber: tour.busNumber,
+      data: { receiptId: tour.receiptId },
+    });
+
     res.json({
       valid: true,
       // Scanned before the first trip day (allowed, but staff are warned)
@@ -631,6 +659,14 @@ export const payExtraKm = async (req, res) => {
       body: `${receipt.pfirstName || ""} ${receipt.plastName || ""} added ${kmNumber} km (LKR ${amount.toLocaleString()}) to the tour on ${receipt.date}. Bus ${receipt.busNumber}.`,
       type: "tour",
       audience: ["admin", "staff"],
+      busNumber: receipt.busNumber,
+      data: { receiptId: receipt.receiptId },
+    });
+
+    await notifyPassengers(receipt.pemail, {
+      title: "💳 Extra km payment successful",
+      body: `You added ${kmNumber} km (LKR ${amount.toLocaleString()}) to tour ${receipt.receiptId}.`,
+      type: "tour",
       busNumber: receipt.busNumber,
       data: { receiptId: receipt.receiptId },
     });

@@ -1,21 +1,25 @@
 import React, { useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useLocalSearchParams } from "expo-router";
 import {
-  StaffRole,
+  AlertRole,
+  ensurePassengerSession,
   getSession,
   getUnreadAlertCount,
   subscribeToNotificationHistory,
 } from "../services/notificationService";
 
-/** Red unread counter for the Alerts icon in the admin / bus staff bottom bar. */
-export default function AlertBadge({ role }: { role: StaffRole }) {
+/** Red unread counter for the Alerts icon in the admin / bus staff / passenger bottom bar. */
+export default function AlertBadge({ role }: { role: AlertRole }) {
   const [count, setCount] = useState(0);
+  const { pemail } = useLocalSearchParams<{ pemail?: string }>();
 
   const refresh = useCallback(async () => {
+    if (role === "passenger") await ensurePassengerSession(pemail);
     const session = await getSession();
-    setCount(await getUnreadAlertCount(role, session?.busNumber));
-  }, [role]);
+    const email = role === "passenger" ? session?.email || pemail : undefined;
+    setCount(await getUnreadAlertCount(role, session?.busNumber, email));
+  }, [role, pemail]);
 
   // Only check while this screen is visible
   useFocusEffect(

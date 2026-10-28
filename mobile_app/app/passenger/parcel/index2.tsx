@@ -27,6 +27,7 @@ import { useFieldErrors } from "../../../utils/validation";
 import { getSchedules } from "../../../services/scheduleServices";
 import LocationSheet, { LocationOption } from "../../../components/LocationSheet";
 import { ScreenHeader, GradientButton, C, ui } from "../../../components/JetUI";
+import AlertBadge from "../../../components/AlertBadge";
 
 type Schedule = {
   pickuploca?: string;
@@ -463,7 +464,7 @@ const JetLinkInterface: React.FC = () => {
               </TouchableOpacity>
         
               <TouchableOpacity style={styles.item} onPress={() => { router.push({ pathname: "/notifications", params: { role: "passenger" } }); }}>
-                <Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/>
+                <View><Ionicons name="notifications-outline" size={24} color={activeTab === "alerts" ? "#0057D9" : "#8A8A8A"}/><AlertBadge role="passenger" /></View>
                 <Text style={[styles.label1,activeTab === "alerts" && styles.activeLabel, ]}>
                   Alerts
                 </Text>

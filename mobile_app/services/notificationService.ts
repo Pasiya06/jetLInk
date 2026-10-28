@@ -420,12 +420,14 @@ export function subscribeToNotificationHistory(listener: () => void) {
   };
 }
 
-// ─── Admin & Bus Staff Alerts (stored on the server) ────────────────────
-// Admin and staff use different phones, so their alerts live in the backend
-// (/api/notifications). While an admin or staff member is signed in, the app
-// checks for new alerts every 30 seconds and shows them in the status bar.
+// ─── Admin, Bus Staff & Passenger Alerts (stored on the server) ─────────
+// Everyone uses different phones, so alerts live in the backend
+// (/api/notifications). While someone is signed in, the app checks for new
+// alerts every 30 seconds and shows them in the status bar.
 
 export type StaffRole = "admin" | "staff";
+/** Every signed-in role that has an Alerts screen. */
+export type AlertRole = StaffRole | "passenger";
 export type ServerAlertType = "emergency" | "parcel" | "ticket" | "tour" | "general";
 
 export interface ServerAlert {
@@ -433,19 +435,22 @@ export interface ServerAlert {
   title: string;
   body: string;
   type: ServerAlertType;
-  audience: StaffRole[];
+  audience: AlertRole[];
   busNumber?: string | null;
+  passengerEmail?: string | null;
   data?: Record<string, any>;
   createdAt: string;
 }
 
 export interface Session {
-  role: StaffRole | "passenger";
+  role: AlertRole;
   busNumber?: string;
+  /** Passenger's email – used to fetch their own alerts */
+  email?: string;
 }
 
 const SESSION_KEY = "@jetlink_session";
-const lastReadKey = (role: StaffRole) => `@jetlink_alerts_last_read_${role}`;
+const lastReadKey = (role: AlertRole) => `@jetlink_alerts_last_read_${role}`;
 const LAST_POLLED_KEY = "@jetlink_alerts_last_polled";
 const POLL_INTERVAL_MS = 30_000;
 
@@ -479,12 +484,14 @@ export async function clearSession() {
 }
 
 export async function fetchServerAlerts(
-  role: StaffRole,
+  role: AlertRole,
   busNumber?: string,
-  since?: string
+  since?: string,
+  email?: string
 ): Promise<ServerAlert[]> {
   const query = new URLSearchParams({ role, limit: "100" });
   if (busNumber) query.append("busNumber", busNumber);
+  if (email) query.append("email", email.trim().toLowerCase());
   if (since) query.append("since", since);
 
   const response = await fetch(`${API_URL}/notifications?${query.toString()}`);
@@ -500,8 +507,9 @@ export async function sendServerAlert(alert: {
   title: string;
   body?: string;
   type?: ServerAlertType;
-  audience: StaffRole[];
+  audience: AlertRole[];
   busNumber?: string;
+  passengerEmail?: string;
 }) {
   const response = await fetch(`${API_URL}/notifications`, {
     method: "POST",
@@ -520,7 +528,7 @@ export async function deleteServerAlert(id: string) {
   if (!response.ok) throw new Error("Failed to delete alert");
 }
 
-export async function getAlertsLastRead(role: StaffRole): Promise<number> {
+export async function getAlertsLastRead(role: AlertRole): Promise<number> {
   try {
     return Number(await AsyncStorage.getItem(lastReadKey(role))) || 0;
   } catch {
@@ -528,7 +536,7 @@ export async function getAlertsLastRead(role: StaffRole): Promise<number> {
   }
 }
 
-export async function markAlertsRead(role: StaffRole) {
+export async function markAlertsRead(role: AlertRole) {
   try {
     await AsyncStorage.setItem(lastReadKey(role), String(Date.now()));
   } catch {}
@@ -536,10 +544,15 @@ export async function markAlertsRead(role: StaffRole) {
 }
 
 /** Number of alerts newer than the last time the Alerts screen was opened. */
-export async function getUnreadAlertCount(role: StaffRole, busNumber?: string): Promise<number> {
+export async function getUnreadAlertCount(
+  role: AlertRole,
+  busNumber?: string,
+  email?: string
+): Promise<number> {
   try {
+    if (role === "passenger" && !email) return 0;
     const lastRead = await getAlertsLastRead(role);
-    const alerts = await fetchServerAlerts(role, busNumber, new Date(lastRead).toISOString());
+    const alerts = await fetchServerAlerts(role, busNumber, new Date(lastRead).toISOString(), email);
     return alerts.length;
   } catch {
     return 0;
@@ -557,10 +570,12 @@ let polling = false;
 
 async function pollOnce() {
   const session = await getSession();
-  if (!session || session.role === "passenger") return;
+  if (!session) return;
+  // Passengers need their email to get their own alerts
+  if (session.role === "passenger" && !session.email) return;
 
   const since = (await AsyncStorage.getItem(LAST_POLLED_KEY)) || new Date().toISOString();
-  const alerts = await fetchServerAlerts(session.role, session.busNumber, since);
+  const alerts = await fetchServerAlerts(session.role, session.busNumber, since, session.email);
   if (alerts.length === 0) return;
 
   // Remember the newest one we've seen
@@ -585,7 +600,25 @@ async function pollOnce() {
   }
 }
 
-/** Start checking the server for new admin/staff alerts. Returns a stop function. */
+/**
+ * Passenger screens call this with the email from their params so that
+ * passengers who signed in before this update also get their alerts.
+ */
+export async function ensurePassengerSession(email?: string) {
+  const mail = String(email || "").trim().toLowerCase();
+  if (!mail) return;
+  const session = await getSession();
+  if (session?.role === "passenger" && session.email === mail) return;
+  if (session && session.role !== "passenger") return; // admin / staff phone
+  try {
+    await AsyncStorage.setItem(SESSION_KEY, JSON.stringify({ role: "passenger", email: mail }));
+    if (!(await AsyncStorage.getItem(LAST_POLLED_KEY))) {
+      await AsyncStorage.setItem(LAST_POLLED_KEY, new Date().toISOString());
+    }
+  } catch {}
+}
+
+/** Start checking the server for new alerts (admin, staff or passenger). Returns a stop function. */
 export function startServerAlertPolling(): () => void {
   const tick = async () => {
     if (polling) return;
