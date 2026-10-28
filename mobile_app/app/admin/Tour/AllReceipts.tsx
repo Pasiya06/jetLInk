@@ -20,6 +20,7 @@ import { Ionicons, FontAwesome, Feather } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
 import { useBusNames, getBusLabel } from "../../../components/BusName";
+import TourReceiptCard, { TourReceipt } from "../../../components/TourReceiptCard";
 
 if (
   Platform.OS === "android" &&
@@ -46,36 +47,7 @@ const C = {
   danger: "#dc3545",
 };
 
-interface Receipt {
-  _id: string;
-  receiptId: string;
-  busNumber: string;
-  driverNIC: string;
-  conductorNIC: string;
-  driverD: string;
-  conductorD: string;
-  isOnline: boolean;
-  date: string;
-  pickup: string;
-  time: string;
-  packageId: string;
-  description: string;
-  packageType: string;
-  totalDistance: number;
-  tripDuration: string;
-  maxPassengers: number;
-  maxPrice: number;
-  Pid: string;
-  Pid1?: string;
-  pfirstName: string;
-  plastName: string;
-  pphoneNumber: string;
-  pemail: string;
-  status?: "active" | "gone";
-  tripEnd?: string;
-  scanned?: boolean;
-  scannedAt?: string | null;
-}
+type Receipt = TourReceipt;
 
 type ListTab = "active" | "gone";
 
@@ -159,6 +131,9 @@ export default function AllReceipts() {
         r.plastName,
         r.pemail,
         r.pphoneNumber,
+        r.packageDetails?.title,
+        r.packageDetails?.destination,
+        r.busDetails?.busName,
       ]
         .filter(Boolean)
         .some((v) => String(v).toLowerCase().includes(q));
@@ -239,7 +214,7 @@ export default function AllReceipts() {
         <FlatList
           data={filterBySearch(filtered, searchQuery)}
           keyExtractor={(item) => item._id}
-          renderItem={({ item }) => <ReceiptCard item={item} />}
+          renderItem={({ item }) => <TourReceiptCard item={item} mode="admin" notchColor={C.bg} />}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.list}
@@ -381,133 +356,6 @@ export default function AllReceipts() {
         </LinearGradient>
       </View>
     </SafeAreaView>
-  );
-}
-
-/* ---------- Ticket card ---------- */
-function ReceiptCard({ item }: { item: Receipt }) {
-  const [open, setOpen] = useState(false);
-
-  const toggle = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    setOpen((v) => !v);
-  };
-
-  const passenger =
-    `${item.pfirstName ?? ""} ${item.plastName ?? ""}`.trim() || "N/A";
-  const isGone = item.status === "gone";
-
-  return (
-    <View style={styles.card}>
-      <View style={styles.cardTop}>
-        <View style={styles.topRow}>
-          <View style={styles.busBadge}>
-            <Ionicons name="bus" size={14} color={C.brand} />
-            <Text style={styles.busBadgeText}>{item.busNumber ? getBusLabel(item.busNumber) : "—"}</Text>
-          </View>
-          <View
-            style={[
-              styles.status,
-              { backgroundColor: isGone ? C.neutralSoft : C.successSoft },
-            ]}
-          >
-            <View style={[styles.statusDot, { backgroundColor: isGone ? C.neutral : C.success }]} />
-            <Text style={[styles.statusText, { color: isGone ? C.neutral : C.success }]}>
-              {item.scanned ? "Boarded" : isGone ? "Ended" : "Active"}
-            </Text>
-          </View>
-        </View>
-
-        <Text style={styles.fieldLabel}>Pickup</Text>
-        <Text style={styles.pickup} numberOfLines={2}>
-          {item.pickup || "N/A"}
-        </Text>
-
-        <View style={styles.metaRow}>
-          <Meta icon="calendar-outline" text={item.date} />
-          <Meta icon="time-outline" text={item.time} />
-          <Meta
-            icon="navigate-outline"
-            text={item.totalDistance ? `${item.totalDistance} km` : ""}
-          />
-        </View>
-
-        <View style={styles.passengerRow}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
-              {(passenger[0] || "?").toUpperCase()}
-            </Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.passengerName} numberOfLines={1}>
-              {passenger}
-            </Text>
-            <Text style={styles.passengerEmail} numberOfLines={1}>
-              {item.pemail || "No email"}
-            </Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Perforation */}
-      <View style={styles.perforation}>
-        <View style={[styles.notch, styles.notchLeft]} />
-        <View style={styles.dashes}>
-          {Array.from({ length: 22 }).map((_, i) => (
-            <View key={i} style={styles.dash} />
-          ))}
-        </View>
-        <View style={[styles.notch, styles.notchRight]} />
-      </View>
-
-      <View style={styles.stub}>
-        <View style={{ flex: 1 }}>
-          <Text style={styles.fieldLabel}>Receipt</Text>
-          <Text style={styles.receiptId} numberOfLines={1}>
-            {item.receiptId}
-          </Text>
-        </View>
-        <View style={{ alignItems: "flex-end" }}>
-          <Text style={styles.fieldLabel}>Maximum price</Text>
-          <Text style={styles.price}>
-            Rs. {Number(item.maxPrice || 0).toLocaleString()}
-          </Text>
-        </View>
-      </View>
-
-      {open && (
-        <View style={styles.details}>
-          <Section title="Package" icon="cube-outline">
-            <Detail label="Package ID" value={item.packageId} />
-            <Detail label="Type" value={item.packageType} />
-            <Detail label="Description" value={item.description} />
-            <Detail label="Duration" value={item.tripDuration} />
-            <Detail label="Max passengers" value={item.maxPassengers} />
-          </Section>
-
-          <Section title="Passenger" icon="person-outline" last>
-            <Detail label="Passenger ID" value={item.Pid} />
-            <Detail label="Phone" value={item.pphoneNumber} />
-            <Detail label="Email" value={item.pemail} />
-          </Section>
-        </View>
-      )}
-
-      <TouchableOpacity
-        style={styles.toggle}
-        onPress={toggle}
-        activeOpacity={0.7}
-      >
-        <Text style={styles.toggleText}>
-          {open ? "Hide details" : "View details"}
-        </Text>
-        <Ionicons
-          name={open ? "chevron-up" : "chevron-down"}
-          size={16}
-          color={C.brand}
-        />
-      </TouchableOpacity>
-    </View>
   );
 }
 

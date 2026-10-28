@@ -580,14 +580,7 @@ function ReceiptCard({ item }: { item: Receipt }) {
 
       {open && (
         <View style={styles.details}>
-          <Section title="Package" icon="cube-outline">
-            <Detail label="Package ID" value={item.packageId} />
-            <Detail label="Type" value={item.packageType} />
-            <Detail label="Description" value={item.description} />
-          </Section>
-
-          <Section title="Passenger" icon="person-outline" last>
-            <Detail label="Passenger ID" value={item.Pid} />
+          <Section title="Passenger" icon="person-outline" last>    
             <Detail label="Phone" value={item.pphoneNumber} />
             <Detail label="Email" value={item.pemail} />
           </Section>
