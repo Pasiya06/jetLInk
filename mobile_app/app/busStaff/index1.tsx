@@ -405,11 +405,11 @@ export default function DriverHome() {
         </View> */}
 
           {/* ── Latest alerts for this bus (bookings, parcels, tours, emergencies) ── */}
-          <LatestAlerts
+          {/* <LatestAlerts
             role="staff"
             busNumber={busNum}
             onSeeAll={() => router.push({ pathname: "/notifications", params: { role: "staff", busNumber: busNum } })}
-          />
+          /> */}
 
           {/* ── Main action ──────────────────────────────────── */}
           <GradientAction
