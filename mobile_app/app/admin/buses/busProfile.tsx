@@ -39,6 +39,8 @@ const AddBus = () => {
         Bid: params.Bid,
         busId: params.busId,
         busNumber: params.busNumber,
+        busName: params.busName || "",
+        noOfSeats: params.noOfSeats || "",
         chassis: params.chassis || "",
         engine: params.engine || "",
         colour: params.colour || "",
@@ -67,7 +69,7 @@ const AddBus = () => {
     <>
     <Stack.Screen options={{ title: "", headerShown: false }} />
     <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
-      <ScreenHeader eyebrow={`${params.busTypeTopic || "Bus"} profile`} title={String(params.busNumber || "Bus")} />
+      <ScreenHeader eyebrow={`${params.busTypeTopic || "Bus"} profile`} title={String(params.busName || params.busNumber || "Bus")} />
 
       <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
         <View style={[ui.card, styles.heroCard]}>
@@ -75,7 +77,10 @@ const AddBus = () => {
             <MaterialCommunityIcons name="bus" size={30} color="#FFFFFF" />
           </LinearGradient>
           <View style={{ flex: 1, marginLeft: 14 }}>
-            <Text style={styles.heroTitle}>{params.busNumber}</Text>
+            <Text style={styles.heroTitle}>{params.busName || params.busNumber}</Text>
+            {!!params.busName && (
+              <Text style={styles.heroSub}>{params.busNumber}</Text>
+            )}
             <View style={[styles.statusPill, { backgroundColor: isOnline ? C.greenSoft : C.redSoft }]}>
               <View style={[styles.statusDotSm, { backgroundColor: isOnline ? C.green : C.red }]} />
               <Text style={[styles.statusTextSm, { color: isOnline ? C.green : C.red }]}>{isOnline ? "Online" : "Offline"}</Text>
@@ -95,6 +100,7 @@ const AddBus = () => {
 
         <View style={[ui.card, styles.detailCard]}>
           <Text style={styles.cardHeading}>Vehicle</Text>
+          <DetailLine icon="bus-outline" label="Bus name" value={String(params.busName || "")} />
           <DetailLine icon="barcode-outline" label="Chassis number" value={String(params.chassis || "")} />
           <DetailLine icon="hardware-chip-outline" label="Engine number" value={String(params.engine || "")} />
           <DetailLine icon="people-outline" label="Seats" value={String(params.noOfSeats || "")} />

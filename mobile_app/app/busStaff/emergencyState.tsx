@@ -24,6 +24,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../components/AlertBadge";
 import { formatEmergencyTime, emergencyTimeAgo } from "../../utils/emergencyTime";
+import { useBusNames, getBusLabel, getBusTitle } from "../../components/BusName";
 
 type EmergencyStatus = "normal" | "accident" | "breakdown";
 
@@ -38,6 +39,7 @@ export default function EmergencyButton() {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const params = useLocalSearchParams();
+  useBusNames();
   const router = useRouter();
   const busNumber = params.busNo as string;
   const [activeTab, setActiveTab] = useState('');
@@ -123,7 +125,7 @@ export default function EmergencyButton() {
 
               Alert.alert(
                 "Emergency Reported",
-                `Bus ${busNumber}: ${emergencyType.toUpperCase()}`
+                `${getBusTitle(busNumber)}: ${emergencyType.toUpperCase()}`
               );
             } catch (error) {
               Alert.alert(
@@ -211,7 +213,7 @@ export default function EmergencyButton() {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <View style={[styles.container, { backgroundColor: C.bg }]}>
-        <ScreenHeader eyebrow={`Bus ${busNumber || ""}`.trim()} title="Emergency" />
+        <ScreenHeader eyebrow={getBusTitle(busNumber || "")} title="Emergency" />
 
         <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
           <View style={[ui.card, styles.statusCard, emergency ? styles.statusBad : styles.statusOk]}>

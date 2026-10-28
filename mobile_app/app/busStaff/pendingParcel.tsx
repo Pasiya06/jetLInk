@@ -20,6 +20,7 @@ import {
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../components/AlertBadge";
+import { useBusNames, getBusLabel, getBusTitle } from "../../components/BusName";
 
 interface parcel {
   _id:string;
@@ -42,6 +43,7 @@ interface parcel {
 const JetLinkInterface: React.FC = () => {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const params = useLocalSearchParams();
+  useBusNames();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState('');
   const [parcelData, setParcelData] = useState<parcel[]>([]);
@@ -88,7 +90,7 @@ const JetLinkInterface: React.FC = () => {
         to={item.drop}
         date={item.date}
         time={item.time}
-        bus={item.Bnumber}
+        bus={getBusLabel(item.Bnumber)}
         showChevron={false}
         status="Pending"
       />
@@ -102,7 +104,7 @@ const JetLinkInterface: React.FC = () => {
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
         
-        <ScreenHeader eyebrow={`Bus ${params.busNo ?? ""}`.trim()} title="Pending parcels" />
+        <ScreenHeader eyebrow={getBusTitle(params.busNo ?? "")} title="Pending parcels" />
 
         <FlatList
           style={ui.body}

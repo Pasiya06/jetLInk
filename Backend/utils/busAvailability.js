@@ -32,3 +32,16 @@ export const getBusBlockReason = async (busNumber) => {
 };
 
 export const busKey = key;
+
+// Map of BUS NUMBER -> { busName, noOfSeats } for every bus
+export const getBusInfoMap = async () => {
+  const buses = await Bus.find({}).select("busNumber busName noOfSeats");
+  const map = new Map();
+  for (const b of buses) {
+    map.set(key(b.busNumber), {
+      busName: b.busName || "",
+      noOfSeats: b.noOfSeats || "",
+    });
+  }
+  return map;
+};

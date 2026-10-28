@@ -55,7 +55,7 @@ const ParcelService = () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-        <ScreenHeader eyebrow="Tours" title="Staff" />
+        <ScreenHeader eyebrow="Manage Tours" title="Tours" />
 
         <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
           <FeatureCard

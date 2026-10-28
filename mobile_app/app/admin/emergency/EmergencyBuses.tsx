@@ -59,6 +59,7 @@ type Bus = {
   _id: string;
   busId?: number;
   busNumber: string;
+  busName?: string;
   chassisNo?: string;
   engineNo?: string;
   noOfSeats?: string;
@@ -214,6 +215,11 @@ function BusCard({ bus }: { bus: Bus }) {
       {/* Top: plate + status */}
       <View style={styles.cardTop}>
         <View style={{ flex: 1 }}>
+          {!!bus.busName && (
+            <Text style={{ fontSize: 15, fontWeight: "800", color: "#0F1B2D", marginBottom: 4 }} numberOfLines={1}>
+              {bus.busName}
+            </Text>
+          )}
           <Plate value={bus.busNumber} />
           <Text style={styles.busType} numberOfLines={1}>
             {bus.busType || "Bus type unavailable"}

@@ -29,8 +29,10 @@ import AlertBadge from "../../components/AlertBadge";
 
 import FieldError from "../../components/FieldError";
 import { useFieldErrors } from "../../utils/validation";
+import { useBusNames, getBusLabel } from "../../components/BusName";
 const JetLinkInterface: React.FC = () => {
   const params = useLocalSearchParams();
+  useBusNames();
   const [sendername, setsendername] = useState(String(params.sendername || ""));
   const [smobilenumber, Ssetmobilenumber] = useState(String(params.smobilenumber || ""));
   const [semail, ssetEmail] = useState(String(params.semail || ""));
@@ -220,7 +222,7 @@ const JetLinkInterface: React.FC = () => {
           </FormSection>
 
           <FormSection title="Parcel" subtitle="Route, weight and pickup time" icon="cube-outline" color={C.amber} bg={C.amberSoft}>
-            <FormField label="Bus number" icon="bus-outline" value={String(params.busNo ?? "")} readOnly />
+            <FormField label="Bus" icon="bus-outline" value={getBusLabel(params.busNo ?? "")} readOnly />
             <FieldRow>
               <FormField
                 label="Pickup"

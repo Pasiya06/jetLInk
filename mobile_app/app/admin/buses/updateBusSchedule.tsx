@@ -28,6 +28,7 @@ import AlertBadge from "../../../components/AlertBadge";
 
 import FieldError from "../../../components/FieldError";
 import { useFieldErrors } from "../../../utils/validation";
+import { useBusNames } from "../../../components/BusName";
 const ToursScreen: React.FC = () => {
   const router = useRouter();
   const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
@@ -35,6 +36,7 @@ const ToursScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab, setActiveTab] = useState('');
   const params = useLocalSearchParams();
+  const { busLabel } = useBusNames();
   const [busdate, setBusDate] = useState(String(params.busdate || "ANY DATE"));
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
   const [date, setDate] = useState(new Date());
@@ -137,7 +139,7 @@ const ToursScreen: React.FC = () => {
     <>
     <Stack.Screen options={{ title: "", headerShown: false }} />
     <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
-      <ScreenHeader eyebrow="Bus schedule" title={`Edit schedule${params.busNo || params.busNumber ? " · " + (params.busNo || params.busNumber) : ""}`} />
+      <ScreenHeader eyebrow="Bus schedule" title={`Edit schedule${params.busNo || params.busNumber ? " · " + busLabel(params.busNo || params.busNumber) : ""}`} />
 
       <ScrollView
         style={ui.body}

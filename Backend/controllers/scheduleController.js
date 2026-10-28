@@ -1,14 +1,17 @@
 import Schedule from "../models/Schedule.js";
 import Counter from "../models/Counter.js";
-import { getEmergencyBusMap, busKey } from "../utils/busAvailability.js";
+import { getEmergencyBusMap, getBusInfoMap, busKey } from "../utils/busAvailability.js";
 
-// Add the bus accident / breakdown status to each schedule
-const withBusStatus = (schedules, emergencyMap) =>
+// Add the bus name, seat count and accident / breakdown status to each schedule
+const withBusStatus = (schedules, emergencyMap, infoMap = new Map()) =>
   schedules.map((sch) => {
     const obj = typeof sch.toObject === "function" ? sch.toObject() : sch;
     const problem = emergencyMap.get(busKey(obj.busNo));
+    const info = infoMap.get(busKey(obj.busNo));
     return {
       ...obj,
+      busName: info ? info.busName : "",
+      noOfSeats: info ? info.noOfSeats : "",
       busStatus: problem ? problem.status : "normal",
       busEmergency: !!problem,
       busEmergencyAt: problem ? problem.emergencyAt : null,
@@ -35,11 +38,15 @@ export const addSchedule = async (req, res) => {
 // Get all schedules
 export const getSchedules = async (req, res) => {
   try {
-    const [schedules, emergencyMap] = await Promise.all([Schedule.find(), getEmergencyBusMap()]);
+    const [schedules, emergencyMap, infoMap] = await Promise.all([
+      Schedule.find(),
+      getEmergencyBusMap(),
+      getBusInfoMap(),
+    ]);
 
     res.json({
       success: true,
-      data: withBusStatus(schedules, emergencyMap),
+      data: withBusStatus(schedules, emergencyMap, infoMap),
     });
   } catch (error) {
     res.status(500).json({

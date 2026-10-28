@@ -36,6 +36,7 @@ import {
   isBusLocationSharing,
 } from "../../services/busLocationService";
 import { ScreenHeader, GradientAction, SectionLabel, Tile, IconBox, C, ui } from "../../components/JetUI";
+import { useBusNames } from "../../components/BusName";
 // ─── Environment Variables ─────────────────────────────────────────
 const API_URL     = process.env.EXPO_PUBLIC_API_URL;
 const WEATHER_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
@@ -43,6 +44,7 @@ const WEATHER_KEY = process.env.EXPO_PUBLIC_OPENWEATHER_API_KEY;
 export default function DriverHome() {
   const router  = useRouter();
   const params  = useLocalSearchParams();
+  const { busName } = useBusNames();
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState('');
@@ -317,7 +319,8 @@ export default function DriverHome() {
             <View style={styles.busRow}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.title1}>{getGreeting()} · your bus today</Text>
-                <Text style={styles.title2}>{busNum || "No Bus"}</Text>
+                <Text style={styles.title2}>{busName(busNum) || busNum || "No Bus"}</Text>
+                {!!busName(busNum) && <Text style={styles.title1}>{busNum}</Text>}
               </View>
               <IconBox bg={C.blueSoft} size={52}>
                 <MaterialIcons name="directions-bus" size={28} color={C.blue} />

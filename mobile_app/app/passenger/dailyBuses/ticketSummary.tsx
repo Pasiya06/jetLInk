@@ -24,11 +24,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import FieldError from "../../../components/FieldError";
 import { useFieldErrors } from "../../../utils/validation";
 import { ScreenHeader, SectionLabel, Pill, GradientButton, C, ui } from "../../../components/JetUI";
+import { useBusNames } from "../../../components/BusName";
 const ParcelService = () => {
     const API_URL = process.env.EXPO_PUBLIC_API_URL;
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const params = useLocalSearchParams();
+    const { busLabel } = useBusNames();
     const seatNumbers:number = 0;
     const [activeTab, setActiveTab] = useState('');
     const router = useRouter();
@@ -83,7 +85,7 @@ const ParcelService = () => {
               <Pill text={String(params.busType) === "Highway" ? "Highway" : "Normal"} />
               <View style={styles.busTag}>
                 <Ionicons name="bus-outline" size={15} color={C.blue} />
-                <Text style={styles.busTagText}>{params.bNumber}</Text>
+                <Text style={styles.busTagText}>{busLabel(params.bNumber)}</Text>
               </View>
             </View>
 

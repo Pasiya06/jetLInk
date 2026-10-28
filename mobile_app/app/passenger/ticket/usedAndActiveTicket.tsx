@@ -28,6 +28,7 @@ import {
 
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenHeader, EmptyState, ParcelRow, C } from "../../../components/JetUI";
+import { useBusNames } from "../../../components/BusName";
 
 interface ticket {
   _id: string;
@@ -58,6 +59,7 @@ type TicketListItem =
 const JetLinkInterface: React.FC = () => {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const params = useLocalSearchParams();
+  const { busLabel } = useBusNames();
   const router = useRouter();
 
   const [activeTab, setActiveTab] = useState('');
@@ -355,7 +357,7 @@ const JetLinkInterface: React.FC = () => {
         to={item.drop}
         date={item.date}
         time={item.time}
-        bus={item.bNumber}
+        bus={busLabel(item.bNumber)}
         status="Active"
       />
     </TouchableOpacity>
@@ -384,7 +386,7 @@ const JetLinkInterface: React.FC = () => {
         to={item.drop}
         date={item.date}
         time={item.time}
-        bus={item.bNumber}
+        bus={busLabel(item.bNumber)}
         status="Used"
         muted
       />

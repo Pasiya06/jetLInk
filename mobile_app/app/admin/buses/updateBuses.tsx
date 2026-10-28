@@ -27,6 +27,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
 
 import FieldError from "../../../components/FieldError";
+import { loadBusNames } from "../../../components/BusName";
 import { useFieldErrors } from "../../../utils/validation";
 const ToursScreen: React.FC = () => {
   const router = useRouter();
@@ -37,7 +38,8 @@ const ToursScreen: React.FC = () => {
   const params = useLocalSearchParams();
   const [chassisNo, setChassisNo] = useState(String(params.chassis || ""));
   const [engineNo, setEngineNo] = useState(String(params.engine || ""));
-  const [noOfSeats, setnoOfSeats] = useState("");
+  const [busName, setBusName] = useState(String(params.busName || ""));
+  const [noOfSeats, setnoOfSeats] = useState(String(params.noOfSeats || ""));
   const [colour, setColour] = useState(String(params.colour || ""));
   const [serviceDate, setServiceDate] = useState(String(params.serviceDate || ""));
   const [licenseDate, setLicenseDate] = useState(String(params.licenseDate || ""));
@@ -48,6 +50,7 @@ const ToursScreen: React.FC = () => {
   const [showCalendar2, setShowCalendar2] = useState<boolean>(false);
   const handleUpdate = async () => {
     if (!validateFields([
+      { key: "busName", label: "Bus name", value: busName },
       { key: "chassisNo", label: "Chassis number", value: chassisNo },
       { key: "engineNo", label: "Engine number", value: engineNo },
       { key: "noOfSeats", label: "Number of seats", value: noOfSeats, type: "int" },
@@ -59,11 +62,12 @@ const ToursScreen: React.FC = () => {
 
 
     try{
-        if (!chassisNo || !engineNo  || !colour || !serviceDate  || !licenseDate || !emissionDate) {
+        if (!busName.trim() || !chassisNo || !engineNo  || !colour || !serviceDate  || !licenseDate || !emissionDate) {
             Alert.alert("Missing details", "Please fill in all the required fields.");
             return;
         }
         await updateBus(params.Bid as string,{
+            busName: busName.trim(),
             chassisNo,
             engineNo,
             noOfSeats,
@@ -73,6 +77,7 @@ const ToursScreen: React.FC = () => {
             emissionDate
         });
 
+        loadBusNames(true);
         Alert.alert("Updated successfully", "Your changes have been saved.");
 
         router.push({
@@ -116,6 +121,17 @@ const ToursScreen: React.FC = () => {
               value={String(params.busNumber || params.busNum || "")}
               readOnly
               hint="The bus number can't be changed"
+            />
+            <FormField
+              label="Bus name"
+              icon="bus-outline"
+              value={busName}
+              onChangeText={(text) => setBusName(text.replace(/\s/g, "").toUpperCase())}
+              placeholder="GALLE-MATARA or DAM RAJINI"
+              autoCorrect={false}
+              autoCapitalize="characters"
+              maxLength={40}
+              error={fieldError("busName", busName)}
             />
             <FormField
               label="Chassis number"

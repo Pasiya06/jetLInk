@@ -23,12 +23,14 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import QRCode from 'react-native-qrcode-svg';
 import { ScreenHeader, GradientButton, C, ui } from "../../../components/JetUI";
+import { useBusNames } from "../../../components/BusName";
 
 const ParcelService = () => {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const params = useLocalSearchParams();
+  const { busLabel } = useBusNames();
   const selectedSeatNumbers = params.seatNumbers ? JSON.parse(params.seatNumbers as string): [];
   const [activeTab, setActiveTab] = useState('');
   const router = useRouter();
@@ -202,7 +204,7 @@ const ParcelService = () => {
           <View style={styles.grid}>
             <View style={styles.gridItem}>
               <Text style={styles.gridLabel}>Bus number</Text>
-              <Text style={styles.gridValue}>{params.bNumber}</Text>
+              <Text style={styles.gridValue}>{busLabel(params.bNumber)}</Text>
             </View>
             <View style={styles.gridItem}>
               <Text style={styles.gridLabel}>Seats</Text>

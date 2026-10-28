@@ -9,7 +9,10 @@ import {
   SafeAreaView,
   FlatList,
   ScrollView,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
+import BusCard, { BusCardAction } from "../../../components/BusCard";
 import { BusStatusNotice, isBusBlocked } from "../../../components/BusStatus";
 import SearchPanel from "../../../components/SearchPanel";
 import { Alert } from "../../../components/JetAlert";
@@ -26,6 +29,8 @@ interface Bus {
   driverD: string;
   conductorD: string;
   busNumber: string;
+  busName?: string;
+  noOfSeats?: string;
   chassisNo?: string;
   engineNo?: string;
   colour?: string;
@@ -48,6 +53,9 @@ const BusScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [busData, setBusData] = useState<Bus[]>([]);
   const [activeTab, setActiveTab] = useState('');
+  const [filter, setFilter] = useState<"all" | "online" | "offline" | "alerts">("all");
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
   
@@ -66,15 +74,14 @@ const BusScreen: React.FC = () => {
       );
 
       setBusData(typeOfBuses);
-
-      
-
     } catch (error) {
       console.log("Error details:", error);
       Alert.alert(
-        "Network Error",
-        "Unable to load data elements from database server context."
+        "Couldn't load buses",
+        "Please check your internet connection and try again."
       );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -143,115 +150,188 @@ const BusScreen: React.FC = () => {
     );
   };
   
-  const renderBusItem = ({ item }: { item: Bus }) => (
-    <TouchableOpacity style={styles.friendRow}
-      onPress={() =>
-        router.push({
-          pathname: "/admin/buses/busProfile",
-          params: {
-            Bid: item._id, 
-            busId: String(item.busId),
-            busNumber: item.busNumber,
-            chassis: item.chassisNo || "",
-            engine: item.engineNo || "",
-            colour: item.colour || "",
-            serviceDate: item.serviceDate || "",
-            licenseDate: item.licenseDate || "",
-            emissionDate: item.emissionDate || "",
-            busType: item.busType || "",
-            driverNIC: item.driverNIC,
-            conductorNIC: item.conductorNIC,
-            driverD: item.driverD,
-            conductorD: item.conductorD,
-            isOnline: item.isOnline,
+  const isOnlineBus = (b: Bus) => String(b.isOnline) === "true";
 
+  const openProfile = (item: Bus) =>
+    router.push({
+      pathname: "/admin/buses/busProfile",
+      params: {
+        Bid: item._id,
+        busId: String(item.busId),
+        busNumber: item.busNumber,
+        busName: item.busName || "",
+        noOfSeats: String(item.noOfSeats || ""),
+        chassis: item.chassisNo || "",
+        engine: item.engineNo || "",
+        colour: item.colour || "",
+        serviceDate: item.serviceDate || "",
+        licenseDate: item.licenseDate || "",
+        emissionDate: item.emissionDate || "",
+        busType: item.busType || "",
+        driverNIC: item.driverNIC,
+        conductorNIC: item.conductorNIC,
+        driverD: item.driverD,
+        conductorD: item.conductorD,
+        isOnline: item.isOnline,
+        busTypeTopic: params.busTypeTopic,
+        Aid: params.Aid,
+        firstName: params.firstName,
+        lastName: params.lastName,
+        email: params.email,
+      },
+    });
 
-            busTypeTopic:params.busTypeTopic,
+  const openLocation = (item: Bus) =>
+    router.push({
+      pathname: "/admin/buses/loaction",
+      params: {
+        Bid: item._id,
+        busId: String(item.busId),
+        busNum: item.busNumber,
+        busName: item.busName || "",
+        noOfSeats: String(item.noOfSeats || ""),
+        chassis: item.chassisNo || "",
+        engine: item.engineNo || "",
+        colour: item.colour || "",
+        fuel: item.fuelType || "",
+        serviceDate: item.serviceDate || "",
+        licenseDate: item.licenseDate || "",
+        emissionDate: item.emissionDate || "",
+        busType: item.busType || "",
+        busTypeTopic: params.busTypeTopic,
+        Aid: params.Aid,
+        firstName: params.firstName,
+        lastName: params.lastName,
+        email: params.email,
+      },
+    });
 
-            Aid: params.Aid,
-            firstName: params.firstName,
-            lastName: params.lastName,
-            email: params.email,
-          },
-        })
-      }
-    >
-      
-      <View style={styles.profileCircle}>
-        <Fontisto name={"bus"} size={20} color={C.amber} />
-      </View>
-      <View style={{ flex: 1, marginLeft: 12 }}>
-        <Text style={styles.friendName}>{item.busNumber}</Text>
-        <Text style={styles.friendSub}>{String(params.busTypeTopic || item.busType || "Bus")}</Text>
-        {isBusBlocked(item) && (
-          <View style={{ marginTop: 8 }}>
-            <BusStatusNotice item={item} note="Passengers can't book this bus until the emergency is resolved." />
-          </View>
-        )}
-      </View>
-      <TouchableOpacity style={styles.iconButton} accessibilityLabel={`Show location of ${item.busNumber}`}>
-        <MaterialIcons name="location-on" size={22} color={C.green} 
-        onPress={() =>
-        router.push({
-          pathname: "/admin/buses/loaction",
-          params: {
-            Bid: item._id, 
-            busId: String(item.busId),
-            busNum: item.busNumber,
-            chassis: item.chassisNo || "",
-            engine: item.engineNo || "",
-            colour: item.colour || "",
-            fuel: item.fuelType || "",
-            serviceDate: item.serviceDate || "",
-            licenseDate: item.licenseDate || "",
-            emissionDate: item.emissionDate || "",
-            busType: item.busType || "",
-            busTypeTopic:params.busTypeTopic,
+  const renderBusItem = ({ item }: { item: Bus }) => {
+    const online = isOnlineBus(item);
+    return (
+      <BusCard
+        bus={item}
+        statusLabel={online ? "Online" : "Offline"}
+        tone={online ? "green" : "grey"}
+        onPress={() => openProfile(item)}
+        blockedNote="Passengers can't book this bus until the emergency is resolved."
+        footer={
+          <>
+            <View style={styles.crew}>
+              <Ionicons name="people-outline" size={15} color={C.muted} />
+              <Text style={styles.crewText} numberOfLines={1}>
+                {crewText(item)}
+              </Text>
+            </View>
+            <BusCardAction
+              icon="location-outline"
+              label="Track"
+              tone="green"
+              onPress={() => openLocation(item)}
+              accessibilityLabel={`Show location of ${item.busName || item.busNumber}`}
+            />
+            <BusCardAction
+              icon="trash-outline"
+              tone="red"
+              onPress={() => deleteBus(item._id)}
+              accessibilityLabel={`Delete ${item.busName || item.busNumber}`}
+            />
+          </>
+        }
+      />
+    );
+  };
 
-            Aid: params.Aid,
-            firstName: params.firstName,
-            lastName: params.lastName,
-            email: params.email,
-          },
-        })
-      }
-      />    
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.deleteButton} onPress={() => deleteBus(item._id)} accessibilityLabel={`Delete ${item.busNumber}`}>
-        <Ionicons name="trash-outline" size={21} color={C.red} />
-      </TouchableOpacity>
-      
-    </TouchableOpacity>
+  const q = searchQuery.trim().toLowerCase();
+  const searchedBuses = busData.filter(bus =>
+    bus.busNumber.toLowerCase().includes(q) ||
+    (bus.busName || "").toLowerCase().includes(q)
+  );
+  const counts = {
+    all: busData.length,
+    online: busData.filter(isOnlineBus).length,
+    alerts: busData.filter((b) => isBusBlocked(b)).length,
+  };
+  const filteredBusData = searchedBuses.filter((b) =>
+    filter === "online" ? isOnlineBus(b) :
+    filter === "offline" ? !isOnlineBus(b) :
+    filter === "alerts" ? isBusBlocked(b) : true
   );
 
-  const filteredBusData = busData.filter(bus => 
-    bus.busNumber.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const FILTERS: { key: typeof filter; label: string }[] = [
+    { key: "all", label: "All" },
+    { key: "online", label: "Online" },
+    { key: "offline", label: "Offline" },
+    { key: "alerts", label: "Alerts" },
+  ];
 
   return (
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-        <ScreenHeader eyebrow="Manage all buses" title={String(params.busTypeTopic || "Buses")} />
+        <ScreenHeader eyebrow="Fleet management" title={String(params.busTypeTopic || "Buses")} />
 
         <View style={[ui.body, { paddingHorizontal: 16 }]}>
-          <SearchBox value={searchQuery} onChangeText={setSearchQuery} placeholder="Search by bus number" />
-          <SectionLabel style={{ marginTop: 18, marginBottom: 10 }} right={<Pill text={`${filteredBusData.length} listed`} />}>
-            Buses
-          </SectionLabel>
+          {/* Fleet overview */}
+          <View style={[ui.card, styles.stats]}>
+            <Stat value={counts.all} label="Total buses" icon="bus" color={C.blue} bg={C.blueSoft} />
+            <View style={styles.statDivider} />
+            <Stat value={counts.online} label="Online now" icon="radio-outline" color={C.green} bg={C.greenSoft} />
+            <View style={styles.statDivider} />
+            <Stat value={counts.alerts} label="Alerts" icon="warning-outline" color={counts.alerts ? C.red : C.muted} bg={counts.alerts ? C.redSoft : "#EEF2F7"} />
+          </View>
+
+          <View style={{ marginTop: 14 }}>
+            <SearchBox value={searchQuery} onChangeText={setSearchQuery} placeholder="Search by bus name or number" />
+          </View>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.chipsScroll}
+            contentContainerStyle={styles.chips}
+          >
+            {FILTERS.map((f) => {
+              const active = filter === f.key;
+              const n = f.key === "offline" ? counts.all - counts.online : counts[f.key as "all" | "online" | "alerts"];
+              return (
+                <TouchableOpacity
+                  key={f.key}
+                  onPress={() => setFilter(f.key)}
+                  activeOpacity={0.85}
+                  style={[styles.chip, active && styles.chipActive]}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: active }}
+                >
+                  <Text style={[styles.chipText, active && styles.chipTextActive]}>{f.label}</Text>
+                  <View style={[styles.chipCount, active && styles.chipCountActive]}>
+                    <Text style={[styles.chipCountText, active && { color: "#FFFFFF" }]}>{n}</Text>
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+
           <FlatList
             style={{ flex: 1 }}
             data={filteredBusData}
             renderItem={renderBusItem}
             keyExtractor={(item) => item._id}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 250 }}
+            contentContainerStyle={{ paddingTop: 4, paddingBottom: 250 }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await loadBuses(); setRefreshing(false); }} tintColor={C.blue} colors={[C.blue]} />
+            }
             ListEmptyComponent={
-              <EmptyState
-                icon={<Fontisto name="bus" size={26} color={C.amber} />}
-                title="No buses yet"
-                subtitle="Tap Add bus to register one."
-              />
+              loading ? (
+                <ActivityIndicator size="large" color={C.blue} style={{ marginTop: 40 }} />
+              ) : (
+                <EmptyState
+                  icon={<Fontisto name="bus" size={26} color={C.amber} />}
+                  title={busData.length ? "No matching buses" : "No buses yet"}
+                  subtitle={busData.length ? "Try another search or filter." : "Tap Add bus to register one."}
+                />
+              )
             }
           />
         </View>
@@ -359,7 +439,69 @@ const BusScreen: React.FC = () => {
   );
 };
 
+// Driver / conductor shown in the card footer
+const crewText = (b: Bus) => {
+  const loggedIn = (v?: string) => !!v && !/not\s*login/i.test(v);
+  const names = [b.driverD, b.conductorD].filter(loggedIn);
+  return names.length ? names.join(" · ") : "No crew logged in";
+};
+
+function Stat({
+  value,
+  label,
+  icon,
+  color,
+  bg,
+}: {
+  value: number;
+  label: string;
+  icon: React.ComponentProps<typeof Ionicons>["name"];
+  color: string;
+  bg: string;
+}) {
+  return (
+    <View style={styles.stat}>
+      <View style={[styles.statIcon, { backgroundColor: bg }]}>
+        <Ionicons name={icon} size={17} color={color} />
+      </View>
+      <Text style={styles.statValue}>{value}</Text>
+      <Text style={styles.statLabel} numberOfLines={1}>{label}</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  stats: { flexDirection: "row", alignItems: "center", paddingVertical: 16, paddingHorizontal: 8 },
+  stat: { flex: 1, alignItems: "center" },
+  statIcon: { width: 34, height: 34, borderRadius: 11, alignItems: "center", justifyContent: "center", marginBottom: 8 },
+  statValue: { fontSize: 22, fontWeight: "800", color: C.ink },
+  statLabel: { fontSize: 12, fontWeight: "600", color: C.muted, marginTop: 1 },
+  statDivider: { width: 1, alignSelf: "stretch", backgroundColor: C.line, marginVertical: 6 },
+
+  chipsScroll: { flexGrow: 0, marginTop: 14, marginBottom: 10 },
+  chips: { gap: 8, paddingRight: 8 },
+  chip: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    height: 38,
+    paddingLeft: 14,
+    paddingRight: 8,
+    borderRadius: 19,
+    backgroundColor: C.card,
+    borderWidth: 1,
+    borderColor: "#E2E8F0",
+  },
+  chipActive: { backgroundColor: C.navy, borderColor: C.navy },
+  chipText: { fontSize: 13.5, fontWeight: "700", color: C.ink },
+  chipTextActive: { color: "#FFFFFF" },
+  chipCount: { minWidth: 24, height: 22, borderRadius: 11, paddingHorizontal: 7, backgroundColor: "#EEF2F7", alignItems: "center", justifyContent: "center" },
+  chipCountActive: { backgroundColor: "rgba(255,255,255,0.2)" },
+  chipCountText: { fontSize: 12, fontWeight: "800", color: C.muted },
+
+  crew: { flex: 1, flexDirection: "row", alignItems: "center", gap: 6, marginRight: 4 },
+  crewText: { flex: 1, fontSize: 12.5, fontWeight: "600", color: C.muted },
+
   container:{
     flex:1,
     backgroundColor:C.bg

@@ -21,6 +21,13 @@ const busSchema = new mongoose.Schema({
     unique: true,
   },
 
+  // Display name of the bus, e.g. "Jetlink Express"
+  busName: {
+    type: String,
+    trim: true,
+    default: "",
+  },
+
   noOfSeats: String,
   
   colour: String,

@@ -18,6 +18,7 @@ import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons, MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
 import ParcelQRDialog from "@/components/ParcelQRDialog"; // adjust path to wherever you saved it
 import AlertBadge from "../../../components/AlertBadge";
+import { useBusNames, getBusLabel, getBusTitle } from "../../../components/BusName";
 
 // ─── Types ────────────────────────────────────────────────────────
 interface BusLocationData {
@@ -36,6 +37,7 @@ interface BusLocationData {
 const PassengerTrackScreen: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
+  useBusNames();
   const mapRef = useRef<MapView>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -155,7 +157,7 @@ const PassengerTrackScreen: React.FC = () => {
           latitude: bus.latitude,
           longitude: bus.longitude,
         }}
-        title={`Bus ${busNumber}`}
+        title={getBusTitle(busNumber)}
         description={`Speed: ${bus.speed?.toFixed(1) ?? 0} km/h`}
         rotation={bus.heading || 0}
         anchor={{ x: 0.5, y: 0.5 }}
@@ -224,7 +226,7 @@ const PassengerTrackScreen: React.FC = () => {
           <View style={styles.headerInfo1}>
             <View style={styles.headerInfo}>
               <Text style={styles.headerEyebrow}>Parcel on the way</Text>
-              <Text style={styles.headerTitle}>Bus {busNumber}</Text>
+              <Text style={styles.headerTitle}>{getBusTitle(busNumber)}</Text>
               <View style={styles.statusPillStyle}>
                 <View style={styles.dotWrap}>
                   {isOnline && (

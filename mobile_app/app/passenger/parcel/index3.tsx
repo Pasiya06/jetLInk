@@ -36,6 +36,7 @@ interface Bussched {
   depaturetime?:string;
   stops?:string;
   busNo?:string;
+  busName?: string;
   busStatus?:string;
   busEmergency?:boolean;
   busEmergencyAt?:string;
@@ -141,7 +142,7 @@ const JetLinkInterface: React.FC = () => {
         <View style={styles.topRow}>
           <View style={styles.busNoPill}>
             <Ionicons name="bus" size={14} color="#155B8A" />
-            <Text style={styles.busNoText}>{item.busNo}</Text>
+            <Text style={styles.busNoText}>{item.busName ? `${item.busName} · ${item.busNo}` : item.busNo}</Text>
           </View>
           <Text style={styles.dateText}>{params.date}</Text>
         </View>

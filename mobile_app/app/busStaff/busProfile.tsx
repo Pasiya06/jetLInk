@@ -22,6 +22,7 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL;
 type Bus = {
   busId?: number;
   busNumber: string;
+  busName?: string;
   chassisNo?: string;
   engineNo?: string;
   noOfSeats?: string;
@@ -153,7 +154,7 @@ export default function BusStaffBusProfile() {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
-        <ScreenHeader eyebrow="My bus" title={bus?.busNumber || busNo || "Bus profile"} />
+        <ScreenHeader eyebrow="My bus" title={bus?.busName || bus?.busNumber || busNo || "Bus profile"} />
 
         <ScrollView
           style={ui.body}
@@ -167,7 +168,8 @@ export default function BusStaffBusProfile() {
                 <MaterialIcons name="directions-bus" size={32} color="#fff" />
               </LinearGradient>
               <View style={{ marginLeft: 14, flex: 1 }}>
-                <Text style={styles.busNumber}>{bus?.busNumber || busNo || "—"}</Text>
+                {!!bus?.busName && <Text style={styles.busNumber}>{bus.busName}</Text>}
+                <Text style={bus?.busName ? { fontSize: 14, fontWeight: "700", color: "#5B6B7F", marginTop: 2 } : styles.busNumber}>{bus?.busNumber || busNo || "—"}</Text>
                 <View style={styles.badgeRow}>
                   {bus?.busType ? (
                     <Pill text={BUS_TYPE_LABEL[bus.busType] ?? bus.busType} bg={C.blueSoft} color={C.blue} />
@@ -222,6 +224,7 @@ export default function BusStaffBusProfile() {
 
               <View style={[ui.card, styles.sectionCard]}>
                 <Text style={styles.section}>Bus details</Text>
+                <InfoRow icon={<MaterialIcons name="directions-bus" size={18} color={C.blue} />} label="Bus name" value={bus?.busName || undefined} />
                 <InfoRow icon={<Ionicons name="pricetag-outline" size={18} color={C.blue} />} label="Bus ID" value={bus?.busId != null ? `#${bus.busId}` : undefined} />
                 <InfoRow icon={<MaterialCommunityIcons name="car-cog" size={18} color={C.blue} />} label="Chassis number" value={bus?.chassisNo} />
                 <InfoRow icon={<MaterialCommunityIcons name="engine-outline" size={18} color={C.blue} />} label="Engine number" value={bus?.engineNo} />

@@ -24,6 +24,7 @@ import {
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 
 import { LinearGradient } from 'expo-linear-gradient';
+import { useBusNames, getBusLabel } from "../../../components/BusName";
 
 
 const { width } = Dimensions.get('window');
@@ -51,6 +52,7 @@ export default function PackageReceipt() {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const router = useRouter();
   const params = useLocalSearchParams();
+  useBusNames();
   const receiptId = params.receiptId as string;
   
   const maxPrice:string = "50942272";
@@ -281,7 +283,7 @@ export default function PackageReceipt() {
                 <View style={styles.tripleCell}>
                   <MaterialCommunityIcons name="bus" size={18} color={C.blue} />
                   <Text style={styles.tripleValue} numberOfLines={1}>
-                    {params.busNumber || "-"}
+                    {params.busNumber ? getBusLabel(params.busNumber) : "-"}
                   </Text>
                   <Text style={styles.tripleLabel}>Bus</Text>
                 </View>

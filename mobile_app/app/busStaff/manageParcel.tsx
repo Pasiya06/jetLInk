@@ -23,11 +23,13 @@ import {
 import { LinearGradient } from 'expo-linear-gradient'; 
 import AlertBadge from "../../components/AlertBadge";
 import { ScreenHeader, FeatureCard, RowCard, SectionLabel, Pill, C, ui } from "../../components/JetUI";
+import { useBusNames, getBusLabel, getBusTitle } from "../../components/BusName";
 
 const ParcelService = () => {
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const params = useLocalSearchParams();
+    useBusNames();
 
     const [activeTab, setActiveTab] = useState('');
     const router = useRouter();
@@ -91,7 +93,7 @@ const ParcelService = () => {
     <>
       <Stack.Screen options={{ title: "", headerShown: false }} />
       <SafeAreaView style={styles.container}>
-        <ScreenHeader eyebrow={params.busNo ? `Bus ${params.busNo}` : "Bus staff"} title="Parcels" />
+        <ScreenHeader eyebrow={params.busNo ? getBusTitle(params.busNo) : "Bus staff"} title="Parcels" />
 
         <ScrollView style={ui.body} contentContainerStyle={ui.bodyContent} showsVerticalScrollIndicator={false}>
           <FeatureCard

@@ -119,6 +119,8 @@ export const checkBusNumber = async (req, res) => {
         _id: bus._id,
         busId: bus.busId,
         busNumber: bus.busNumber,
+        busName: bus.busName || "",
+        noOfSeats: bus.noOfSeats || "",
         
       },
     });

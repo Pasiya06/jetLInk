@@ -17,6 +17,7 @@ import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import FieldError from "../../../components/FieldError";
 import { useFieldErrors } from "../../../utils/validation";
+import { useBusNames, getBusLabel } from "../../../components/BusName";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -40,6 +41,7 @@ const lkr = (n: number) => `LKR ${Number(n || 0).toLocaleString()}`;
 export default function ExtraKmScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  useBusNames();
   const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
   const receiptId = String(params.receiptId ?? "");
 
@@ -218,7 +220,7 @@ export default function ExtraKmScreen() {
                     <Text style={styles.muted}>{booking?.date} · {booking?.time}</Text>
                   </View>
                   <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{booking?.busNumber}</Text>
+                    <Text style={styles.badgeText}>{getBusLabel(booking?.busNumber)}</Text>
                   </View>
                 </View>
                 <View style={styles.pickupChip}>

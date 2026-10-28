@@ -18,6 +18,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons, MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
 import AlertBadge from "../../components/AlertBadge";
+import { useBusNames } from "../../components/BusName";
 
 // ─── Types ────────────────────────────────────────────────────────
 interface BusLocationData {
@@ -36,6 +37,7 @@ interface BusLocationData {
 const PassengerTrackScreen: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const { busLabel } = useBusNames();
   const mapRef = useRef<MapView>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -155,7 +157,7 @@ const PassengerTrackScreen: React.FC = () => {
           latitude: bus.latitude,
           longitude: bus.longitude,
         }}
-        title={`Bus ${busNumber}`}
+        title={busLabel(busNumber) === busNumber ? `Bus ${busNumber}` : busLabel(busNumber)}
         description={`Speed: ${bus.speed?.toFixed(1) ?? 0} km/h`}
         rotation={bus.heading || 0}
         anchor={{ x: 0.5, y: 0.5 }}
@@ -202,7 +204,7 @@ const PassengerTrackScreen: React.FC = () => {
 
           <View style={styles.headerInfo}>
             <Text style={styles.headerEyebrow}>My live location</Text>
-            <Text style={styles.headerTitle}>Bus {busNumber}</Text>
+            <Text style={styles.headerTitle}>{busLabel(busNumber) === busNumber ? `Bus ${busNumber}` : busLabel(busNumber)}</Text>
             <View style={styles.statusPillStyle}>
               <View style={styles.dotWrap}>
                 {isOnline && (

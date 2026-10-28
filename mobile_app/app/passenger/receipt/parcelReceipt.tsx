@@ -28,6 +28,7 @@ import {
 
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenHeader, EmptyState, ParcelRow, C } from "../../../components/JetUI";
+import { useBusNames, getBusLabel } from "../../../components/BusName";
 
 interface parcel {
   _id: string;
@@ -61,6 +62,7 @@ type ParcelListItem =
 const JetLinkInterface: React.FC = () => {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   const params = useLocalSearchParams();
+  useBusNames();
   const router = useRouter();
   
   const [activeTab, setActiveTab] = useState('');
@@ -336,7 +338,7 @@ const JetLinkInterface: React.FC = () => {
         to={item.drop}
         date={item.date}
         time={item.time}
-        bus={item.Bnumber}
+        bus={getBusLabel(item.Bnumber)}
       />
     </TouchableOpacity>
   );
@@ -363,7 +365,7 @@ const JetLinkInterface: React.FC = () => {
         to={item.drop}
         date={item.date}
         time={item.time}
-        bus={item.Bnumber}
+        bus={getBusLabel(item.Bnumber)}
         delivered
       />
     </TouchableOpacity>

@@ -24,6 +24,8 @@ interface Bus {
   driverD: string;
   conductorD: string;
   busNumber: string;
+  busName?: string;
+  noOfSeats?: string;
   chassisNo?: string;
   engineNo?: string;
   colour?: string;
@@ -120,8 +122,11 @@ const BusScreen: React.FC = () => {
         <Fontisto name="bus" size={20} color={C.blue} />
       </View>
       <View style={{ flex: 1, marginLeft: 12 }}>
-        <Text style={styles.busRowTitle}>{item.busNumber}</Text>
-        <Text style={styles.busRowSub}>Tap to add a schedule</Text>
+        <Text style={styles.busRowTitle}>{item.busName || item.busNumber}</Text>
+        <Text style={styles.busRowSub}>
+          {item.busName ? `${item.busNumber}  •  ` : ""}
+          {item.noOfSeats ? `${item.noOfSeats} seats  •  ` : ""}Tap to add a schedule
+        </Text>
       </View>
       <View style={styles.rowArrow}>
         <Ionicons name="add" size={20} color={C.blue} />
@@ -129,8 +134,9 @@ const BusScreen: React.FC = () => {
     </TouchableOpacity>
   );
 
-  const filteredBusData = busData.filter(bus => 
-    bus.busNumber.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredBusData = busData.filter(bus =>
+    bus.busNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (bus.busName || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (

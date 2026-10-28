@@ -19,11 +19,13 @@ import {
 from '@expo/vector-icons'; 
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenHeader, C, ui } from "../../../components/JetUI";
+import { useBusNames } from "../../../components/BusName";
 
 const ParcelService = () => {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const params = useLocalSearchParams();
+  const { busLabel } = useBusNames();
   const selectedSeatNumbers = params.seatNumbers ? JSON.parse(params.seatNumbers as string): [];
   const [activeTab, setActiveTab] = useState('');
   const router = useRouter();
@@ -82,7 +84,7 @@ const ParcelService = () => {
             </View>
             <View style={styles.gridItem}>
               <Text style={styles.gridLabel}>Bus number</Text>
-              <Text style={styles.gridValue}>{params.bNumber}</Text>
+              <Text style={styles.gridValue}>{busLabel(params.bNumber)}</Text>
             </View>
             <View style={styles.gridItem}>
               <Text style={styles.gridLabel}>Seats</Text>

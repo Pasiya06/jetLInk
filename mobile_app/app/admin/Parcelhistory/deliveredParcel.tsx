@@ -19,11 +19,13 @@ import { Ionicons,
   FontAwesome, Feather } from '@expo/vector-icons'; 
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
+import { useBusNames, getBusLabel } from "../../../components/BusName";
 
 const ParcelService = () => {
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const params = useLocalSearchParams();
+    useBusNames();
     const [activeTab, setActiveTab] = useState('');
     const router = useRouter();
     
@@ -68,7 +70,7 @@ const ParcelService = () => {
             <DetailLine icon="barbell-outline" label="Weight" value={params.weight ? `${params.weight} kg` : ""} color={C.amber} />
             <DetailLine icon="location-outline" label="Pickup" value={String(params.pickup || "")} color={C.amber} />
             <DetailLine icon="flag-outline" label="Drop-off" value={String(params.drop || "")} color={C.amber} />
-            <DetailLine icon="bus-outline" label="Bus" value={String(params.Bnumber || "")} color={C.amber} />
+            <DetailLine icon="bus-outline" label="Bus" value={getBusLabel(params.Bnumber || "")} color={C.amber} />
             <DetailLine icon="cash-outline" label="Total fare" value={params.totalFare ? `Rs. ${params.totalFare}` : ""} color={C.amber} last />
           </View>
         </ScrollView>

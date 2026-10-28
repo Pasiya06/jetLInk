@@ -25,6 +25,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
 import { formatEmergencyTime, emergencyTimeAgo } from "../../../utils/emergencyTime";
+import { useBusNames } from "../../../components/BusName";
 
 type EmergencyStatus = "normal" | "accident" | "breakdown";
 
@@ -36,6 +37,7 @@ export default function EmergencyButton() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab, setActiveTab] = useState('');
   const params = useLocalSearchParams();
+  const { busName } = useBusNames();
   const [emergency, setEmergency] = useState(false);
   const [status, setStatus] = useState<EmergencyStatus>("normal");
   const [emergencyAt, setEmergencyAt] = useState<string | null>(null);
@@ -123,7 +125,7 @@ export default function EmergencyButton() {
 
               Alert.alert(
                 "Emergency Reported",
-                `Bus ${busNumber}: ${emergencyType.toUpperCase()}`
+                `Bus ${busName(busNumber) ? `${busName(busNumber)} (${busNumber})` : busNumber}: ${emergencyType.toUpperCase()}`
               );
             } catch (error) {
               Alert.alert(
@@ -227,6 +229,11 @@ export default function EmergencyButton() {
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Bus Emergency</Text>
 
+          {!!busName(busNumber) && (
+            <Text style={styles.busNumber}>
+                Bus Name: {busName(busNumber)}
+            </Text>
+          )}
           <Text style={styles.busNumber}>
               Bus Number: {busNumber}
           </Text>

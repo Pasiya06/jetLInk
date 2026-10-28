@@ -22,10 +22,12 @@ import AlertBadge from "../../../components/AlertBadge";
 
 
 import FieldError from "../../../components/FieldError";
+import { loadBusNames } from "../../../components/BusName";
 import { useFieldErrors } from "../../../utils/validation";
 const AddBus = () => {
   const params = useLocalSearchParams();
   const [busNumber, setBusNumber] = useState("");
+  const [busName, setBusName] = useState("");
   const [chassisNo, setChassisNo] = useState("");
   const [engineNo, setEngineNo] = useState("");
   const [colour, setColour] = useState("");
@@ -69,6 +71,7 @@ const AddBus = () => {
 
   const handleAddBus = async () => {
     if (!validateFields([
+      { key: "busName", label: "Bus name", value: busName },
       { key: "busNumber", label: "Bus number", value: busNumber },
       { key: "chassisNo", label: "Chassis number", value: chassisNo },
       { key: "engineNo", label: "Engine number", value: engineNo },
@@ -79,7 +82,7 @@ const AddBus = () => {
       { key: "emissionDate", label: "Emission date", value: emissionDate },
     ])) return;
 
-    if (!busNumber || !chassisNo || !engineNo  || !colour || !serviceDate  || !licenseDate || !emissionDate) {
+    if (!busName.trim() || !busNumber || !chassisNo || !engineNo  || !colour || !serviceDate  || !licenseDate || !emissionDate) {
       Alert.alert("Missing details", "Please fill in all the required fields.");
       return;
     }
@@ -95,6 +98,7 @@ const AddBus = () => {
             conductorNIC,
             driverD,
             conductorD,
+            busName: busName.trim(),
             busNumber,
             chassisNo,
             engineNo,
@@ -110,6 +114,7 @@ const AddBus = () => {
       const data = await response.json();
 
       if (data.success) {
+        loadBusNames(true);
         Alert.alert("Bus added", "The bus was added successfully.");
 
         router.push({
@@ -146,6 +151,17 @@ const AddBus = () => {
           keyboardShouldPersistTaps="handled"
         >
           <FormSection title="Bus details" subtitle="Registration and vehicle numbers" icon="bus-outline">
+            <FormField
+              label="Bus name"
+              icon="bus-outline"
+              value={busName}
+              onChangeText={(text) => setBusName(text.replace(/\s/g, "").toUpperCase())}
+              placeholder="GALLE-MATARA or DAM RAJINI"
+              autoCorrect={false}
+              autoCapitalize="characters"
+              maxLength={40}
+              error={fieldError("busName", busName)}
+            />
             <FormField
               label="Bus number"
               icon="pricetag-outline"

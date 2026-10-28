@@ -176,7 +176,7 @@ export default function Index() {
               icon={<SimpleLineIcons name="people" size={20} color={C.green} />}
               iconBg={C.greenSoft}
               title="Friend"
-              subtitle="Find a friend's bus"
+              subtitle="Find a friend"
               onPress={() =>
                 router.push({
                   pathname: "/passenger/friend/index1",

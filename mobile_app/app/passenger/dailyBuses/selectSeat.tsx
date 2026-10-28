@@ -21,6 +21,7 @@ import { Ionicons,
   FontAwesome5, 
   FontAwesome } from '@expo/vector-icons'; // Standard icon sets
   import { LinearGradient } from 'expo-linear-gradient';
+import { useBusNames } from "../../../components/BusName";
 
 type SeatStatus = 'available' | 'selected' | 'booked';
 
@@ -33,7 +34,7 @@ interface Seat {
 // const BOOKED_SEATS = [9, 14, 20, 27];
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
-const TOTAL_SEATS = 54;
+const DEFAULT_SEATS = 54; // used only if the bus has no seat count
 const SEATS_PER_ROW = 6;
 
 
@@ -41,8 +42,12 @@ export default function SeatSelectionScreen() {
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const params = useLocalSearchParams();
+    const { busLabel, busSeats } = useBusNames();
     const [BookedSeats, setBookedSeats] = useState<number[]>([]);
     const BOOKED_SEATS = BookedSeats;
+    // Seat count of this bus (from the timetable, else from the bus list)
+    const TOTAL_SEATS =
+      parseInt(String(params.noOfSeats || busSeats(params.bNumber) || ""), 10) || DEFAULT_SEATS;
     const getBookedSeats = async () => {
       try {
         const response = await fetch(
@@ -77,7 +82,7 @@ export default function SeatSelectionScreen() {
       );
 
       setSeats(updatedSeats);
-    }, [BookedSeats]);
+    }, [BookedSeats, TOTAL_SEATS]);
     
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('');
@@ -129,6 +134,7 @@ export default function SeatSelectionScreen() {
             date:params.date,
             time:params.depaturetime,
             bNumber:params.bNumber,
+            busName: params.busName,
             busType:params.busType,
             ticketPrice:params.ticketPrice,
             seatCount: selectedSeats.length.toString(),
@@ -155,7 +161,7 @@ export default function SeatSelectionScreen() {
         <View style={[ui.card, styles.tripCard]}>
           <View style={styles.tripItem}>
             <Ionicons name="bus-outline" size={18} color={C.blue} />
-            <Text style={styles.tripValue}>{params.bNumber}</Text>
+            <Text style={styles.tripValue}>{busLabel(params.bNumber)}</Text>
           </View>
           <View style={styles.tripDivider} />
           <View style={styles.tripItem}>

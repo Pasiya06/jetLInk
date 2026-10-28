@@ -19,6 +19,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons, FontAwesome, Feather } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../components/AlertBadge";
+import { useBusNames, getBusLabel, getBusTitle } from "../../components/BusName";
 
 if (
   Platform.OS === "android" &&
@@ -83,6 +84,8 @@ export default function BusReceipts() {
   const router = useRouter();
 
   const params = useLocalSearchParams();
+
+  useBusNames();
   const busNumber = params.busNo as string;
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
@@ -186,7 +189,7 @@ export default function BusReceipts() {
         end={{x: 1, y: 1,}}
         style={styles.submitGradient1}>
         <View style={styles.header}>
-          <Text style={styles.eyebrow}>Bus {busNumber}</Text>
+          <Text style={styles.eyebrow}>{getBusTitle(busNumber)}</Text>
           <Text style={styles.title}>Tour receipts</Text>
         </View>
       </LinearGradient>

@@ -21,6 +21,7 @@ import { router, Stack, useFocusEffect, useLocalSearchParams, useRouter } from "
 import { Ionicons, FontAwesome, Feather } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenHeader } from "../../../components/JetUI";
+import { useBusNames, getBusLabel } from "../../../components/BusName";
 
 if (
   Platform.OS === "android" &&
@@ -88,6 +89,8 @@ export default function ReceiptList() {
   const router = useRouter();
   
   const params = useLocalSearchParams();
+  
+  useBusNames();
   const pemail = Array.isArray(params.pemail)
     ? params.pemail[0]
     : params.pemail;
@@ -442,7 +445,7 @@ function ReceiptCard({ item, onShowQr }: { item: Receipt; onShowQr: () => void }
         <View style={styles.topRow}>
           <View style={styles.busBadge}>
             <Ionicons name="bus" size={14} color={C.brand} />
-            <Text style={styles.busBadgeText}>{item.busNumber || "—"}</Text>
+            <Text style={styles.busBadgeText}>{item.busNumber ? getBusLabel(item.busNumber) : "—"}</Text>
           </View>
 
           <View

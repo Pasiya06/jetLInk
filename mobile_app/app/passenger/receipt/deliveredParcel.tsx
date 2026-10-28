@@ -17,11 +17,13 @@ import { Ionicons,
   FontAwesome, Feather } from '@expo/vector-icons'; 
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenHeader, C, ui } from "../../../components/JetUI";
+import { useBusNames, getBusLabel } from "../../../components/BusName";
 
 const ParcelService = () => {
     const [isSearching, setIsSearching] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const params = useLocalSearchParams();
+    useBusNames();
     const [activeTab, setActiveTab] = useState('');
     const router = useRouter();
     const handleSearch = () => {
@@ -200,7 +202,7 @@ const ParcelService = () => {
             </View>
             <View style={styles.infoTextWrap}>
             <Text style={styles.infoLabel}>Bus Number</Text>
-            <Text style={styles.infoValue}>{params.Bnumber}</Text>
+            <Text style={styles.infoValue}>{getBusLabel(params.Bnumber)}</Text>
             </View>
             </View>
 

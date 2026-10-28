@@ -23,6 +23,7 @@ import AlertBadge from "../../../components/AlertBadge";
 
 import FieldError from "../../../components/FieldError";
 import { useFieldErrors } from "../../../utils/validation";
+import { useBusNames } from "../../../components/BusName";
 const AddBus = () => {
  
   const [busdate, setBusDate] = useState("ANY DATE");
@@ -41,6 +42,7 @@ const AddBus = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab, setActiveTab] = useState('');
   const params = useLocalSearchParams();
+  const { busLabel } = useBusNames();
   const router = useRouter();
   const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
   const busNumber = params.busNumber as string;
@@ -142,7 +144,7 @@ const AddBus = () => {
     <Stack.Screen options={{ title: "", headerShown: false }} />
     <SafeAreaView style={[styles.container, { backgroundColor: C.bg }]}>
       
-      <ScreenHeader eyebrow="Bus schedule" title={`New schedule · ${params.busNumber || ""}`} />
+      <ScreenHeader eyebrow="Bus schedule" title={`New schedule · ${busLabel(params.busNumber)}`} />
 
       <ScrollView
         style={ui.body}

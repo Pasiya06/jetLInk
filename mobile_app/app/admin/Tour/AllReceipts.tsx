@@ -19,6 +19,7 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons, FontAwesome, Feather } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
+import { useBusNames, getBusLabel } from "../../../components/BusName";
 
 if (
   Platform.OS === "android" &&
@@ -84,6 +85,7 @@ type Filter = "all" | "online" | "offline";
 export default function AllReceipts() {
   const router = useRouter();
   const params = useLocalSearchParams();
+  useBusNames();
   const [receipts, setReceipts] = useState<Receipt[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -401,7 +403,7 @@ function ReceiptCard({ item }: { item: Receipt }) {
         <View style={styles.topRow}>
           <View style={styles.busBadge}>
             <Ionicons name="bus" size={14} color={C.brand} />
-            <Text style={styles.busBadgeText}>{item.busNumber || "—"}</Text>
+            <Text style={styles.busBadgeText}>{item.busNumber ? getBusLabel(item.busNumber) : "—"}</Text>
           </View>
           <View
             style={[

@@ -18,6 +18,7 @@ import { Alert } from "../../../components/JetAlert";
 
 import { LinearGradient } from "expo-linear-gradient";
 import { C, GRADIENT } from "../../../components/JetUI";
+import BusCard from "../../../components/BusCard";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import {
   Ionicons,
@@ -47,6 +48,8 @@ interface Bus {
   driverD: string;
   conductorD: string;
   busNumber: string;
+  busName?: string;
+  noOfSeats?: string;
   chassisNo?: string;
   engineNo?: string;
   colour?: string;
@@ -177,16 +180,17 @@ export default function PackageDetails() {
 
   
   
-  const renderBusItem = ({ item }: { item: Bus }) => (
-    <TouchableOpacity style={[styles.friendRow, isBusBlocked(item) && styles.blockedRow]}
-      activeOpacity={isBusBlocked(item) ? 1 : 0.7}
-      onPress={() => isBusBlocked(item) ? showBusBlockedAlert(item) :
-        router.push({
+  const chooseBus = (item: Bus) =>
+    isBusBlocked(item)
+      ? showBusBlockedAlert(item)
+      : router.push({
           pathname: "/passenger/tours/tourSummary",
           params: {
-            Bid: item._id, 
+            Bid: item._id,
             busId: String(item.busId),
             busNumber: item.busNumber,
+            busName: item.busName || "",
+            noOfSeats: String(item.noOfSeats || ""),
             driverNIC: item.driverNIC,
             conductorNIC: item.conductorNIC,
             driverD: item.driverD,
@@ -203,46 +207,55 @@ export default function PackageDetails() {
             Pid: params.Pid,
             Pid1: params.Pid1,
             pfirstName: params.pfirstName,
-            plastName:params.plastName,
+            plastName: params.plastName,
             pphoneNumber: params.pphoneNumber,
             pemail: params.pemail,
           },
-        })
-      }
-    >
-      <View style={styles.profileCircle}>
-        <Fontisto name={"bus"} size={22} color={C.blue} />
-      </View>
-      <View style={{ flex: 1, marginLeft: 14 }}>
-        <Text style={styles.friendName}>{item.busNumber}</Text>
-        <View style={styles.busMeta}>
-          {isBusBlocked(item) ? (
-            <View style={[styles.availPill, { backgroundColor: C.redSoft }]}>
-              <View style={[styles.availDot, { backgroundColor: C.red }]} />
-              <Text style={[styles.availText, { color: C.red }]}>Not available</Text>
-            </View>
-          ) : (
-            <View style={styles.availPill}>
-              <View style={styles.availDot} />
-              <Text style={styles.availText}>Available</Text>
-            </View>
-          )}
-          <Text style={styles.busMetaText}>Tour bus</Text>
-        </View>
-        {isBusBlocked(item) && (
-          <View style={{ marginTop: 8 }}>
-            <BusStatusNotice item={item} />
-          </View>
-        )}
-      </View>
-      <View style={styles.arrowDot}>
-        <Ionicons name="chevron-forward" size={18} color={C.blue} />
-      </View>
-    </TouchableOpacity>
-  );
+        });
 
-  const filteredBusData = busData.filter(bus => 
-    bus.busNumber.toLowerCase().includes(searchQuery.toLowerCase())
+  const renderBusItem = ({ item }: { item: Bus }) => {
+    const blocked = isBusBlocked(item);
+    const seats = Number(item.noOfSeats) || 0;
+    const groupSize = Number(params.maxPassengers) || 0;
+    const fits = !seats || !groupSize || seats >= groupSize;
+    return (
+      <BusCard
+        bus={item}
+        statusLabel="Available"
+        tone="green"
+        disabled={blocked}
+        onPress={() => chooseBus(item)}
+        footer={
+          blocked ? undefined : (
+            <>
+              <View style={styles.fitRow}>
+                <Ionicons
+                  name={fits ? "checkmark-circle" : "alert-circle"}
+                  size={16}
+                  color={fits ? C.green : C.amber}
+                />
+                <Text style={[styles.fitText, !fits && { color: C.amber }]} numberOfLines={1}>
+                  {seats && groupSize
+                    ? fits
+                      ? `Fits your group of ${groupSize}`
+                      : `Only ${seats} seats for ${groupSize}`
+                    : `Free for ${tripDays === 1 ? "your trip" : `all ${tripDays} days`}`}
+                </Text>
+              </View>
+              <View style={styles.selectBtn}>
+                <Text style={styles.selectText}>Select</Text>
+                <Ionicons name="arrow-forward" size={16} color="#FFFFFF" />
+              </View>
+            </>
+          )
+        }
+      />
+    );
+  };
+
+  const filteredBusData = busData.filter(bus =>
+    bus.busNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (bus.busName || "").toLowerCase().includes(searchQuery.toLowerCase())
   );
 
 
@@ -360,18 +373,36 @@ export default function PackageDetails() {
           ) : (
             <FlatList
               ListHeaderComponent={
-                <View style={styles.tripInfo}>
-                  <View style={styles.tripIcon}>
-                    <Ionicons name="calendar" size={18} color={C.green} />
+                <View>
+                  <View style={styles.tripBanner}>
+                    <View style={styles.tripIcon}>
+                      <Ionicons name="calendar" size={18} color={C.green} />
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.tripBannerLabel}>
+                        {tripDays === 1 ? "One-day trip" : `${tripDays}-day trip`}
+                      </Text>
+                      <Text style={styles.tripBannerDates}>
+                        {tripDays === 1 ? date : `${date}  →  ${tripEnd}`}
+                      </Text>
+                    </View>
                   </View>
-                  <Text style={styles.tripInfoText}>
-                    {tripDays === 1
-                      ? `Trip on ${date}`
-                      : `${tripDays}-day trip: ${date} – ${tripEnd}`}
-                    {hiddenCount > 0
-                      ? `\n${hiddenCount} bus${hiddenCount === 1 ? " is" : "es are"} already booked on these dates and hidden.`
-                      : ""}
-                  </Text>
+                  {hiddenCount > 0 ? (
+                    <View style={styles.hiddenNote}>
+                      <Ionicons name="eye-off-outline" size={14} color={C.muted} />
+                      <Text style={styles.hiddenNoteText}>
+                        {hiddenCount} bus{hiddenCount === 1 ? " is" : "es are"} already booked on these dates
+                      </Text>
+                    </View>
+                  ) : null}
+                  {filteredBusData.length > 0 ? (
+                    <View style={styles.listHead}>
+                      <Text style={styles.listHeadText}>Available buses</Text>
+                      <View style={styles.countPill}>
+                        <Text style={styles.countPillText}>{filteredBusData.length}</Text>
+                      </View>
+                    </View>
+                  ) : null}
                 </View>
               }
               style={styles.svw}
@@ -379,7 +410,7 @@ export default function PackageDetails() {
               renderItem={renderBusItem}
               keyExtractor={(item) => item._id}
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingVertical: 10, flexGrow: 1 }}
+              contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 30, flexGrow: 1 }}
               ListEmptyComponent={
                 <View style={styles.dateMessageContainer}>
                   <View style={[styles.messageIcon, { backgroundColor: "#F3F6FA" }]}>
@@ -511,6 +542,34 @@ function StatCard({value,label,}: {value: string;label: string;}) {
 /* STYLES */
 
 const styles = StyleSheet.create({
+  tripBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    backgroundColor: C.greenSoft,
+    borderRadius: 16,
+    padding: 12,
+  },
+  tripBannerLabel: { fontSize: 12, fontWeight: "700", color: C.green, letterSpacing: 0.6, textTransform: "uppercase" },
+  tripBannerDates: { fontSize: 15, fontWeight: "800", color: C.ink, marginTop: 2 },
+  hiddenNote: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 10, marginLeft: 4 },
+  hiddenNoteText: { fontSize: 12.5, fontWeight: "500", color: C.muted },
+  listHead: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 18, marginBottom: 10, marginLeft: 4 },
+  listHeadText: { fontSize: 13, fontWeight: "700", color: C.muted, letterSpacing: 1, textTransform: "uppercase" },
+  countPill: { backgroundColor: C.blueSoft, borderRadius: 999, paddingHorizontal: 9, paddingVertical: 2 },
+  countPillText: { fontSize: 12, fontWeight: "800", color: C.blue },
+  fitRow: { flex: 1, flexDirection: "row", alignItems: "center", gap: 6, marginRight: 8 },
+  fitText: { flex: 1, fontSize: 12.5, fontWeight: "600", color: C.green },
+  selectBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    height: 38,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    backgroundColor: C.blue,
+  },
+  selectText: { color: "#FFFFFF", fontSize: 13.5, fontWeight: "800" },
   blockedRow: { borderWidth: 1, borderColor: C.redBorder, alignItems: "flex-start" },
 
   headerTop: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" },

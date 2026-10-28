@@ -36,6 +36,8 @@ interface Bussched {
   depaturetime?:string;
   stops?:string;
   busNo?:string;
+  busName?: string;
+  noOfSeats?: string;
   busType:string;
   ticketPrice:string;
   busStatus?:string;
@@ -119,6 +121,8 @@ const JetLinkInterface: React.FC = () => {
                             depaturetime: item.depaturetime || "",
                             stops: item.stops || "",
                             bNumber: item.busNo || "",
+                            busName: item.busName || "",
+                            noOfSeats: String(item.noOfSeats || ""),
                             busType:item.busType,
                             ticketPrice:item.ticketPrice,
 
@@ -145,7 +149,7 @@ const JetLinkInterface: React.FC = () => {
                         <View style={styles.topRow}>
                         <View style={styles.busNoPill}>
                             <Ionicons name="bus" size={14} color="#155B8A" />
-                            <Text style={styles.busNoText}>{item.busNo}</Text>
+                            <Text style={styles.busNoText}>{item.busName ? `${item.busName} · ${item.busNo}` : item.busNo}</Text>
                         </View>
                         <Text style={styles.priceText}>{item.ticketPrice ? `Rs. ${item.ticketPrice}` : ""}</Text>
                         </View>
@@ -203,6 +207,8 @@ const JetLinkInterface: React.FC = () => {
                             depaturetime: item.depaturetime || "",
                             stops: item.stops || "",
                             bNumber: item.busNo || "",
+                            busName: item.busName || "",
+                            noOfSeats: String(item.noOfSeats || ""),
                             busType:item.busType,
                             ticketPrice:item.ticketPrice,
 
@@ -229,7 +235,7 @@ const JetLinkInterface: React.FC = () => {
                         <View style={styles.topRow}>
                         <View style={styles.busNoPill}>
                             <Ionicons name="bus" size={14} color="#155B8A" />
-                            <Text style={styles.busNoText}>{item.busNo}</Text>
+                            <Text style={styles.busNoText}>{item.busName ? `${item.busName} · ${item.busNo}` : item.busNo}</Text>
                         </View>
                         <Text style={styles.priceText}>{item.ticketPrice ? `Rs. ${item.ticketPrice}` : ""}</Text>
                         </View>

@@ -23,6 +23,7 @@ import {Ionicons,
   FontAwesome, Feather} from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
+import { useBusNames } from "../../../components/BusName";
 
 
 interface Bussched {
@@ -35,6 +36,8 @@ interface Bussched {
   depaturetime?:string;
   stops?:string;
   busNo?:string;
+  busName?: string;
+  noOfSeats?: string;
   ticketPrice:string;
   busStatus?:string;
   busEmergency?:boolean;
@@ -44,6 +47,7 @@ interface Bussched {
 const BusScreen: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
+  const { busLabel } = useBusNames();
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState('');
@@ -109,7 +113,7 @@ const BusScreen: React.FC = () => {
   const confirmDelete = (item: Bussched) => {
     Alert.alert(
       "Delete schedule?",
-      `${item.pickuploca} → ${item.dropoffloca} at ${item.depaturetime} (bus ${item.busNo}) will be removed.`,
+      `${item.pickuploca} → ${item.dropoffloca} at ${item.depaturetime} (bus ${item.busName ? `${item.busName} - ` : ""}${item.busNo}) will be removed.`,
       [
         { text: "Cancel", style: "cancel" },
         { text: "Delete", style: "destructive", onPress: () => deleteBussched(item._id) },
@@ -178,7 +182,7 @@ const BusScreen: React.FC = () => {
       <View style={styles.schedTop}>
         <View style={styles.busTag}>
           <Ionicons name="bus" size={14} color={C.blue} />
-          <Text style={styles.busTagText}>{item.busNo}</Text>
+          <Text style={styles.busTagText}>{item.busName ? `${item.busName} · ${item.busNo}` : busLabel(item.busNo)}</Text>
         </View>
         <View style={styles.dayTag}>
           <Ionicons name={item.busdate === "ANY DATE" ? "repeat" : "calendar-outline"} size={13} color={C.muted} />

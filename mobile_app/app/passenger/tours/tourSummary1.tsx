@@ -31,6 +31,7 @@ import * as Location from "expo-location";
 
 import FieldError from "../../../components/FieldError";
 import { useFieldErrors } from "../../../utils/validation";
+import { useBusNames, getBusLabel } from "../../../components/BusName";
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 type Place = {
@@ -58,6 +59,7 @@ export default function PackageDetails() {
   const router = useRouter();
   const { validate: validateFields, errorFor: fieldError } = useFieldErrors();
   const params = useLocalSearchParams();
+  useBusNames();
   const [pickup, setPickup] = useState(String(params.pickup || ""));
   const [time, setTime] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -273,7 +275,7 @@ export default function PackageDetails() {
                 </View>
                 <View style={styles.detailTextWrap}>
                   <Text style={styles.detailLabel}>Bus</Text>
-                  <Text style={styles.detailValue}>{params.busNumber}</Text>
+                  <Text style={styles.detailValue}>{getBusLabel(params.busNumber)}</Text>
                 </View>
               </View>
             </>
