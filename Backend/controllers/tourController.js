@@ -596,7 +596,7 @@ export const verifyTourQR = async (req, res) => {
       title: `✅ Tour ${tour.receiptId} boarded`,
       body: `${tour.pfirstName || ""} ${tour.plastName || ""} boarded bus ${tour.busNumber}.`,
       type: "tour",
-      audience: ["admin"],
+      audience: ["admin", "staff"],
       busNumber: tour.busNumber,
       data: { receiptId: tour.receiptId },
     });

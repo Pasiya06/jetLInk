@@ -1,13 +1,15 @@
 import Notification from "../models/Notification.js";
+import { emailNotification } from "../utils/notificationEmail.js";
 
 /**
- * Save a notification. Used by other controllers when something happens
+ * Save a notification and email it to the people it concerns (passenger,
+ * bus crew, admins). Used by other controllers when something happens
  * (emergency, new parcel, new ticket...). Never throws, so it can't break
  * the request that triggered it.
  */
 export const notify = async ({ title, body = "", type = "general", audience = ["admin"], busNumber = null, passengerEmail = null, data = {} }) => {
   try {
-    return await Notification.create({
+    const saved = await Notification.create({
       title,
       body,
       type,
@@ -16,6 +18,9 @@ export const notify = async ({ title, body = "", type = "general", audience = ["
       passengerEmail: passengerEmail ? String(passengerEmail).trim().toLowerCase() : null,
       data,
     });
+    // Email in the background so the app gets its answer straight away
+    emailNotification(saved.toObject());
+    return saved;
   } catch (error) {
     console.error("Failed to save notification:", error.message);
     return null;
@@ -114,6 +119,9 @@ export const createNotification = async (req, res) => {
       passengerEmail: passengerEmail ? String(passengerEmail).trim().toLowerCase() : null,
       data,
     });
+
+    // Announcements are emailed too (see utils/notificationEmail.js for the rules)
+    emailNotification(notification.toObject());
 
     return res.status(201).json({
       success: true,

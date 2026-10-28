@@ -29,6 +29,7 @@ import * as Location from "expo-location";
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import AlertBadge from "../../components/AlertBadge";
+import LatestAlerts from "../../components/LatestAlerts";
 import {
   startBusLocationSharing,
   stopBusLocationSharing,
@@ -402,6 +403,13 @@ export default function DriverHome() {
             </View>
           )}
         </View> */}
+
+          {/* ── Latest alerts for this bus (bookings, parcels, tours, emergencies) ── */}
+          <LatestAlerts
+            role="staff"
+            busNumber={busNum}
+            onSeeAll={() => router.push({ pathname: "/notifications", params: { role: "staff", busNumber: busNum } })}
+          />
 
           {/* ── Main action ──────────────────────────────────── */}
           <GradientAction

@@ -293,6 +293,15 @@ export const verifyTicket = async (req, res) => {
     ticket.usedAt = new Date();
     await ticket.save();
 
+    await notify({
+      title: `🎫 Ticket ${ticket.ticketId} scanned`,
+      body: `${ticket.pfirstName || ""} ${ticket.plastName || ""} boarded with ${ticket.noOfTicket || 1} seat(s)${ticket.seatNumbers ? ` (${ticket.seatNumbers})` : ""}: ${ticket.pickup} → ${ticket.drop}.`,
+      type: "ticket",
+      audience: ["staff"],
+      busNumber: ticket.bNumber,
+      data: { ticketId: ticket.ticketId },
+    });
+
     await notifyPassengers(ticket.pemail, {
       title: "✅ Ticket scanned – have a good trip",
       body: `Ticket ${ticket.ticketId} (${ticket.pickup} → ${ticket.drop}) was used on bus ${ticket.bNumber}.`,

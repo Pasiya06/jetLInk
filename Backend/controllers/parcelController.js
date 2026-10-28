@@ -193,7 +193,8 @@ export const verifyParcelQR = async (req, res) => {
         title: `📦 Parcel ${parcel.parcelId} picked up`,
         body: `Bus ${parcel.Bnumber || "-"} collected the parcel (${parcel.pickup || "?"} → ${parcel.drop || "?"}).`,
         type: "parcel",
-        audience: ["admin"],
+        audience: ["admin", "staff"],
+        busNumber: parcel.Bnumber,
         data: { parcelId: parcel.parcelId },
       });
 
@@ -218,7 +219,8 @@ export const verifyParcelQR = async (req, res) => {
         title: `✅ Parcel ${parcel.parcelId} delivered`,
         body: `Delivered to ${parcel.receivername || "the receiver"} at ${parcel.drop || "destination"}.`,
         type: "parcel",
-        audience: ["admin"],
+        audience: ["admin", "staff"],
+        busNumber: parcel.Bnumber,
         data: { parcelId: parcel.parcelId },
       });
 
@@ -344,7 +346,8 @@ export const markParcelDelivered = async (req, res) => {
         title: `📦 Parcel ${parcel.parcelId} picked up`,
         body: `Bus ${parcel.Bnumber || "-"} collected the parcel (${parcel.pickup || "?"} → ${parcel.drop || "?"}).`,
         type: "parcel",
-        audience: ["admin"],
+        audience: ["admin", "staff"],
+        busNumber: parcel.Bnumber,
         data: { parcelId: parcel.parcelId },
       });
 
@@ -369,7 +372,8 @@ export const markParcelDelivered = async (req, res) => {
         title: `✅ Parcel ${parcel.parcelId} delivered`,
         body: `Delivered to ${parcel.receivername || "the receiver"} at ${parcel.drop || "destination"}.`,
         type: "parcel",
-        audience: ["admin"],
+        audience: ["admin", "staff"],
+        busNumber: parcel.Bnumber,
         data: { parcelId: parcel.parcelId },
       });
 
