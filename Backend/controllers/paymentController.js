@@ -51,7 +51,7 @@ export const pay = async (req, res) => {
         // Optional numeric range check
         if (
         card < 4_000_000_000_000_000n ||
-        card > 5_999_999_999_999_999n
+        card > 8_999_999_999_999_999n
         ) {
         return res.status(400).json({
             success: false,
@@ -94,7 +94,7 @@ export const pay = async (req, res) => {
     const cvcNumber = Number(cvc);
 
     if (
-        cvcNumber < 800 ||
+        cvcNumber < 300 ||
         cvcNumber > 900
     ) {
         return res.status(400).json({
