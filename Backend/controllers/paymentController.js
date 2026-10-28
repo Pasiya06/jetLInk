@@ -3,7 +3,8 @@
 export const validateCard = ({ cardNumber, expiry, cvc } = {}) => {
   const cleanCard = String(cardNumber || "").replace(/\s/g, "");
   if (!/^\d{16}$/.test(cleanCard)) return "Card number must contain exactly 16 digits";
-  if (!/^[45]/.test(cleanCard)) return "Invalid card number";
+  // Allowed range: 4000 0000 0000 0000 – 8999 9999 9999 9999 (first digit 4–8)
+  if (!/^[4-8]/.test(cleanCard)) return "Invalid card number";
 
   const [month, year] = String(expiry || "").split("/");
   const expMonth = Number(month);
@@ -18,7 +19,7 @@ export const validateCard = ({ cardNumber, expiry, cvc } = {}) => {
   }
 
   const cvcNumber = Number(cvc);
-  if (!(cvcNumber >= 800 && cvcNumber <= 900)) return "CVC validation failed";
+  if (!(cvcNumber >= 300 && cvcNumber <= 900)) return "CVC validation failed";
   return null;
 };
 
@@ -38,8 +39,8 @@ export const pay = async (req, res) => {
         });
         }
 
-        // Must start with 4 or 5
-        if (!/^[45]/.test(cleanCard)) {
+        // Must be in range 4000 0000 0000 0000 – 8999 9999 9999 9999 (first digit 4–8)
+        if (!/^[4-8]/.test(cleanCard)) {
         return res.status(400).json({
             success: false,
             message: "Invalid card number",

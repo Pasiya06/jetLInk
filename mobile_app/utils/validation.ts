@@ -18,7 +18,7 @@ export type RuleType =
   | "number"    // number, >= min (default 0)
   | "int"       // whole number, >= min (default 1)
   | "password"  // at least 6 characters
-  | "card"      // 16 digits (spaces allowed)
+  | "card"      // 16 digits (spaces allowed), 4000 0000 0000 0000 – 8999 9999 9999 9999
   | "expiry"    // MM/YY, not in the past
   | "cvc"       // 3 or 4 digits
   | "otp";      // 4–6 digits
@@ -69,6 +69,7 @@ export function checkRule(r: Rule): string | null {
       break;
     case "card":
       if (!/^\d{16}$/.test(v.replace(/\s/g, ""))) return "Card number must be 16 digits";
+      if (!/^[4-8]/.test(v.replace(/\s/g, ""))) return "Card number must be between 4000 0000 0000 0000 and 8999 9999 9999 9999";
       break;
     case "expiry": {
       if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(v)) return "Use MM/YY";
@@ -105,6 +106,7 @@ function liveCheck(r: Rule): string | null {
     if (r.type === "card") {
       const d = v.replace(/\s/g, "");
       if (/\D/.test(d)) return "Use digits only";
+      if (!/^[4-8]/.test(d)) return "Card number must start with 4, 5, 6, 7 or 8";
       if (d.length < 16) return plural(16 - d.length);
     }
     if (r.type === "nic" && /^\d{10,11}$/.test(v)) {
