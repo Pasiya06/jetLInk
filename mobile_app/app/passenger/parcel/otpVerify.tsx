@@ -138,33 +138,10 @@ export const FlatmateLogin: React.FC = () => {
             }
 
             else {
-              router.push({
-                pathname: "/passenger/parcel/paymentFail",
-                params: {
-                  Sid: params.Sid,
-                  scheduleId: params.scheduleId,
-                  bNumber: params.bNumber,
-
-                  Pid: params.Pid,
-                  Pid1: params.Pid1,
-                  pfirstName: params.pfirstName,
-                  plastName:params.plastName,
-                  pphoneNumber: params.pphoneNumber,
-                  pemail: params.pemail,
-                  sendername:params.sendername,
-                  smobilenumber:params.smobilenumber,
-                  semail:params.semail,
-                  receivername:params.receivername,
-                  rmobilenumber:params.rmobilenumber,
-                  remail:params.remail,
-                  weight:params.weight,
-                  pickup:params.pickup,
-                  drop:params.drop,
-                  date:params.date,
-                  time:params.time,
-                  totalFare:params.totalFare,  
-                },    
-              });
+                // Wrong / expired code: stay here and let the passenger try again
+                setError(data.message || "Invalid or expired code. Check the code and try again.");
+                setDigits(Array(OTP_LENGTH).fill(""));
+                inputRefs.current[0]?.focus();
             }
 
             // const response = await fetch(`${API_URL}/tickets`, {
@@ -260,6 +237,12 @@ export const FlatmateLogin: React.FC = () => {
                 />
                 ))}
             </View>
+
+            {!error && otp.length > 0 && otp.length < OTP_LENGTH ? (
+                <Text style={styles.otpHint}>
+                    {OTP_LENGTH - otp.length} more digit{OTP_LENGTH - otp.length === 1 ? "" : "s"} to go
+                </Text>
+            ) : null}
 
             {error ? (
                 <View style={styles.errorRow}>

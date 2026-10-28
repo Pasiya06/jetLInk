@@ -20,10 +20,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { updatePassenger } from "../../services/passengerService";
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_REGEX = /^0\d{9}$/;
-const NIC_REGEX = /^(\d{9}[VvXx]|\d{12})$/;
+import { useFieldErrors } from "../../utils/validation";
 
 type FieldProps = TextInputProps & {
   label: string;
@@ -77,25 +74,38 @@ export default function EditPassengerProfile() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (!firstName.trim()) e.firstName = "First name is required";
-    if (!lastName.trim()) e.lastName = "Last name is required";
-    if (!PHONE_REGEX.test(phoneNumber.trim())) e.phoneNumber = "10 digits starting with 0 (e.g. 0771234567)";
-    if (!EMAIL_REGEX.test(email.trim())) e.email = "Enter a valid email";
-    if (!NIC_REGEX.test(NIC.trim())) e.NIC = "9 digits + V/X, or 12 digits";
-    if (!address.trim()) e.address = "Address is required";
-    if (changePassword) {
-      if (!currentPassword) e.currentPassword = "Enter your current password";
-      if (newPassword.length < 6) e.newPassword = "At least 6 characters";
-      if (newPassword !== confirmPassword) e.confirmPassword = "Passwords do not match";
-    }
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
+  // Messages show while typing and after pressing Save
+  const { validate: validateFields, errorFor } = useFieldErrors({
+    rules: {
+      currentPassword: { label: "Current password" },
+      newPassword: { label: "New password", type: "password" },
+      confirmPassword: { label: "Confirm password", equalsKey: "newPassword", message: "Passwords do not match" },
+    },
+  });
+
+  const validate = () =>
+    validateFields([
+      { key: "firstName", label: "First name", value: firstName },
+      { key: "lastName", label: "Last name", value: lastName },
+      { key: "NIC", label: "NIC", value: NIC, type: "nic" },
+      { key: "phoneNumber", label: "Phone number", value: phoneNumber, type: "phone" },
+      { key: "email", label: "Email", value: email, type: "email" },
+      { key: "address", label: "Address", value: address },
+      ...(changePassword
+        ? [
+            { key: "currentPassword", label: "Current password", value: currentPassword },
+            { key: "newPassword", label: "New password", value: newPassword, type: "password" as const },
+            {
+              key: "confirmPassword",
+              label: "Confirm password",
+              value: confirmPassword,
+              equals: { value: newPassword, message: "Passwords do not match" },
+            },
+          ]
+        : []),
+    ]);
 
   const handleSave = async () => {
     if (!id) {
@@ -162,12 +172,12 @@ export default function EditPassengerProfile() {
 
             <View style={styles.card}>
               <Text style={styles.sectionTitle}>Personal Details</Text>
-              <Field label="First Name" icon="person-outline" color="#0057D9" value={firstName} onChangeText={setFirstName} error={errors.firstName} placeholder="First name" />
-              <Field label="Last Name" icon="person-outline" color="#0057D9" value={lastName} onChangeText={setLastName} error={errors.lastName} placeholder="Last name" />
-              <Field label="NIC" icon="card-outline" color="#7C3AED" value={NIC} onChangeText={setNIC} error={errors.NIC} placeholder="200012345678" autoCapitalize="characters" maxLength={12} />
-              <Field label="Phone Number" icon="call-outline" color="#159B79" value={phoneNumber} onChangeText={setPhoneNumber} error={errors.phoneNumber} placeholder="0771234567" keyboardType="phone-pad" maxLength={10} />
-              <Field label="Email" icon="mail-outline" color="#0057D9" value={email} onChangeText={setEmail} error={errors.email} placeholder="you@example.com" keyboardType="email-address" autoCapitalize="none" />
-              <Field label="Address" icon="location-outline" color="#F59E0B" value={address} onChangeText={setAddress} error={errors.address} placeholder="Address" multiline />
+              <Field label="First Name" icon="person-outline" color="#0057D9" value={firstName} onChangeText={setFirstName} error={errorFor("firstName", firstName)} placeholder="First name" />
+              <Field label="Last Name" icon="person-outline" color="#0057D9" value={lastName} onChangeText={setLastName} error={errorFor("lastName", lastName)} placeholder="Last name" />
+              <Field label="NIC" icon="card-outline" color="#7C3AED" value={NIC} onChangeText={setNIC} error={errorFor("NIC", NIC)} placeholder="200012345678" autoCapitalize="characters" maxLength={12} />
+              <Field label="Phone Number" icon="call-outline" color="#159B79" value={phoneNumber} onChangeText={setPhoneNumber} error={errorFor("phoneNumber", phoneNumber)} placeholder="0771234567" keyboardType="phone-pad" maxLength={10} />
+              <Field label="Email" icon="mail-outline" color="#0057D9" value={email} onChangeText={setEmail} error={errorFor("email", email)} placeholder="you@example.com" keyboardType="email-address" autoCapitalize="none" />
+              <Field label="Address" icon="location-outline" color="#F59E0B" value={address} onChangeText={setAddress} error={errorFor("address", address)} placeholder="Address" multiline />
 
               <View style={styles.switchRow}>
                 <Text style={styles.switchText}>Change Password</Text>
@@ -176,9 +186,9 @@ export default function EditPassengerProfile() {
 
               {changePassword ? (
                 <>
-                  <Field label="Current Password" icon="lock-closed-outline" color="#E5484D" secure value={currentPassword} onChangeText={setCurrentPassword} error={errors.currentPassword} autoCapitalize="none" />
-                  <Field label="New Password" icon="key-outline" color="#E5484D" secure value={newPassword} onChangeText={setNewPassword} error={errors.newPassword} autoCapitalize="none" />
-                  <Field label="Confirm New Password" icon="key-outline" color="#E5484D" secure value={confirmPassword} onChangeText={setConfirmPassword} error={errors.confirmPassword} autoCapitalize="none" />
+                  <Field label="Current Password" icon="lock-closed-outline" color="#E5484D" secure value={currentPassword} onChangeText={setCurrentPassword} error={errorFor("currentPassword", currentPassword)} autoCapitalize="none" />
+                  <Field label="New Password" icon="key-outline" color="#E5484D" secure value={newPassword} onChangeText={setNewPassword} error={errorFor("newPassword", newPassword)} autoCapitalize="none" />
+                  <Field label="Confirm New Password" icon="key-outline" color="#E5484D" secure value={confirmPassword} onChangeText={setConfirmPassword} error={errorFor("confirmPassword", confirmPassword)} autoCapitalize="none" />
                 </>
               ) : null}
 

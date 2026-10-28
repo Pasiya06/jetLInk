@@ -1,5 +1,6 @@
 import Driver from "../models/Driver.js";
 import crypto from "crypto";
+import { cleanStaffFields, findStaffConflict } from "../utils/staffUniqueness.js";
 
 // Renumber 1, 2, 3... after a delete without breaking the unique index.
 // Step 1 moves every id to a temporary negative number, step 2 sets the final number.
@@ -17,12 +18,20 @@ const renumberIds = async (Model, field) => {
 
 export const addDriver = async (req, res) => {
   try {
+    const body = cleanStaffFields(req.body);
+
+    // NIC, email and phone must not belong to any other driver or conductor
+    const conflict = await findStaffConflict(body);
+    if (conflict) {
+      return res.status(409).json({ success: false, field: conflict.field, message: conflict.message });
+    }
+
     const lastDriver = await Driver.findOne().sort({ driverId: -1 });
 
     const nextId = lastDriver ? lastDriver.driverId + 1 : 1;
 
     const driver = new Driver({
-      ...req.body,
+      ...body,
       driverId: nextId,
     });
 
@@ -118,15 +127,31 @@ export const deleteDriver = async (req, res) => {
 
 export const updateDriver = async (req, res) => {
   try {
-    await Driver.findByIdAndUpdate(req.params.id, req.body);
+    const existing = await Driver.findById(req.params.id).lean();
+    if (!existing) {
+      return res.status(404).json({ success: false, message: "Driver not found" });
+    }
+
+    const body = cleanStaffFields(req.body);
+    delete body.driverId;
+
+    // NIC, email and phone must not belong to any other driver or conductor
+    const conflict = await findStaffConflict({ ...existing, ...body }, { type: "driver", id: req.params.id });
+    if (conflict) {
+      return res.status(409).json({ success: false, field: conflict.field, message: conflict.message });
+    }
+
+    await Driver.findByIdAndUpdate(req.params.id, body, { runValidators: true });
 
     res.json({
       success: true,
       message: "Updated Successfully",
     });
-  } catch {
+  } catch (error) {
+    console.error("Update driver error:", error);
     res.status(500).json({
       success: false,
+      message: error.message || "Server Error",
     });
   }
 };

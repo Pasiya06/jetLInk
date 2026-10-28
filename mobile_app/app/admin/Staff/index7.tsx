@@ -61,7 +61,7 @@ const DriverScreen: React.FC = () => {
 
     try{
 
-        await updateConductor(params.Cid as string,{
+        const result = await updateConductor(params.Cid as string,{
             firstName,
             lastName,
             phoneNumber,
@@ -71,6 +71,11 @@ const DriverScreen: React.FC = () => {
             email,
             password,
         });
+
+        if (!result?.success) {
+            Alert.alert("Update failed", String(result?.message || "Your changes couldn't be saved. Please try again."));
+            return;
+        }
 
         Alert.alert("Updated successfully", "Your changes have been saved.");
 

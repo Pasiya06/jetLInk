@@ -17,9 +17,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { createAdmin } from "../../../services/adminService";
 import AdminBottomNav from "../../../components/AdminBottomNav";
 import AdminFormField from "../../../components/AdminFormField";
-
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const PHONE_REGEX = /^0\d{9}$/;
+import { useFieldErrors } from "../../../utils/validation";
 
 export default function CreateAdmin() {
   const router = useRouter();
@@ -39,21 +37,28 @@ export default function CreateAdmin() {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
 
-  const validate = () => {
-    const e: Record<string, string> = {};
-    if (!firstName.trim()) e.firstName = "First name is required";
-    if (!lastName.trim()) e.lastName = "Last name is required";
-    if (!EMAIL_REGEX.test(email.trim())) e.email = "Enter a valid email";
-    if (phoneNumber.trim() && !PHONE_REGEX.test(phoneNumber.trim()))
-      e.phoneNumber = "10 digits starting with 0 (e.g. 0771234567)";
-    if (password.length < 6) e.password = "At least 6 characters";
-    if (password !== confirmPassword) e.confirmPassword = "Passwords do not match";
-    setErrors(e);
-    return Object.keys(e).length === 0;
-  };
+  // Messages show while typing and after pressing Create
+  const { validate: validateFields, errorFor } = useFieldErrors({
+    optional: ["phoneNumber"],
+    rules: { password: { label: "Password", type: "password" } },
+  });
+
+  const validate = () =>
+    validateFields([
+      { key: "firstName", label: "First name", value: firstName },
+      { key: "lastName", label: "Last name", value: lastName },
+      { key: "email", label: "Email", value: email, type: "email" },
+      { key: "phoneNumber", label: "Phone number", value: phoneNumber, type: "phone", optional: true },
+      { key: "password", label: "Password", value: password, type: "password" },
+      {
+        key: "confirmPassword",
+        label: "Confirm password",
+        value: confirmPassword,
+        equals: { value: password, message: "Passwords do not match" },
+      },
+    ]);
 
   const handleCreate = async () => {
     if (!validate()) return;
@@ -103,12 +108,12 @@ export default function CreateAdmin() {
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} style={styles.card}>
           <Text style={styles.cardTitle}>Create Admin</Text>
           <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
-            <AdminFormField label="First Name" icon="person-outline" value={firstName} onChangeText={setFirstName} error={errors.firstName} placeholder="First name" />
-            <AdminFormField label="Last Name" icon="person-outline" value={lastName} onChangeText={setLastName} error={errors.lastName} placeholder="Last name" />
-            <AdminFormField label="Email" icon="mail-outline" value={email} onChangeText={setEmail} error={errors.email} placeholder="admin@example.com" keyboardType="email-address" autoCapitalize="none" />
-            <AdminFormField label="Phone Number" icon="call-outline" value={phoneNumber} onChangeText={setPhoneNumber} error={errors.phoneNumber} placeholder="0771234567" keyboardType="phone-pad" maxLength={10} />
-            <AdminFormField label="Password" icon="lock-closed-outline" secure value={password} onChangeText={setPassword} error={errors.password} autoCapitalize="none" />
-            <AdminFormField label="Confirm Password" icon="lock-closed-outline" secure value={confirmPassword} onChangeText={setConfirmPassword} error={errors.confirmPassword} autoCapitalize="none" />
+            <AdminFormField label="First Name" icon="person-outline" value={firstName} onChangeText={setFirstName} error={errorFor("firstName", firstName)} placeholder="First name" />
+            <AdminFormField label="Last Name" icon="person-outline" value={lastName} onChangeText={setLastName} error={errorFor("lastName", lastName)} placeholder="Last name" />
+            <AdminFormField label="Email" icon="mail-outline" value={email} onChangeText={setEmail} error={errorFor("email", email)} placeholder="admin@example.com" keyboardType="email-address" autoCapitalize="none" />
+            <AdminFormField label="Phone Number" icon="call-outline" value={phoneNumber} onChangeText={setPhoneNumber} error={errorFor("phoneNumber", phoneNumber)} placeholder="0771234567" keyboardType="phone-pad" maxLength={10} />
+            <AdminFormField label="Password" icon="lock-closed-outline" secure value={password} onChangeText={setPassword} error={errorFor("password", password)} autoCapitalize="none" />
+            <AdminFormField label="Confirm Password" icon="lock-closed-outline" secure value={confirmPassword} onChangeText={setConfirmPassword} error={errorFor("confirmPassword", confirmPassword)} autoCapitalize="none" />
 
             <TouchableOpacity activeOpacity={0.85} style={styles.btnWrap} onPress={handleCreate} disabled={saving}>
               <LinearGradient colors={["#173C79", "#155B8A", "#159B79"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.btn}>

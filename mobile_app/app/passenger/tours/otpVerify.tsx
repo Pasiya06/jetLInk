@@ -113,36 +113,10 @@ export const FlatmateLogin: React.FC = () => {
             const data = await res.json();
 
             if (!data.success) {
-              router.push({
-                pathname: "/passenger/tours/paymentFail",
-                params: {
-                  busNumber: params.busNumber,
-                  driverNIC: params.driverNIC,
-                  conductorNIC: params.conductorNIC,
-                  driverD: params.driverD,
-                  conductorD: params.conductorD,
-                  isOnline: params.isOnline,
-                  date: params.date,
-                  pickup: params.pickup,
-                  pickupLat: params.pickupLat,
-                  pickupLng: params.pickupLng,
-                  pickupAddress: params.pickupAddress,
-                  time: params.time,
-                  packageId: params.packageId,
-                  description: params.description,
-                  packageType: params.packageType,
-                  totalDistance: params.totalDistance,
-                  tripDuration: params.tripDuration,
-                  maxPassengers: params.maxPassengers,
-                  maxPrice: params.maxPrice,
-                  Pid: params.Pid,
-                  Pid1: params.Pid1,
-                  pfirstName: params.pfirstName,
-                  plastName:params.plastName,
-                  pphoneNumber: params.pphoneNumber,
-                  pemail: params.pemail,
-                },
-              });
+                // Wrong / expired code: stay here and let the passenger try again
+                setError(data.message || "Invalid or expired code. Check the code and try again.");
+                setDigits(Array(OTP_LENGTH).fill(""));
+                inputRefs.current[0]?.focus();
             }
             
             else{
@@ -499,6 +473,12 @@ export const FlatmateLogin: React.FC = () => {
                 />
                 ))}
             </View>
+
+            {!error && otp.length > 0 && otp.length < OTP_LENGTH ? (
+                <Text style={styles.otpHint}>
+                    {OTP_LENGTH - otp.length} more digit{OTP_LENGTH - otp.length === 1 ? "" : "s"} to go
+                </Text>
+            ) : null}
 
             {error ? (
                 <View style={styles.errorRow}>

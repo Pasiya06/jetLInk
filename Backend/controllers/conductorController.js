@@ -1,4 +1,5 @@
 import Conductor from "../models/Conductor.js";
+import { cleanStaffFields, findStaffConflict } from "../utils/staffUniqueness.js";
 
 // Renumber 1, 2, 3... after a delete without breaking the unique index.
 // Step 1 moves every id to a temporary negative number, step 2 sets the final number.
@@ -76,14 +77,20 @@ export const conductorLogin = async (req, res) => {
 export const addConductor = async (req, res) => {
   try {
 
+    const body = cleanStaffFields(req.body);
+
+    // NIC, email and phone must not belong to any other driver or conductor
+    const conflict = await findStaffConflict(body);
+    if (conflict) {
+      return res.status(409).json({ success: false, field: conflict.field, message: conflict.message });
+    }
+
     const lastConductor = await Conductor.findOne().sort({ conductorId: -1 });
 
     const nextId = lastConductor ? lastConductor.conductorId + 1 : 1;
 
-    
-
     const conductor = new Conductor({
-      ...req.body,
+      ...body,
       conductorId: nextId,
       
     });
@@ -192,10 +199,24 @@ export const deleteConductor = async (req, res) => {
 
 export const updateConductor = async (req, res) => {
   try {
+    const existing = await Conductor.findById(req.params.id).lean();
+    if (!existing) {
+      return res.status(404).json({ success: false, message: "Conductor not found" });
+    }
+
+    const body = cleanStaffFields(req.body);
+    delete body.conductorId;
+
+    // NIC, email and phone must not belong to any other driver or conductor
+    const conflict = await findStaffConflict({ ...existing, ...body }, { type: "conductor", id: req.params.id });
+    if (conflict) {
+      return res.status(409).json({ success: false, field: conflict.field, message: conflict.message });
+    }
+
     const conductor = await Conductor.findByIdAndUpdate(
       req.params.id,
-      req.body,
-      { new: true }
+      body,
+      { new: true, runValidators: true }
     );
 
     res.json({
@@ -203,10 +224,11 @@ export const updateConductor = async (req, res) => {
       data: conductor,
       message: "Conductor Updated Successfully",
     });
-  } catch {
+  } catch (error) {
+    console.error("Update conductor error:", error);
     res.status(500).json({
       success: false,
-      message: "Server Error",
+      message: error.message || "Server Error",
     });
   }
 };

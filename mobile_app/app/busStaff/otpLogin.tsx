@@ -247,6 +247,12 @@ export const FlatmateLogin: React.FC = () => {
                       ))}
                     </View>
 
+                    {!error && otp.length > 0 && otp.length < OTP_LENGTH ? (
+                      <Text style={styles.otpHint}>
+                        {OTP_LENGTH - otp.length} more digit{OTP_LENGTH - otp.length === 1 ? "" : "s"} to go
+                      </Text>
+                    ) : null}
+
                     {error ? (
                       <View style={styles.errorRow}>
                         <Ionicons name="alert-circle" size={16} color="#E4453A" />
