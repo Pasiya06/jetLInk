@@ -2,6 +2,8 @@ import jwt from "jsonwebtoken";
 import Receipt from "../models/Tour.js";
 import { notify, notifyPassengers } from "./notificationController.js";
 import Package from "../models/Package.js";
+import Bus from "../models/Bus.js";
+import Passenger from "../models/Passenger.js";
 import { validateCard } from "./paymentController.js";
 import { getBusBlockReason } from "../utils/busAvailability.js";
 
@@ -218,6 +220,8 @@ export const createReceipt = async (req, res) => {
       plastName,
       pphoneNumber,
       pemail,
+      nameOnCard,
+      cardLast4,
     } = req.body;
 
     // Map pickup point is optional; keep it only if both numbers are valid
@@ -245,16 +249,61 @@ export const createReceipt = async (req, res) => {
       });
     }
 
+    // Load the package, bus and passenger so their full details are saved with the booking
+    const [pkg, bus, passenger] = await Promise.all([
+      packageId ? Package.findById(packageId).lean().catch(() => null) : null,
+      Bus.findOne({ busNumber }).select("busName noOfSeats colour busType").lean(),
+      Pid ? Passenger.findById(Pid).select("NIC address").lean().catch(() => null) : null,
+    ]);
+
     // Save the distance as a number of km; fall back to the package if it's missing
     let distanceKm = parseDistanceKm(totalDistance);
-    if (!distanceKm && packageId) {
-      try {
-        const pkg = await Package.findById(packageId).select("totalDistance");
-        distanceKm = parseDistanceKm(pkg?.totalDistance);
-      } catch {
-        // invalid packageId - keep 0
-      }
-    }
+    if (!distanceKm) distanceKm = parseDistanceKm(pkg?.totalDistance);
+
+    const packageDetails = {
+      title: pkg?.title || "",
+      destination: pkg?.destination || "",
+      packageType: pkg?.packageType || packageType || "",
+      description: pkg?.description || description || "",
+      busType: pkg?.busType || "",
+      totalDistance: pkg?.totalDistance || String(totalDistance ?? ""),
+      tripDuration: pkg?.tripDuration || tripDuration || "",
+      maxPassengers: Number(pkg?.maxPassengers ?? maxPassengers) || 0,
+      maxPrice: Number(pkg?.maxPrice ?? maxPrice) || 0,
+      extraKmPrice: Number(pkg?.extraKmPrice) || 0,
+      pickupMinKm: Number(pkg?.pickupMinKm) || 0,
+      pickupMaxKm: Number(pkg?.pickupMaxKm) || 0,
+      places: [...(pkg?.places ?? [])]
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+        .map((p) => ({
+          name: p.name,
+          description: p.description,
+          icon: p.icon,
+          iconType: p.iconType,
+          color: p.color,
+          order: p.order,
+        })),
+    };
+
+    const busDetails = {
+      busName: bus?.busName || "",
+      noOfSeats: String(bus?.noOfSeats ?? ""),
+      colour: bus?.colour || "",
+      busType: bus?.busType || "",
+    };
+
+    const startDay = toDayNumber(date);
+    const tripEndDate =
+      startDay != null ? dayNumberToString(startDay + parseTripDays(tripDuration) - 1) : "";
+
+    const payment = {
+      amount: Number(maxPrice) || packageDetails.maxPrice,
+      method: "card",
+      nameOnCard: String(nameOnCard || "").trim(),
+      cardLast4: String(cardLast4 || "").replace(/\D/g, "").slice(-4),
+      status: "paid",
+      paidAt: new Date(),
+    };
 
     // Generate receipt ID
     const receiptId =
@@ -288,6 +337,12 @@ export const createReceipt = async (req, res) => {
       plastName,
       pphoneNumber,
       pemail,
+      pNIC: passenger?.NIC || "",
+      paddress: passenger?.address || "",
+      tripEndDate,
+      packageDetails,
+      busDetails,
+      payment,
     });
 
     const savedReceipt = await receipt.save();

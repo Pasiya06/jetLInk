@@ -161,6 +161,9 @@ export const FlatmateLogin: React.FC = () => {
                 plastName: params.plastName,       
                 pphoneNumber: params.pphoneNumber,        
                 pemail: params.pemail,
+                // Payment details (the server also saves the full package, bus and passenger details)
+                nameOnCard: params.nameOnCard || "",
+                cardLast4: params.cardLast4 || "",
               };
         
               console.log(

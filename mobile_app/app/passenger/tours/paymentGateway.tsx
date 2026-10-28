@@ -155,6 +155,9 @@ const JetLinkInterface: React.FC = () => {
                 plastName:params.plastName,
                 pphoneNumber: params.pphoneNumber,
                 pemail: params.pemail,
+                // Saved with the booking (only the last 4 digits of the card)
+                nameOnCard: nameOnCard.trim(),
+                cardLast4: cardNumber.replace(/\D/g, "").slice(-4),
               } 
           });
             return;

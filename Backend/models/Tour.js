@@ -12,6 +12,63 @@ const extraKmPaymentSchema = new mongoose.Schema(
   { _id: true }
 );
 
+// Copy of the package as it was when the tour was booked
+// (so the booking stays correct even if the admin edits or deletes the package later)
+const bookedPlaceSchema = new mongoose.Schema(
+  {
+    name: { type: String, default: "" },
+    description: { type: String, default: "" },
+    icon: { type: String, default: "location-outline" },
+    iconType: { type: String, default: "ion" },
+    color: { type: String, default: "#12966F" },
+    order: { type: Number, default: 0 },
+  },
+  { _id: false }
+);
+
+const packageSnapshotSchema = new mongoose.Schema(
+  {
+    title: { type: String, default: "" },
+    destination: { type: String, default: "" },
+    packageType: { type: String, default: "" },
+    description: { type: String, default: "" },
+    busType: { type: String, default: "" },
+    totalDistance: { type: String, default: "" },
+    tripDuration: { type: String, default: "" },
+    maxPassengers: { type: Number, default: 0 },
+    maxPrice: { type: Number, default: 0 },
+    extraKmPrice: { type: Number, default: 0 },
+    pickupMinKm: { type: Number, default: 0 },
+    pickupMaxKm: { type: Number, default: 0 },
+    places: { type: [bookedPlaceSchema], default: [] },
+  },
+  { _id: false }
+);
+
+// Bus details at booking time
+const busSnapshotSchema = new mongoose.Schema(
+  {
+    busName: { type: String, default: "" },
+    noOfSeats: { type: String, default: "" },
+    colour: { type: String, default: "" },
+    busType: { type: String, default: "" },
+  },
+  { _id: false }
+);
+
+// The tour payment
+const tourPaymentSchema = new mongoose.Schema(
+  {
+    amount: { type: Number, default: 0 },
+    method: { type: String, default: "card" },
+    nameOnCard: { type: String, default: "" },
+    cardLast4: { type: String, default: "" },
+    status: { type: String, enum: ["paid", "pending"], default: "paid" },
+    paidAt: { type: Date, default: Date.now },
+  },
+  { _id: false }
+);
+
 const receiptSchema = new mongoose.Schema(
   {
     receiptId: {
@@ -145,6 +202,18 @@ const receiptSchema = new mongoose.Schema(
       required: true,
       lowercase: true,
     },
+
+    // Passenger details from their profile at booking time
+    pNIC: { type: String, default: "" },
+    paddress: { type: String, default: "" },
+
+    // Last day of the trip ("MM/DD/YYYY")
+    tripEndDate: { type: String, default: "" },
+
+    // Full package, bus and payment details saved with the booking
+    packageDetails: { type: packageSnapshotSchema, default: () => ({}) },
+    busDetails: { type: busSnapshotSchema, default: () => ({}) },
+    payment: { type: tourPaymentSchema, default: () => ({}) },
 
     // Tour QR: set when bus staff scan the passenger's QR code
     scanned: {
