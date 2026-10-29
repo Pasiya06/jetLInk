@@ -13,7 +13,7 @@ import { Alert } from "../../components/JetAlert";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
-import MapView, { Marker } from "react-native-maps";
+import MapView, { Marker, MapViewHandle } from "../../components/OSMMap";
 
 import { C, GRADIENT } from "../../components/JetUI";
 
@@ -47,7 +47,7 @@ const distanceKm = (a: Coords, b: Coords) => {
 export default function PickupLocation() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const mapRef = useRef<MapView>(null);
+  const mapRef = useRef<MapViewHandle>(null);
 
   const lat = Number(params.pickupLat);
   const lng = Number(params.pickupLng);

@@ -11,7 +11,7 @@ import {
   Animated,
 } from "react-native";
 import SearchPanel from "../../../components/SearchPanel";
-import MapView, { Marker, Polyline, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, { Marker, Polyline, PROVIDER_GOOGLE, MapViewHandle } from "../../../components/OSMMap";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import { Ionicons, MaterialIcons, Feather, FontAwesome } from "@expo/vector-icons";
@@ -37,7 +37,7 @@ const PassengerTrackScreen: React.FC = () => {
   const router = useRouter();
   const params = useLocalSearchParams();
   const { busLabel } = useBusNames();
-  const mapRef = useRef<MapView>(null);
+  const mapRef = useRef<MapViewHandle>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
@@ -152,6 +152,7 @@ const PassengerTrackScreen: React.FC = () => {
 
     return (
       <Marker
+        icon="parcel"
         coordinate={{
           latitude: bus.latitude,
           longitude: bus.longitude,
