@@ -397,28 +397,8 @@ function ReceiptCard({ item }: { item: Receipt }) {
   const price = `Rs. ${Number(item.maxPrice || 0).toLocaleString()}`;
 
   return (
-    <TouchableOpacity 
+    <View 
       style={styles.card}
-      onPress={() => {
-        router.push({
-          pathname: "/passenger/receipt/PackageDetails",
-          params: {
-            packageId: item.packageId,
-            description: item.description,
-            packageType: item.packageType,
-            totalDistance: item.totalDistance,
-            tripDuration: item.tripDuration,
-            maxPassengers: item.maxPassengers,
-            maxPrice: item.maxPrice,
-            Pid: params.Pid,
-            Pid1: params.Pid1,
-            pfirstName: params.pfirstName,
-            plastName:params.plastName,
-            pphoneNumber: params.pphoneNumber,
-            pemail: params.pemail,
-          },
-        });
-      }}
     >
       
       {/* Top: pickup + status */}
@@ -534,7 +514,7 @@ function ReceiptCard({ item }: { item: Receipt }) {
       </View>
 
       
-    </TouchableOpacity>
+    </View>
   );
 }
 

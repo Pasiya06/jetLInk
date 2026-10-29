@@ -149,6 +149,13 @@ export default function ExtraKmScreen() {
               setCvc("");
               await load();
               Alert.alert("Payment successful", data.message);
+              // Auto-redirect to the additional payments screen after a short delay
+              setTimeout(() => {
+                router.replace({
+                  pathname: "/passenger/tours/additionalPay",
+                  params: { ...navParams, NIC: params.NIC },
+                });
+              }, 1500);
             } catch {
               Alert.alert("Error", "Unable to connect to server");
             } finally {
