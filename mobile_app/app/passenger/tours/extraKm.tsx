@@ -152,7 +152,7 @@ export default function ExtraKmScreen() {
               // Auto-redirect to the additional payments screen after a short delay
               setTimeout(() => {
                 router.replace({
-                  pathname: "/passenger/tours/additionalPay",
+                  pathname: "/passenger/tours/index1",
                   params: { ...navParams, NIC: params.NIC },
                 });
               }, 1500);
