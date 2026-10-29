@@ -13,7 +13,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "http://10.123.202.187:5001/api"
+        "EXPO_PUBLIC_API_URL": "https://paddling-erased-alto.ngrok-free.dev/api"
       }
     },
     "production": {

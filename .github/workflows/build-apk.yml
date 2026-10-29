@@ -48,7 +48,7 @@ jobs:
     env:
       # Baked into the APK at build time. Must be reachable from any network,
       # so no secret/variable override: a stale LAN IP there only works on home Wi-Fi.
-      EXPO_PUBLIC_API_URL: ${{ inputs.api_url || 'https://caffeinic-maximiliano-incidentless.ngrok-free.dev/api' }}
+      EXPO_PUBLIC_API_URL: ${{ inputs.api_url || 'https://paddling-erased-alto.ngrok-free.dev/api' }}
 
     steps:
       - name: ⬇️ Checkout Source Code
