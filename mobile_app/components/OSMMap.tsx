@@ -15,6 +15,8 @@ import { WebView } from "react-native-webview";
 
 export type LatLng = { latitude: number; longitude: number };
 export type Region = LatLng & { latitudeDelta: number; longitudeDelta: number };
+export type MapPressEvent = { nativeEvent: { coordinate: LatLng } };
+export type MarkerDragEndEvent = { nativeEvent: { coordinate: LatLng } };
 
 export const PROVIDER_GOOGLE = undefined;
 export const PROVIDER_DEFAULT = undefined;
@@ -28,6 +30,8 @@ type MarkerProps = {
   anchor?: { x: number; y: number };
   /** Round icon to show instead of a pin. Defaults to "bus" when the Marker has custom children. */
   icon?: "bus" | "parcel";
+  draggable?: boolean;
+  onDragEnd?: (e: MarkerDragEndEvent) => void;
   children?: React.ReactNode;
 };
 type PolylineProps = {
@@ -50,6 +54,8 @@ type MapViewProps = {
   initialRegion?: Region;
   showsUserLocation?: boolean;
   showsScale?: boolean;
+  onPress?: (e: MapPressEvent) => void;
+  onMapReady?: () => void;
   children?: React.ReactNode;
   // Accepted for compatibility, ignored:
   provider?: unknown;
@@ -74,6 +80,7 @@ const deltaToZoom = (delta: number) =>
 // Walk children (including fragments and helper-returned elements) to collect markers/polylines.
 function collect(children: React.ReactNode) {
   const markers: any[] = [];
+  const dragHandlers: Array<((e: MarkerDragEndEvent) => void) | undefined> = [];
   const lines: any[] = [];
   const walk = (node: React.ReactNode) => {
     React.Children.forEach(node, (child) => {
@@ -90,7 +97,9 @@ function collect(children: React.ReactNode) {
           color: p.pinColor ?? "#E53935",
           rotation: p.rotation ?? 0,
           icon: p.icon ?? (p.children ? "bus" : null),
+          draggable: !!p.draggable,
         });
+        dragHandlers.push(p.onDragEnd);
       } else if (el.type === Polyline) {
         const p = el.props as PolylineProps;
         if (!p.coordinates?.length) return;
@@ -109,7 +118,7 @@ function collect(children: React.ReactNode) {
     });
   };
   walk(children);
-  return { markers, lines };
+  return { markers, lines, dragHandlers };
 }
 
 const buildHtml = (region: Region, showsUserLocation: boolean, showsScale: boolean) => `
@@ -130,10 +139,12 @@ const buildHtml = (region: Region, showsUserLocation: boolean, showsScale: boole
   };
   var map = L.map('map', { zoomControl: true, attributionControl: true })
     .setView([${region.latitude}, ${region.longitude}], ${deltaToZoom(region.latitudeDelta)});
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-    maxZoom: 19, subdomains: 'abcd',
-    attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
+  function send(o) { window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify(o)); }
+  map.on('click', function (e) { send({ type: 'press', lat: e.latlng.lat, lng: e.latlng.lng }); });
   ${showsScale ? "L.control.scale().addTo(map);" : ""}
 
   var layer = L.layerGroup().addTo(map);
@@ -152,9 +163,10 @@ const buildHtml = (region: Region, showsUserLocation: boolean, showsScale: boole
     (data.lines || []).forEach(function (l) {
       L.polyline(l.points, { color: l.color, weight: l.width, dashArray: l.dash }).addTo(layer);
     });
-    (data.markers || []).forEach(function (m) {
+    (data.markers || []).forEach(function (m, i) {
       var icon = m.icon ? roundIcon(m.icon, m.rotation) : pinIcon(m.color);
-      var mk = L.marker([m.lat, m.lng], { icon: icon }).addTo(layer);
+      var mk = L.marker([m.lat, m.lng], { icon: icon, draggable: !!m.draggable }).addTo(layer);
+      if (m.draggable) mk.on('dragend', function () { var p = mk.getLatLng(); send({ type: 'dragend', index: i, lat: p.lat, lng: p.lng }); });
       if (m.title || m.description) mk.bindPopup('<b>' + esc(m.title) + '</b>' + (m.description ? '<br/>' + esc(m.description) : ''));
     });
   };
@@ -178,11 +190,11 @@ const buildHtml = (region: Region, showsUserLocation: boolean, showsScale: boole
   map.locate({ watch: true, setView: false, enableHighAccuracy: true });`
       : ""
   }
-  window.ReactNativeWebView && window.ReactNativeWebView.postMessage('ready');
+  send({ type: 'ready' });
 </script></body></html>`;
 
 const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
-  { style, initialRegion, showsUserLocation = false, showsScale = false, children },
+  { style, initialRegion, showsUserLocation = false, showsScale = false, onPress, onMapReady, children },
   ref
 ) {
   const webRef = useRef<WebView>(null);
@@ -206,8 +218,11 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
     else pendingRef.current.push(js);
   }, []);
 
-  const { markers, lines } = collect(children);
+  const { markers, lines, dragHandlers } = collect(children);
   const dataJson = JSON.stringify({ markers, lines });
+  // Keep latest callbacks without rebuilding the page
+  const cbRef = useRef({ onPress, onMapReady, dragHandlers, dataJson });
+  cbRef.current = { onPress, onMapReady, dragHandlers, dataJson };
 
   useEffect(() => {
     run(`window.updateMap(${dataJson})`);
@@ -232,11 +247,24 @@ const MapView = forwardRef<MapViewHandle, MapViewProps>(function MapView(
   );
 
   const onMessage = (e: { nativeEvent: { data: string } }) => {
-    if (e.nativeEvent.data !== "ready") return;
-    readyRef.current = true;
-    webRef.current?.injectJavaScript(`window.updateMap(${dataJson});true;`);
-    pendingRef.current.forEach((js) => webRef.current?.injectJavaScript(js + ";true;"));
-    pendingRef.current = [];
+    let msg: any;
+    try {
+      msg = JSON.parse(e.nativeEvent.data);
+    } catch {
+      return;
+    }
+    const cb = cbRef.current;
+    if (msg.type === "ready") {
+      readyRef.current = true;
+      webRef.current?.injectJavaScript(`window.updateMap(${cb.dataJson});true;`);
+      pendingRef.current.forEach((js) => webRef.current?.injectJavaScript(js + ";true;"));
+      pendingRef.current = [];
+      cb.onMapReady?.();
+    } else if (msg.type === "press") {
+      cb.onPress?.({ nativeEvent: { coordinate: { latitude: msg.lat, longitude: msg.lng } } });
+    } else if (msg.type === "dragend") {
+      cb.dragHandlers[msg.index]?.({ nativeEvent: { coordinate: { latitude: msg.lat, longitude: msg.lng } } });
+    }
   };
 
   return (

@@ -28,7 +28,7 @@ import {
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Location from "expo-location";
-import MapView, { Marker, MapPressEvent, Region } from "react-native-maps";
+import MapView, { Marker, MapPressEvent, Region, MapViewHandle } from "../../../components/OSMMap";
 
 import FieldError from "../../../components/FieldError";
 import { useFieldErrors } from "../../../utils/validation";
@@ -79,7 +79,7 @@ export default function PackageDetails() {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Current-location pickup + map
-  const mapRef = useRef<MapView>(null);
+  const mapRef = useRef<MapViewHandle>(null);
   const [pickupCoords, setPickupCoords] = useState<Coords | null>(
     params.pickupLat && params.pickupLng
       ? { latitude: Number(params.pickupLat), longitude: Number(params.pickupLng) }
