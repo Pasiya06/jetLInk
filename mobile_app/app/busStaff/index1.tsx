@@ -324,14 +324,15 @@ export default function DriverHome() {
           {/* ── Bus + location card ──────────────────────────── */}
           <View style={[ui.card, styles.busCard]}>
             <View style={styles.busRow}>
-              <View style={{ flex: 1 }}>
+              {/* <IconBox bg={C.blueSoft} size={52}>
+                <MaterialIcons name="directions-bus" size={28} color={C.blue} />
+              </IconBox> */}
+              <View style={{ flex: 1, marginLeft:10 }}>
                 <Text style={styles.title1}>{getGreeting()} · your bus today</Text>
                 <Text style={styles.title2}>{busName(busNum) || busNum || "No Bus"}</Text>
-                {!!busName(busNum) && <Text style={styles.title1}>{busNum}</Text>}
+                {!!busName(busNum) && <Text style={styles.title3}>{busNum}</Text>}
               </View>
-              <IconBox bg={C.blueSoft} size={52}>
-                <MaterialIcons name="directions-bus" size={28} color={C.blue} />
-              </IconBox>
+              
             </View>
 
             <View style={[styles.statusPill, { backgroundColor: sharingActive ? C.greenSoft : "#FDF1F1" }]}>
@@ -620,7 +621,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   title1: { color: C.muted, fontSize: 13, fontWeight: "600", marginBottom: 2 },
-  title2: { color: C.navy, fontSize: 30, fontWeight: "800", letterSpacing: 0.5 },
+  title2: { color: C.navy, fontSize: 17, fontWeight: "800", letterSpacing: 0.5 },
+  title3: { color: C.muted, fontSize: 16, fontWeight: "600", marginBottom: 2 },
   subtitle1: {
     color: "#555",
     fontSize: 14,
