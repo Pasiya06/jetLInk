@@ -397,7 +397,7 @@ function ReceiptCard({ item }: { item: Receipt }) {
   const price = `Rs. ${Number(item.maxPrice || 0).toLocaleString()}`;
 
   return (
-    <View 
+    <TouchableOpacity 
       style={styles.card}
     >
       
@@ -514,7 +514,7 @@ function ReceiptCard({ item }: { item: Receipt }) {
       </View>
 
       
-    </View>
+    </TouchableOpacity>
   );
 }
 
