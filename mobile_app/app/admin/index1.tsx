@@ -141,10 +141,10 @@ export default function Index() {
 
           <View style={ui.grid}>
             <Tile
-              compact
               icon={<FontAwesome5 name="bus-alt" size={20} color={C.purple} />}
               iconBg={C.purpleSoft}
               title="Buses"
+              subtitle="Buses & schedules"
               onPress={() => router.push({
                 pathname: "/admin/buses/busAndSchedule",
                 params: {
@@ -156,10 +156,10 @@ export default function Index() {
               })}
             />
             <Tile
-              compact
               icon={<Feather name="gift" size={21} color={C.amber} />}
               iconBg={C.amberSoft}
               title="Parcel"
+              subtitle="Parcel history"
               onPress={() => router.push({
                 pathname: "/admin/Parcelhistory/parcelDetails",
                 params: {
@@ -171,17 +171,17 @@ export default function Index() {
               })}
             />
             <Tile
-              compact
               icon={<FontAwesome5 name="route" size={20} color={C.pink} />}
               iconBg={C.pinkSoft}
               title="Tours"
+              subtitle="Tour packages"
               onPress={tourinterface}
             />
             <Tile
-              compact
               icon={<SimpleLineIcons name="people" size={20} color={C.green} />}
               iconBg={C.greenSoft}
               title="Passengers"
+              subtitle="Registered users"
               onPress={() => router.push({
                 pathname: "/admin/regpassengers/index1",
                 params: {
@@ -193,10 +193,10 @@ export default function Index() {
               })}
             />
             <Tile
-              compact
               icon={<Ionicons name="briefcase-outline" size={21} color={C.blue} />}
               iconBg={C.blueSoft}
               title="Staff"
+              subtitle="Drivers & conductors"
               onPress={() => router.push({
                 pathname: "/admin/Staff/index1",
                 params: {
@@ -208,11 +208,11 @@ export default function Index() {
               })}
             />
             <Tile
-              compact
               danger
               icon={<MaterialCommunityIcons name="alarm-light-outline" size={22} color={C.red} />}
               iconBg={C.redSoft}
               title="Emergency"
+              subtitle="Emergency buses"
               onPress={() => router.push({
                 pathname: "/admin/emergency/EmergencyBuses",
                 params: {

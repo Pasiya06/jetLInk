@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { JetAlertHost } from "../components/JetAlert";
+import SplashVideo from "../components/SplashVideo";
 import {
   initNotifications,
   addNotificationListeners,
@@ -13,6 +14,7 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const router = useRouter();
+  const [showSplashVideo, setShowSplashVideo] = useState(true);
 
   useEffect(() => {
     async function prepare() {
@@ -23,10 +25,8 @@ export default function RootLayout() {
         );
       } catch (e) {
         console.warn("Init error:", e);
-      } finally {
-        // Dismiss splash screen so the app UI is revealed
-        await SplashScreen.hideAsync().catch(() => {});
       }
+      // The native splash is hidden by <SplashVideo /> once the video is ready to play
     }
 
     prepare();
@@ -52,6 +52,10 @@ export default function RootLayout() {
   return (
     <>
       <Stack screenOptions={{ headerShown: false }} />
+      {/* Branded splash video, plays once on app open */}
+      {showSplashVideo && (
+        <SplashVideo onFinish={() => setShowSplashVideo(false)} />
+      )}
       {/* Themed pop-up used by every Alert.alert in the app */}
       <JetAlertHost />
     </>

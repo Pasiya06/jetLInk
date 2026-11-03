@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Stack, useRouter } from "expo-router";
 import {
   Image,
@@ -11,15 +11,10 @@ import {
 } from "react-native";
 import { FontAwesome6 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as SplashScreen from 'expo-splash-screen';
 
 export default function Index() {
   const router = useRouter();
-
-  useEffect(() => {
-    // Ensure splash screen is hidden once this screen is ready
-    SplashScreen.hideAsync().catch(() => {});
-  }, []);
+  // The native splash is hidden by <SplashVideo /> in app/_layout.tsx
 
   const handleStart = () => {
     router.push("/passenger/selectScreen");
