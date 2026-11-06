@@ -6,10 +6,12 @@ import {
     getConductorById,
     deleteConductor,
     updateConductor,
-    conductorLogin,
+
     checkNIC,
     loginConductor
 } from "../controllers/conductorController.js";
+
+import { requireRole, requireSelfOrStaff } from "../utils/auth.js";
 
 const router = express.Router();
 
@@ -21,14 +23,14 @@ router.post("/login", loginConductor);
 
 
 // CRUD routes
-router.post("/", addConductor);
+router.post("/", requireRole("admin"), addConductor);
 
-router.get("/", getConductors);
+router.get("/", requireRole("admin"), getConductors);
 
-router.get("/:id", getConductorById);
+router.get("/:id", requireRole("staff"), getConductorById);
 
-router.put("/:id", updateConductor);
+router.put("/:id", requireRole("admin"), updateConductor);
 
-router.delete("/:id", deleteConductor);
+router.delete("/:id", requireRole("admin"), deleteConductor);
 
 export default router;

@@ -415,7 +415,7 @@ const styles = StyleSheet.create({
   cameraWrap: { flex: 1, borderRadius: 28, overflow: "hidden", backgroundColor: "#000", elevation: 6, shadowColor: "#0F1B2D", shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 } },
 
   frameOverlay: {
-    ...StyleSheet.absoluteFill,
+    ...StyleSheet.absoluteFillObject,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -429,7 +429,7 @@ const styles = StyleSheet.create({
   },
 
   loadingOverlay: {
-    ...StyleSheet.absoluteFill,
+    ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.55)",
     alignItems: "center",
     justifyContent: "center",

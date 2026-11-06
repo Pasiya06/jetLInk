@@ -25,7 +25,7 @@ export default function AlertBadge({ role }: { role: AlertRole }) {
   useFocusEffect(
     useCallback(() => {
       refresh();
-      const timer = setInterval(refresh, 30_000);
+      const timer = setInterval(refresh, 10_000);
       const unsubscribe = subscribeToNotificationHistory(refresh);
       return () => {
         clearInterval(timer);

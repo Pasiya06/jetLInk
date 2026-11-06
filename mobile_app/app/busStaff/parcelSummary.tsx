@@ -324,7 +324,6 @@ const ParcelService = () => {
 
 const styles = StyleSheet.create({
   sumCard: { padding: 18 },
-  cardTitle: { fontSize: 16, fontWeight: "800", color: "#0F1B2D", marginBottom: 6 },
   rowDivider: { borderBottomWidth: 1, borderBottomColor: "#EDF1F6" },
   totalBox: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 12, backgroundColor: "#E3F5EE", borderRadius: 14, paddingHorizontal: 14, paddingVertical: 12 },
   container:{

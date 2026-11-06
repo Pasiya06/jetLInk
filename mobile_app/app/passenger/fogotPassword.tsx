@@ -138,7 +138,7 @@ useEffect(() => {
       const data = await res.json();
 
       if (!data.success) {
-        setError("Invalid or expired code. Try again.");
+        setError(data.message || "Invalid or expired code. Try again.");
         setDigits(Array(OTP_LENGTH).fill(""));
         inputRefs.current[0]?.focus();
         return;
@@ -148,7 +148,8 @@ useEffect(() => {
         pathname: "/passenger/resetPassword",
         params: {
           email:email,
-          
+          // proves the code was correct; the server needs it to change the password
+          resetToken: data.otpToken,
         },
       });
 

@@ -117,6 +117,8 @@ const packageSchema = new mongoose.Schema(
   }
 );
 
+packageSchema.index({ createdAt: -1 }); // packages list (newest first)
+
 const Package = mongoose.model(
   "Package",
   packageSchema

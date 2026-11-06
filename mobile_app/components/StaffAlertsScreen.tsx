@@ -15,6 +15,7 @@ import {
   View,
 } from "react-native";
 import { Alert } from "./JetAlert";
+import { SkeletonList } from "./Skeleton";
 import { Stack, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
@@ -139,7 +140,7 @@ export default function StaffAlertsScreen({
 
   useEffect(() => {
     load();
-    const timer = setInterval(load, 30_000);
+    const timer = setInterval(load, 10_000);
     const unsubscribe = subscribeToNotificationHistory(load);
     return () => {
       clearInterval(timer);
@@ -321,10 +322,7 @@ export default function StaffAlertsScreen({
           }
         >
           {loading ? (
-            <View style={styles.center}>
-              <ActivityIndicator size="large" color="#0057D9" />
-              <Text style={styles.muted}>Loading alerts…</Text>
-            </View>
+            <SkeletonList count={5} />
           ) : error ? (
             <View style={styles.center}>
               <Ionicons name="cloud-offline-outline" size={48} color="#EF4444" />

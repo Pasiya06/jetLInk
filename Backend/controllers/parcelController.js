@@ -14,26 +14,26 @@ const parcelPassengerAlert = async (parcel, stage) => {
   const base = { type: "parcel", busNumber: parcel.Bnumber, data: { parcelId: id, status: parcel.status } };
 
   if (stage === "booked") {
-    await notifyPassengers(sender, {
+    notifyPassengers(sender, {
       ...base,
       title: `📦 Parcel ${id} booked`,
       body: `${route} on ${parcel.date || "-"} ${parcel.time || ""}. Bus ${bus}. Show the parcel QR when you hand it over.`,
     });
     if (!same) {
-      await notifyPassengers(receiver, {
+      notifyPassengers(receiver, {
         ...base,
         title: `📦 A parcel is coming to you`,
         body: `${parcel.sendername || "Someone"} sent you parcel ${id} (${route}) on bus ${bus}, ${parcel.date || ""}.`,
       });
     }
   } else if (stage === "pickup") {
-    await notifyPassengers(same ? [sender] : [sender, receiver], {
+    notifyPassengers(same ? [sender] : [sender, receiver], {
       ...base,
       title: `🚌 Parcel ${id} is on the way`,
       body: `Bus ${bus} collected the parcel (${route}). You can track the bus live.`,
     });
   } else if (stage === "delivered") {
-    await notifyPassengers(same ? [sender] : [sender, receiver], {
+    notifyPassengers(same ? [sender] : [sender, receiver], {
       ...base,
       title: `✅ Parcel ${id} delivered`,
       body: `Delivered to ${parcel.receivername || "the receiver"} at ${parcel.drop || "the destination"}.`,
@@ -41,6 +41,7 @@ const parcelPassengerAlert = async (parcel, stage) => {
   }
 };
 import { getBusBlockReason } from "../utils/busAvailability.js";
+import { nextNumber, maxOfPrefixed } from "../utils/nextId.js";
 
 export const createParcel = async (req, res) => {
   try {
@@ -50,22 +51,27 @@ export const createParcel = async (req, res) => {
       return res.status(409).json({ success: false, message: blockReason });
     }
 
-    // Find the last parcel
-    const lastParcel = await Parcel.findOne().sort({ createdAt: -1 });
+    // Next parcel number from an atomic counter (two bookings at once can't clash)
+    const nextId = await nextNumber("parcel", maxOfPrefixed(Parcel, "parcelId", "P"));
+    const parcelId = `P${String(nextId).padStart(4, "0")}`;
 
-    let parcelId = "P0001";
-
-    if (lastParcel && lastParcel.parcelId) {
-      const lastNumber = parseInt(lastParcel.parcelId.substring(1), 10);
-      parcelId = `P${String(lastNumber + 1).padStart(4, "0")}`;
+    // Passengers can't set the status themselves. Bus staff can: a walk-in
+    // parcel handed to the bus starts as "PickedUp".
+    const { status, delivered, deliveredAt, pickupVerified, pickupVerifiedAt, ...body } = req.body;
+    if (req.user?.role === "staff" || req.user?.role === "admin") {
+      if (status === "PickedUp") {
+        body.status = "PickedUp";
+        body.pickupVerified = true;
+        body.pickupVerifiedAt = new Date();
+      }
     }
 
     const parcel = await Parcel.create({
-      ...req.body,
+      ...body,
       parcelId,
     });
 
-    await notify({
+    notify({
       title: `📦 New parcel ${parcel.parcelId}`,
       body: `${parcel.pickup || "?"} → ${parcel.drop || "?"} on ${parcel.date || "-"} ${parcel.time || ""}. Bus ${parcel.Bnumber || "-"}.`,
       type: "parcel",
@@ -92,22 +98,12 @@ export const getParcelByEmailAndUsed = async (req, res) => {
   try {
     const { Semail, status } = req.params;
 
-    console.log("Search:", Semail, status);
-
     const parcels = await Parcel.find({
       Semail: Semail,
       status: status,
-    });
+    }).sort({ createdAt: -1 }).lean();
 
-    console.log("Parcels:", parcels);
-
-    if (parcels.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No parcels found",
-      });
-    }
-
+    // An empty list is a normal answer, not an error
     res.json({
       success: true,
       data: parcels,
@@ -123,7 +119,6 @@ export const getParcelByEmailAndUsed = async (req, res) => {
 
 export const generateParcelQR = async (req, res) => {
   const { parcelId} = req.params;
-   console.log("Searching Bus ID:", parcelId); 
   try {
     const parcel = await Parcel.findOne({parcelId});
     
@@ -189,7 +184,7 @@ export const verifyParcelQR = async (req, res) => {
       await parcel.save();
       await parcelPassengerAlert(parcel, "pickup");
 
-      await notify({
+      notify({
         title: `📦 Parcel ${parcel.parcelId} picked up`,
         body: `Bus ${parcel.Bnumber || "-"} collected the parcel (${parcel.pickup || "?"} → ${parcel.drop || "?"}).`,
         type: "parcel",
@@ -215,7 +210,7 @@ export const verifyParcelQR = async (req, res) => {
       await parcel.save();
       await parcelPassengerAlert(parcel, "delivered");
 
-      await notify({
+      notify({
         title: `✅ Parcel ${parcel.parcelId} delivered`,
         body: `Delivered to ${parcel.receivername || "the receiver"} at ${parcel.drop || "destination"}.`,
         type: "parcel",
@@ -291,22 +286,12 @@ export const getParcelBybusNumberandStatus = async (req, res) => {
   try {
     const { Bnumber, status } = req.params;
 
-    console.log("Search:", Bnumber, status);
-
     const parcels = await Parcel.find({
       Bnumber: Bnumber,
       status: status,
-    });
+    }).sort({ createdAt: -1 }).lean();
 
-    console.log("Parcels:", parcels);
-
-    if (parcels.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No parcels found",
-      });
-    }
-
+    // An empty list is a normal answer, not an error
     res.json({
       success: true,
       data: parcels,
@@ -342,7 +327,7 @@ export const markParcelDelivered = async (req, res) => {
       await parcel.save();
       await parcelPassengerAlert(parcel, "pickup");
 
-      await notify({
+      notify({
         title: `📦 Parcel ${parcel.parcelId} picked up`,
         body: `Bus ${parcel.Bnumber || "-"} collected the parcel (${parcel.pickup || "?"} → ${parcel.drop || "?"}).`,
         type: "parcel",
@@ -368,7 +353,7 @@ export const markParcelDelivered = async (req, res) => {
       await parcel.save();
       await parcelPassengerAlert(parcel, "delivered");
 
-      await notify({
+      notify({
         title: `✅ Parcel ${parcel.parcelId} delivered`,
         body: `Delivered to ${parcel.receivername || "the receiver"} at ${parcel.drop || "destination"}.`,
         type: "parcel",
@@ -403,19 +388,9 @@ export const getParcel = async (req, res) => {
   try {
     const { status } = req.params;
 
-    console.log("Search:", status);
+    const parcels = await Parcel.find({ status: status }).sort({ createdAt: -1 }).lean();
 
-    const parcels = await Parcel.find({status: status});
-
-    console.log("Parcels:", parcels);
-
-    if (parcels.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "No parcels found",
-      });
-    }
-
+    // An empty list is a normal answer, not an error
     res.json({
       success: true,
       data: parcels,
@@ -432,7 +407,7 @@ export const getParcel = async (req, res) => {
 // Get all parcel details
 export const getAllParcels = async (req, res) => {
   try {
-    const parcels = await Parcel.find().sort({ createdAt: -1 });
+    const parcels = await Parcel.find().sort({ createdAt: -1 }).lean();
 
     return res.status(200).json({
       success: true,

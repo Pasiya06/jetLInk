@@ -4,10 +4,10 @@
     "slug": "jetlink",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/JetLink.png",
     "scheme": "jetlink",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "backgroundColor": "#ffffff",
     "ios": {
       "supportsTablet": true
     },
@@ -34,7 +34,8 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff",
           "dark": {
-            "backgroundColor": "#173C79"
+            "image": "./assets/images/JetLink.png",
+            "backgroundColor": "#ffffff"
           }
         }
       ],

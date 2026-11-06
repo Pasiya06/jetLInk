@@ -10,22 +10,24 @@ import {
   getTicketByEmail,
 } from "../controllers/ticketController.js";
 
+import { requireRole, requireSelfOrStaff } from "../utils/auth.js";
+
 const router = express.Router();
 
-router.post("/", createTicket);
+router.post("/", requireRole("passenger"), createTicket);
 
-router.get("/", getTickets);
+router.get("/", requireRole("admin"), getTickets);
 
-router.post("/generate-qr", generateTicketQR);
+router.post("/generate-qr", requireRole(), generateTicketQR);
 
 router.get("/booked-seats", getBookedSeats);
 
-router.get("/bus/:ticketId/qr", generateTicketQRByticketId);
+router.get("/bus/:ticketId/qr", requireRole(), generateTicketQRByticketId);
 
-router.post("/verify", verifyTicket);
+router.post("/verify", requireRole("staff"), verifyTicket);
 
-router.get("/:ticketId", getTicketById);
+router.get("/:ticketId", requireRole(), getTicketById);
 
-router.get( "/email/:pemail/:busType/:used", getTicketByEmail);
+router.get("/email/:pemail/:busType/:used", requireSelfOrStaff("pemail"), getTicketByEmail);
 
 export default router;

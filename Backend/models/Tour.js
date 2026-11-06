@@ -252,4 +252,9 @@ const receiptSchema = new mongoose.Schema(
   }
 );
 
+// ── Indexes: make the app's common searches fast (built automatically on server start) ──
+receiptSchema.index({ pemail: 1, createdAt: -1 });    // passenger tour receipts
+receiptSchema.index({ busNumber: 1, createdAt: -1 }); // bus staff receipts / bus availability
+receiptSchema.index({ createdAt: -1 });               // admin tour receipts
+
 export default mongoose.model("Receipt", receiptSchema);

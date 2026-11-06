@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { getSavedLogin, forgetLogin, SavedLogin } from '../services/apiAuth';
 import { Stack, useRouter } from "expo-router";
 import {
   Image,
@@ -16,7 +17,24 @@ export default function Index() {
   const router = useRouter();
   // The native splash is hidden by <SplashVideo /> in app/_layout.tsx
 
+  // Stay logged in: offer to continue where the user left off
+  const [saved, setSaved] = useState<SavedLogin | null>(null);
+  useEffect(() => {
+    getSavedLogin().then(setSaved);
+  }, []);
+
   const handleStart = () => {
+    router.push("/passenger/selectScreen");
+  };
+
+  const handleContinue = () => {
+    if (!saved) return;
+    router.push({ pathname: saved.pathname as any, params: saved.params });
+  };
+
+  const handleSwitch = async () => {
+    await forgetLogin();
+    setSaved(null);
     router.push("/passenger/selectScreen");
   };
 
@@ -42,7 +60,7 @@ export default function Index() {
             <TouchableOpacity
               style={styles.submitButton}
               activeOpacity={0.85}
-              onPress={handleStart}
+              onPress={saved ? handleContinue : handleStart}
             >
               <LinearGradient
                 colors={['#173C79', '#155B8A', '#159B79']}
@@ -50,10 +68,17 @@ export default function Index() {
                 end={{ x: 1, y: 0 }}
                 style={styles.submitGradient}
               >
-                <Text style={styles.submitText}>Get Started</Text>
+                <Text style={styles.submitText} numberOfLines={1}>
+                  {saved ? `Continue as ${saved.name || "you"}` : "Get Started"}
+                </Text>
                 <FontAwesome6 name="arrow-right-long" size={20} color="#ffffff" />
               </LinearGradient>
             </TouchableOpacity>
+            {saved && (
+              <TouchableOpacity onPress={handleSwitch} style={styles.switchButton} activeOpacity={0.7}>
+                <Text style={styles.switchText}>Not you? Log in with another account</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </SafeAreaView>
@@ -118,6 +143,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  switchButton: {
+    marginTop: 16,
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  switchText: {
+    color: '#155B8A',
+    fontSize: 14,
+    fontWeight: '600',
   },
   submitText: {
     color: '#ffffff',

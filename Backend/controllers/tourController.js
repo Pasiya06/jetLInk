@@ -54,7 +54,7 @@ const todayDayNumber = () => {
 // Emails of passengers with a tour on this bus that hasn't ended yet
 export const getActiveTourEmails = async (busNumber) => {
   const today = todayDayNumber();
-  const tours = await Receipt.find({ busNumber }).select("pemail date tripDuration");
+  const tours = await Receipt.find({ busNumber }).select("pemail date tripDuration").lean();
   return tours
     .filter((t) => {
       const end = tourEndDay(t);
@@ -68,7 +68,7 @@ const findBookedBuses = async (date, days, onlyBus) => {
   const start = toDayNumber(date);
   const end = start + days - 1;
   const query = onlyBus ? { busNumber: onlyBus } : {};
-  const receipts = await Receipt.find(query).select("busNumber date tripDuration receiptId");
+  const receipts = await Receipt.find(query).select("busNumber date tripDuration receiptId").lean();
 
   const clashes = [];
   for (const r of receipts) {
@@ -347,7 +347,7 @@ export const createReceipt = async (req, res) => {
 
     const savedReceipt = await receipt.save();
 
-    await notify({
+    notify({
       title: `🏝️ New tour booking ${receiptId}`,
       body: `${pfirstName || ""} ${plastName || ""} booked a ${packageType || "tour"} on ${date || "-"}${pickup ? ` from ${pickup}` : ""}. Bus ${busNumber || "-"}.`,
       type: "tour",
@@ -356,7 +356,7 @@ export const createReceipt = async (req, res) => {
       data: { receiptId },
     });
 
-    await notifyPassengers(pemail, {
+    notifyPassengers(pemail, {
       title: "🏝️ Tour booking confirmed",
       body: `Booking ${receiptId}: ${packageType || "Tour"} package on ${date || "-"}${time ? ` at ${time}` : ""}${pickup ? `, pickup ${pickup}` : ""}. Bus ${busNumber || "-"}.`,
       type: "tour",
@@ -383,7 +383,8 @@ export const createReceipt = async (req, res) => {
 export const getAllReceipts = async (req, res) => {
   try {
     const receipts = await Receipt.find({})
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     return res.status(200).json({
       success: true,
@@ -441,7 +442,7 @@ export const getReceiptsByEmail = async (req, res) => {
 
     const receipts = await Receipt.find({ 
       pemail: pemail.trim().toLowerCase(), 
-    }).sort({ createdAt: -1 }); 
+    }).sort({ createdAt: -1 }).lean(); 
     
     return res.status(200).json({ 
       success: true, 
@@ -472,7 +473,7 @@ export const getReceiptsByBusNumber = async (req, res) => {
 
     const receipts = await Receipt.find({ 
       busNumber: busNumber
-    }).sort({ createdAt: -1 }); 
+    }).sort({ createdAt: -1 }).lean(); 
     
     return res.status(200).json({ 
       success: true, 
@@ -493,7 +494,6 @@ export const getReceiptsByBusNumber = async (req, res) => {
 
 export const generateTourQR = async (req, res) => {
   const { receiptId} = req.params;
-   console.log("Searching Bus ID:", receiptId); 
   try {
     const tour = await Receipt.findOne({receiptId});
     
@@ -592,7 +592,7 @@ export const verifyTourQR = async (req, res) => {
     tour.scannedBy = busNumber || "";
     await tour.save();
 
-    await notify({
+    notify({
       title: `✅ Tour ${tour.receiptId} boarded`,
       body: `${tour.pfirstName || ""} ${tour.plastName || ""} boarded bus ${tour.busNumber}.`,
       type: "tour",
@@ -601,7 +601,7 @@ export const verifyTourQR = async (req, res) => {
       data: { receiptId: tour.receiptId },
     });
 
-    await notifyPassengers(tour.pemail, {
+    notifyPassengers(tour.pemail, {
       title: "✅ Welcome aboard!",
       body: `Your tour ${tour.receiptId} has started on bus ${tour.busNumber}. Enjoy the trip!`,
       type: "tour",
@@ -709,7 +709,7 @@ export const payExtraKm = async (req, res) => {
     receipt.extraKmAmount = (receipt.extraKmAmount || 0) + amount;
     await receipt.save();
 
-    await notify({
+    notify({
       title: `➕ Extra km paid ${receipt.receiptId}`,
       body: `${receipt.pfirstName || ""} ${receipt.plastName || ""} added ${kmNumber} km (LKR ${amount.toLocaleString()}) to the tour on ${receipt.date}. Bus ${receipt.busNumber}.`,
       type: "tour",
@@ -718,7 +718,7 @@ export const payExtraKm = async (req, res) => {
       data: { receiptId: receipt.receiptId },
     });
 
-    await notifyPassengers(receipt.pemail, {
+    notifyPassengers(receipt.pemail, {
       title: "💳 Extra km payment successful",
       body: `You added ${kmNumber} km (LKR ${amount.toLocaleString()}) to tour ${receipt.receiptId}.`,
       type: "tour",

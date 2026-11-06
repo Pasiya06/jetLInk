@@ -2,6 +2,8 @@ import express from "express";
 
 import { addDriver, getDrivers, getDriverById, deleteDriver, updateDriver, checkNIC } from "../controllers/driverController.js";
 
+import { requireRole, requireSelfOrStaff } from "../utils/auth.js";
+
 const router = express.Router();
 
 // Authentication routes
@@ -10,14 +12,14 @@ router.get("/check/:nic", checkNIC);
 
 
 // CRUD routes
-router.post("/", addDriver);
+router.post("/", requireRole("admin"), addDriver);
 
-router.get("/", getDrivers);
+router.get("/", requireRole("admin"), getDrivers);
 
-router.get("/:id", getDriverById);
+router.get("/:id", requireRole("staff"), getDriverById);
 
-router.put("/:id", updateDriver);
+router.put("/:id", requireRole("admin"), updateDriver);
 
-router.delete("/:id", deleteDriver);
+router.delete("/:id", requireRole("admin"), deleteDriver);
 
 export default router;

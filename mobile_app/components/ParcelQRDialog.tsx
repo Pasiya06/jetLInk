@@ -12,7 +12,7 @@ import { Alert } from "./JetAlert";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import QRCode from "react-native-qrcode-svg";
-import ViewShot, { ViewShotRef } from "react-native-view-shot";
+import ViewShot from "react-native-view-shot";
 import * as Sharing from "expo-sharing";
 
 interface ParcelQRDialogProps {
@@ -32,7 +32,7 @@ export default function ParcelQRDialog({
   parcelId,
   loading,
 }: ParcelQRDialogProps) {
-  const viewShotRef = useRef<ViewShotRef>(null);
+  const viewShotRef = useRef<ViewShot>(null);
   const [sharing, setSharing] = useState(false);
 
   const handleShare = async () => {

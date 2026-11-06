@@ -28,141 +28,74 @@ export default function PaymentSuccessScreen() {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const createParcel = async (parcelData: any) => {
-    try {
-        const response = await fetch(`${API_URL}/parcel`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(parcelData),
-        });
+  const [saving, setSaving] = useState(true);
+  const started = useRef(false);
 
-        const data = await response.json();
+  const parcelData = {
+    sendername:params.sendername,
+    Smobilenumber:params.smobilenumber,
+    Semail:params.semail,
+    receivername:params.receivername,
+    Rmobilenumber:params.rmobilenumber,
+    Remail:params.remail,
+    weight:params.weight,
+    pickup:params.pickup,
+    drop:params.drop,
+    date:params.date,
+    time:params.time,
+    Bnumber:params.bNumber,
+    totalFare:params.totalFare,
+  };
 
-        return data;
-    } catch (error) {
-        console.log(error);
-        return {
-        success: false,
-        message: "Server connection failed",
-        };
-    }
-    };
-
-
-  const loadQr = async () =>{
-    const response = await fetch(`${API_URL}/parcel/generateQR`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            sendername: params.sendername,
-            receivername: params.receivername,
-            pickup: params.pickup,
-            drop: params.drop,
-            weight: params.weight,
-            totalFare: params.totalFare,
-        }),
-        });
-
-    const data = await response.json();
-
-        if (data.success) {
-            setQrToken(data.qrToken);
-        console.log(data.qrToken);
-        }
-  }
-
+  // Save the parcel as soon as this screen opens (once), then show its real QR code.
+  // Before, the parcel was only saved when a button was tapped, so leaving the
+  // screen another way lost the booking.
   useEffect(() => {
-          
-    loadQr();
-
+    if (started.current) return;
+    started.current = true;
+    (async () => {
+      try {
+        const response = await fetch(`${API_URL}/parcel`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(parcelData),
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          setError(String(data.message || "Your parcel could not be booked. Please try again."));
+          return;
+        }
+        const parcelId = data.data?.parcelId || data.parcel?.parcelId;
+        if (parcelId) {
+          const qr = await fetch(`${API_URL}/parcel/parcel/${encodeURIComponent(parcelId)}/qr`);
+          const qrData = await qr.json();
+          if (qrData.qrToken) setQrToken(qrData.qrToken);
+        }
+      } catch (err) {
+        console.log(err);
+        setError("Couldn't reach the server. Your parcel may not be booked — check My Parcels.");
+      } finally {
+        setSaving(false);
+      }
+    })();
   }, []);
 
-  const handleSaveParcel = async () => {
-      const parcelData = {
-        sendername:params.sendername,
-        Smobilenumber:params.smobilenumber,
-        Semail:params.semail,
-        receivername:params.receivername,
-        Rmobilenumber:params.rmobilenumber,
-        Remail:params.remail,
-        weight:params.weight,
-        pickup:params.pickup,
-        drop:params.drop,
-        date:params.date,
-        time:params.time,
-        Bnumber:params.bNumber,
-        totalFare:params.totalFare,
-      };
-  
-      const result = await createParcel(parcelData);
-  
-      if (result.success) {
-        router.push({
-              pathname: "/passenger/parcel/index2",
-              params: {
-                
-                Pid: params.Pid,
-                Pid1: params.Pid1,
-                pfirstName: params.pfirstName,
-                plastName:params.plastName,
-                pphoneNumber: params.pphoneNumber,
-                pemail: params.pemail,
-                
-              },
-            })
-        
-  
-  
-      } else {
-        Alert.alert("Error", result.message);
-      }
-    };
+  const passengerParams = {
+    Pid: params.Pid,
+    Pid1: params.Pid1,
+    pfirstName: params.pfirstName,
+    plastName:params.plastName,
+    pphoneNumber: params.pphoneNumber,
+    pemail: params.pemail,
+  };
 
-    const handleSearch = async () => {
-        const parcelData = {
-        sendername:params.sendername,
-        Smobilenumber:params.smobilenumber,
-        Semail:params.semail,
-        receivername:params.receivername,
-        Rmobilenumber:params.rmobilenumber,
-        Remail:params.remail,
-        weight:params.weight,
-        pickup:params.pickup,
-        drop:params.drop,
-        date:params.date,
-        time:params.time,
-        Bnumber:params.bNumber,
-        totalFare:params.totalFare,
-      };
-  
-      const result = await createParcel(parcelData);
-  
-      if (result.success) {
-        router.push({
-              pathname: "/passenger/index1",
-              params: {
-                
-                Pid: params.Pid,
-                Pid1: params.Pid1,
-                pfirstName: params.pfirstName,
-                plastName:params.plastName,
-                pphoneNumber: params.pphoneNumber,
-                pemail: params.pemail,
-                
-              },
-            })
-        
-  
-  
-      } else {
-        Alert.alert("Error", result.message);
-      }
-    };
-  
+  const handleSaveParcel = () => {
+    router.push({ pathname: "/passenger/parcel/index2", params: passengerParams });
+  };
+
+  const handleSearch = () => {
+    router.push({ pathname: "/passenger/index1", params: passengerParams });
+  };
 
   useEffect(() => {
     Animated.sequence([
@@ -204,9 +137,9 @@ export default function PaymentSuccessScreen() {
       </Animated.View>
 
       <Animated.View style={{ opacity: fadeAnim, width: '100%', alignItems: 'center' }}>
-        <Text style={styles.title}>Payment Successful</Text>
+        <Text style={styles.title}>{error ? "Booking failed" : saving ? "Saving your parcel…" : "Payment Successful"}</Text>
         <Text style={styles.subtitle}>
-          Your parcel has been booked successfully
+          {error ? "You have not been charged." : "Your parcel has been booked successfully"}
         </Text>
 
         {/* Amount */}

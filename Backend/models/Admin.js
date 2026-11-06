@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { passwordPlugin } from "../utils/password.js";
 
 const adminSchema = new mongoose.Schema(
   {
@@ -36,6 +37,9 @@ const adminSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Hash passwords, never return them in responses
+adminSchema.plugin(passwordPlugin);
 
 const Admin = mongoose.model("Admin", adminSchema);
 

@@ -25,6 +25,8 @@ import {
  } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList, SkeletonStat } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 import { formatEmergencyTime, emergencyTimeAgo } from "../../../utils/emergencyTime";
 
 if (
@@ -357,9 +359,10 @@ export default function EmergencyBuses() {
   const params = useLocalSearchParams();
   
 
-  const fetchEmergencyBuses = useCallback(async () => {
+  // silent = background live refresh (keep current list, no error banner flicker)
+  const fetchEmergencyBuses = useCallback(async (silent = false) => {
     try {
-      setError("");
+      if (!silent) setError("");
 
       if (!API_URL) {
         throw new Error("EXPO_PUBLIC_API_URL is not configured.");
@@ -378,20 +381,17 @@ export default function EmergencyBuses() {
 
       setBuses(emergencyBuses);
       setUpdatedAt(new Date());
+      setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      if (!silent) setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, []);
 
-  // Refetch whenever the screen is focused (no full-screen spinner after first load)
-  useFocusEffect(
-    useCallback(() => {
-      fetchEmergencyBuses();
-    }, [fetchEmergencyBuses])
-  );
+  // Live: loads on focus, then re-checks every 5 seconds (emergencies need to show fast)
+  useLiveRefresh((silent) => fetchEmergencyBuses(silent), 5_000);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -414,9 +414,22 @@ export default function EmergencyBuses() {
     return (
       <>
         <Stack.Screen options={{ title: "", headerShown: false }} />
-        <SafeAreaView style={styles.center}>
-          <ActivityIndicator size="large" color={C.brand} />
-          <Text style={styles.loadingText}>Checking for emergencies…</Text>
+        <SafeAreaView style={styles.container}>
+          <LinearGradient
+            colors={["#173C79","#155B8A","#159B79",]}
+            start={{x: 0, y: 0,}}
+            end={{x: 1, y: 1,}}
+            style={styles.submitGradient1}
+          >
+            <View style={styles.header}>
+              <View style={styles.headerTop}>
+                <Text style={styles.title}>Emergency buses</Text>
+              </View>
+              <Text style={styles.subtitle}>Checking for emergencies…</Text>
+            </View>
+          </LinearGradient>
+          <SkeletonStat style={{ marginHorizontal: 16, marginTop: -24 }} />
+          <SkeletonList count={3} />
         </SafeAreaView>
       </>
     );

@@ -17,6 +17,8 @@ import { Ionicons, MaterialIcons, FontAwesome, Feather, Entypo } from '@expo/vec
 import {getConductors, deleteConductor,} from "../../../services/conductorService";
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 import { ScreenHeader, SearchBox, SectionLabel, Pill, EmptyState, GradientButton, Avatar, C, ui } from "../../../components/JetUI";
 interface Conductor {
   _id: string;
@@ -41,21 +43,23 @@ const BusScreen: React.FC = () => {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   
   
-  const loadConductors = async () => {
+  const [loading, setLoading] = useState(true);
+
+  // silent = background live refresh (no pop-up if a tick fails)
+  const loadConductors = async (silent = false) => {
   try {
     const response = await getConductors();
     setConductors(response.data);
   } catch (error) {
     console.log(error);
-    Alert.alert("Error", "Failed to load conductors.");
+    if (!silent) Alert.alert("Error", "Failed to load conductors.");
+  } finally {
+    setLoading(false);
   }
 };
 
-useFocusEffect(
-  useCallback(() => {
-    loadConductors();
-  }, [])
-);
+// Live: loads on focus, then refreshes every few seconds
+useLiveRefresh((silent) => loadConductors(silent));
 
   const handleSearch = () => {
     router.push({
@@ -171,6 +175,7 @@ useFocusEffect(
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 250 }}
             ListEmptyComponent={
+              loading ? <SkeletonList count={4} cardStyle={{ marginHorizontal: 0 }} /> :
               <EmptyState
                 icon={<Ionicons name="people-outline" size={28} color={C.amber} />}
                 title="No conductors yet"

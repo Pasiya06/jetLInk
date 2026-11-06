@@ -25,6 +25,7 @@ import {
   Foundation
 } from '@expo/vector-icons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { forgetLogin } from "../../services/apiAuth";
 import { LinearGradient } from 'expo-linear-gradient';
 import { BiTrip } from "react-icons/bi";
 import AlertBadge from "../../components/AlertBadge";
@@ -82,7 +83,8 @@ export default function Index() {
         text: "Logout",
         style: "destructive",
         onPress: async () => {
-          await AsyncStorage.clear(); // or remove specific keys
+          await forgetLogin(); // log out: forget the login token
+          await AsyncStorage.clear();
           router.replace("/passenger/selectScreen");
         },
       },

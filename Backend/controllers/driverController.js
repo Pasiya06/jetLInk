@@ -53,7 +53,7 @@ export const addDriver = async (req, res) => {
 
 export const getDrivers = async (req, res) => {
   try {
-    const drivers = await Driver.find();
+    const drivers = await Driver.find().select("-password").lean();
 
     res.json({
       success: true,

@@ -1,48 +1,43 @@
 import cron from "node-cron";
 import Parcel from "../models/Parcel.js";
+import { dayNumber, todayInSriLanka, TIME_ZONE } from "../utils/sriLankaDate.js";
 
 const updateExpiredParcels = async () => {
   try {
-    const today = new Date();
+    // Today in Sri Lanka, whatever time zone the server is in
+    const today = todayInSriLanka();
 
-    // Set today to midnight
-    today.setHours(0, 0, 0, 0);
-
+    // Only the fields we need, as plain objects (much faster than full documents)
     const parcels = await Parcel.find({
       delivered: false,
       status: { $ne: "Delivered" },
-    });
+    }).select("_id parcelId date").lean();
 
-    let updatedCount = 0;
+    const expiredIds = [];
 
     for (const parcel of parcels) {
       if (!parcel.date) continue;
 
-      // Your date format should be MM/DD/YYYY
-      const [month, day, year] = parcel.date.split("/").map(Number);
-
-      if (!month || !day || !year) {
+      const parcelDate = dayNumber(parcel.date); // date format: MM/DD/YYYY
+      if (parcelDate == null) {
         console.log(`Invalid parcel date: ${parcel.date}`);
         continue;
       }
 
-      const parcelDate = new Date(year, month - 1, day);
-      parcelDate.setHours(0, 0, 0, 0);
-
       // If parcel date has passed
       if (parcelDate < today) {
-        parcel.delivered = true;
-        parcel.deliveredAt = new Date();
-        parcel.status = "Delivered";
-
-        await parcel.save();
-
-        updatedCount++;
-
-        console.log(
-          `Parcel ${parcel.parcelId} automatically marked as Delivered`
-        );
+        expiredIds.push(parcel._id);
       }
+    }
+
+    // One database call for all expired parcels instead of one save per parcel
+    let updatedCount = 0;
+    if (expiredIds.length) {
+      const result = await Parcel.updateMany(
+        { _id: { $in: expiredIds } },
+        { $set: { delivered: true, deliveredAt: new Date(), status: "Delivered" } }
+      );
+      updatedCount = result.modifiedCount;
     }
 
     if (updatedCount > 0) {
@@ -60,6 +55,6 @@ const updateExpiredParcels = async () => {
     cron.schedule("5 0 * * *", () => {
       console.log("Checking expired parcels...");
       updateExpiredParcels();
-    });
+    }, { timezone: TIME_ZONE });
 
 export default updateExpiredParcels;

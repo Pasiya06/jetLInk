@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -23,6 +23,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenHeader } from "../../../components/JetUI";
 import { useBusNames, getBusLabel } from "../../../components/BusName";
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 import TourReceiptCard, { TourReceipt } from "../../../components/TourReceiptCard";
 
 if (
@@ -80,8 +82,11 @@ export default function ReceiptList() {
   const goneReceipts = receipts.filter((r) => r.status === "gone");
   const shown = listTab === "active" ? activeReceipts : goneReceipts;
    
+  const loadedOnce = useRef(false);
+
+  // silent = background live refresh (no skeleton, no error screen)
   const fetchReceipts = useCallback(
-    async (refresh = false) => {
+    async (refresh = false, silent = false) => {
       if (!pemail) {
         setError("Passenger email is missing.");
         setLoading(false);
@@ -97,10 +102,11 @@ export default function ReceiptList() {
       }
 
       try {
-        if (refresh) setRefreshing(true);
-        else setLoading(true);
-
-        setError("");
+        if (!silent) {
+          if (refresh) setRefreshing(true);
+          else if (!loadedOnce.current) setLoading(true); // skeleton only before first data
+          setError("");
+        }
 
         const email = encodeURIComponent(pemail.trim().toLowerCase());
         const response = await fetch(`${API_URL}/receipts/email/${email}`);
@@ -111,8 +117,10 @@ export default function ReceiptList() {
         }
 
         setReceipts(data.receipts || []);
+        loadedOnce.current = true;
+        setError("");
       } catch (err) {
-        setError(
+        if (!silent) setError(
           err instanceof Error ? err.message : "Unable to fetch receipts."
         );
       } finally {
@@ -123,12 +131,8 @@ export default function ReceiptList() {
     [pemail]
   );
 
-  // Reload every time the list is shown (e.g. after paying for extra km)
-  useFocusEffect(
-    useCallback(() => {
-      fetchReceipts();
-    }, [fetchReceipts])
-  );
+  // Live: reloads when shown (e.g. after paying for extra km), then every few seconds
+  useLiveRefresh((silent) => fetchReceipts(false, silent));
 
   const openPackage = (item: Receipt) =>
     router.push({
@@ -200,10 +204,7 @@ export default function ReceiptList() {
       </View>
 
       {loading ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color={C.brand} />
-          <Text style={styles.infoText}>Loading your receipts…</Text>
-        </View>
+        <SkeletonList count={4} />
       ) : error ? (
         <View style={styles.center}>
           <View style={[styles.stateIcon, { backgroundColor: "#fde8ea" }]}>

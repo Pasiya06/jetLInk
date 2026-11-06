@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Feather as Icon, AntDesign, Fontisto, Ionicons } from '@expo/vector-icons';
 import { ScreenHeader, IconBox, GRADIENT, C } from "../../components/JetUI";
 import { saveSession } from "../../services/notificationService";
+import { rememberLogin } from "../../services/apiAuth";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 const OTP_LENGTH = 6;
@@ -122,12 +123,12 @@ export const FlatmateLogin: React.FC = () => {
       const res = await fetch(`${API_URL}/otp/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
+        body: JSON.stringify({ email, otp, busNumber: params.busNo }),
       });
       const data = await res.json();
 
       if (!data.success) {
-        setError("Invalid or expired code. Try again.");
+        setError(data.message || "Invalid or expired code. Try again.");
         setDigits(Array(OTP_LENGTH).fill(""));
         inputRefs.current[0]?.focus();
         return;
@@ -136,20 +137,19 @@ export const FlatmateLogin: React.FC = () => {
       // Remember the bus on this phone so its alerts (bookings, parcels, tours…) are shown
       await saveSession({ role: "staff", busNumber: String(params.busNo ?? "").trim().toUpperCase() });
 
+      const staffParams: Record<string, string> = {};
+      for (const key of ["conductorNIC", "cfirstName", "clastName", "cphoneNumber", "cemail", "driverId", "dfirstName", "dlastName", "dphoneNumber", "busNo"]) {
+        staffParams[key] = String(params[key] ?? "");
+      }
+      // Save the staff login token + details so the app can stay logged in
+      await rememberLogin(
+        { role: "staff", name: `Bus ${staffParams.busNo}`, pathname: "/busStaff/index1", params: staffParams },
+        data.token
+      );
+
       router.push({
         pathname: "/busStaff/index1",
-        params: {
-          conductorNIC:params.conductorNIC,
-          cfirstName:params.cfirstName,
-          clastName:params.clastName,
-          cphoneNumber:params.cphoneNumber,
-          cemail:params.cemail,
-          driverId:params.driverId,
-          dfirstName:params.dfirstName,
-          dlastName:params.dlastName,
-          dphoneNumber:params.dphoneNumber,
-          busNo:params.busNo,
-        },
+        params: staffParams,
       });
 
       //router.replace("/index6"); // swap for your post-verification route

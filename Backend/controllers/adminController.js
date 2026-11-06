@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 import Admin from "../models/Admin.js";
+import { signLoginToken } from "../utils/auth.js";
 
 // Never send the password hash back to the app
 const toSafeAdmin = (admin) => {
@@ -37,6 +38,7 @@ export const loginAdmin = async (req, res) => {
     res.json({
       success: true,
       admin: toSafeAdmin(admin),
+      token: signLoginToken({ id: admin._id, role: "admin", email: admin.email }),
     });
   } catch (error) {
     res.status(500).json({

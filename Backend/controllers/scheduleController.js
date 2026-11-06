@@ -39,7 +39,7 @@ export const addSchedule = async (req, res) => {
 export const getSchedules = async (req, res) => {
   try {
     const [schedules, emergencyMap, infoMap] = await Promise.all([
-      Schedule.find(),
+      Schedule.find().lean(),
       getEmergencyBusMap(),
       getBusInfoMap(),
     ]);
@@ -142,25 +142,9 @@ export const deleteSchedule = async (req, res) => {
       });
     }
 
-    const deletedScheduleId = schedule.scheduleId;
-
-    // Delete the schedule
+    // Delete the schedule. Other schedules keep their IDs, so a passenger
+    // who is booking one of them right now isn't moved to a different trip.
     await Schedule.findByIdAndDelete(req.params.id);
-
-    // Shift remaining schedule IDs down by 1
-    await Schedule.updateMany(
-      { scheduleId: { $gt: deletedScheduleId } },
-      { $inc: { scheduleId: -1 } }
-    );
-
-    // Update auto-increment counter tracker setup
-    const totalSchedules = await Schedule.countDocuments();
-
-    await Counter.findByIdAndUpdate(
-      "scheduleId",
-      { seq: totalSchedules },
-      { upsert: true }
-    );
 
     res.json({
       success: true,

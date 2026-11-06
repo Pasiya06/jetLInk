@@ -7,7 +7,7 @@ import { getActiveTourEmails } from "./tourController.js";
 const passengersOnBus = async (busNumber) => {
   try {
     const [tickets, tourEmails] = await Promise.all([
-      Ticket.find({ bNumber: busNumber, used: false }).select("pemail"),
+      Ticket.find({ bNumber: busNumber, used: false }).select("pemail").lean(),
       getActiveTourEmails(busNumber),
     ]);
     return [...tickets.map((t) => t.pemail), ...tourEmails];
@@ -22,7 +22,7 @@ const busDisplay = (bus) => (bus.busName ? `${bus.busName} (${bus.busNumber})` :
 // @desc    Get all buses
 export const getBuses = async (req, res) => {
   try {
-    const buses = await Bus.find({}).sort({ busId: 1 });
+    const buses = await Bus.find({}).sort({ busId: 1 }).lean();
     res.status(200).json(buses);
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -172,14 +172,13 @@ export const logoutBus = async (req, res) => {
 export const getBusesByBusType = async (req, res) => {
   try {
     const { busType } = req.query; // Get busType from query params
-    console.log(busType);
     let filter = {};
 
     if (busType) {
       filter.busType = busType;
     }
 
-    const buses = await Bus.find(filter).sort({ busId: 1 });
+    const buses = await Bus.find(filter).sort({ busId: 1 }).lean();
 
     res.status(200).json({
       success: true,
@@ -297,7 +296,7 @@ export const reportEmergency = async (req, res) => {
       });
     }
 
-    await notify({
+    notify({
       title: `🚨 Emergency: Bus ${bus.busNumber}`,
       body: `Bus ${bus.busNumber} reported a ${status} at ${reportedAt.toLocaleString("en-GB", {
         timeZone: "Asia/Colombo",
@@ -318,13 +317,13 @@ export const reportEmergency = async (req, res) => {
       },
     });
 
-    await notifyPassengers(await passengersOnBus(bus.busNumber), {
+    passengersOnBus(bus.busNumber).then((list) => notifyPassengers(list, {
       title: `⚠️ ${busDisplay(bus)} is delayed`,
       body: `Your bus reported a ${status === "accident" ? "accident" : "breakdown"}. We're sorry for the trouble. Please wait for updates or contact JetLink support.`,
       type: "emergency",
       busNumber: bus.busNumber,
       data: { busNumber: bus.busNumber, status },
-    });
+    }));
 
     return res.status(200).json({
       success: true,
@@ -369,7 +368,7 @@ export const resolveEmergency = async (req, res) => {
       });
     }
 
-    await notify({
+    notify({
       title: `✅ Emergency resolved: Bus ${bus.busNumber}`,
       body: `Bus ${bus.busNumber} is back to normal.`,
       type: "emergency",
@@ -377,13 +376,13 @@ export const resolveEmergency = async (req, res) => {
       data: { busNumber: bus.busNumber, status: "normal" },
     });
 
-    await notifyPassengers(await passengersOnBus(bus.busNumber), {
+    passengersOnBus(bus.busNumber).then((list) => notifyPassengers(list, {
       title: `✅ ${busDisplay(bus)} is back in service`,
       body: "The problem has been fixed and your bus is running again.",
       type: "emergency",
       busNumber: bus.busNumber,
       data: { busNumber: bus.busNumber, status: "normal" },
-    });
+    }));
 
     return res.status(200).json({
       success: true,
@@ -439,7 +438,7 @@ export const getAllEmergencyBuses = async (req, res) => {
     const buses = await Bus.find({ emergency: true }).sort({
       emergencyAt: -1,
       busId: 1,
-    });
+    }).lean();
 
     return res.status(200).json({
       success: true,
@@ -465,7 +464,7 @@ export const getOtherEmergencyBuses = async (req, res) => {
     const buses = await Bus.find({
       emergency: true,
       busNumber: { $ne: busNumber },
-    }).sort({ busId: 1 });
+    }).sort({ busId: 1 }).lean();
 
     return res.status(200).json({
       success: true,

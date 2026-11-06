@@ -4,12 +4,14 @@ import {
   updateParcelFee,
 } from "../controllers/parcelFeeController.js";
 
+import { requireRole, requireSelfOrStaff } from "../utils/auth.js";
+
 const router = express.Router();
 
 // Get parcel fee
 router.get("/", getParcelFee);
 
 // Update parcel fee
-router.put("/", updateParcelFee);
+router.put("/", requireRole("admin"), updateParcelFee);
 
 export default router;

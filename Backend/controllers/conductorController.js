@@ -1,5 +1,7 @@
 import Conductor from "../models/Conductor.js";
 import { cleanStaffFields, findStaffConflict } from "../utils/staffUniqueness.js";
+import { checkPassword } from "../utils/password.js";
+import { signLoginToken } from "../utils/auth.js";
 
 // Renumber 1, 2, 3... after a delete without breaking the unique index.
 // Step 1 moves every id to a temporary negative number, step 2 sets the final number.
@@ -13,65 +15,6 @@ const renumberIds = async (Model, field) => {
   await Model.bulkWrite(
     docs.map((d, i) => ({ updateOne: { filter: { _id: d._id }, update: { $set: { [field]: i + 1 } } } }))
   );
-};
-
-// Conductor Login - Send OTP
-export const conductorLogin = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "Email and password are required",
-      });
-    }
-
-    const conductor = await Conductor.findOne({ email: email.toLowerCase() });
-
-    if (!conductor) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid email or password",
-      });
-    }
-
-    const isPasswordValid = await bcryptjs.compare(password, conductor.password);
-
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid email or password",
-      });
-    }
-
-    // Generate and store OTP
-    const otp = generateOTP();
-    const existingOTP = await OTP.findOneAndDelete({ email: email.toLowerCase(), userType: "conductor" });
-
-    const newOTP = new OTP({
-      email: email.toLowerCase(),
-      otp: otp,
-      userType: "conductor",
-    });
-
-    await newOTP.save();
-
-    // Send OTP via email
-    await sendOTPEmail(email, otp);
-
-    res.json({
-      success: true,
-      message: "OTP sent to your email. Please verify to complete login.",
-      tempToken: Buffer.from(JSON.stringify({ email, conductorId: conductor._id })).toString("base64"),
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
 };
 
 export const addConductor = async (req, res) => {
@@ -119,7 +62,7 @@ export const getConductors = async (req, res) => {
 
     try {
 
-        const conductors = await Conductor.find();
+        const conductors = await Conductor.find().select("-password").lean();
 
         res.json({
             success: true,
@@ -284,7 +227,7 @@ export const loginConductor = async (req, res) => {
       });
     }
 
-    if (password !== conductor.password) {
+    if (!(await checkPassword(password, conductor.password))) {
       return res.status(401).json({
         success: false,
         message: "Invalid NIC or password",
@@ -294,6 +237,12 @@ export const loginConductor = async (req, res) => {
     res.json({
       success: true,
       message: "Login Successful",
+      token: signLoginToken({
+        id: conductor._id,
+        role: "staff",
+        email: conductor.email,
+        busNumber: req.body.busNumber,
+      }),
       data: {
         _id: conductor._id,
         conductorId: conductor.conductorId,

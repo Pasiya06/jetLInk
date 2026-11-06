@@ -30,6 +30,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenHeader, EmptyState, ParcelRow, C } from "../../../components/JetUI";
 import { useBusNames } from "../../../components/BusName";
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 
 interface ticket {
   _id: string;
@@ -72,7 +74,10 @@ const JetLinkInterface: React.FC = () => {
   const pemail = params.pemail as string;
   const busType = params.busType as string;
 
-  const getActiveTickets = async () => {
+  const [loading, setLoading] = useState(true);
+
+  // silent = background live refresh (no pop-up if a tick fails)
+  const getActiveTickets = async (silent = false) => {
     try {
       const used: boolean = false;
       const response = await fetch(`${API_URL}/tickets/email/${encodeURIComponent(pemail)}/${busType}/${used}`);
@@ -86,14 +91,14 @@ const JetLinkInterface: React.FC = () => {
     } 
     catch (error) {
       console.log(error);
-      Alert.alert(
+      if (!silent) Alert.alert(
         "Error",
         "Something went wrong."
       );
     }
   };
 
-  const getUsedTickets = async () => {
+  const getUsedTickets = async (silent = false) => {
     try {
       const used: boolean = true;
       const response = await fetch(`${API_URL}/tickets/email/${encodeURIComponent(pemail)}/${busType}/${used}`);
@@ -108,19 +113,18 @@ const JetLinkInterface: React.FC = () => {
 
     catch (error) {
       console.log(error);
-      Alert.alert(
+      if (!silent) Alert.alert(
         "Error",
         "Something went wrong."
       );
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      getActiveTickets();
-      getUsedTickets();
-    }, [])
-  );
+  // Live: loads on focus, then refreshes every few seconds (a scanned ticket moves to "Used" by itself)
+  useLiveRefresh(async (silent) => {
+    await Promise.all([getActiveTickets(silent), getUsedTickets(silent)]);
+    setLoading(false);
+  });
 
   const getDateOnly = (dateString: string) => {
     const parts = dateString.split('/');
@@ -455,6 +459,7 @@ const JetLinkInterface: React.FC = () => {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{paddingVertical: 10, paddingBottom: 180,}}
               ListEmptyComponent={
+                loading ? <SkeletonList count={4} cardStyle={{ marginHorizontal: 0 }} /> :
                 <EmptyState
                   icon={<Ionicons name="ticket-outline" size={28} color={C.amber} />}
                   title="No active tickets"
@@ -481,6 +486,7 @@ const JetLinkInterface: React.FC = () => {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{ paddingVertical: 10, paddingBottom: 180,}}
               ListEmptyComponent={
+                loading ? <SkeletonList count={4} cardStyle={{ marginHorizontal: 0 }} /> :
                 <EmptyState
                   icon={<Ionicons name="ticket-outline" size={28} color={C.amber} />}
                   title="No used tickets"

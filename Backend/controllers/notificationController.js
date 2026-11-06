@@ -58,6 +58,20 @@ export const getNotifications = async (req, res) => {
       });
     }
 
+    // You can only read the alerts of your own role (admins can read all)
+    const me = req.user;
+    if (me.role !== "admin") {
+      if (role !== me.role) {
+        return res.status(403).json({ success: false, message: "You can't read these alerts." });
+      }
+      if (role === "staff" && me.busNumber && busNumber && String(busNumber).trim().toUpperCase() !== me.busNumber) {
+        return res.status(403).json({ success: false, message: "You can only read alerts for your own bus." });
+      }
+      if (role === "passenger" && email && String(email).trim().toLowerCase() !== me.email) {
+        return res.status(403).json({ success: false, message: "You can only read your own alerts." });
+      }
+    }
+
     let filter = { audience: role };
 
     // Staff see alerts for every bus, plus EVERYTHING about their own bus
@@ -86,7 +100,7 @@ export const getNotifications = async (req, res) => {
       if (!isNaN(sinceDate.getTime())) filter.createdAt = { $gt: sinceDate };
     }
 
-    const notifications = await Notification.find(filter).sort({ createdAt: -1 }).limit(limit);
+    const notifications = await Notification.find(filter).sort({ createdAt: -1 }).limit(limit).lean();
 
     return res.status(200).json({
       success: true,

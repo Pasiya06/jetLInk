@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -19,6 +19,8 @@ import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons, FontAwesome, Feather } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../components/AlertBadge";
+import { SkeletonList } from "../../components/Skeleton";
+import { useLiveRefresh } from "../../hooks/useLiveRefresh";
 import { useBusNames, getBusLabel, getBusTitle } from "../../components/BusName";
 
 if (
@@ -96,8 +98,11 @@ export default function BusReceipts() {
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
 
+  const loadedOnce = useRef(false);
+
+  // silent = background live refresh (no skeleton, no error screen)
   const fetchReceipts = useCallback(
-    async (refresh = false) => {
+    async (refresh = false, silent = false) => {
       if (!busNumber) {
         setError("Bus number is missing.");
         setLoading(false);
@@ -112,9 +117,11 @@ export default function BusReceipts() {
       }
 
       try {
-        if (refresh) setRefreshing(true);
-        else setLoading(true);
-        setError("");
+        if (!silent) {
+          if (refresh) setRefreshing(true);
+          else if (!loadedOnce.current) setLoading(true); // skeleton only before first data
+          setError("");
+        }
 
         const response = await fetch(
           `${API_URL}/receipts/busNumber/${encodeURIComponent(busNumber)}`
@@ -126,8 +133,10 @@ export default function BusReceipts() {
         }
 
         setReceipts(data.receipts || []);
+        loadedOnce.current = true;
+        setError("");
       } catch (err) {
-        setError(
+        if (!silent) setError(
           err instanceof Error ? err.message : "Unable to fetch receipts."
         );
       } finally {
@@ -138,9 +147,8 @@ export default function BusReceipts() {
     [busNumber]
   );
 
-  useEffect(() => {
-    fetchReceipts();
-  }, [fetchReceipts]);
+  // Live: loads on focus, then refreshes every few seconds
+  useLiveRefresh((silent) => fetchReceipts(false, silent));
 
   const stats = useMemo(() => {
     const online = receipts.filter((r) => r.isOnline).length;
@@ -228,10 +236,7 @@ export default function BusReceipts() {
       </TouchableOpacity>
 
       {loading ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color={C.brand} />
-          <Text style={styles.infoText}>Loading receipts…</Text>
-        </View>
+        <SkeletonList count={4} />
       ) : error ? (
         <View style={styles.center}>
           <View style={[styles.stateIcon, { backgroundColor: "#fde8ea" }]}>

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -24,6 +24,8 @@ import {
 } from "@expo/vector-icons";
 import { Stack, useRouter, useLocalSearchParams } from "expo-router";
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList, SkeletonStat } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
@@ -74,27 +76,34 @@ export default function AllTicketsScreen() {
   const [activeTab, setActiveTab] = useState('');
   
 
-  const load = useCallback(async (isRefresh = false) => {
+  const loadedOnce = useRef(false);
+
+  // silent = background live refresh (no skeleton, no error screen)
+  const load = useCallback(async (isRefresh = false, silent = false) => {
     try {
-      isRefresh ? setRefreshing(true) : setLoading(true);
-      setError(null);
+      if (!silent) {
+        if (isRefresh) setRefreshing(true);
+        else if (!loadedOnce.current) setLoading(true); // skeleton only before first data
+        setError(null);
+      }
       const res = await fetch(`${API_URL}/tickets`);
       const json = await res.json();
       if (!res.ok || !json.success) {
         throw new Error(json.message || "Failed to fetch tickets");
       }
       setTickets(json.tickets ?? []);
+      loadedOnce.current = true;
+      setError(null);
     } catch (e: any) {
-      setError(e.message || "Something went wrong");
+      if (!silent) setError(e.message || "Something went wrong");
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, []);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  // Live: loads on focus, then refreshes every few seconds
+  useLiveRefresh((silent) => load(false, silent));
 
   const GetName = async ({ item }: { item: Ticket }) => {
     try {
@@ -206,21 +215,22 @@ export default function AllTicketsScreen() {
         <View>
           {/* Stats */}
           <View style={styles.statsRow}>
+            {loading ? (
+              <SkeletonStat style={{ flex: 1.25 }} />
+            ) : (
             <View style={[styles.statCard, { flex: 1.25 }]}>
               <Text style={styles.statLabel}>Total Income</Text>
               <Text style={styles.statBig} numberOfLines={1} adjustsFontSizeToFit>
                 Rs. {stats.value.toLocaleString()}
               </Text>
               <Text style={styles.statHint}>{stats.total} Payments</Text>
-            </View>  
+            </View>
+            )}
           </View>
         </View>
 
         {loading ? (
-          <View style={styles.center}>
-            <ActivityIndicator size="large" color="#4F46E5" />
-            <Text style={styles.muted}>Loading tickets…</Text>
-          </View>
+          <SkeletonList count={5} />
         ) : error ? (
           <View style={styles.center}>
             <View style={[styles.bigIcon, { backgroundColor: "#FEE2E2" }]}>

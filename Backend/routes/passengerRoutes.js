@@ -11,16 +11,18 @@ import {
   getOtherPassengers
 } from "../controllers/passengerController.js";
 
+import { requireRole, requireSelfOrStaff } from "../utils/auth.js";
+
 const router = express.Router();
 
 router.post("/register", registerPassenger);
 router.post("/login", loginPassenger);
-router.get("/", getPassengers);
-router.get("/others/:id", getOtherPassengers); // everyone except the logged-in passenger
-router.delete("/:id",deletePassenger)
-router.get("/NIC/:NIC", getPassengerByNIC);
-router.get("/get/:email", Getname);
+router.get("/", requireRole("admin"), getPassengers);
+router.get("/others/:id", requireRole("passenger"), getOtherPassengers); // everyone except the logged-in passenger
+router.delete("/:id", requireRole("admin"), deletePassenger);
+router.get("/NIC/:NIC", requireRole(), getPassengerByNIC);
+router.get("/get/:email", requireRole(), Getname);
 router.put("/password/:email", updatePassengerPassword);
-router.put("/:id", updatePassenger);
+router.put("/:id", requireRole("passenger"), updatePassenger);
 
 export default router;

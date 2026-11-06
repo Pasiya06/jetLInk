@@ -23,6 +23,8 @@ import {Ionicons,
   FontAwesome, Feather} from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 import { useBusNames } from "../../../components/BusName";
 
 
@@ -54,6 +56,8 @@ const BusScreen: React.FC = () => {
   const [busschedData, setBusschedData] = useState<Bussched[]>([]);
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
+  const [loading, setLoading] = useState(true);
+
   const loadschedBuses = async () => {
     try {
       const response = await fetch(`${API_URL}/schedules`);
@@ -68,6 +72,8 @@ const BusScreen: React.FC = () => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -90,9 +96,8 @@ const BusScreen: React.FC = () => {
   //   }
   // };
 
-  useEffect(() => {
-    loadschedBuses();
-  }, []);
+  // Live: loads on focus, then refreshes every few seconds
+  useLiveRefresh(() => loadschedBuses());
 
   
 
@@ -255,6 +260,7 @@ const BusScreen: React.FC = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: NAV_SPACE + 70 }}
           ListEmptyComponent={
+            loading ? <SkeletonList count={4} cardStyle={{ marginHorizontal: 0 }} /> :
             <EmptyState
               icon={<Ionicons name="calendar-outline" size={28} color={C.amber} />}
               title={searchQuery ? "No matching schedules" : "No schedules yet"}

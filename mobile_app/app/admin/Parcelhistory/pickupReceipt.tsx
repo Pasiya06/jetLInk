@@ -22,6 +22,8 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView } from 'react-native-reanimated/lib/typescript/Animated';
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 import { useBusNames, getBusLabel } from "../../../components/BusName";
 
 
@@ -56,7 +58,10 @@ const JetLinkInterface: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const status : string = "PickedUp";
 
-  const getParcelByEmailAndUsed = async () => {
+  const [loading, setLoading] = useState(true);
+
+  // silent = background live refresh (keep the current list if a tick fails)
+  const getParcelByEmailAndUsed = async (silent = false) => {
     try {
 
         const response = await fetch(
@@ -80,13 +85,16 @@ const JetLinkInterface: React.FC = () => {
 
         console.log("Get Parcel Error:", error);
 
-        setParcelData([]);
+        if (!silent) setParcelData([]);
 
+    } finally {
+        setLoading(false);
     }
 };
 
   
-    useFocusEffect(useCallback(()=>{getParcelByEmailAndUsed();},[]));
+    // Live: loads on focus, then refreshes every few seconds
+    useLiveRefresh((silent) => getParcelByEmailAndUsed(silent));
     
     const renderBusItem = ({item}:{item:parcel}) => (
       <TouchableOpacity
@@ -162,6 +170,7 @@ const JetLinkInterface: React.FC = () => {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: NAV_SPACE }}
             ListEmptyComponent={
+              loading ? <SkeletonList count={4} cardStyle={{ marginHorizontal: 0 }} /> :
               <EmptyState
                 icon={<Feather name="package" size={28} color={C.amber} />}
                 title={searchQuery ? "No matching parcels" : "No parcels on the way"}

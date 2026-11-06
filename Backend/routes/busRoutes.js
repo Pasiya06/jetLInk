@@ -17,6 +17,8 @@ import {
   getBusProfile,
 } from "../controllers/busController.js";
 
+import { requireRole, requireSelfOrStaff } from "../utils/auth.js";
+
 const router = express.Router();
 
 // Get all buses filtered by bus type
@@ -25,7 +27,7 @@ router.get("/buses", getBusesByBusType);
 // Get ALL buses with emergency = true
 router.get("/emergency", getAllEmergencyBuses);
 
-router.post("/offline", logoutBus);
+router.post("/offline", requireRole("staff"), logoutBus);
 
 router.get("/check/:busNumber", checkBusNumber);
 
@@ -34,8 +36,8 @@ router.get("/profile/:busNumber", getBusProfile);
 router.get("/check1/:driverNIC", checkDriver);
 router.get("/check2/:conductorNIC", checkConductor);
 
-router.patch("/:busNumber/emergency", reportEmergency);
-router.patch("/:busNumber/emergency/resolve", resolveEmergency);
+router.patch("/:busNumber/emergency", requireRole("staff"), reportEmergency);
+router.patch("/:busNumber/emergency/resolve", requireRole("staff"), resolveEmergency);
 router.get("/:busNumber/emergency", getBusEmergency);
 // Get all other emergency buses, excluding the current bus
 router.get("/emergency/except/:busNumber", getOtherEmergencyBuses);
@@ -43,11 +45,11 @@ router.get("/emergency/except/:busNumber", getOtherEmergencyBuses);
 router
   .route("/")
   .get(getBuses)
-  .post(createBus);
+  .post(requireRole("admin"), createBus);
 
 router
   .route("/:id")
-  .put(updateBus)
-  .delete(deleteBus);
+  .put(requireRole("admin"), updateBus)
+  .delete(requireRole("admin"), deleteBus);
 
 export default router;

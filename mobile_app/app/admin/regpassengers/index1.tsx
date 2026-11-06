@@ -22,6 +22,8 @@ import {Ionicons,
   FontAwesome} from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 import { ScreenHeader, SearchBox, SectionLabel, Pill, EmptyState, Avatar, C, ui } from "../../../components/JetUI";
 
 
@@ -47,6 +49,8 @@ const RGScreen: React.FC = () => {
   const [passengerData, setPassengerData] = useState<pasenger[]>([]);
   const [activeTab, setActiveTab] = useState('');
 
+  const [loading, setLoading] = useState(true);
+
   const loadPassengers = async () => {
   try {
     const response = await fetch(`${API_URL}/passengers`);
@@ -70,14 +74,13 @@ const RGScreen: React.FC = () => {
     }
   } catch (error) {
     console.log(error);
+  } finally {
+    setLoading(false);
   }
 };
 
-useFocusEffect(
-  useCallback(() => {
-    loadPassengers();
-  }, [])
-);
+// Live: loads on focus, then refreshes every few seconds
+useLiveRefresh(() => loadPassengers());
 
 const deletePassenger = async (id: string) => {
   Alert.alert(
@@ -192,6 +195,7 @@ const deletePassenger = async (id: string) => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 190 }}
           ListEmptyComponent={
+            loading ? <SkeletonList count={4} cardStyle={{ marginHorizontal: 0 }} /> :
             <EmptyState
               icon={<Ionicons name="people-outline" size={28} color={C.amber} />}
               title={passengerData.length ? "No matches" : "No passengers yet"}

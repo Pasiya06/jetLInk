@@ -15,6 +15,8 @@ import { Alert } from "../../../components/JetAlert";
 import { Ionicons, MaterialIcons, FontAwesome, Feather, Fontisto } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 
 interface Bus {
   _id: string; 
@@ -48,7 +50,10 @@ const BusScreen: React.FC = () => {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
   
-  const loadBuses = async () => {
+  const [loading, setLoading] = useState(true);
+
+  // silent = background live refresh (no pop-up if a tick fails)
+  const loadBuses = async (silent = false) => {
   try {
     const response = await fetch(`${API_URL}/buses?busType=${busType}`);
 
@@ -68,18 +73,17 @@ const BusScreen: React.FC = () => {
 
   } catch (error) {
     console.log("Error details:", error);
-    Alert.alert(
+    if (!silent) Alert.alert(
       "Network Error",
       "Unable to load data elements from database server context."
     );
+  } finally {
+    setLoading(false);
   }
 };
 
-  useFocusEffect(
-    useCallback(() => {
-      loadBuses();
-    }, [])
-  );
+  // Live: loads on focus, then refreshes every few seconds
+  useLiveRefresh((silent) => loadBuses(silent));
 
 
   
@@ -165,6 +169,7 @@ const BusScreen: React.FC = () => {
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: NAV_SPACE }}
             ListEmptyComponent={
+              loading ? <SkeletonList count={4} cardStyle={{ marginHorizontal: 0 }} /> :
               <EmptyState
                 icon={<Ionicons name="bus-outline" size={28} color={C.amber} />}
                 title={searchQuery ? "No matching buses" : "No buses yet"}

@@ -2,6 +2,7 @@ import type * as NotificationsModule from "expo-notifications";
 import Constants, { ExecutionEnvironment } from "expo-constants";
 import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAuthToken } from "./apiAuth";
 
 // ─── Load expo-notifications safely ─────────────────────────────────────
 // Expo Go (SDK 53+) no longer ships the native modules expo-notifications needs,
@@ -571,6 +572,8 @@ let polling = false;
 async function pollOnce() {
   const session = await getSession();
   if (!session) return;
+  // Not logged in (or logged out): nothing to check
+  if (!(await getAuthToken())) return;
   // Passengers need their email to get their own alerts
   if (session.role === "passenger" && !session.email) return;
 

@@ -28,6 +28,7 @@ import {
 import * as Location from "expo-location";
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { forgetLogin } from "../../services/apiAuth";
 import AlertBadge from "../../components/AlertBadge";
 import LatestAlerts from "../../components/LatestAlerts";
 import { ensureStaffSession } from "../../services/notificationService";
@@ -198,7 +199,8 @@ export default function DriverHome() {
           onPress: async () => {
             setLoading(true);
             await stopBusLocationSharing();
-            await AsyncStorage.clear();
+            await forgetLogin(); // log out: forget the login token
+          await AsyncStorage.clear();
             setLoading(false);
             router.replace("/passenger/selectScreen");
           },

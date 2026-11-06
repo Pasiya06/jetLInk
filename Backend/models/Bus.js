@@ -114,6 +114,13 @@ busSchema.pre("save", async function () {
   this.busId = lastBus ? lastBus.busId + 1 : 1;
 });
 
+// ── Indexes: make the app's common searches fast (built automatically on server start) ──
+busSchema.index({ busType: 1, busId: 1 });          // buses by type
+busSchema.index({ emergency: 1, emergencyAt: -1 }); // emergency buses
+busSchema.index({ status: 1 });                     // out-of-service check on every booking
+busSchema.index({ driverNIC: 1 });
+busSchema.index({ conductorNIC: 1 });
+
 const Bus = mongoose.model("Bus", busSchema);
 
 export default Bus;

@@ -107,4 +107,11 @@ const parcelSchema = new mongoose.Schema(
   }
 );
 
+// ── Indexes: make the app's common searches fast (built automatically on server start) ──
+parcelSchema.index({ Semail: 1, status: 1, createdAt: -1 });  // passenger parcels
+parcelSchema.index({ Bnumber: 1, status: 1, createdAt: -1 }); // bus staff parcels
+parcelSchema.index({ status: 1, createdAt: -1 });             // admin pending / delivered lists
+parcelSchema.index({ delivered: 1, status: 1 });              // daily expired-parcel job
+parcelSchema.index({ createdAt: -1 });                        // admin payment history / next parcel ID
+
 export default mongoose.model("Parcel", parcelSchema);

@@ -55,7 +55,8 @@ const DriverScreen: React.FC = () => {
         { key: "address", label: "Address", value: address },
         { key: "NIC", label: "NIC", value: NIC, type: "nic" },
         { key: "email", label: "Email", value: email, type: "email" },
-        { key: "password", label: "Password", value: password },
+        // Passwords are stored securely and not sent back, so leave it empty to keep the current one
+        { key: "password", label: "New password", value: password, optional: true },
       ])) return;
 
 
@@ -286,7 +287,7 @@ const DriverScreen: React.FC = () => {
                       style={styles.textInput}
                       value={password}
                       onChangeText={setPassword}
-                      placeholder="Abc@123"
+                      placeholder="Leave empty to keep the current password"
                       placeholderTextColor="#A3A3A3"
                       secureTextEntry={!showPassword}
                       autoCapitalize="none"

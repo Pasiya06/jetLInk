@@ -152,6 +152,13 @@ export const FlatmateLogin: React.FC = () => {
                           bNumber:params.bNumber,
                       },
                   });
+              } else {
+                  // The booking was not saved (e.g. the seat was just taken): tell the passenger
+                  Alert.alert(
+                      data1.code === "SEAT_TAKEN" ? "Seat no longer available" : "Booking failed",
+                      String(data1.message || "Your ticket could not be booked. You have not been charged. Please try again."),
+                      [{ text: "OK", onPress: () => router.back() }]
+                  );
               }
             };
             

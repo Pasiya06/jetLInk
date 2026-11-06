@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -25,6 +25,8 @@ import {
 } from "@expo/vector-icons";
 import { LinearGradient } from 'expo-linear-gradient'; 
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList, SkeletonStat } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 import { ScreenHeader, SectionLabel, Pill, C as JC, NAV_SPACE } from "../../../components/JetUI";
 
 if (
@@ -93,7 +95,10 @@ export default function AllReceipts() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab, setActiveTab] = useState('');
 
-  const fetchReceipts = useCallback(async (refresh = false) => {
+  const loadedOnce = useRef(false);
+
+  // silent = background live refresh (no skeleton, no error screen)
+  const fetchReceipts = useCallback(async (refresh = false, silent = false) => {
     if (!API_URL) {
       setError("API URL is not configured.");
       setLoading(false);
@@ -102,9 +107,11 @@ export default function AllReceipts() {
     }
 
     try {
-      if (refresh) setRefreshing(true);
-      else setLoading(true);
-      setError("");
+      if (!silent) {
+        if (refresh) setRefreshing(true);
+        else if (!loadedOnce.current) setLoading(true); // skeleton only before first data
+        setError("");
+      }
 
       // Adjust this path to match the route that uses getAllReceipts
       const response = await fetch(`${API_URL}/receipts/all`);
@@ -115,17 +122,18 @@ export default function AllReceipts() {
       }
 
       setReceipts(data.receipts || []);
+      loadedOnce.current = true;
+      setError("");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to fetch receipts.");
+      if (!silent) setError(err instanceof Error ? err.message : "Unable to fetch receipts.");
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, []);
 
-  useEffect(() => {
-    fetchReceipts();
-  }, [fetchReceipts]);
+  // Live: loads on focus, then refreshes every few seconds
+  useLiveRefresh((silent) => fetchReceipts(false, silent));
 
   const stats = useMemo(() => { 
     const value = receipts.reduce((sum, r) => sum + Number(r.maxPrice || 0), 0);
@@ -160,6 +168,7 @@ export default function AllReceipts() {
       <ScreenHeader eyebrow="Payment history" title="Tour payments" />
 
       <View style={styles.summaryWrap}>
+        {loading ? <SkeletonStat /> : (
         <View style={styles.summaryCard}>
           <View style={{ flex: 1 }}>
             <Text style={styles.statLabel}>Total income</Text>
@@ -172,14 +181,12 @@ export default function AllReceipts() {
             <Text style={styles.countLabel}>{stats.total === 1 ? "payment" : "payments"}</Text>
           </View>
         </View>
+        )}
         <SectionLabel style={{ marginTop: 18 }}>Recent receipts</SectionLabel>
       </View>
 
       {loading ? (
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color={C.brand} />
-          <Text style={styles.infoText}>Loading receipts…</Text>
-        </View>
+        <SkeletonList count={5} />
       ) : error ? (
         <View style={styles.center}>
           <View style={[styles.stateIcon, { backgroundColor: "#fde8ea" }]}>

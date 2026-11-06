@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { passwordPlugin } from "../utils/password.js";
 
 const driverSchema = new mongoose.Schema({
 
@@ -48,5 +49,8 @@ const driverSchema = new mongoose.Schema({
 });
 
 
+
+// Hash passwords, never return them in responses
+driverSchema.plugin(passwordPlugin);
 
 export default mongoose.model("Driver", driverSchema);

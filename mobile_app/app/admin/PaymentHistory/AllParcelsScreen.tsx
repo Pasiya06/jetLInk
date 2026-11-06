@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -23,6 +23,8 @@ import {
 } from "@expo/vector-icons";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList, SkeletonStat } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
@@ -71,27 +73,34 @@ export default function AllParcelsScreen() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activeTab, setActiveTab] = useState('');
 
-  const load = useCallback(async (isRefresh = false) => {
+  const loadedOnce = useRef(false);
+
+  // silent = background live refresh (no skeleton, no error screen)
+  const load = useCallback(async (isRefresh = false, silent = false) => {
     try {
-      isRefresh ? setRefreshing(true) : setLoading(true);
-      setError(null);
+      if (!silent) {
+        if (isRefresh) setRefreshing(true);
+        else if (!loadedOnce.current) setLoading(true); // skeleton only before first data
+        setError(null);
+      }
       const res = await fetch(`${API_URL}/parcel/all`);
       const json = await res.json();
       if (!res.ok || !json.success) {
         throw new Error(json.message || "Failed to fetch parcels");
       }
       setParcels(json.parcels ?? []);
+      loadedOnce.current = true;
+      setError(null);
     } catch (e: any) {
-      setError(e.message || "Something went wrong");
+      if (!silent) setError(e.message || "Something went wrong");
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
   }, []);
 
-  useEffect(() => {
-    load();
-  }, [load]);
+  // Live: loads on focus, then refreshes every few seconds
+  useLiveRefresh((silent) => load(false, silent));
 
   const stats = useMemo(() => { 
     const value = parcels.reduce((sum, p) => sum + Number(p.totalFare || 0), 0);
@@ -184,6 +193,7 @@ export default function AllParcelsScreen() {
         </LinearGradient>
 
         <View style={styles.statsRow}>
+          {loading ? <SkeletonStat style={{ flex: 1.25 }} /> : (
           <View style={[styles.statCard, { flex: 1.25 }]}>
             <Text style={styles.statLabel}>Total Income</Text>
             <Text style={styles.statBig} numberOfLines={1} adjustsFontSizeToFit>
@@ -192,15 +202,13 @@ export default function AllParcelsScreen() {
             <Text style={styles.statHint}>
               {stats.total} Payments
             </Text>
-          </View>  
+          </View>
+          )}
         </View>
 
         <StatusBar barStyle="light-content" />
         {loading ? (
-          <View style={styles.center}>
-            <ActivityIndicator size="large" color="#4F46E5" />
-            <Text style={styles.muted}>Loading parcels…</Text>
-          </View>
+          <SkeletonList count={5} />
         ) : error ? (
           <View style={styles.center}>
             <View style={[styles.bigIcon, { backgroundColor: "#FEE2E2" }]}>

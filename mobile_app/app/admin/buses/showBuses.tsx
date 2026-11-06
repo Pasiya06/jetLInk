@@ -19,6 +19,8 @@ import { Alert } from "../../../components/JetAlert";
 import { Ionicons, MaterialIcons, FontAwesome, Feather, Fontisto } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 import { ScreenHeader, SearchBox, SectionLabel, Pill, EmptyState, GradientButton, C, ui } from "../../../components/JetUI";
 
 interface Bus {
@@ -59,7 +61,8 @@ const BusScreen: React.FC = () => {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
   
-  const loadBuses = async () => {
+  // silent = background live refresh (no pop-up if a tick fails)
+  const loadBuses = async (silent = false) => {
     try {
       const response = await fetch(`${API_URL}/buses?busType=${busType}`);
 
@@ -76,7 +79,7 @@ const BusScreen: React.FC = () => {
       setBusData(typeOfBuses);
     } catch (error) {
       console.log("Error details:", error);
-      Alert.alert(
+      if (!silent) Alert.alert(
         "Couldn't load buses",
         "Please check your internet connection and try again."
       );
@@ -85,11 +88,8 @@ const BusScreen: React.FC = () => {
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      loadBuses();  
-    }, [])
-  );
+  // Live: loads on focus, then refreshes every few seconds (online/offline, alerts)
+  useLiveRefresh((silent) => loadBuses(silent));
 
   const handleSearch = () => {
     router.push({
@@ -324,7 +324,7 @@ const BusScreen: React.FC = () => {
             }
             ListEmptyComponent={
               loading ? (
-                <ActivityIndicator size="large" color={C.blue} style={{ marginTop: 40 }} />
+                <SkeletonList count={4} cardStyle={{ marginHorizontal: 0 }} />
               ) : (
                 <EmptyState
                   icon={<Fontisto name="bus" size={26} color={C.amber} />}

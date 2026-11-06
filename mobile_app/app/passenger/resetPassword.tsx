@@ -56,7 +56,7 @@ export const FlatmateLogin: React.FC = () => {
       setLoading(true);
       const res = await axios.put(
         `${API_URL}/passengers/password/${encodeURIComponent(email)}`,
-        { password }
+        { password, resetToken: params.resetToken }
       );
 
       if (res.data.success) {

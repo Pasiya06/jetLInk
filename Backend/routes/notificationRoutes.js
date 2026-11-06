@@ -5,10 +5,12 @@ import {
   deleteNotification,
 } from "../controllers/notificationController.js";
 
+import { requireRole, requireSelfOrStaff } from "../utils/auth.js";
+
 const router = express.Router();
 
-router.get("/", getNotifications);
-router.post("/", createNotification);
-router.delete("/:id", deleteNotification);
+router.get("/", requireRole(), getNotifications);
+router.post("/", requireRole("staff"), createNotification);
+router.delete("/:id", requireRole("admin"), deleteNotification);
 
 export default router;

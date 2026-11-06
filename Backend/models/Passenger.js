@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import { passwordPlugin } from "../utils/password.js";
+import { nextNumber, maxOf } from "../utils/nextId.js";
 
 const passengerSchema = new mongoose.Schema(
   {
@@ -53,19 +55,14 @@ const passengerSchema = new mongoose.Schema(
   }
 );
 
-// Auto Increment passengerId
+// Auto Increment passengerId (atomic counter: two sign-ups at once can't get the same number)
 passengerSchema.pre("save", async function () {
   if (!this.isNew || this.passengerId) return;
-
-  const lastPassenger = await mongoose
-    .model("Passenger")
-    .findOne()
-    .sort({ passengerId: -1 });
-
-  this.passengerId = lastPassenger
-    ? lastPassenger.passengerId + 1
-    : 1;
+  this.passengerId = await nextNumber("passenger", maxOf(mongoose.model("Passenger"), "passengerId"));
 });
+
+// Hash passwords, never return them in responses
+passengerSchema.plugin(passwordPlugin);
 
 const Passenger = mongoose.model("Passenger", passengerSchema);
 

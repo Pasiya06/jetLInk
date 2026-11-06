@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { passwordPlugin } from "../utils/password.js";
 
 const conductorSchema = new mongoose.Schema({
 
@@ -44,5 +45,8 @@ const conductorSchema = new mongoose.Schema({
 
 
 
+
+// Hash passwords, never return them in responses
+conductorSchema.plugin(passwordPlugin);
 
 export default mongoose.model("Conductor", conductorSchema);

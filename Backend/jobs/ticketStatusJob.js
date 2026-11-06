@@ -1,60 +1,44 @@
 import cron from "node-cron";
 import Ticket from "../models/Ticket.js";
+import { dayNumber, todayInSriLanka, TIME_ZONE } from "../utils/sriLankaDate.js";
 
 const updateExpiredTickets = async () => {
   try {
-    const now = new Date();
-
-    // Start of today
-    const today = new Date(
-      now.getFullYear(),
-      now.getMonth(),
-      now.getDate()
-    );
+    // Today in Sri Lanka, whatever time zone the server is in
+    const today = todayInSriLanka();
 
     // Get all tickets that are still unused
+    // Only the fields we need, as plain objects (much faster than full documents)
     const tickets = await Ticket.find({
       used: false,
-    });
+    }).select("_id ticketId date").lean();
 
-    let updatedCount = 0;
+    const expiredIds = [];
 
     for (const ticket of tickets) {
-      const parts = ticket.date.split("/");
+      const ticketDate = dayNumber(ticket.date); // date format: MM/DD/YYYY
 
-      if (parts.length !== 3) {
+      if (ticketDate == null) {
         console.log(
           `Invalid ticket date: ${ticket.ticketId} - ${ticket.date}`
         );
         continue;
       }
 
-      const month = Number(parts[0]);
-      const day = Number(parts[1]);
-      const year = Number(parts[2]);
-
-      const ticketDate = new Date(
-        year,
-        month - 1,
-        day
-      );
-
-      // Remove time
-      ticketDate.setHours(0, 0, 0, 0);
-
       // If ticket date is before today
       if (ticketDate < today) {
-        ticket.used = true;
-        ticket.usedAt = new Date();
-
-        await ticket.save();
-
-        updatedCount++;
-
-        console.log(
-          `Ticket ${ticket.ticketId} marked as used`
-        );
+        expiredIds.push(ticket._id);
       }
+    }
+
+    // One database call for all expired tickets instead of one save per ticket
+    let updatedCount = 0;
+    if (expiredIds.length) {
+      const result = await Ticket.updateMany(
+        { _id: { $in: expiredIds } },
+        { $set: { used: true, usedAt: new Date() } }
+      );
+      updatedCount = result.modifiedCount;
     }
 
     console.log(
@@ -74,7 +58,7 @@ updateExpiredTickets();
 cron.schedule("1 0 * * *", () => {
   console.log("Running expired ticket check...");
   updateExpiredTickets();
-});
+}, { timezone: TIME_ZONE });
 
 export default updateExpiredTickets;
 

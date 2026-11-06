@@ -31,153 +31,81 @@ export default function PaymentSuccessScreen() {
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const createParcel = async (parcelData: any) => {
-    try {
-        const response = await fetch(`${API_URL}/parcel`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(parcelData),
-        });
+  const [saving, setSaving] = useState(true);
+  const started = useRef(false);
 
-        const data = await response.json();
+  // Walk-in parcel: the bus already has it, so it starts as "PickedUp"
+  const parcelData = {
+    sendername:params.sendername,
+    Smobilenumber:params.smobilenumber,
+    Semail:params.semail,
+    receivername:params.receivername,
+    Rmobilenumber:params.rmobilenumber,
+    Remail:params.remail,
+    weight:params.weight,
+    pickup:params.pickup,
+    drop:params.drop,
+    date:params.date,
+    time:params.time,
+    Bnumber:params.busNo,
+    totalFare:params.totalFare,
+    status:status,
+    pickupVerified:pickupVerified,
+  };
 
-        return data;
-    } catch (error) {
-        console.log(error);
-        return {
-        success: false,
-        message: "Server connection failed",
-        };
-    }
-    };
-
-
-  const loadQr = async () =>{
-    const response = await fetch(`${API_URL}/parcel/generateQR`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            sendername: params.sendername,
-            receivername: params.receivername,
-            pickup: params.pickup,
-            drop: params.drop,
-            weight: params.weight,
-            totalFare: params.totalFare,
-        }),
-        });
-
-    const data = await response.json();
-
-        if (data.success) {
-            setQrToken(data.qrToken);
-        console.log(data.qrToken);
-        }
-  }
-
+  // Save the parcel as soon as this screen opens (once), then show its real QR code.
+  // Before, it was only saved when a button was tapped.
   useEffect(() => {
-          
-    loadQr();
-
+    if (started.current) return;
+    started.current = true;
+    (async () => {
+      try {
+        const response = await fetch(`${API_URL}/parcel`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(parcelData),
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          setError(String(data.message || "The parcel could not be booked. Please try again."));
+          return;
+        }
+        const parcelId = data.data?.parcelId;
+        if (parcelId) {
+          const qr = await fetch(`${API_URL}/parcel/parcel/${encodeURIComponent(parcelId)}/qr`);
+          const qrData = await qr.json();
+          if (qrData.qrToken) setQrToken(qrData.qrToken);
+        }
+      } catch (err) {
+        console.log(err);
+        setError("Couldn't reach the server. Check the parcel list before booking again.");
+      } finally {
+        setSaving(false);
+      }
+    })();
   }, []);
 
-  const handleSaveParcel = async () => {
-      const parcelData = {
-        sendername:params.sendername,
-        Smobilenumber:params.smobilenumber,
-        Semail:params.semail,
-        receivername:params.receivername,
-        Rmobilenumber:params.rmobilenumber,
-        Remail:params.remail,
-        weight:params.weight,
-        pickup:params.pickup,
-        drop:params.drop,
-        date:params.date,
-        time:params.time,
-        Bnumber:params.busNo,
-        totalFare:params.totalFare,
-        status:status,
-        pickupVerified:pickupVerified,
-      };
-  
-      const result = await createParcel(parcelData);
-  
-      if (result.success) {
-        router.push({
-              pathname: "/busStaff/busBookedParcel",
-              params: {
-                Cid: params.Cid,
-                conductorId: params.conductorId,
-                conductorNIC:params.conductorNIC,
-                cfirstName: params.cfirstName,
-                clastName: params.clastName,
-                cphoneNumber:params.cphoneNumber,
-                driverId:params.driverId,
-                dfirstName:params.dfirstName,
-                dlastName:params.dlastName,
-                dphoneNumber:params.dphoneNumber,
-                busNo: params.busNo,
-              },
-            })
-        
-  
-  
-      } else {
-        Alert.alert("Error", result.message);
-      }
-    };
+  const staffParams = {
+    Cid: params.Cid,
+    conductorId: params.conductorId,
+    conductorNIC:params.conductorNIC,
+    cfirstName: params.cfirstName,
+    clastName: params.clastName,
+    cphoneNumber:params.cphoneNumber,
+    driverId:params.driverId,
+    dfirstName:params.dfirstName,
+    dlastName:params.dlastName,
+    dphoneNumber:params.dphoneNumber,
+    busNo: params.busNo,
+  };
 
-    const handleSearch = async () => {
-        const parcelData = {
-        sendername:params.sendername,
-        Smobilenumber:params.smobilenumber,
-        Semail:params.semail,
-        receivername:params.receivername,
-        Rmobilenumber:params.rmobilenumber,
-        Remail:params.remail,
-        weight:params.weight,
-        pickup:params.pickup,
-        drop:params.drop,
-        date:params.date,
-        time:params.time,
-        Bnumber:params.busNo,
-        totalFare:params.totalFare,
-        status:status,
-        pickupVerified:pickupVerified,
-      };
-  
-      const result = await createParcel(parcelData);
-  
-      if (result.success) {
-        router.push({
-              pathname: "/busStaff/index1",
-              params: {
-                
-                Cid: params.Cid,
-                conductorId: params.conductorId,
-                conductorNIC:params.conductorNIC,
-                cfirstName: params.cfirstName,
-                clastName: params.clastName,
-                cphoneNumber:params.cphoneNumber,
-                driverId:params.driverId,
-                dfirstName:params.dfirstName,
-                dlastName:params.dlastName,
-                dphoneNumber:params.dphoneNumber,
-                busNo: params.busNo,
-                
-              },
-            })
-        
-  
-  
-      } else {
-        Alert.alert("Error", result.message);
-      }
-    };
-  
+  const handleSaveParcel = () => {
+    router.push({ pathname: "/busStaff/busBookedParcel", params: staffParams });
+  };
+
+  const handleSearch = () => {
+    router.push({ pathname: "/busStaff/index1", params: staffParams });
+  };
 
   useEffect(() => {
     Animated.sequence([
@@ -208,8 +136,8 @@ export default function PaymentSuccessScreen() {
                 </View>
               </View>
             </Animated.View>
-            <Text style={styles.title}>Payment successful</Text>
-            <Text style={styles.subtitle}>The parcel is booked. Give the sender this QR code.</Text>
+            <Text style={styles.title}>{error ? "Booking failed" : saving ? "Saving the parcel…" : "Payment successful"}</Text>
+            <Text style={styles.subtitle}>{error ? "Nothing was charged. Please try again." : "The parcel is booked. Give the sender this QR code."}</Text>
           </LinearGradient>
 
           <Animated.View style={{ opacity: fadeAnim }}>

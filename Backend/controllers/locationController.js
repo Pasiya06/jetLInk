@@ -87,7 +87,7 @@ export const getBusLocation = async (req, res) => {
 // GET /api/locations
 export const getAllLocations = async (req, res) => {
   try {
-    const locations = await Location.find();
+    const locations = await Location.find().lean();
 
     res.json({
       success: true,

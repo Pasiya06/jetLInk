@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -24,6 +24,8 @@ import {
 } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 import TourPackageCard, { TourPackage } from "../../../components/TourPackageCard";
 import PickupTownPicker from "../../../components/PickupTownPicker";
 
@@ -115,9 +117,12 @@ export default function PackagesScreen() {
     setBusType("Standard bus");
   };
 
-  const getPackages = useCallback(async () => {
+  const loadedOnce = useRef(false);
+
+  // silent = background live refresh (no skeleton, no pop-up)
+  const getPackages = useCallback(async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent && !loadedOnce.current) setLoading(true); // skeleton only before first data
       if (!API_URL) throw new Error("EXPO_PUBLIC_API_URL is not configured.");
 
       const response = await fetch(`${API_URL}/packages`);
@@ -127,17 +132,17 @@ export default function PackagesScreen() {
         throw new Error(data.message || "Failed to load packages");
       }
       setPackages(Array.isArray(data.data) ? data.data : []);
+      loadedOnce.current = true;
     } catch (error: any) {
       console.log("Get Packages Error:", error);
-      Alert.alert("Error", error.message || "Could not load packages");
+      if (!silent) Alert.alert("Error", error.message || "Could not load packages");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    getPackages();
-  }, [getPackages]);
+  // Live: loads on focus, then refreshes every few seconds
+  useLiveRefresh((silent) => getPackages(silent));
 
   const openEditPackage = (item: PackageItem) => {
     setSelectedPackage(item);
@@ -601,10 +606,9 @@ export default function PackagesScreen() {
     return (
       <>
         <Stack.Screen options={{ title: "", headerShown: false }} />
-        <View style={styles.loadingContainer}>
+        <View style={[styles.loadingContainer, { justifyContent: "flex-start", alignItems: "stretch", paddingTop: 60 }]}>
           <StatusBar barStyle="light-content" />
-          <ActivityIndicator size="large" color="#12966F" />
-          <Text style={styles.loadingText}>Loading packages...</Text>
+          <SkeletonList count={4} />
         </View>
       </>
     );

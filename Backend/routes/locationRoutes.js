@@ -9,12 +9,14 @@ import {
   clearLocation,
 } from "../controllers/locationController.js";
 
+import { requireRole, requireSelfOrStaff } from "../utils/auth.js";
+
 const router = express.Router();
 
 // POST /api/locations/update  → driver sends GPS
-router.post("/update", updateLocation);
+router.post("/update", requireRole("staff"), updateLocation);
 
-router.post("/update1", updateLocation1);
+router.post("/update1", requireRole("staff"), updateLocation1);
 
 // GET  /api/locations         → get all bus locations
 router.get("/", getAllLocations);
@@ -23,9 +25,9 @@ router.get("/", getAllLocations);
 router.get("/:busNumber", getBusLocation);
 
 // POST /api/locations/offline → set bus offline
-router.post("/offline", setOffline);
+router.post("/offline", requireRole("staff"), setOffline);
 
 // POST /api/locations/clear   → staff logout: clear location + set offline
-router.post("/clear", clearLocation);
+router.post("/clear", requireRole("staff"), clearLocation);
 
 export default router;

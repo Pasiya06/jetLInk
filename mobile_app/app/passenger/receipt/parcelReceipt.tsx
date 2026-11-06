@@ -30,6 +30,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenHeader, EmptyState, ParcelRow, C } from "../../../components/JetUI";
 import { useBusNames, getBusLabel } from "../../../components/BusName";
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 
 interface parcel {
   _id: string;
@@ -75,7 +77,10 @@ const JetLinkInterface: React.FC = () => {
 
   const Semail = params.pemail as string;
 
-  const getParcelByEmailAndUsed = async () => {
+  const [loading, setLoading] = useState(true);
+
+  // silent = background live refresh (keep the current list if a tick fails)
+  const getParcelByEmailAndUsed = async (silent = false) => {
     try {
       const status = "Pending";
       const response = await fetch(`${API_URL}/parcel/${encodeURIComponent(Semail)}/${status}`);
@@ -90,11 +95,11 @@ const JetLinkInterface: React.FC = () => {
 
     catch (error) {
       console.log("Get Pending Parcel Error:", error);
-      setParcelData([]);
+      if (!silent) setParcelData([]);
     }
   };
 
-  const getParcelByEmailAnddelivery = async () => {
+  const getParcelByEmailAnddelivery = async (silent = false) => {
     try {
       const status = "Delivered";
       const response = await fetch(`${API_URL}/parcel/${encodeURIComponent(Semail)}/${status}`);
@@ -109,16 +114,15 @@ const JetLinkInterface: React.FC = () => {
 
     catch (error) {
       console.log("Get Delivered Parcel Error:", error);
-      setDeliveryData([]);
+      if (!silent) setDeliveryData([]);
     }
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      getParcelByEmailAndUsed();
-      getParcelByEmailAnddelivery();
-    }, [Semail])
-  );
+  // Live: loads on focus, then refreshes every few seconds (status changes show up by themselves)
+  useLiveRefresh(async (silent) => {
+    await Promise.all([getParcelByEmailAndUsed(silent), getParcelByEmailAnddelivery(silent)]);
+    setLoading(false);
+  });
 
   const getDateOnly = (dateString: string) => {
     if (!dateString) {
@@ -432,6 +436,7 @@ const JetLinkInterface: React.FC = () => {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={{paddingVertical: 10, paddingBottom: 180,}}
               ListEmptyComponent={
+                loading ? <SkeletonList count={4} cardStyle={{ marginHorizontal: 0 }} /> :
                 <EmptyState
                   icon={<Feather name="gift" size={26} color={C.amber} />}
                   title="No pending parcels"
@@ -483,6 +488,7 @@ const JetLinkInterface: React.FC = () => {
 
               ListEmptyComponent={
 
+                loading ? <SkeletonList count={4} cardStyle={{ marginHorizontal: 0 }} /> :
                 <EmptyState
                   icon={<Ionicons name="checkmark-done" size={28} color={C.amber} />}
                   title="No delivered parcels"

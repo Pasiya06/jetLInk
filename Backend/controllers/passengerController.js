@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import Passenger from "../models/Passenger.js";
+import { checkPassword } from "../utils/password.js";
+import { signLoginToken, readOtpToken } from "../utils/auth.js";
 
 export const registerPassenger = async (req, res) => {
   try {
@@ -31,8 +33,9 @@ export const registerPassenger = async (req, res) => {
       });
     }
 
-    // Register new passenger
-    const passenger = new Passenger(req.body);
+    // Register new passenger (password is hashed by the model; IDs can't be set by the app)
+    const { passengerId: _ignore, ...body } = req.body;
+    const passenger = new Passenger(body);
     await passenger.save();
 
     res.status(201).json({
@@ -53,8 +56,7 @@ export const loginPassenger = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const passenger = await Passenger.findOne({ email });
-    const passenger1 = await Passenger.findOne({ email, password });
+    const passenger = await Passenger.findOne({ email: String(email || "").trim().toLowerCase() });
     if (!passenger) {
       return res.status(401).json({
         success: false,
@@ -62,7 +64,7 @@ export const loginPassenger = async (req, res) => {
       });
     }
 
-    if (!passenger1) {
+    if (!(await checkPassword(password, passenger.password))) {
       return res.status(401).json({
         success: false,
         message: "Invalid password",
@@ -71,7 +73,8 @@ export const loginPassenger = async (req, res) => {
 
     res.json({
       success: true,
-      passenger,
+      passenger, // password is removed automatically (see utils/password.js)
+      token: signLoginToken({ id: passenger._id, role: "passenger", email: passenger.email }),
     });
   } catch (error) {
     res.status(500).json({
@@ -83,7 +86,7 @@ export const loginPassenger = async (req, res) => {
 
 export const getPassengers = async (req, res) => {
   try {
-    const passengers = await Passenger.find();
+    const passengers = await Passenger.find().select("-password").lean();
 
     res.json({
       success: true,
@@ -108,14 +111,8 @@ export const deletePassenger = async (req, res) => {
       });
     }
 
-    const deletedPassengerId = passenger.passengerId;
-
+    // Other passengers keep their IDs (tour receipts store them)
     await Passenger.findByIdAndDelete(req.params.id);
-
-    await Passenger.updateMany(
-      { passengerId: { $gt: deletedPassengerId } },
-      { $inc: { passengerId: -1 } }
-    );
 
     res.json({
       success: true,
@@ -131,8 +128,22 @@ export const deletePassenger = async (req, res) => {
 
 export const updatePassengerPassword = async (req, res) => {
   try {
-    const { email } = req.params;
-    const { password } = req.body;
+    const email = String(req.params.email || "").trim().toLowerCase();
+    const { password, resetToken } = req.body;
+
+    // Only allowed right after a correct OTP for this email (forgot password),
+    // or by the passenger themself / an admin while logged in
+    const otp = readOtpToken(resetToken);
+    const allowed =
+      (otp && otp.email === email) ||
+      req.user?.role === "admin" ||
+      (req.user?.role === "passenger" && req.user.email === email);
+    if (!allowed) {
+      return res.status(401).json({
+        success: false,
+        message: "Please verify the code sent to your email first.",
+      });
+    }
 
     if (!password) {
       return res.status(400).json({
@@ -223,6 +234,11 @@ export const getPassengerByNIC = async (req, res) => {
         success: false,
         message: "Passenger not found",
       });
+    }
+
+    // Passengers can only open their own profile
+    if (req.user?.role === "passenger" && String(req.user.sub) !== String(passenger._id)) {
+      return res.status(403).json({ success: false, message: "You can only see your own profile." });
     }
 
     return res.status(200).json({
@@ -319,9 +335,14 @@ export const updatePassenger = async (req, res) => {
       if (value !== undefined) passenger[key] = value;
     }
 
-    // Optional password change (same plain-text check as loginPassenger)
+    // Passengers may only edit their own profile
+    if (req.user?.role === "passenger" && String(req.user.sub) !== String(passenger._id)) {
+      return res.status(403).json({ success: false, message: "You can only edit your own profile." });
+    }
+
+    // Optional password change
     if (newPassword) {
-      if (!currentPassword || currentPassword !== passenger.password) {
+      if (!currentPassword || !(await checkPassword(currentPassword, passenger.password))) {
         return res.status(401).json({
           success: false,
           message: "Current password is incorrect",
@@ -370,7 +391,8 @@ export const getOtherPassengers = async (req, res) => {
 
     const passengers = await Passenger.find({ _id: { $ne: id } })
       .select("passengerId firstName lastName email")
-      .sort({ firstName: 1, lastName: 1 });
+      .sort({ firstName: 1, lastName: 1 })
+      .lean();
 
     res.status(200).json({
       success: true,

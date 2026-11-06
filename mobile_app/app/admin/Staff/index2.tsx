@@ -16,6 +16,8 @@ import { Ionicons, MaterialIcons, FontAwesome, Feather, Entypo } from '@expo/vec
 import { LinearGradient } from 'expo-linear-gradient';
 import { getDrivers } from "../../../services/driverService";
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonList } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 import { ScreenHeader, SearchBox, SectionLabel, Pill, EmptyState, GradientButton, Avatar, C, ui } from "../../../components/JetUI";
 
 interface Driver {
@@ -43,6 +45,8 @@ const BusScreen: React.FC = () => {
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
   
   
+  const [loading, setLoading] = useState(true);
+
   const loadDrivers = async () => {
   try {
     const response = await getDrivers();
@@ -51,14 +55,13 @@ const BusScreen: React.FC = () => {
 
   } catch (error) {
     console.log(error);
+  } finally {
+    setLoading(false);
   }
 };
 
-useFocusEffect(
-  React.useCallback(() => {
-    loadDrivers();
-  }, [])
-);
+// Live: loads on focus, then refreshes every few seconds
+useLiveRefresh(() => loadDrivers());
 
   const handleSearch = () => {
     router.push({
@@ -182,6 +185,7 @@ useFocusEffect(
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 250 }}
             ListEmptyComponent={
+              loading ? <SkeletonList count={4} cardStyle={{ marginHorizontal: 0 }} /> :
               <EmptyState
                 icon={<Ionicons name="people-outline" size={28} color={C.amber} />}
                 title="No drivers yet"

@@ -4,6 +4,19 @@ import Ticket from "../models/Ticket.js";
 import { notify, notifyPassengers } from "./notificationController.js";
 import { getBusBlockReason } from "../utils/busAvailability.js";
 
+// seatNumbers is saved as '["1","2"]', but older tickets may be "1,2" or a single seat
+export const parseSeats = (value) => {
+  if (Array.isArray(value)) return value.map(String);
+  const text = String(value ?? "").trim();
+  if (!text) return [];
+  try {
+    const parsed = JSON.parse(text);
+    return (Array.isArray(parsed) ? parsed : [parsed]).map(String);
+  } catch {
+    return text.split(",").map((s) => s.trim()).filter(Boolean);
+  }
+};
+
 export const createTicket = async (req, res) => {
   try {
     let {
@@ -28,6 +41,22 @@ export const createTicket = async (req, res) => {
     }
 
 
+    // Someone else may have booked the same seat since the seat map was opened
+    const wanted = parseSeats(seatNumbers);
+    if (wanted.length) {
+      const sameTrip = await Ticket.find({ bNumber, busType, date, time }).select("seatNumbers").lean();
+      const taken = new Set(sameTrip.flatMap((t) => parseSeats(t.seatNumbers)));
+      const clash = wanted.filter((s) => taken.has(s));
+      if (clash.length) {
+        return res.status(409).json({
+          success: false,
+          code: "SEAT_TAKEN",
+          seats: clash,
+          message: `Seat ${clash.join(", ")} was just booked by someone else. Please choose another seat.`,
+        });
+      }
+    }
+
     const ticket = new Ticket({
       pickup,
       drop,
@@ -45,7 +74,7 @@ export const createTicket = async (req, res) => {
 
     await ticket.save();
 
-    await notify({
+    notify({
       title: `🎫 New booking on Bus ${bNumber || "-"}`,
       body: `${pfirstName || ""} ${plastName || ""} booked ${noOfTicket || 1} seat(s)${seatNumbers ? ` (${seatNumbers})` : ""}: ${pickup || "?"} → ${drop || "?"}, ${date || ""} ${time || ""}.`,
       type: "ticket",
@@ -54,7 +83,7 @@ export const createTicket = async (req, res) => {
       data: { ticketId: ticket.ticketId },
     });
 
-    await notifyPassengers(pemail, {
+    notifyPassengers(pemail, {
       title: "🎫 Ticket confirmed",
       body: `Ticket ${ticket.ticketId}: ${pickup || "?"} → ${drop || "?"} on ${date || ""} at ${time || ""}. Bus ${bNumber || "-"}${seatNumbers ? `, seat(s) ${seatNumbers}` : ""}. Total LKR ${Number(totalFare || 0).toLocaleString()}.`,
       type: "ticket",
@@ -78,7 +107,7 @@ export const createTicket = async (req, res) => {
 // Get All Tickets
 export const getTickets = async (req, res) => {
   try {
-    const tickets = await Ticket.find().sort({ createdAt: -1 });
+    const tickets = await Ticket.find().sort({ createdAt: -1 }).lean();
 
     res.status(200).json({
       success: true,
@@ -130,13 +159,12 @@ export const getBookedSeats = async (req, res) => {
         time
       },
       "seatNumbers"
-    );
+    ).lean();
 
     let bookedSeats = [];
 
     tickets.forEach((ticket) => {
-      const seats = JSON.parse(ticket.seatNumbers);
-      bookedSeats.push(...seats);
+      bookedSeats.push(...parseSeats(ticket.seatNumbers));
     });
 
     res.status(200).json({
@@ -156,23 +184,15 @@ export const getBookedSeats = async (req, res) => {
 export const getTicketByEmail = async (req, res) => {
   try {
     const { pemail, busType, used } = req.params;
-    console.log("Searching Bus ID:", pemail, busType, used);
     const tickets = await Ticket.find(
       {
         pemail: pemail,
         busType: busType,
         used: used,
       }
-    );
-    console.log("Searching Bus ID:", tickets);
+    ).sort({ createdAt: -1 }).lean();
 
-    if (tickets.length === 0) {
-      return res.status(404).json({
-        success: false,
-        message: "Ticket not found",
-      });
-    }
-
+    // An empty list is a normal answer, not an error
     res.json({
       success: true,
       data: tickets,
@@ -214,7 +234,6 @@ export const generateTicketQRByticketId = async (req, res) => {
         expiresIn: "12h",
       }
     );
-    console.log("Searching Bus ID:", token);
 
     res.json({
       qrToken: token,
@@ -293,7 +312,7 @@ export const verifyTicket = async (req, res) => {
     ticket.usedAt = new Date();
     await ticket.save();
 
-    await notify({
+    notify({
       title: `🎫 Ticket ${ticket.ticketId} scanned`,
       body: `${ticket.pfirstName || ""} ${ticket.plastName || ""} boarded with ${ticket.noOfTicket || 1} seat(s)${ticket.seatNumbers ? ` (${ticket.seatNumbers})` : ""}: ${ticket.pickup} → ${ticket.drop}.`,
       type: "ticket",
@@ -302,7 +321,7 @@ export const verifyTicket = async (req, res) => {
       data: { ticketId: ticket.ticketId },
     });
 
-    await notifyPassengers(ticket.pemail, {
+    notifyPassengers(ticket.pemail, {
       title: "✅ Ticket scanned – have a good trip",
       body: `Ticket ${ticket.ticketId} (${ticket.pickup} → ${ticket.drop}) was used on bus ${ticket.bNumber}.`,
       type: "ticket",

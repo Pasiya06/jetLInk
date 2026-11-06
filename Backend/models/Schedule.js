@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import Counter from "./Counter.js";
+import { nextNumber, maxOf } from "../utils/nextId.js";
 const scheduleSchema = new mongoose.Schema(
   {
     scheduleId: {
@@ -63,11 +63,13 @@ const scheduleSchema = new mongoose.Schema(
 scheduleSchema.pre("save", async function () {
   if (!this.isNew) return;
 
-  const Schedule = mongoose.model("Schedule");
-
-  const count = await Schedule.countDocuments();
-
-  this.scheduleId = count + 1;
+  if (this.scheduleId) return;
+  // Atomic counter: IDs are never reused, even after a schedule is deleted
+  this.scheduleId = await nextNumber("schedule", maxOf(mongoose.model("Schedule"), "scheduleId"));
 });
+
+// ── Indexes: make the app's common searches fast (built automatically on server start) ──
+scheduleSchema.index({ busType: 1, busdate: 1 });
+scheduleSchema.index({ busNo: 1 });
 
 export default mongoose.model("Schedule", scheduleSchema);

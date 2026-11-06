@@ -230,7 +230,8 @@ export const deletePackage = async (req, res) => {
 export const getPackages = async (req, res) => {
   try {
     const packages = await Package.find()
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.status(200).json({
       success: true,

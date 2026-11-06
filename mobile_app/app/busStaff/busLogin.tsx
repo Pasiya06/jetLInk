@@ -6,6 +6,7 @@ import { Alert } from "../../components/JetAlert";
 import { LinearGradient } from 'expo-linear-gradient';
 import { Feather as Icon, AntDesign, Fontisto, EvilIcons, Ionicons } from '@expo/vector-icons';
 import { saveSession } from "../../services/notificationService";
+import { setAuthToken } from "../../services/apiAuth";
 
 
 import FieldError from "../../components/FieldError";
@@ -132,19 +133,17 @@ const login = async () => {
   try {
 
     
-    console.log("Sending password:", password1); // is this defined?
-
     const response = await fetch(`${API_URL}/conductors/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         NIC: verifiedCNIC,
         password: password1,
+        busNumber: verifiedBusno,
       }),
     });
 
     const data = await response.json();
-    console.log("Response:", data); 
 
     if (!data.success) {
       Alert.alert("Login failed", String(data.message || "Please check your details and try again."));
@@ -155,6 +154,8 @@ const login = async () => {
     
 
     
+    // Login token for the staff screens
+    await setAuthToken(data.token);
     // Bus staff alerts: this phone will now receive alerts for this bus
     await saveSession({ role: "staff", busNumber: String(verifiedBusno ?? "") });
 

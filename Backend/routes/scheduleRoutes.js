@@ -9,17 +9,19 @@ import {
   getScheduleByScheduleId,
 } from "../controllers/scheduleController.js";
 
+import { requireRole, requireSelfOrStaff } from "../utils/auth.js";
+
 const router = express.Router();
 
-router.post("/", addSchedule);
+router.post("/", requireRole("admin"), addSchedule);
 
 router.get("/", getSchedules);
 
 router.get("/bus/:busId", getSchedulesByBus);
 
-router.delete("/:id", deleteSchedule);
+router.delete("/:id", requireRole("admin"), deleteSchedule);
 
-router.put("/:id", updateSchedule);
+router.put("/:id", requireRole("admin"), updateSchedule);
 
 router.get("/:scheduleId", getScheduleByScheduleId); 
 

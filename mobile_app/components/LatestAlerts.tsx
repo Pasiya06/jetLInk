@@ -5,6 +5,7 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from "rea
 import { useFocusEffect } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { C, ui } from "./JetUI";
+import { SkeletonBox, SkeletonCircle } from "./Skeleton";
 import {
   AlertRole,
   ServerAlert,
@@ -76,7 +77,7 @@ export default function LatestAlerts({
   useFocusEffect(
     useCallback(() => {
       load();
-      const timer = setInterval(load, 30_000);
+      const timer = setInterval(load, 10_000);
       const unsubscribe = subscribeToNotificationHistory(load);
       return () => {
         clearInterval(timer);
@@ -108,7 +109,17 @@ export default function LatestAlerts({
       </View>
 
       {loading ? (
-        <ActivityIndicator color={C.blue} style={{ marginVertical: 16 }} />
+        <View style={{ gap: 14, paddingVertical: 8 }}>
+          {[0, 1, 2].map((i) => (
+            <View key={i} style={{ flexDirection: "row", alignItems: "center" }}>
+              <SkeletonCircle size={34} />
+              <View style={{ flex: 1, marginLeft: 12, gap: 7 }}>
+                <SkeletonBox width="70%" height={12} />
+                <SkeletonBox width="45%" height={10} />
+              </View>
+            </View>
+          ))}
+        </View>
       ) : failed ? (
         <TouchableOpacity onPress={load} style={s.empty}>
           <Ionicons name="cloud-offline-outline" size={18} color={C.muted} />

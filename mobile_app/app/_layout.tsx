@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { installAuthFetch } from "../services/apiAuth";
 import { Stack, useRouter } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { JetAlertHost } from "../components/JetAlert";
@@ -8,6 +9,9 @@ import {
   addNotificationListeners,
   startServerAlertPolling,
 } from "../services/notificationService";
+
+// Send the login token with every request to our backend
+installAuthFetch();
 
 // Prevent splash screen from auto-hiding before initialization
 SplashScreen.preventAutoHideAsync().catch(() => {});

@@ -17,6 +17,7 @@ import { Feather as Icon, EvilIcons, Fontisto, MaterialCommunityIcons, Entypo, A
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveSession } from '../../services/notificationService';
+import { rememberLogin } from '../../services/apiAuth';
 
 import FieldError from "../../components/FieldError";
 import { useFieldErrors } from "../../utils/validation";
@@ -178,19 +179,26 @@ const loginPassenger = async () => {
       await AsyncStorage.setItem("@jetlink_passenger_nic", String(user.NIC ?? "")).catch(() => {});
       // Passenger alerts: this phone will now receive this passenger's notifications
       await saveSession({ role: "passenger", email: String(user.email || "").toLowerCase() });
-      
+
+      const passengerParams = {
+        Pid: String(user._id ?? ""),
+        Pid1: String(user.passengerId ?? ""),
+        pfirstName: String(user.firstName ?? ""),
+        plastName: String(user.lastName ?? ""),
+        pphoneNumber: String(user.phoneNumber ?? ""),
+        address: String(user.address ?? ""),
+        NIC: String(user.NIC ?? ""),
+        pemail: String(user.email ?? ""),
+      };
+      // Save the login token + details so the app can stay logged in
+      await rememberLogin(
+        { role: "passenger", name: passengerParams.pfirstName, pathname: "/passenger/index1", params: passengerParams },
+        data1.token
+      );
+
       router.push({
         pathname: "/passenger/index1",
-        params: {
-          Pid: user._id,
-          Pid1: user.passengerId,
-          pfirstName: user.firstName,
-          plastName: user.lastName,
-          pphoneNumber: user.phoneNumber,
-          address: user.address,
-          NIC: user.NIC,
-          pemail: user.email,
-        },
+        params: passengerParams,
       });
 
       return;
@@ -217,14 +225,20 @@ const loginPassenger = async () => {
       // Admin alerts: this phone will now receive admin notifications
       await saveSession({ role: "admin" });
       setAdmiEmail(admin.email)
+      const adminParams = {
+        Aid: String(admin._id ?? ""),
+        firstName: String(admin.firstName ?? ""),
+        lastName: String(admin.lastName ?? ""),
+        email: String(admin.email ?? ""),
+      };
+      // Save the login token + details so the app can stay logged in
+      await rememberLogin(
+        { role: "admin", name: adminParams.firstName, pathname: "/admin/index1", params: adminParams },
+        data2.token
+      );
       router.push({
         pathname: "/admin/index1",
-        params: {
-          Aid: admin._id,
-          firstName: admin.firstName,
-          lastName: admin.lastName,
-          email: admin.email,
-        },
+        params: adminParams,
       });
 
       return;

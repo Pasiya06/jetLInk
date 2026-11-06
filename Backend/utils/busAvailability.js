@@ -8,7 +8,7 @@ const key = (busNumber) => String(busNumber || "").trim().toUpperCase();
 export const getEmergencyBusMap = async () => {
   const buses = await Bus.find({
     $or: [{ emergency: true }, { status: { $in: ["accident", "breakdown"] } }],
-  }).select("busNumber status emergencyAt");
+  }).select("busNumber status emergencyAt").lean();
 
   const map = new Map();
   for (const b of buses) {
@@ -35,7 +35,7 @@ export const busKey = key;
 
 // Map of BUS NUMBER -> { busName, noOfSeats } for every bus
 export const getBusInfoMap = async () => {
-  const buses = await Bus.find({}).select("busNumber busName noOfSeats");
+  const buses = await Bus.find({}).select("busNumber busName noOfSeats").lean();
   const map = new Map();
   for (const b of buses) {
     map.set(key(b.busNumber), {

@@ -22,6 +22,17 @@ import otpRoutes from "./routes/otpRoutes.js";
 import packageRoutes from "./routes/packageRoutes.js";
 import tourRoutes from "./routes/tourRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import { readUser } from "./utils/auth.js";
+import { migratePlainPasswords } from "./utils/password.js";
+import Passenger from "./models/Passenger.js";
+import Driver from "./models/Driver.js";
+import Conductor from "./models/Conductor.js";
+import Admin from "./models/Admin.js";
+
+if (!process.env.JWT_SECRET && !process.env.QR_SECRET) {
+  console.error("❌ Add JWT_SECRET (or QR_SECRET) to Backend/.env — it is needed to sign login tokens.");
+  process.exit(1);
+}
 
 
 
@@ -31,6 +42,8 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json());
+// Reads the login token (if any) so routes know who is calling
+app.use(readUser);
 
 // MongoDB Connection
 const mongooseOptions = {
@@ -47,6 +60,10 @@ mongoose
   .connect(process.env.MONGO_URI, mongooseOptions)
   .then(() => {
     console.log("✅ MongoDB Connected Successfully");
+    // Old accounts with plain-text passwords are hashed once (safe to run every start)
+    migratePlainPasswords([Passenger, Driver, Conductor, Admin]).catch((err) =>
+      console.error("Password migration error:", err.message)
+    );
   })
   .catch((err) => {
     console.error("❌ MongoDB Connection Error");

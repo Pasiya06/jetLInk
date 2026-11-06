@@ -452,7 +452,6 @@ const styles = StyleSheet.create({
   hdrEyebrow: { fontSize: 13, fontWeight: "600", color: "rgba(255,255,255,0.85)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 2 },
   hdrSub: { fontSize: 13.5, color: "rgba(255,255,255,0.85)", marginTop: 6 },
   cornerBox: { position: "absolute", top: "18%", bottom: "18%", left: "14%", right: "14%" },
-  corner: { position: "absolute", width: 36, height: 36, borderColor: "#FFFFFF" },
   cTL: { top: 0, left: 0, borderTopWidth: 4, borderLeftWidth: 4, borderTopLeftRadius: 18 },
   cTR: { top: 0, right: 0, borderTopWidth: 4, borderRightWidth: 4, borderTopRightRadius: 18 },
   cBL: { bottom: 0, left: 0, borderBottomWidth: 4, borderLeftWidth: 4, borderBottomLeftRadius: 18 },
