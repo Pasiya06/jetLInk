@@ -23,6 +23,8 @@ import { Ionicons,
   import { LinearGradient } from 'expo-linear-gradient';
 import { useBusNames } from "../../../components/BusName";
 import AlertBadge from "../../../components/AlertBadge";
+import { SkeletonBox } from "../../../components/Skeleton";
+import { useLiveRefresh } from "../../../hooks/useLiveRefresh";
 
 type SeatStatus = 'available' | 'selected' | 'booked';
 
@@ -36,7 +38,22 @@ interface Seat {
 const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 const DEFAULT_SEATS = 54; // used only if the bus has no seat count
-const SEATS_PER_ROW = 6;
+const SEATS_PER_ROW = 5;  // 2 + aisle + 3, like most Sri Lankan buses
+const AISLE_AFTER = 2;    // the aisle comes after the 2nd seat in a row
+
+// Split seat numbers into bus rows. The back row is a full bench with no aisle:
+// if one seat would be left over (e.g. 46 = 8 x 5 + 6), the last row gets 6 seats.
+function seatRows<T>(seats: T[]): { seats: T[]; bench: boolean }[] {
+  const n = seats.length;
+  const benchSize = n > SEATS_PER_ROW && n % SEATS_PER_ROW === 1 ? SEATS_PER_ROW + 1 : 0;
+  const body = benchSize ? seats.slice(0, n - benchSize) : seats;
+  const rows: { seats: T[]; bench: boolean }[] = [];
+  for (let i = 0; i < body.length; i += SEATS_PER_ROW) {
+    rows.push({ seats: body.slice(i, i + SEATS_PER_ROW), bench: false });
+  }
+  if (benchSize) rows.push({ seats: seats.slice(n - benchSize), bench: true });
+  return rows;
+}
 
 
 export default function SeatSelectionScreen() {
@@ -45,45 +62,86 @@ export default function SeatSelectionScreen() {
     const params = useLocalSearchParams();
     const { busLabel, busSeats } = useBusNames();
     const [BookedSeats, setBookedSeats] = useState<number[]>([]);
-    const BOOKED_SEATS = BookedSeats;
-    // Seat count of this bus (from the timetable, else from the bus list)
+
+    // ---- Seats of THIS bus, looked up by its bus number ----
+    const [busSeatCount, setBusSeatCount] = useState<number | null>(null);
+    const [loadingBus, setLoadingBus] = useState(true);
+
+    useEffect(() => {
+      let cancelled = false;
+      (async () => {
+        try {
+          const res = await fetch(`${API_URL}/buses/profile/${encodeURIComponent(String(params.bNumber ?? ""))}`);
+          const data = await res.json();
+          const n = parseInt(String(data?.data?.noOfSeats ?? ""), 10);
+          if (!cancelled && res.ok && n > 0) setBusSeatCount(n);
+        } catch (error) {
+          console.log("Bus seats error:", error);
+        } finally {
+          if (!cancelled) setLoadingBus(false);
+        }
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }, [params.bNumber]);
+
+    // The bus record first; then the timetable / bus list; then a default
     const TOTAL_SEATS =
-      parseInt(String(params.noOfSeats || busSeats(params.bNumber) || ""), 10) || DEFAULT_SEATS;
+      busSeatCount ||
+      parseInt(String(params.noOfSeats || busSeats(params.bNumber) || ""), 10) ||
+      DEFAULT_SEATS;
+
+    // ---- Seats already booked on this trip (refreshed every few seconds) ----
     const getBookedSeats = async () => {
       try {
-        const response = await fetch(
-          `${API_URL}/tickets/booked-seats?bNumber=${params.bNumber}&busType=${params.busType}&date=${params.date}&time=${params.depaturetime}`
-        );
-
+        const query =
+          `bNumber=${encodeURIComponent(String(params.bNumber ?? ""))}` +
+          `&busType=${encodeURIComponent(String(params.busType ?? ""))}` +
+          `&date=${encodeURIComponent(String(params.date ?? ""))}` +
+          `&time=${encodeURIComponent(String(params.depaturetime ?? ""))}`;
+        const response = await fetch(`${API_URL}/tickets/booked-seats?${query}`);
         const data = await response.json();
 
         if (response.ok && data.success) {
-          console.log(data.bookedSeats);
-
-          setBookedSeats(data.bookedSeats);
+          // The server may send "12" or 12: compare as numbers
+          const list = (data.bookedSeats || [])
+            .map((x: unknown) => parseInt(String(x), 10))
+            .filter((x: number) => Number.isFinite(x));
+          setBookedSeats(list);
         }
       } catch (error) {
         console.log(error);
       }
     };
 
-    useEffect(() => {
-      getBookedSeats();
-    }, []);
+    useLiveRefresh(() => getBookedSeats());
 
+    // Rebuild the seat map when the bus or the booked seats change,
+    // keeping the passenger's selection (unless someone else just booked it)
     useEffect(() => {
-      const updatedSeats: Seat[] = Array.from(
-        { length: TOTAL_SEATS },
-        (_, i) => ({
-          id: i + 1,
-          status: BookedSeats.includes(i + 1)
+      setSeats((prev) => {
+        const wasSelected = new Set(prev.filter((x) => x.status === "selected").map((x) => x.id));
+        const lost = [...wasSelected].filter((id) => BookedSeats.includes(id));
+        if (lost.length) {
+          Alert.alert(
+            "Seat just booked",
+            `Seat ${lost.join(", ")} was booked by someone else. Please choose another seat.`
+          );
+        }
+        return Array.from({ length: TOTAL_SEATS }, (_, i) => {
+          const id = i + 1;
+          const status: SeatStatus = BookedSeats.includes(id)
             ? "booked"
-            : "available",
-        })
-      );
-
-      setSeats(updatedSeats);
+            : wasSelected.has(id)
+            ? "selected"
+            : "available";
+          return { id, status };
+        });
+      });
     }, [BookedSeats, TOTAL_SEATS]);
+
+    const availableCount = Math.max(0, TOTAL_SEATS - BookedSeats.filter((id) => id <= TOTAL_SEATS).length);
     
     const router = useRouter();
     const [activeTab, setActiveTab] = useState('');
@@ -107,13 +165,7 @@ export default function SeatSelectionScreen() {
         );
       };
     
-      const rows = useMemo(() => {
-        const chunked: Seat[][] = [];
-        for (let i = 0; i < seats.length; i += SEATS_PER_ROW) {
-          chunked.push(seats.slice(i, i + SEATS_PER_ROW));
-        }
-        return chunked;
-      }, [seats]);
+      const rows = useMemo(() => seatRows(seats), [seats]);
     
        const handleConfirm = () => {
         if (selectedSeats.length === 0) return;
@@ -178,22 +230,47 @@ export default function SeatSelectionScreen() {
 
         {/* Seat map */}
         <View style={styles.seatMapCard}>
+          {/* This bus's seat count */}
+          <View style={styles.seatInfo}>
+            {loadingBus ? (
+              <SkeletonBox width={170} height={14} />
+            ) : (
+              <Text style={styles.seatInfoText}>
+                {TOTAL_SEATS} seats · <Text style={{ color: C.green }}>{availableCount} available</Text>
+              </Text>
+            )}
+          </View>
+
           <View style={styles.busFront}>
             <MaterialCommunityIcons name="steering" size={22} color={C.muted} />
             <Text style={styles.busFrontText}>Front</Text>
           </View>
 
-          {rows.map((row, rowIndex) => (
-            <View key={rowIndex} style={styles.seatRow}>
-              {row.map((seat, seatIndex) => (
-                <React.Fragment key={seat.id}>
-                  <SeatButton seat={seat} onPress={() => toggleSeat(seat.id)} />
-                  {/* aisle gap after 2nd seat in each row */}
-                  {seatIndex === 1 && <View style={styles.aisleGap} />}
-                </React.Fragment>
-              ))}
-            </View>
-          ))}
+          {loadingBus ? (
+            // Placeholder seats while the bus's seat count loads
+            Array.from({ length: 6 }).map((_, r) => (
+              <View key={r} style={styles.seatRow}>
+                {Array.from({ length: SEATS_PER_ROW }).map((__, i) => (
+                  <React.Fragment key={i}>
+                    <SkeletonBox width={SEAT_SIZE} height={SEAT_SIZE} radius={11} style={{ marginHorizontal: 4 }} />
+                    {i === AISLE_AFTER - 1 && <View style={styles.aisleGap} />}
+                  </React.Fragment>
+                ))}
+              </View>
+            ))
+          ) : (
+            rows.map((row, rowIndex) => (
+              <View key={rowIndex} style={styles.seatRow}>
+                {row.seats.map((seat, seatIndex) => (
+                  <React.Fragment key={seat.id}>
+                    <SeatButton seat={seat} onPress={() => toggleSeat(seat.id)} />
+                    {/* aisle after the 2nd seat (the back bench has no aisle) */}
+                    {!row.bench && seatIndex === AISLE_AFTER - 1 && <View style={styles.aisleGap} />}
+                  </React.Fragment>
+                ))}
+              </View>
+            ))
+          )}
 
           {/* Legend */}
           <View style={styles.legendRow}>
@@ -479,6 +556,16 @@ const styles = StyleSheet.create({
   },
   aisleGap: {
     width: 20,
+  },
+  seatInfo: {
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  seatInfoText: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: C.ink,
   },
   seat: {
     width: SEAT_SIZE,

@@ -24,6 +24,14 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScreenHeader, SectionLabel, Pill, EmptyState, C, ui } from "../../../components/JetUI";
 import AlertBadge from "../../../components/AlertBadge";
+import RouteMapModal, { RouteMapButton, RouteInfo } from "../../../components/RouteMapModal";
+import { splitStops, displayName } from "../../../utils/placeGeocode";
+
+// "KADAWATHA,KEGALLE" -> "Kadawatha • Kegalle"
+const prettyStops = (stops?: string) => {
+  const list = splitStops(stops).map(displayName);
+  return list.length ? list.join("  •  ") : "No stops";
+};
 
 
 
@@ -79,6 +87,18 @@ const JetLinkInterface: React.FC = () => {
   const [busschedData, setBusschedData] = useState<Bussched[]>([]);
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Route map popup (pickup, stops and drop-off on a map)
+  const [mapRoute, setMapRoute] = useState<RouteInfo | null>(null);
+  const openMap = (item: Bussched) =>
+    setMapRoute({
+      title: item.busName ? `${item.busName} · ${item.busNo}` : item.busNo,
+      pickup: item.pickuploca,
+      drop: item.dropoffloca,
+      stops: item.stops,
+      departure: item.depaturetime,
+      arrival: item.arrivaltime,
+    });
   
   const loadschedBuses = async () => {
     try {
@@ -183,8 +203,9 @@ const JetLinkInterface: React.FC = () => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <Text style={styles.infoLabel}>Stops</Text>
-                            <Text style={styles.infoValue}>{item.stops}</Text>
+                            <Text style={styles.infoValue}>{prettyStops(item.stops)}</Text>
                         </View>
+                        <RouteMapButton onPress={() => openMap(item)} />
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -269,8 +290,9 @@ const JetLinkInterface: React.FC = () => {
                         </View>
                         <View style={{ flex: 1 }}>
                             <Text style={styles.infoLabel}>Stops</Text>
-                            <Text style={styles.infoValue}>{item.stops}</Text>
+                            <Text style={styles.infoValue}>{prettyStops(item.stops)}</Text>
                         </View>
+                        <RouteMapButton onPress={() => openMap(item)} />
                         </View>
                     </View>
                 </TouchableOpacity>
@@ -323,6 +345,8 @@ const JetLinkInterface: React.FC = () => {
             }
           />
         </View>
+
+      <RouteMapModal route={mapRoute} onClose={() => setMapRoute(null)} />
 
       <SearchPanel
           visible={isSearching}

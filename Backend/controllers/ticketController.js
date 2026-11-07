@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import cron from "node-cron";
 import Ticket from "../models/Ticket.js";
+import Bus from "../models/Bus.js";
 import { notify, notifyPassengers } from "./notificationController.js";
 import { getBusBlockReason } from "../utils/busAvailability.js";
 
@@ -43,6 +44,23 @@ export const createTicket = async (req, res) => {
 
     // Someone else may have booked the same seat since the seat map was opened
     const wanted = parseSeats(seatNumbers);
+
+    // Seats must exist on this bus (e.g. no seat 50 on a 42-seat bus)
+    if (wanted.length) {
+      const bus = await Bus.findOne({ busNumber: bNumber }).select("noOfSeats").lean();
+      const capacity = parseInt(String(bus?.noOfSeats ?? ""), 10);
+      if (capacity > 0) {
+        const outside = wanted.filter((s) => /^\d+$/.test(s) && (Number(s) < 1 || Number(s) > capacity));
+        if (outside.length) {
+          return res.status(400).json({
+            success: false,
+            code: "SEAT_NOT_ON_BUS",
+            message: `This bus has ${capacity} seats. Seat ${outside.join(", ")} doesn't exist on it.`,
+          });
+        }
+      }
+    }
+
     if (wanted.length) {
       const sameTrip = await Ticket.find({ bNumber, busType, date, time }).select("seatNumbers").lean();
       const taken = new Set(sameTrip.flatMap((t) => parseSeats(t.seatNumbers)));
@@ -166,6 +184,8 @@ export const getBookedSeats = async (req, res) => {
     tickets.forEach((ticket) => {
       bookedSeats.push(...parseSeats(ticket.seatNumbers));
     });
+    // Seat numbers go back as numbers (e.g. 12), the way the seat map uses them
+    bookedSeats = bookedSeats.map((s) => (/^\d+$/.test(s) ? Number(s) : s));
 
     res.status(200).json({
       success: true,
