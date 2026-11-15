@@ -113,10 +113,15 @@ export const FlatmateLogin: React.FC = () => {
             const data = await res.json();
 
             if (!data.success) {
-                // Wrong / expired code: stay here and let the passenger try again
-                setError(data.message || "Invalid or expired code. Check the code and try again.");
-                setDigits(Array(OTP_LENGTH).fill(""));
-                inputRefs.current[0]?.focus();
+                // Wrong / expired code: the payment is not completed, show the Payment Failed screen.
+                // All booking details are passed on so "Try again" can return to the payment page.
+                router.replace({
+                  pathname: "/passenger/tours/paymentFail",
+                  params: {
+                    ...params,
+                    reason: String(data.message || "Invalid or expired code."),
+                  },
+                });
             }
             
             else{
