@@ -42,8 +42,10 @@ export const createTicket = async (req, res) => {
     }
 
 
-    // Someone else may have booked the same seat since the seat map was opened
-    const wanted = parseSeats(seatNumbers);
+    // Someone else may have booked the same seat since the seat map was opened.
+    // Normal-way buses have no seat selection and send seatNumbers = 0 ("no seat"),
+    // so "0" is a placeholder, not a seat: skip it in the seat checks.
+    const wanted = parseSeats(seatNumbers).filter((s) => s !== "0");
 
     // Seats must exist on this bus (e.g. no seat 50 on a 42-seat bus)
     if (wanted.length) {
