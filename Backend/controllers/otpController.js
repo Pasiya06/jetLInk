@@ -68,21 +68,34 @@ export const sendOTP = async (req, res) => {
     }
 };
 
-// Bus staff logging in: give a staff token only if this email belongs to the
-// driver or conductor assigned to that bus
+// Bus staff logging in: give a staff token if this email belongs to a registered
+// driver or conductor and the bus exists.
+// NOTE: bus.driverNIC / bus.conductorNIC are only filled in AFTER login (by the
+// location update, which itself needs this token), so they can't be required here.
+// We only refuse if the bus is currently held by a *different* crew.
+const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const isCrewSet = (v) => {
+    const s = String(v ?? "").trim();
+    return s !== "" && s.toLowerCase() !== "not";
+};
+
 const staffTokenFor = async (email, busNumber) => {
     const bus = busNumber
         ? await Bus.findOne({ busNumber: String(busNumber).trim() }).select("busNumber driverNIC conductorNIC").lean()
         : null;
     if (!bus) return null;
+
+    const emailMatch = { email: new RegExp(`^${escapeRegex(email)}$`, "i") };
     const [driver, conductor] = await Promise.all([
-        Driver.findOne({ email }).select("_id NIC").lean(),
-        Conductor.findOne({ email }).select("_id NIC").lean(),
+        Driver.findOne(emailMatch).select("_id NIC").lean(),
+        Conductor.findOne(emailMatch).select("_id NIC").lean(),
     ]);
-    const person =
-        (conductor && conductor.NIC === bus.conductorNIC && conductor) ||
-        (driver && driver.NIC === bus.driverNIC && driver);
+    const person = conductor || driver;
     if (!person) return null;
+
+    const busTaken = isCrewSet(bus.conductorNIC) || isCrewSet(bus.driverNIC);
+    if (busTaken && person.NIC !== bus.conductorNIC && person.NIC !== bus.driverNIC) return null;
+
     return signLoginToken({ id: person._id, role: "staff", email, busNumber: bus.busNumber });
 };
 

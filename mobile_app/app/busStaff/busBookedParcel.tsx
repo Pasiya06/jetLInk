@@ -18,7 +18,6 @@ import {
   MaterialCommunityIcons
 } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ScrollView } from 'react-native-reanimated/lib/typescript/Animated';
 import { ScreenHeader, SearchBox, SectionLabel, Pill, EmptyState, GradientButton, ParcelRow, C, ui } from "../../components/JetUI";
 import AlertBadge from "../../components/AlertBadge";
 import { SkeletonList } from "../../components/Skeleton";

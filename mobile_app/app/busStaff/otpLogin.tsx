@@ -134,6 +134,12 @@ export const FlatmateLogin: React.FC = () => {
         return;
       }
 
+      // Without a staff token every bus-staff screen gets "Please log in again" (401)
+      if (!data.token) {
+        setError("This crew can't sign in to this bus. Check the bus number and crew details.");
+        return;
+      }
+
       // Remember the bus on this phone so its alerts (bookings, parcels, tours…) are shown
       await saveSession({ role: "staff", busNumber: String(params.busNo ?? "").trim().toUpperCase() });
 
